@@ -61,15 +61,18 @@
   </header>
 
   <main class="p-4 max-w-md mx-auto space-y-6">
-    <nav class="glass-pill p-1.5 rounded-2xl flex justify-between items-center shadow-lg">
-      <button id="tabHomeBtn" onclick="switchTab('home')" class="flex-1 py-2.5 rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 bg-indigo-600/80 text-white shadow-md shadow-indigo-500/30">
+    <nav class="glass-pill p-1.5 rounded-2xl flex justify-between items-center shadow-lg gap-1">
+      <button id="tabHomeBtn" onclick="switchTab('home')" class="flex-1 py-2 rounded-xl font-semibold text-[11px] transition flex items-center justify-center gap-1 bg-indigo-600/80 text-white shadow-md shadow-indigo-500/30">
         <span>🏠</span> <span>Accueil</span>
       </button>
-      <button id="tabCollectionBtn" onclick="switchTab('collection')" class="flex-1 py-2.5 rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 text-gray-400 hover:text-white">
-        <span>📚</span> <span>Ma Collection</span>
+      <button id="tabCollectionBtn" onclick="switchTab('collection')" class="flex-1 py-2 rounded-xl font-semibold text-[11px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white">
+        <span>📚</span> <span>Collection</span>
       </button>
-      <button id="tabStatsBtn" onclick="switchTab('stats')" class="flex-1 py-2.5 rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 text-gray-400 hover:text-white">
+      <button id="tabStatsBtn" onclick="switchTab('stats')" class="flex-1 py-2 rounded-xl font-semibold text-[11px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white">
         <span>📊</span> <span>Stats</span>
+      </button>
+      <button id="tabSettingsBtn" onclick="switchTab('settings')" class="flex-1 py-2 rounded-xl font-semibold text-[11px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white">
+        <span>⚙️</span> <span>Paramètres</span>
       </button>
     </nav>
 
@@ -167,7 +170,6 @@
 
     <!-- STATS -->
     <div id="tabStats" class="hidden space-y-4">
-      <!-- Choix d'affichage Barres vs Camembert -->
       <div class="glass-pill p-1.5 rounded-2xl flex justify-between items-center shadow-md">
         <button id="chartStyleBarsBtn" onclick="setChartStyle('bars')" class="flex-1 py-2 rounded-xl font-bold text-xs transition bg-indigo-600 text-white shadow">
           📊 Mode Barres
@@ -188,7 +190,6 @@
         </div>
       </div>
 
-      <!-- Valeurs d'Achat vs Estimée -->
       <div class="grid grid-cols-2 gap-3">
         <div class="glass-card p-4 rounded-3xl text-center">
           <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Valeur D'achat</p>
@@ -205,7 +206,6 @@
         <p id="statAvgPrice" class="text-xl font-black text-indigo-400 mt-0.5">0 €</p>
       </div>
 
-      <!-- Detail Formats -->
       <div class="glass-card p-4 rounded-3xl space-y-3 border border-white/10">
         <p class="text-xs font-bold text-gray-300 uppercase tracking-wider">Répartition par Format</p>
         <div id="statFormatsList" class="space-y-2 text-xs text-gray-300"></div>
@@ -214,7 +214,6 @@
         </div>
       </div>
 
-      <!-- Detail Boîtiers -->
       <div class="glass-card p-4 rounded-3xl space-y-3 border border-white/10">
         <p class="text-xs font-bold text-gray-300 uppercase tracking-wider">Répartition par Boîtier</p>
         <div id="statEditionsList" class="space-y-2 text-xs text-gray-300"></div>
@@ -223,7 +222,6 @@
         </div>
       </div>
 
-      <!-- Detail Lieux d'Achat -->
       <div class="glass-card p-4 rounded-3xl space-y-3 border border-white/10">
         <p class="text-xs font-bold text-gray-300 uppercase tracking-wider">Répartition par Lieu d'achat</p>
         <div id="statLocationsList" class="space-y-2 text-xs text-gray-300"></div>
@@ -232,12 +230,39 @@
         </div>
       </div>
 
-      <!-- Detail Genres -->
       <div class="glass-card p-4 rounded-3xl space-y-3 border border-white/10">
         <p class="text-xs font-bold text-gray-300 uppercase tracking-wider">Répartition par Genre</p>
         <div id="statGenresList" class="space-y-2 text-xs text-gray-300"></div>
         <div id="chartContainerGenre" class="hidden max-w-[220px] mx-auto py-2">
           <canvas id="chartGenre"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- PARAMETRES -->
+    <div id="tabSettings" class="hidden space-y-4">
+      <div class="glass-card p-4 rounded-3xl border border-white/10 space-y-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">📊</span>
+          <div>
+            <h3 class="text-sm font-bold text-white">Sauvegarde & Exportation</h3>
+            <p class="text-[11px] text-gray-400">Téléchargez l'intégralité de votre collection au format Excel.</p>
+          </div>
+        </div>
+        <button onclick="exportToExcel()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-2xl text-xs shadow-lg shadow-emerald-600/30 transition transform active:scale-95 flex items-center justify-center gap-2">
+          <span>📤 Export Excel (.xlsx)</span>
+        </button>
+      </div>
+
+      <div class="glass-card p-4 rounded-3xl border border-white/10 space-y-2 text-xs text-gray-300">
+        <h3 class="text-sm font-bold text-white mb-1">ℹ️ Informations</h3>
+        <div class="flex justify-between border-b border-white/10 py-1.5">
+          <span class="text-gray-400">Total Blu-ray :</span>
+          <span id="settingsTotalCount" class="font-bold text-indigo-300">0</span>
+        </div>
+        <div class="flex justify-between py-1.5">
+          <span class="text-gray-400">Statut Synchro :</span>
+          <span class="font-bold text-emerald-400">Connecté au Cloud ☁️</span>
         </div>
       </div>
     </div>
@@ -264,7 +289,7 @@
     let collection = [];
     let isListView = false;
     let html5QrcodeScanner = null;
-    let chartStyle = 'bars'; // 'bars' ou 'pie'
+    let chartStyle = 'bars';
     let chartInstances = {};
 
     document.addEventListener('DOMContentLoaded', async () => {
@@ -317,6 +342,35 @@
       if (error) console.error("Delete error:", error);
     }
 
+    // --- EXPORT EXCEL ---
+    function exportToExcel() {
+      if (collection.length === 0) return showToast("Votre collection est vide.");
+
+      showToast("Génération du fichier Excel...");
+
+      const excelData = collection.map(m => {
+        const genresStr = m.genres ? m.genres.map(g => typeof g === 'object' ? g.name : g).join(', ') : '';
+        return {
+          'Titre': m.title,
+          'Format': m.format || 'Blu-ray 1080p',
+          'Boîtier': m.editionType || 'Amaray',
+          'Prix d\'achat (€)': m.purchasePrice ? parseFloat(m.purchasePrice) : '',
+          'Valeur Estimée (€)': m.estimatedPrice ? parseFloat(m.estimatedPrice) : '',
+          'Lieu d\'achat': m.purchaseLocation || '',
+          'Genres': genresStr,
+          'Vu': m.seen ? 'Oui' : 'Non',
+          'Date d\'ajout': m.addedAt ? new Date(m.addedAt).toLocaleDateString('fr-FR') : ''
+        };
+      });
+
+      const worksheet = XLSX.utils.json_to_sheet(excelData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Ma Collection");
+
+      XLSX.writeFile(workbook, "Ma_Collection_Bluray.xlsx");
+      showToast("Exportation terminée ! 📥");
+    }
+
     // --- IMPORT EXCEL ---
     async function importExcel(event) {
       const file = event.target.files[0];
@@ -343,10 +397,10 @@
 
             const format = row['Format'] || row['format'] || 'Blu-ray 1080p';
             const editionType = row['Boitier'] || row['boitier'] || row['Édition'] || 'Amaray';
-            const price = row['Prix'] || row['prix'] || row['Prix d\'achat'] || '';
-            const estimatedPrice = row['Estimation'] || row['estimation'] || row['Valeur Estimée'] || row['Valeur'] || '';
+            const price = row['Prix'] || row['prix'] || row['Prix d\'achat'] || row['Prix d\'achat (€)'] || '';
+            const estimatedPrice = row['Estimation'] || row['estimation'] || row['Valeur Estimée'] || row['Valeur Estimée (€)'] || row['Valeur'] || '';
             const location = row['Lieu'] || row['Magasin'] || row['Lieu d\'achat'] || '';
-            const genre = row['Genre'] || row['genre'] || '';
+            const genre = row['Genre'] || row['genre'] || row['Genres'] || '';
             const seenRaw = String(row['Vu'] || row['vu'] || '').toLowerCase();
             const seen = (seenRaw === 'oui' || seenRaw === 'true' || seenRaw === '1');
 
@@ -432,16 +486,17 @@
     }
 
     function switchTab(tab) {
-      const tabs = ['Home', 'Collection', 'Stats'];
+      const tabs = ['Home', 'Collection', 'Stats', 'Settings'];
       tabs.forEach(t => {
         document.getElementById(`tab${t}`).classList.add('hidden');
-        document.getElementById(`tab${t}Btn`).className = "flex-1 py-2.5 rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 text-gray-400 hover:text-white";
+        document.getElementById(`tab${t}Btn`).className = "flex-1 py-2 rounded-xl font-semibold text-[11px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white";
       });
 
       document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.remove('hidden');
-      document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}Btn`).className = "flex-1 py-2.5 rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 bg-indigo-600/80 text-white shadow-md shadow-indigo-500/30";
+      document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}Btn`).className = "flex-1 py-2 rounded-xl font-semibold text-[11px] transition flex items-center justify-center gap-1 bg-indigo-600/80 text-white shadow-md shadow-indigo-500/30";
 
       if (tab === 'stats') renderStats();
+      if (tab === 'settings') document.getElementById('settingsTotalCount').innerText = collection.length;
     }
 
     // --- SCANNER ---
@@ -653,41 +708,35 @@
     function renderStats() {
       document.getElementById('statTotalMovies').innerText = collection.length;
       
-      // Prix d'Achat Total & Moyen
       const prices = collection.map(m => parseFloat(m.purchasePrice)).filter(p => !isNaN(p) && p > 0);
       const totalVal = prices.reduce((a, b) => a + b, 0);
       document.getElementById('statTotalValue').innerText = `${totalVal.toFixed(2)} €`;
       document.getElementById('statAvgPrice').innerText = prices.length > 0 ? `${(totalVal / prices.length).toFixed(2)} €` : '0.00 €';
 
-      // Valeur Estimée Totale
       const estimatedPrices = collection.map(m => parseFloat(m.estimatedPrice)).filter(p => !isNaN(p) && p > 0);
       const totalEstimatedVal = estimatedPrices.reduce((a, b) => a + b, 0);
       document.getElementById('statTotalEstimatedValue').innerText = `${totalEstimatedVal.toFixed(2)} €`;
 
       document.getElementById('statSeenMovies').innerText = `${collection.filter(m => m.seen).length} / ${collection.length}`;
 
-      // Formats
       const formats = {};
       collection.forEach(m => {
         const fmt = m.format || 'Blu-ray 1080p';
         formats[fmt] = (formats[fmt] || 0) + 1;
       });
 
-      // Boîtiers
       const editions = {};
       collection.forEach(m => {
         const ed = m.editionType || 'Amaray';
         editions[ed] = (editions[ed] || 0) + 1;
       });
 
-      // Lieux d'Achat
       const locations = {};
       collection.forEach(m => {
         const loc = (m.purchaseLocation && m.purchaseLocation.trim() !== '') ? m.purchaseLocation.trim() : 'Non renseigné';
         locations[loc] = (locations[loc] || 0) + 1;
       });
 
-      // Genres
       const genres = {};
       collection.forEach(m => {
         if (m.genres && Array.isArray(m.genres) && m.genres.length > 0) {
