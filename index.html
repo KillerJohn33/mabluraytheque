@@ -155,17 +155,6 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 <!-- ONGLET COLLECTION AVEC FILTRES AVANCÉS -->
 <div id="tabCollection" class="hidden space-y-4">
-<div class="glass-card p-3 rounded-2xl flex items-center justify-between gap-2 border border-indigo-500/30">
-<div class="text-xs">
-<p class="font-bold text-indigo-300">Importer un fichier Excel</p>
-<p class="text-[10px] text-gray-400">Format .xlsx / .xls</p>
-</div>
-<label class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-3 py-2 rounded-xl text-xs cursor-pointer shadow transition active:scale-95">
-📥 Choisir
-<input type="file" id="excelInput" accept=".xlsx, .xls" class="hidden" onchange="importExcel(event)">
-</label>
-</div>
-
 <!-- BARRE DE FILTRES ET DE TRI AVANCÉS -->
 <div class="glass-card p-3 rounded-2xl space-y-2 border border-white/10">
 <div class="flex items-center justify-between border-b border-white/10 pb-2">
