@@ -10,6 +10,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- LIBRAIRIE EXCEL (SheetJS) -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- LIBRAIRIE CHART.JS POUR DIAGRAMMES CIRCULAIRES -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       background: radial-gradient(circle at 50% -20%, #2e1065, #0f172a, #030712);
@@ -164,6 +166,16 @@
 
     <!-- STATS -->
     <div id="tabStats" class="hidden space-y-4">
+      <!-- Choix d'affichage Barres vs Camembert -->
+      <div class="glass-pill p-1.5 rounded-2xl flex justify-between items-center shadow-md">
+        <button id="chartStyleBarsBtn" onclick="setChartStyle('bars')" class="flex-1 py-2 rounded-xl font-bold text-xs transition bg-indigo-600 text-white shadow">
+          📊 Mode Barres
+        </button>
+        <button id="chartStylePieBtn" onclick="setChartStyle('pie')" class="flex-1 py-2 rounded-xl font-bold text-xs transition text-gray-400 hover:text-white">
+          ⭕ Diagramme Circulaire
+        </button>
+      </div>
+
       <div class="grid grid-cols-2 gap-3">
         <div class="glass-card p-4 rounded-3xl text-center">
           <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Blu-ray</p>
@@ -186,14 +198,40 @@
         </div>
       </div>
 
-      <div class="glass-card p-4 rounded-3xl space-y-2 border border-white/10">
+      <!-- Detail Formats -->
+      <div class="glass-card p-4 rounded-3xl space-y-3 border border-white/10">
         <p class="text-xs font-bold text-gray-300 uppercase tracking-wider">Répartition par Format</p>
-        <div id="statFormatsList" class="space-y-1.5 text-xs text-gray-300"></div>
+        <div id="statFormatsList" class="space-y-2 text-xs text-gray-300"></div>
+        <div id="chartContainerFormat" class="hidden max-w-[220px] mx-auto py-2">
+          <canvas id="chartFormat"></canvas>
+        </div>
       </div>
 
-      <div class="glass-card p-4 rounded-3xl space-y-2 border border-white/10">
+      <!-- Detail Boîtiers -->
+      <div class="glass-card p-4 rounded-3xl space-y-3 border border-white/10">
         <p class="text-xs font-bold text-gray-300 uppercase tracking-wider">Répartition par Boîtier</p>
-        <div id="statEditionsList" class="space-y-1.5 text-xs text-gray-300"></div>
+        <div id="statEditionsList" class="space-y-2 text-xs text-gray-300"></div>
+        <div id="chartContainerEdition" class="hidden max-w-[220px] mx-auto py-2">
+          <canvas id="chartEdition"></canvas>
+        </div>
+      </div>
+
+      <!-- Detail Lieux d'Achat -->
+      <div class="glass-card p-4 rounded-3xl space-y-3 border border-white/10">
+        <p class="text-xs font-bold text-gray-300 uppercase tracking-wider">Répartition par Lieu d'achat</p>
+        <div id="statLocationsList" class="space-y-2 text-xs text-gray-300"></div>
+        <div id="chartContainerLocation" class="hidden max-w-[220px] mx-auto py-2">
+          <canvas id="chartLocation"></canvas>
+        </div>
+      </div>
+
+      <!-- Detail Genres -->
+      <div class="glass-card p-4 rounded-3xl space-y-3 border border-white/10">
+        <p class="text-xs font-bold text-gray-300 uppercase tracking-wider">Répartition par Genre</p>
+        <div id="statGenresList" class="space-y-2 text-xs text-gray-300"></div>
+        <div id="chartContainerGenre" class="hidden max-w-[220px] mx-auto py-2">
+          <canvas id="chartGenre"></canvas>
+        </div>
       </div>
     </div>
   </main>
@@ -219,6 +257,8 @@
     let collection = [];
     let isListView = false;
     let html5QrcodeScanner = null;
+    let chartStyle = 'bars'; // 'bars' ou 'pie'
+    let chartInstances = {};
 
     document.addEventListener('DOMContentLoaded', async () => {
       const searchInput = document.getElementById('searchInput');
@@ -297,9 +337,12 @@
             const format = row['Format'] || row['format'] || 'Blu-ray 1080p';
             const editionType = row['Boitier'] || row['boitier'] || row['Édition'] || 'Amaray';
             const price = row['Prix'] || row['prix'] || '';
-            const location = row['Lieu'] || row['Magasin'] || '';
+            const location = row['Lieu'] || row['Magasin'] || row['Lieu d\'achat'] || '';
+            const genre = row['Genre'] || row['genre'] || '';
             const seenRaw = String(row['Vu'] || row['vu'] || '').toLowerCase();
             const seen = (seenRaw === 'oui' || seenRaw === 'true' || seenRaw === '1');
+
+            const genresArray = genre ? String(genre).split(',').map(g => g.trim()) : [];
 
             const newMovie = { 
               id: 'custom_' + Date.now() + '_' + Math.floor(Math.random() * 1000), 
@@ -310,7 +353,7 @@
               editionType: String(editionType), 
               purchaseLocation: String(location), 
               purchasePrice: price ? String(price) : '', 
-              genres: [], 
+              genres: genresArray, 
               seen: seen, 
               addedAt: Date.now()
             };
@@ -464,6 +507,18 @@
 
       showToast("Sauvegarde dans le Cloud...");
 
+      // Récupération des genres via TMDB avant enregistrement
+      let fetchedGenres = [];
+      if (!String(id).startsWith('custom_')) {
+        try {
+          const res = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=fr-FR`);
+          if (res.ok) {
+            const data = await res.json();
+            fetchedGenres = data.genres ? data.genres.map(g => g.name) : [];
+          }
+        } catch (e) { console.error(e); }
+      }
+
       const newMovie = { 
         id: String(id), 
         title: title, 
@@ -473,7 +528,7 @@
         editionType: 'Amaray', 
         purchaseLocation: '', 
         purchasePrice: '', 
-        genres: [], 
+        genres: fetchedGenres, 
         seen: false, 
         addedAt: Date.now()
       };
@@ -506,7 +561,7 @@
       if (item) {
         item[key] = value;
         await updateMovieInCloud(item);
-        if(['format', 'seen', 'editionType', 'purchasePrice'].includes(key)) renderCollection();
+        if(['format', 'seen', 'editionType', 'purchasePrice', 'purchaseLocation'].includes(key)) renderCollection();
       }
     }
 
@@ -577,6 +632,14 @@
       });
     }
 
+    // --- GESTION DES STATS ---
+    function setChartStyle(style) {
+      chartStyle = style;
+      document.getElementById('chartStyleBarsBtn').className = style === 'bars' ? "flex-1 py-2 rounded-xl font-bold text-xs transition bg-indigo-600 text-white shadow" : "flex-1 py-2 rounded-xl font-bold text-xs transition text-gray-400 hover:text-white";
+      document.getElementById('chartStylePieBtn').className = style === 'pie' ? "flex-1 py-2 rounded-xl font-bold text-xs transition bg-indigo-600 text-white shadow" : "flex-1 py-2 rounded-xl font-bold text-xs transition text-gray-400 hover:text-white";
+      renderStats();
+    }
+
     function renderStats() {
       document.getElementById('statTotalMovies').innerText = collection.length;
       const prices = collection.map(m => parseFloat(m.purchasePrice)).filter(p => !isNaN(p) && p > 0);
@@ -585,31 +648,103 @@
       document.getElementById('statAvgPrice').innerText = prices.length > 0 ? `${(totalVal / prices.length).toFixed(2)} €` : '0.00 €';
       document.getElementById('statSeenMovies').innerText = `${collection.filter(m => m.seen).length} / ${collection.length}`;
 
+      // Formats
       const formats = {};
       collection.forEach(m => {
         const fmt = m.format || 'Blu-ray 1080p';
         formats[fmt] = (formats[fmt] || 0) + 1;
       });
-      const fmtList = document.getElementById('statFormatsList');
-      fmtList.innerHTML = Object.entries(formats).map(([k, v]) => `
-        <div class="flex justify-between items-center bg-white/5 px-3 py-1.5 rounded-xl">
-          <span>${k}</span>
-          <span class="font-bold text-indigo-400">${v}</span>
-        </div>
-      `).join('');
 
+      // Boîtiers
       const editions = {};
       collection.forEach(m => {
         const ed = m.editionType || 'Amaray';
         editions[ed] = (editions[ed] || 0) + 1;
       });
-      const edList = document.getElementById('statEditionsList');
-      edList.innerHTML = Object.entries(editions).map(([k, v]) => `
-        <div class="flex justify-between items-center bg-white/5 px-3 py-1.5 rounded-xl">
-          <span>${k}</span>
-          <span class="font-bold text-purple-400">${v}</span>
-        </div>
-      `).join('');
+
+      // Lieux d'Achat
+      const locations = {};
+      collection.forEach(m => {
+        const loc = (m.purchaseLocation && m.purchaseLocation.trim() !== '') ? m.purchaseLocation.trim() : 'Non renseigné';
+        locations[loc] = (locations[loc] || 0) + 1;
+      });
+
+      // Genres
+      const genres = {};
+      collection.forEach(m => {
+        if (m.genres && Array.isArray(m.genres) && m.genres.length > 0) {
+          m.genres.forEach(g => {
+            const genreName = typeof g === 'object' ? g.name : String(g);
+            genres[genreName] = (genres[genreName] || 0) + 1;
+          });
+        } else {
+          genres['Non renseigné'] = (genres['Non renseigné'] || 0) + 1;
+        }
+      });
+
+      renderStatCategory('Format', formats, 'statFormatsList', 'chartContainerFormat', 'chartFormat', ['#3b82f6', '#ef4444', '#d97706', '#8b5cf6']);
+      renderStatCategory('Boîtier', editions, 'statEditionsList', 'chartContainerEdition', 'chartEdition', ['#a855f7', '#ec4899', '#6366f1', '#14b8a6', '#f59e0b']);
+      renderStatCategory('Lieu', locations, 'statLocationsList', 'chartContainerLocation', 'chartLocation', ['#10b981', '#06b6d4', '#f97316', '#64748b', '#84cc16']);
+      renderStatCategory('Genre', genres, 'statGenresList', 'chartContainerGenre', 'chartGenre', ['#8b5cf6', '#ec4899', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#64748b']);
+    }
+
+    function renderStatCategory(label, dataObj, listId, chartContainerId, canvasId, colors) {
+      const listEl = document.getElementById(listId);
+      const containerEl = document.getElementById(chartContainerId);
+      const totalCount = collection.length || 1;
+
+      if (chartStyle === 'bars') {
+        containerEl.classList.add('hidden');
+        listEl.classList.remove('hidden');
+
+        listEl.innerHTML = Object.entries(dataObj).map(([k, v], idx) => {
+          const pct = Math.round((v / totalCount) * 100);
+          const color = colors[idx % colors.length];
+          return `
+            <div class="space-y-1">
+              <div class="flex justify-between items-center text-xs">
+                <span>${k}</span>
+                <span class="font-bold text-gray-200">${v} <span class="text-[10px] text-gray-400 font-normal">(${pct}%)</span></span>
+              </div>
+              <div class="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+                <div class="h-2 rounded-full transition-all duration-500" style="width: ${pct}%; background-color: ${color}"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } else {
+        listEl.classList.add('hidden');
+        containerEl.classList.remove('hidden');
+
+        const labels = Object.keys(dataObj);
+        const dataValues = Object.values(dataObj);
+
+        if (chartInstances[canvasId]) {
+          chartInstances[canvasId].destroy();
+        }
+
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        chartInstances[canvasId] = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: dataValues,
+              backgroundColor: colors.slice(0, labels.length),
+              borderWidth: 0
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { color: '#e2e8f0', font: { size: 10 } }
+              }
+            }
+          }
+        });
+      }
     }
 
     async function openMovieDetails(movieId) {
@@ -627,23 +762,19 @@
         overview: 'Aucun synopsis disponible.',
         release_date: localMovie.releaseDate || '',
         runtime: null,
-        genres: [],
+        genres: localMovie.genres || [],
         director: '',
         cast: []
       };
 
-      // Récupération enrichie via TMDB API (crédits + détails)
       if (!String(movieId).startsWith('custom_')) {
         try {
           const res = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&language=fr-FR&append_to_response=credits`);
           if (res.ok) {
             const data = await res.json();
             
-            // Extraction du Réalisateur
             const directorObj = data.credits?.crew?.find(person => person.job === 'Director');
             const directorName = directorObj ? directorObj.name : '';
-
-            // Extraction des 4 Acteurs Principaux
             const mainCast = data.credits?.cast?.slice(0, 4).map(actor => actor.name) || [];
 
             movieDetails = { 
@@ -652,13 +783,20 @@
               director: directorName,
               cast: mainCast
             };
+
+            // Mettre à jour les genres s'ils n'étaient pas encore synchronisés
+            if (data.genres && data.genres.length > 0) {
+              const genreNames = data.genres.map(g => g.name);
+              if (JSON.stringify(localMovie.genres) !== JSON.stringify(genreNames)) {
+                updateMovieDetails(localMovie.id, 'genres', genreNames);
+              }
+            }
           }
         } catch (e) { console.error("Erreur TMDB Details:", e); }
       }
 
-      const genresStr = movieDetails.genres ? movieDetails.genres.map(g => g.name).join(', ') : '';
+      const genresStr = movieDetails.genres ? movieDetails.genres.map(g => typeof g === 'object' ? g.name : g).join(', ') : '';
       
-      // Formater la durée (ex: 2h 15m)
       let runtimeFormatted = '';
       if (movieDetails.runtime) {
         const hours = Math.floor(movieDetails.runtime / 60);
@@ -691,7 +829,6 @@
             </div>
           </div>
 
-          <!-- ACTEURS PRINCIPAUX -->
           ${movieDetails.cast && movieDetails.cast.length > 0 ? `
             <div class="glass-card p-2.5 rounded-2xl border border-white/10 text-xs">
               <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Acteurs principaux :</p>
@@ -699,7 +836,6 @@
             </div>
           ` : ''}
 
-          <!-- INFORMATIONS D'ACHAT ET DE FORMAT -->
           <div class="space-y-3 glass-card p-3 rounded-2xl border border-white/10">
             <p class="text-[11px] font-bold text-gray-300 uppercase tracking-wider">Informations Édition & Achat</p>
 
@@ -737,7 +873,6 @@
             </div>
           </div>
 
-          <!-- SYNOPSIS -->
           <div class="space-y-1">
             <p class="text-[11px] font-bold text-gray-400 uppercase">Synopsis</p>
             <p class="text-xs text-gray-300 leading-relaxed max-h-28 overflow-y-auto pr-1">${movieDetails.overview}</p>
