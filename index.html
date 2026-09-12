@@ -16,7 +16,14 @@
     body {
       background: radial-gradient(circle at 50% -20%, #2e1065, #0f172a, #030712);
       background-attachment: fixed;
+      transition: background 0.5s ease;
     }
+    /* Thèmes */
+    body.theme-purple { background: radial-gradient(circle at 50% -20%, #2e1065, #0f172a, #030712); }
+    body.theme-midnight { background: radial-gradient(circle at 50% -20%, #0f172a, #0284c7, #020617); }
+    body.theme-amber { background: radial-gradient(circle at 50% -20%, #78350f, #1c1917, #0c0a09); }
+    body.theme-emerald { background: radial-gradient(circle at 50% -20%, #064e3b, #022c22, #020617); }
+
     .glass-card {
       background: rgba(255, 255, 255, 0.05);
       backdrop-filter: blur(16px);
@@ -53,7 +60,7 @@
     @keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-10px); } }
   </style>
 </head>
-<body class="text-gray-100 min-h-screen pb-10 selection:bg-indigo-500 selection:text-white">
+<body class="theme-purple text-gray-100 min-h-screen pb-10 selection:bg-indigo-500 selection:text-white">
 
   <header class="sticky top-0 z-40 p-4 glass-card border-b-0 border-b-[0.5px] border-white/10 text-center font-extrabold text-xl tracking-wide flex items-center justify-center gap-2">
     <span class="text-2xl">💿</span>
@@ -241,19 +248,84 @@
 
     <!-- PARAMETRES -->
     <div id="tabSettings" class="hidden space-y-4">
+      <!-- Exports -->
       <div class="glass-card p-4 rounded-3xl border border-white/10 space-y-3">
         <div class="flex items-center gap-2">
           <span class="text-xl">📊</span>
           <div>
             <h3 class="text-sm font-bold text-white">Sauvegarde & Exportation</h3>
-            <p class="text-[11px] text-gray-400">Téléchargez l'intégralité de votre collection au format Excel.</p>
+            <p class="text-[11px] text-gray-400">Exporter les données au format Excel ou JSON.</p>
           </div>
         </div>
-        <button onclick="exportToExcel()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-2xl text-xs shadow-lg shadow-emerald-600/30 transition transform active:scale-95 flex items-center justify-center gap-2">
-          <span>📤 Export Excel (.xlsx)</span>
-        </button>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-3 rounded-2xl text-xs shadow-lg transition transform active:scale-95 flex items-center justify-center gap-1.5">
+            <span>📊 Excel (.xlsx)</span>
+          </button>
+          <button onclick="exportToJSON()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 px-3 rounded-2xl text-xs shadow-lg transition transform active:scale-95 flex items-center justify-center gap-1.5">
+            <span>💾 JSON (.json)</span>
+          </button>
+        </div>
       </div>
 
+      <!-- Préférences d'affichage & Thèmes -->
+      <div class="glass-card p-4 rounded-3xl border border-white/10 space-y-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🎨</span>
+          <div>
+            <h3 class="text-sm font-bold text-white">Apparence & Préférences</h3>
+            <p class="text-[11px] text-gray-400">Personnaliser le thème et l'affichage.</p>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold text-gray-300">Vue par défaut au démarrage :</label>
+          <select id="defaultViewSelect" onchange="saveDefaultViewPref(this.value)" class="w-full glass-input text-white text-xs p-2 rounded-xl focus:outline-none">
+            <option class="bg-gray-900" value="grid">Vue Grille (Miniatures)</option>
+            <option class="bg-gray-900" value="list">Vue Liste (Compacte)</option>
+          </select>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold text-gray-300">Thème de l'interface :</label>
+          <select id="themeSelect" onchange="changeTheme(this.value)" class="w-full glass-input text-white text-xs p-2 rounded-xl focus:outline-none">
+            <option class="bg-gray-900" value="theme-purple">🌌 Nébuleuse Violette (Défaut)</option>
+            <option class="bg-gray-900" value="theme-midnight">🌌 Midnight Blue</option>
+            <option class="bg-gray-900" value="theme-amber">🔥 Cyberpunk Amber</option>
+            <option class="bg-gray-900" value="theme-emerald">🌲 Dark Emerald</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Configurations Clés API & Supabase -->
+      <div class="glass-card p-4 rounded-3xl border border-white/10 space-y-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🔑</span>
+          <div>
+            <h3 class="text-sm font-bold text-white">Connexions & Identifiants</h3>
+            <p class="text-[11px] text-gray-400">Gérer vos accès Supabase et TMDB.</p>
+          </div>
+        </div>
+
+        <div class="space-y-2 text-xs">
+          <div>
+            <label class="block text-[10px] text-gray-400 font-semibold mb-1">Clé API TMDB :</label>
+            <input type="password" id="settingTmdbKey" class="w-full glass-input text-white text-xs p-2 rounded-xl focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-[10px] text-gray-400 font-semibold mb-1">URL Supabase :</label>
+            <input type="text" id="settingSupaUrl" class="w-full glass-input text-white text-xs p-2 rounded-xl focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-[10px] text-gray-400 font-semibold mb-1">Clé Anon Supabase :</label>
+            <input type="password" id="settingSupaKey" class="w-full glass-input text-white text-xs p-2 rounded-xl focus:outline-none">
+          </div>
+          <button onclick="saveApiKeysFromSettings()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-xl text-xs transition active:scale-95">
+            💾 Enregistrer la configuration
+          </button>
+        </div>
+      </div>
+
+      <!-- Infos -->
       <div class="glass-card p-4 rounded-3xl border border-white/10 space-y-2 text-xs text-gray-300">
         <h3 class="text-sm font-bold text-white mb-1">ℹ️ Informations</h3>
         <div class="flex justify-between border-b border-white/10 py-1.5">
@@ -279,12 +351,12 @@
   <div id="toast-container"></div>
 
   <script>
-    // --- CONFIGURATION ---
-    const API_KEY = '6fbfd02937fa91630bd1987257207b01'; 
-    const SUPABASE_URL = 'https://vshugonvufhubjwjkuhq.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzaHVnb252dWZodWJqd2prdWhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyMjMwNjUsImV4cCI6MjEwNDc5OTA2NX0.pHsW1O_IQWqQcfFtTz6_pHxZ2-iCpVe9v-UnzsLXpjQ';
+    // --- CONFIGURATION PAR DÉFAUT ---
+    let API_KEY = localStorage.getItem('tmdb_key') || '6fbfd02937fa91630bd1987257207b01'; 
+    let SUPABASE_URL = localStorage.getItem('supa_url') || 'https://vshugonvufhubjwjkuhq.supabase.co';
+    let SUPABASE_KEY = localStorage.getItem('supa_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzaHVnb252dWZodWJqd2prdWhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyMjMwNjUsImV4cCI6MjEwNDc5OTA2NX0.pHsW1O_IQWqQcfFtTz6_pHxZ2-iCpVe9v-UnzsLXpjQ';
 
-    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let collection = [];
     let isListView = false;
@@ -293,6 +365,20 @@
     let chartInstances = {};
 
     document.addEventListener('DOMContentLoaded', async () => {
+      // Préférences enregistrées
+      const savedTheme = localStorage.getItem('app_theme') || 'theme-purple';
+      changeTheme(savedTheme);
+      document.getElementById('themeSelect').value = savedTheme;
+
+      const savedDefaultView = localStorage.getItem('default_view') || 'grid';
+      isListView = (savedDefaultView === 'list');
+      document.getElementById('defaultViewSelect').value = savedDefaultView;
+      document.getElementById('viewModeLabel').innerText = isListView ? "Vue Grille" : "Vue Liste";
+
+      document.getElementById('settingTmdbKey').value = API_KEY;
+      document.getElementById('settingSupaUrl').value = SUPABASE_URL;
+      document.getElementById('settingSupaKey').value = SUPABASE_KEY;
+
       const searchInput = document.getElementById('searchInput');
       const clearBtn = document.getElementById('clearSearchBtn');
       
@@ -307,16 +393,45 @@
       await fetchCollectionFromCloud();
     });
 
+    // --- PARAMÈTRES & PRÉFÉRENCES ---
+    function changeTheme(themeClass) {
+      document.body.className = `${themeClass} text-gray-100 min-h-screen pb-10 selection:bg-indigo-500 selection:text-white`;
+      localStorage.setItem('app_theme', themeClass);
+    }
+
+    function saveDefaultViewPref(val) {
+      localStorage.setItem('default_view', val);
+      showToast("Préférence d'affichage sauvegardée");
+    }
+
+    function saveApiKeysFromSettings() {
+      API_KEY = document.getElementById('settingTmdbKey').value.trim();
+      SUPABASE_URL = document.getElementById('settingSupaUrl').value.trim();
+      SUPABASE_KEY = document.getElementById('settingSupaKey').value.trim();
+
+      localStorage.setItem('tmdb_key', API_KEY);
+      localStorage.setItem('supa_url', SUPABASE_URL);
+      localStorage.setItem('supa_key', SUPABASE_KEY);
+
+      db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      showToast("Identifiants enregistrés !");
+      fetchCollectionFromCloud();
+    }
+
     // --- SUPABASE SYNCHRO ---
     async function fetchCollectionFromCloud() {
       showToast("Chargement du cloud...");
-      const { data, error } = await db.from('bluray').select('*');
-      if (error) {
-        showToast("Erreur de synchronisation Supabase");
-        console.error("Fetch error:", error);
-      } else {
-        collection = data.map(item => ({ ...item.data, cloud_id: item.id }));
-        renderCollection();
+      try {
+        const { data, error } = await db.from('bluray').select('*');
+        if (error) {
+          showToast("Erreur de synchronisation Supabase");
+          console.error("Fetch error:", error);
+        } else {
+          collection = data.map(item => ({ ...item.data, cloud_id: item.id }));
+          renderCollection();
+        }
+      } catch (err) {
+        showToast("Erreur de connexion cloud.");
       }
     }
 
@@ -342,7 +457,7 @@
       if (error) console.error("Delete error:", error);
     }
 
-    // --- EXPORT EXCEL ---
+    // --- EXPORTS & IMPORTS ---
     function exportToExcel() {
       if (collection.length === 0) return showToast("Votre collection est vide.");
 
@@ -368,10 +483,23 @@
       XLSX.utils.book_append_sheet(workbook, worksheet, "Ma Collection");
 
       XLSX.writeFile(workbook, "Ma_Collection_Bluray.xlsx");
-      showToast("Exportation terminée ! 📥");
+      showToast("Exportation Excel terminée ! 📊");
     }
 
-    // --- IMPORT EXCEL ---
+    function exportToJSON() {
+      if (collection.length === 0) return showToast("Votre collection est vide.");
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(collection, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `Collection_Bluray_Backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+
+      showToast("Exportation JSON terminée ! 💾");
+    }
+
     async function importExcel(event) {
       const file = event.target.files[0];
       if (!file) return;
