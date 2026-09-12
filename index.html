@@ -156,7 +156,8 @@
             <option class="bg-gray-900" value="added_asc">Date d'ajout (Anciens)</option>
             <option class="bg-gray-900" value="title_asc">Titre (A ➔ Z)</option>
             <option class="bg-gray-900" value="title_desc">Titre (Z ➔ A)</option>
-            <option class="bg-gray-900" value="price_desc">Prix (Cher ➔ Pas cher)</option>
+            <option class="bg-gray-900" value="price_desc">Prix d'achat (Cher ➔ Pas cher)</option>
+            <option class="bg-gray-900" value="estimated_desc">Estimation (Élevée ➔ Basse)</option>
           </select>
         </div>
       </div>
@@ -182,20 +183,26 @@
           <p id="statTotalMovies" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400 mt-1">0</p>
         </div>
         <div class="glass-card p-4 rounded-3xl text-center">
-          <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Valeur Totale</p>
-          <p id="statTotalValue" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 mt-1">0 €</p>
+          <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Films Vus</p>
+          <p id="statSeenMovies" class="text-3xl font-black text-emerald-400 mt-1">0</p>
         </div>
       </div>
 
+      <!-- Valeurs d'Achat vs Estimée -->
       <div class="grid grid-cols-2 gap-3">
         <div class="glass-card p-4 rounded-3xl text-center">
-          <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Films Vus</p>
-          <p id="statSeenMovies" class="text-2xl font-black text-emerald-400 mt-1">0</p>
+          <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Valeur D'achat</p>
+          <p id="statTotalValue" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 mt-1">0 €</p>
         </div>
         <div class="glass-card p-4 rounded-3xl text-center">
-          <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Prix Moyen</p>
-          <p id="statAvgPrice" class="text-2xl font-black text-indigo-400 mt-1">0 €</p>
+          <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Valeur Estimée</p>
+          <p id="statTotalEstimatedValue" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 mt-1">0 €</p>
         </div>
+      </div>
+
+      <div class="glass-card p-3 rounded-2xl text-center">
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Prix d'Achat Moyen</p>
+        <p id="statAvgPrice" class="text-xl font-black text-indigo-400 mt-0.5">0 €</p>
       </div>
 
       <!-- Detail Formats -->
@@ -336,7 +343,8 @@
 
             const format = row['Format'] || row['format'] || 'Blu-ray 1080p';
             const editionType = row['Boitier'] || row['boitier'] || row['Édition'] || 'Amaray';
-            const price = row['Prix'] || row['prix'] || '';
+            const price = row['Prix'] || row['prix'] || row['Prix d\'achat'] || '';
+            const estimatedPrice = row['Estimation'] || row['estimation'] || row['Valeur Estimée'] || row['Valeur'] || '';
             const location = row['Lieu'] || row['Magasin'] || row['Lieu d\'achat'] || '';
             const genre = row['Genre'] || row['genre'] || '';
             const seenRaw = String(row['Vu'] || row['vu'] || '').toLowerCase();
@@ -353,6 +361,7 @@
               editionType: String(editionType), 
               purchaseLocation: String(location), 
               purchasePrice: price ? String(price) : '', 
+              estimatedPrice: estimatedPrice ? String(estimatedPrice) : '',
               genres: genresArray, 
               seen: seen, 
               addedAt: Date.now()
@@ -507,7 +516,6 @@
 
       showToast("Sauvegarde dans le Cloud...");
 
-      // Récupération des genres via TMDB avant enregistrement
       let fetchedGenres = [];
       if (!String(id).startsWith('custom_')) {
         try {
@@ -528,6 +536,7 @@
         editionType: 'Amaray', 
         purchaseLocation: '', 
         purchasePrice: '', 
+        estimatedPrice: '',
         genres: fetchedGenres, 
         seen: false, 
         addedAt: Date.now()
@@ -561,7 +570,7 @@
       if (item) {
         item[key] = value;
         await updateMovieInCloud(item);
-        if(['format', 'seen', 'editionType', 'purchasePrice', 'purchaseLocation'].includes(key)) renderCollection();
+        if(['format', 'seen', 'editionType', 'purchasePrice', 'estimatedPrice', 'purchaseLocation'].includes(key)) renderCollection();
       }
     }
 
@@ -620,6 +629,7 @@
         if (sortType === 'title_desc') return b.title.localeCompare(a.title);
         if (sortType === 'added_asc') return (a.addedAt || 0) - (b.addedAt || 0);
         if (sortType === 'price_desc') return (parseFloat(b.purchasePrice) || 0) - (parseFloat(a.purchasePrice) || 0);
+        if (sortType === 'estimated_desc') return (parseFloat(b.estimatedPrice) || 0) - (parseFloat(a.estimatedPrice) || 0);
         return (b.addedAt || 0) - (a.addedAt || 0);
       });
 
@@ -642,10 +652,18 @@
 
     function renderStats() {
       document.getElementById('statTotalMovies').innerText = collection.length;
+      
+      // Prix d'Achat Total & Moyen
       const prices = collection.map(m => parseFloat(m.purchasePrice)).filter(p => !isNaN(p) && p > 0);
       const totalVal = prices.reduce((a, b) => a + b, 0);
       document.getElementById('statTotalValue').innerText = `${totalVal.toFixed(2)} €`;
       document.getElementById('statAvgPrice').innerText = prices.length > 0 ? `${(totalVal / prices.length).toFixed(2)} €` : '0.00 €';
+
+      // Valeur Estimée Totale
+      const estimatedPrices = collection.map(m => parseFloat(m.estimatedPrice)).filter(p => !isNaN(p) && p > 0);
+      const totalEstimatedVal = estimatedPrices.reduce((a, b) => a + b, 0);
+      document.getElementById('statTotalEstimatedValue').innerText = `${totalEstimatedVal.toFixed(2)} €`;
+
       document.getElementById('statSeenMovies').innerText = `${collection.filter(m => m.seen).length} / ${collection.length}`;
 
       // Formats
@@ -784,7 +802,6 @@
               cast: mainCast
             };
 
-            // Mettre à jour les genres s'ils n'étaient pas encore synchronisés
             if (data.genres && data.genres.length > 0) {
               const genreNames = data.genres.map(g => g.name);
               if (JSON.stringify(localMovie.genres) !== JSON.stringify(genreNames)) {
@@ -837,7 +854,7 @@
           ` : ''}
 
           <div class="space-y-3 glass-card p-3 rounded-2xl border border-white/10">
-            <p class="text-[11px] font-bold text-gray-300 uppercase tracking-wider">Informations Édition & Achat</p>
+            <p class="text-[11px] font-bold text-gray-300 uppercase tracking-wider">Informations Édition, Prix & Estimation</p>
 
             <div class="grid grid-cols-2 gap-2">
               <div>
@@ -867,9 +884,14 @@
               </div>
 
               <div>
-                <label class="block text-[10px] text-gray-400 font-semibold mb-1">Lieu d'achat :</label>
-                <input type="text" placeholder="ex: Fnac, Amazon..." value="${localMovie.purchaseLocation || ''}" onchange="updateMovieDetails('${localMovie.id}', 'purchaseLocation', this.value)" class="w-full glass-input text-white text-xs p-2 rounded-xl focus:outline-none">
+                <label class="block text-[10px] text-purple-300 font-semibold mb-1">Valeur Estimée (€) :</label>
+                <input type="number" step="0.01" placeholder="ex: 35.00" value="${localMovie.estimatedPrice || ''}" onchange="updateMovieDetails('${localMovie.id}', 'estimatedPrice', this.value)" class="w-full glass-input text-white text-xs p-2 rounded-xl focus:outline-none border-purple-500/40">
               </div>
+            </div>
+
+            <div>
+              <label class="block text-[10px] text-gray-400 font-semibold mb-1">Lieu d'achat :</label>
+              <input type="text" placeholder="ex: Fnac, Amazon, Brocante..." value="${localMovie.purchaseLocation || ''}" onchange="updateMovieDetails('${localMovie.id}', 'purchaseLocation', this.value)" class="w-full glass-input text-white text-xs p-2 rounded-xl focus:outline-none">
             </div>
           </div>
 
