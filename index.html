@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ma Collection Blu-ray</title>
+  <title>Ma Collection Blu-ray & Wishlist</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <!-- SDK SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- LIBRAIRIE EXCEL (SheetJS) -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <!-- LIBRAIRIE CHART.JS POUR DIAGRAMMES CIRCULAIRES -->
+  <!-- LIBRAIRIE CHART.JS -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
@@ -18,7 +18,6 @@
       background-attachment: fixed;
       transition: background 0.5s ease;
     }
-    /* Thèmes */
     body.theme-purple { background: radial-gradient(circle at 50% -20%, #2e1065, #0f172a, #030712); }
     body.theme-midnight { background: radial-gradient(circle at 50% -20%, #0f172a, #0284c7, #020617); }
     body.theme-amber { background: radial-gradient(circle at 50% -20%, #78350f, #1c1917, #0c0a09); }
@@ -67,40 +66,44 @@
     <span class="bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">Blu-raythèque Cloud</span>
   </header>
 
-  <main class="p-4 max-w-md mx-auto space-y-6">
+  <main class="p-4 max-w-md mx-auto space-y-5">
+    <!-- NAVIGATION BAR -->
     <nav class="glass-pill p-1.5 rounded-2xl flex justify-between items-center shadow-lg gap-1">
-      <button id="tabHomeBtn" onclick="switchTab('home')" class="flex-1 py-2 rounded-xl font-semibold text-[11px] transition flex items-center justify-center gap-1 bg-indigo-600/80 text-white shadow-md shadow-indigo-500/30">
+      <button id="tabHomeBtn" onclick="switchTab('home')" class="flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 bg-indigo-600/80 text-white shadow-md">
         <span>🏠</span> <span>Accueil</span>
       </button>
-      <button id="tabCollectionBtn" onclick="switchTab('collection')" class="flex-1 py-2 rounded-xl font-semibold text-[11px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white">
+      <button id="tabCollectionBtn" onclick="switchTab('collection')" class="flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white">
         <span>📚</span> <span>Collection</span>
       </button>
-      <button id="tabStatsBtn" onclick="switchTab('stats')" class="flex-1 py-2 rounded-xl font-semibold text-[11px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white">
+      <button id="tabWishlistBtn" onclick="switchTab('wishlist')" class="flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white relative">
+        <span>✨</span> <span>Wishlist</span>
+        <span id="wishlistBadge" class="hidden bg-pink-500 text-white text-[9px] font-black px-1.5 py-0.2 rounded-full ml-0.5">0</span>
+      </button>
+      <button id="tabStatsBtn" onclick="switchTab('stats')" class="flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white">
         <span>📊</span> <span>Stats</span>
       </button>
-      <button id="tabSettingsBtn" onclick="switchTab('settings')" class="flex-1 py-2 rounded-xl font-semibold text-[11px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white">
-        <span>⚙️</span> <span>Paramètres</span>
+      <button id="tabSettingsBtn" onclick="switchTab('settings')" class="flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white">
+        <span>⚙️</span> <span>Options</span>
       </button>
     </nav>
 
-    <div class="space-y-6">
+    <!-- RECHERCHE & SCANNER -->
+    <div class="space-y-4">
       <div class="space-y-2">
         <div class="flex gap-2">
-          <input id="searchInput" type="text" placeholder="Rechercher un film..." class="flex-1 px-4 py-3 rounded-2xl glass-input text-white text-sm placeholder-gray-400 focus:outline-none transition">
-          <button onclick="searchMovie()" class="bg-indigo-600 hover:bg-indigo-500 px-5 py-3 rounded-2xl font-semibold text-sm shadow-lg shadow-indigo-600/30 transition transform active:scale-95">Chercher</button>
+          <input id="searchInput" type="text" placeholder="Chercher un film (TMDB)..." class="flex-1 px-4 py-3 rounded-2xl glass-input text-white text-sm placeholder-gray-400 focus:outline-none transition">
+          <button onclick="triggerNewSearch()" class="bg-indigo-600 hover:bg-indigo-500 px-5 py-3 rounded-2xl font-semibold text-sm shadow-lg shadow-indigo-600/30 transition transform active:scale-95">Chercher</button>
         </div>
         <div class="flex justify-start px-2">
           <button id="clearSearchBtn" onclick="clearSearch()" class="hidden text-[11px] text-gray-400 hover:text-red-400 transition flex items-center gap-1">
-            <span>✕</span> <span>Effacer la recherche</span>
+            <span>✕</span> <span>Effacer les résultats de recherche</span>
           </button>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 gap-3">
-        <button onclick="toggleScanner()" class="w-full glass-card hover:bg-white/10 text-white font-semibold py-3 rounded-2xl flex items-center justify-center gap-2 shadow transition transform active:scale-95 text-sm">
-          📷 Scanner un code-barres
-        </button>
-      </div>
+      <button onclick="toggleScanner()" class="w-full glass-card hover:bg-white/10 text-white font-semibold py-2.5 rounded-2xl flex items-center justify-center gap-2 shadow transition transform active:scale-95 text-xs">
+        📷 Scanner un code-barres
+      </button>
 
       <div id="scanner-container" class="hidden glass-card p-4 rounded-3xl border border-white/20 overflow-hidden">
         <div id="reader" class="w-full rounded-2xl overflow-hidden"></div>
@@ -108,9 +111,22 @@
       </div>
     </div>
 
-    <div id="searchResults" class="grid grid-cols-2 gap-4"></div>
+    <!-- RÉSULTATS DE RECHERCHE AMÉLIORÉS DE TMDB -->
+    <div id="searchResultsContainer" class="hidden space-y-3">
+      <div class="flex items-center justify-between px-1">
+        <span class="text-xs font-bold uppercase tracking-wider text-indigo-300">Résultats TMDB</span>
+        <span id="searchPageInfo" class="text-[10px] text-gray-400">Page 1</span>
+      </div>
+      <div id="searchResults" class="grid grid-cols-1 gap-3"></div>
+      
+      <!-- PAGINATION TMDB -->
+      <div id="searchPagination" class="hidden flex justify-between items-center pt-1">
+        <button id="prevPageBtn" onclick="changeSearchPage(-1)" class="glass-pill px-3 py-1.5 rounded-xl text-xs text-gray-300 hover:text-white disabled:opacity-30 disabled:pointer-events-none">← Précédent</button>
+        <button id="nextPageBtn" onclick="changeSearchPage(1)" class="glass-pill px-3 py-1.5 rounded-xl text-xs text-indigo-300 hover:text-white disabled:opacity-30 disabled:pointer-events-none">Suivant →</button>
+      </div>
+    </div>
 
-    <!-- ACCUEIL -->
+    <!-- ONGLET ACCUEIL -->
     <div id="tabHome" class="space-y-6">
       <div>
         <div class="flex items-center justify-between mb-3 px-1">
@@ -137,9 +153,8 @@
       </div>
     </div>
 
-    <!-- COLLECTION -->
+    <!-- ONGLET COLLECTION AVEC FILTRES AVANCÉS -->
     <div id="tabCollection" class="hidden space-y-4">
-      <!-- Import Excel -->
       <div class="glass-card p-3 rounded-2xl flex items-center justify-between gap-2 border border-indigo-500/30">
         <div class="text-xs">
           <p class="font-bold text-indigo-300">Importer un fichier Excel</p>
@@ -151,31 +166,72 @@
         </label>
       </div>
 
-      <div class="flex flex-col gap-2 px-1">
-        <div class="flex items-center justify-between">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-gray-400">Tous mes Blu-ray</h2>
-          <button onclick="toggleViewMode()" id="toggleViewBtn" class="glass-pill px-3 py-1.5 rounded-xl text-xs text-indigo-300 hover:text-white flex items-center gap-1 transition">
+      <!-- BARRE DE FILTRES ET DE TRI AVANCÉS -->
+      <div class="glass-card p-3 rounded-2xl space-y-2 border border-white/10">
+        <div class="flex items-center justify-between border-b border-white/10 pb-2">
+          <span class="text-[11px] font-bold text-gray-300 flex items-center gap-1">⚡ Filtres & Tri</span>
+          <button onclick="toggleViewMode()" id="toggleViewBtn" class="glass-pill px-2.5 py-1 rounded-xl text-[11px] text-indigo-300 hover:text-white flex items-center gap-1 transition">
             <span>☰</span> <span id="viewModeLabel">Vue Liste</span>
           </button>
         </div>
-        
-        <div class="flex items-center justify-between gap-2">
-          <label for="sortSelect" class="text-xs text-gray-400 font-medium">Trier par :</label>
-          <select id="sortSelect" onchange="renderCollection()" class="glass-input text-white text-xs px-3 py-1.5 rounded-xl focus:outline-none">
-            <option class="bg-gray-900" value="added_desc">Date d'ajout (Récents)</option>
-            <option class="bg-gray-900" value="added_asc">Date d'ajout (Anciens)</option>
-            <option class="bg-gray-900" value="title_asc">Titre (A ➔ Z)</option>
-            <option class="bg-gray-900" value="title_desc">Titre (Z ➔ A)</option>
-            <option class="bg-gray-900" value="price_desc">Prix d'achat (Cher ➔ Pas cher)</option>
-            <option class="bg-gray-900" value="estimated_desc">Estimation (Élevée ➔ Basse)</option>
-          </select>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Format</label>
+            <select id="filterFormat" onchange="renderCollection()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
+              <option class="bg-gray-900" value="all">Tous les formats</option>
+              <option class="bg-gray-900" value="4K UHD">4K UHD</option>
+              <option class="bg-gray-900" value="Blu-ray 1080p">Blu-ray 1080p</option>
+              <option class="bg-gray-900" value="DVD">DVD</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Statut Visionnage</label>
+            <select id="filterSeen" onchange="renderCollection()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
+              <option class="bg-gray-900" value="all">Tous (Vus + Non vus)</option>
+              <option class="bg-gray-900" value="seen">🍿 Seulement Vus</option>
+              <option class="bg-gray-900" value="unseen">👁️ Non Vus</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Trier par</label>
+            <select id="sortSelect" onchange="renderCollection()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
+              <option class="bg-gray-900" value="added_desc">Date d'ajout (Récents)</option>
+              <option class="bg-gray-900" value="added_asc">Date d'ajout (Anciens)</option>
+              <option class="bg-gray-900" value="title_asc">Titre (A ➔ Z)</option>
+              <option class="bg-gray-900" value="title_desc">Titre (Z ➔ A)</option>
+              <option class="bg-gray-900" value="price_desc">Prix d'achat (Élevé)</option>
+              <option class="bg-gray-900" value="estimated_desc">Estimation (Élevée)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Filtrer par nom</label>
+            <input id="filterText" type="text" placeholder="Mot clé..." oninput="renderCollection()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
+          </div>
         </div>
       </div>
 
       <div id="collectionGrid" class="grid grid-cols-2 gap-4"></div>
     </div>
 
-    <!-- STATS -->
+    <!-- ONGLET WISHLIST -->
+    <div id="tabWishlist" class="hidden space-y-4">
+      <div class="glass-card p-3 rounded-2xl border border-pink-500/30 flex items-center justify-between">
+        <div>
+          <h2 class="text-xs font-bold text-pink-300">Ma Liste de Souhaits</h2>
+          <p class="text-[10px] text-gray-400">Les films que vous prévoyez d'acheter.</p>
+        </div>
+        <span id="wishlistTotalCount" class="bg-pink-500/20 text-pink-300 font-black text-xs px-2.5 py-1 rounded-xl border border-pink-500/30">0 film</span>
+      </div>
+
+      <div id="wishlistGrid" class="grid grid-cols-2 gap-4"></div>
+    </div>
+
+    <!-- ONGLET STATS -->
     <div id="tabStats" class="hidden space-y-4">
       <div class="glass-pill p-1.5 rounded-2xl flex justify-between items-center shadow-md">
         <button id="chartStyleBarsBtn" onclick="setChartStyle('bars')" class="flex-1 py-2 rounded-xl font-bold text-xs transition bg-indigo-600 text-white shadow">
@@ -248,7 +304,6 @@
 
     <!-- PARAMETRES -->
     <div id="tabSettings" class="hidden space-y-4">
-      <!-- Exports -->
       <div class="glass-card p-4 rounded-3xl border border-white/10 space-y-3">
         <div class="flex items-center gap-2">
           <span class="text-xl">📊</span>
@@ -267,7 +322,6 @@
         </div>
       </div>
 
-      <!-- Préférences d'affichage & Thèmes -->
       <div class="glass-card p-4 rounded-3xl border border-white/10 space-y-3">
         <div class="flex items-center gap-2">
           <span class="text-xl">🎨</span>
@@ -296,7 +350,6 @@
         </div>
       </div>
 
-      <!-- Configurations Clés API & Supabase -->
       <div class="glass-card p-4 rounded-3xl border border-white/10 space-y-3">
         <div class="flex items-center gap-2">
           <span class="text-xl">🔑</span>
@@ -325,12 +378,15 @@
         </div>
       </div>
 
-      <!-- Infos -->
       <div class="glass-card p-4 rounded-3xl border border-white/10 space-y-2 text-xs text-gray-300">
         <h3 class="text-sm font-bold text-white mb-1">ℹ️ Informations</h3>
         <div class="flex justify-between border-b border-white/10 py-1.5">
           <span class="text-gray-400">Total Blu-ray :</span>
           <span id="settingsTotalCount" class="font-bold text-indigo-300">0</span>
+        </div>
+        <div class="flex justify-between border-b border-white/10 py-1.5">
+          <span class="text-gray-400">Films en Wishlist :</span>
+          <span id="settingsWishlistCount" class="font-bold text-pink-300">0</span>
         </div>
         <div class="flex justify-between py-1.5">
           <span class="text-gray-400">Statut Synchro :</span>
@@ -359,13 +415,18 @@
     let db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let collection = [];
+    let wishlist = [];
     let isListView = false;
     let html5QrcodeScanner = null;
     let chartStyle = 'bars';
     let chartInstances = {};
 
+    // Recherche TMDB
+    let currentSearchQuery = '';
+    let currentSearchPage = 1;
+    let totalSearchPages = 1;
+
     document.addEventListener('DOMContentLoaded', async () => {
-      // Préférences enregistrées
       const savedTheme = localStorage.getItem('app_theme') || 'theme-purple';
       changeTheme(savedTheme);
       document.getElementById('themeSelect').value = savedTheme;
@@ -384,16 +445,16 @@
       
       searchInput.addEventListener('input', () => {
         if (searchInput.value.trim().length > 0) clearBtn.classList.remove('hidden');
-        else {
-          clearBtn.classList.add('hidden');
-          document.getElementById('searchResults').innerHTML = '';
-        }
+        else clearSearch();
+      });
+
+      searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') triggerNewSearch();
       });
 
       await fetchCollectionFromCloud();
     });
 
-    // --- PARAMÈTRES & PRÉFÉRENCES ---
     function changeTheme(themeClass) {
       document.body.className = `${themeClass} text-gray-100 min-h-screen pb-10 selection:bg-indigo-500 selection:text-white`;
       localStorage.setItem('app_theme', themeClass);
@@ -427,8 +488,15 @@
           showToast("Erreur de synchronisation Supabase");
           console.error("Fetch error:", error);
         } else {
-          collection = data.map(item => ({ ...item.data, cloud_id: item.id }));
+          collection = [];
+          wishlist = [];
+          data.forEach(item => {
+            const m = { ...item.data, cloud_id: item.id };
+            if (m.isWishlist) wishlist.push(m);
+            else collection.push(m);
+          });
           renderCollection();
+          renderWishlist();
         }
       } catch (err) {
         showToast("Erreur de connexion cloud.");
@@ -457,12 +525,9 @@
       if (error) console.error("Delete error:", error);
     }
 
-    // --- EXPORTS & IMPORTS ---
+    // --- EXPORTS ---
     function exportToExcel() {
       if (collection.length === 0) return showToast("Votre collection est vide.");
-
-      showToast("Génération du fichier Excel...");
-
       const excelData = collection.map(m => {
         const genresStr = m.genres ? m.genres.map(g => typeof g === 'object' ? g.name : g).join(', ') : '';
         return {
@@ -481,29 +546,25 @@
       const worksheet = XLSX.utils.json_to_sheet(excelData);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "Ma Collection");
-
       XLSX.writeFile(workbook, "Ma_Collection_Bluray.xlsx");
       showToast("Exportation Excel terminée ! 📊");
     }
 
     function exportToJSON() {
-      if (collection.length === 0) return showToast("Votre collection est vide.");
-
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(collection, null, 2));
+      if (collection.length === 0 && wishlist.length === 0) return showToast("Aucune donnée à exporter.");
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ collection, wishlist }, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `Collection_Bluray_Backup_${new Date().toISOString().slice(0,10)}.json`);
+      downloadAnchor.setAttribute("download", `Backup_Bluray_${new Date().toISOString().slice(0,10)}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
-
       showToast("Exportation JSON terminée ! 💾");
     }
 
     async function importExcel(event) {
       const file = event.target.files[0];
       if (!file) return;
-
       showToast("Lecture d'Excel...");
       const reader = new FileReader();
 
@@ -515,9 +576,7 @@
           const json = XLSX.utils.sheet_to_json(worksheet);
 
           if (json.length === 0) return showToast("Fichier vide.");
-
           let addedCount = 0;
-          showToast(`Import de ${json.length} films...`);
 
           for (const row of json) {
             const title = row['Titre'] || row['titre'] || row['Title'] || row['Nom'];
@@ -526,7 +585,7 @@
             const format = row['Format'] || row['format'] || 'Blu-ray 1080p';
             const editionType = row['Boitier'] || row['boitier'] || row['Édition'] || 'Amaray';
             const price = row['Prix'] || row['prix'] || row['Prix d\'achat'] || row['Prix d\'achat (€)'] || '';
-            const estimatedPrice = row['Estimation'] || row['estimation'] || row['Valeur Estimée'] || row['Valeur Estimée (€)'] || row['Valeur'] || '';
+            const estimatedPrice = row['Estimation'] || row['estimation'] || row['Valeur Estimée (€)'] || '';
             const location = row['Lieu'] || row['Magasin'] || row['Lieu d\'achat'] || '';
             const genre = row['Genre'] || row['genre'] || row['Genres'] || '';
             const seenRaw = String(row['Vu'] || row['vu'] || '').toLowerCase();
@@ -546,6 +605,7 @@
               estimatedPrice: estimatedPrice ? String(estimatedPrice) : '',
               genres: genresArray, 
               seen: seen, 
+              isWishlist: false,
               addedAt: Date.now()
             };
 
@@ -580,6 +640,7 @@
     function clearSearch() {
       document.getElementById('searchInput').value = '';
       document.getElementById('clearSearchBtn').classList.add('hidden');
+      document.getElementById('searchResultsContainer').classList.add('hidden');
       document.getElementById('searchResults').innerHTML = '';
     }
 
@@ -614,17 +675,20 @@
     }
 
     function switchTab(tab) {
-      const tabs = ['Home', 'Collection', 'Stats', 'Settings'];
+      const tabs = ['Home', 'Collection', 'Wishlist', 'Stats', 'Settings'];
       tabs.forEach(t => {
         document.getElementById(`tab${t}`).classList.add('hidden');
-        document.getElementById(`tab${t}Btn`).className = "flex-1 py-2 rounded-xl font-semibold text-[11px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white";
+        document.getElementById(`tab${t}Btn`).className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white";
       });
 
       document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.remove('hidden');
-      document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}Btn`).className = "flex-1 py-2 rounded-xl font-semibold text-[11px] transition flex items-center justify-center gap-1 bg-indigo-600/80 text-white shadow-md shadow-indigo-500/30";
+      document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}Btn`).className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 bg-indigo-600/80 text-white shadow-md";
 
       if (tab === 'stats') renderStats();
-      if (tab === 'settings') document.getElementById('settingsTotalCount').innerText = collection.length;
+      if (tab === 'settings') {
+        document.getElementById('settingsTotalCount').innerText = collection.length;
+        document.getElementById('settingsWishlistCount').innerText = wishlist.length;
+      }
     }
 
     // --- SCANNER ---
@@ -652,52 +716,109 @@
         if (data.status === 1 && data.product.product_name) {
           document.getElementById('searchInput').value = data.product.product_name;
           document.getElementById('clearSearchBtn').classList.remove('hidden');
-          searchMovie();
+          triggerNewSearch();
         } else showToast("Code-barres inconnu.");
       } catch (err) { showToast("Erreur du scanner."); }
     }
 
-    // --- RECHERCHE & AJOUT ---
-    async function searchMovie() {
-      const query = document.getElementById('searchInput').value;
-      if (!query) return;
-      showToast("Recherche...");
+    // --- RECHERCHE TMDB AMÉLIORÉE AVEC PAGINATION & INFOS COMPLÈTES ---
+    function triggerNewSearch() {
+      currentSearchQuery = document.getElementById('searchInput').value.trim();
+      if (!currentSearchQuery) return;
+      currentSearchPage = 1;
+      searchMovieTMDB();
+    }
+
+    function changeSearchPage(delta) {
+      currentSearchPage += delta;
+      if (currentSearchPage < 1) currentSearchPage = 1;
+      if (currentSearchPage > totalSearchPages) currentSearchPage = totalSearchPages;
+      searchMovieTMDB();
+    }
+
+    async function searchMovieTMDB() {
+      if (!currentSearchQuery) return;
+      showToast(`Recherche page ${currentSearchPage}...`);
 
       try {
-        const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=fr-FR`);
+        const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(currentSearchQuery)}&language=fr-FR&page=${currentSearchPage}`);
         const data = await res.json();
+        
+        const container = document.getElementById('searchResultsContainer');
         const resultsDiv = document.getElementById('searchResults');
+        const paginationDiv = document.getElementById('searchPagination');
+        
+        container.classList.remove('hidden');
         resultsDiv.innerHTML = '';
 
         if (!data.results || data.results.length === 0) {
-            resultsDiv.innerHTML = '<p class="text-gray-500 text-sm col-span-2 text-center py-4">Aucun film trouvé.</p>';
+            resultsDiv.innerHTML = '<p class="text-gray-400 text-xs text-center py-4">Aucun film trouvé.</p>';
+            paginationDiv.classList.add('hidden');
             return;
         }
 
-        data.results.slice(0, 4).forEach(movie => {
+        totalSearchPages = data.total_pages || 1;
+        document.getElementById('searchPageInfo').innerText = `Page ${currentSearchPage} / ${totalSearchPages}`;
+        
+        document.getElementById('prevPageBtn').disabled = (currentSearchPage <= 1);
+        document.getElementById('nextPageBtn').disabled = (currentSearchPage >= totalSearchPages);
+        paginationDiv.classList.remove('hidden');
+
+        data.results.forEach(movie => {
           const poster = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'https://via.placeholder.com/150x225?text=Pas+d+affiche';
           const releaseDate = movie.release_date || '';
+          const year = releaseDate ? releaseDate.split('-')[0] : 'N/A';
           const safeTitle = movie.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+          const rating = movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A';
+          const overview = movie.overview ? (movie.overview.slice(0, 100) + '...') : 'Pas de description.';
+
+          const inCol = collection.some(m => String(m.id) === String(movie.id));
+          const inWish = wishlist.some(m => String(m.id) === String(movie.id));
+
           resultsDiv.innerHTML += `
-            <div class="glass-card p-2.5 rounded-2xl text-center text-xs flex flex-col justify-between border border-white/10 relative">
-              <img src="${poster}" class="rounded-xl mb-2 w-full h-44 object-cover shadow relative z-0">
-              <div class="relative z-10">
-                <p class="font-bold truncate text-white mb-0.5">${movie.title}</p>
-                <p class="text-gray-400 text-[10px] mb-2">${releaseDate ? releaseDate.split('-')[0] : 'N/A'}</p>
-                <button onclick="addToCollection('${movie.id}', '${safeTitle}', '${poster}', '${releaseDate}')" class="bg-indigo-600 hover:bg-indigo-500 py-1.5 px-2 rounded-xl font-semibold text-white transition active:scale-95 w-full">+ Ajouter</button>
+            <div class="glass-card p-3 rounded-2xl flex gap-3 items-center border border-white/10 relative">
+              <img src="${poster}" class="w-16 h-24 object-cover rounded-xl shadow-md flex-shrink-0">
+              <div class="flex-1 min-w-0 text-left space-y-1">
+                <div class="flex justify-between items-start">
+                  <p class="font-bold text-xs text-white truncate pr-2">${movie.title}</p>
+                  <span class="text-[10px] bg-indigo-500/30 text-indigo-200 px-1.5 py-0.5 rounded font-semibold flex-shrink-0">⭐ ${rating}</span>
+                </div>
+                <p class="text-[10px] text-gray-400">${year}</p>
+                <p class="text-[10px] text-gray-300 leading-tight line-clamp-2">${overview}</p>
+                
+                <div class="flex gap-2 pt-1">
+                  ${inCol ? `
+                    <span class="text-[10px] font-bold text-emerald-400 py-1">✓ En collection</span>
+                  ` : `
+                    <button onclick="addToCollection('${movie.id}', '${safeTitle}', '${poster}', '${releaseDate}')" class="bg-indigo-600 hover:bg-indigo-500 py-1 px-2.5 rounded-xl text-[10px] font-semibold text-white transition active:scale-95 flex-1">
+                      + Collection
+                    </button>
+                  `}
+
+                  ${inWish ? `
+                    <span class="text-[10px] font-bold text-pink-400 py-1">✨ En wishlist</span>
+                  ` : `
+                    <button onclick="addToWishlist('${movie.id}', '${safeTitle}', '${poster}', '${releaseDate}')" class="bg-pink-600/80 hover:bg-pink-500 py-1 px-2.5 rounded-xl text-[10px] font-semibold text-white transition active:scale-95">
+                      + Wishlist
+                    </button>
+                  `}
+                </div>
               </div>
             </div>
           `;
         });
-      } catch (err) { showToast("Erreur de recherche."); }
+      } catch (err) { 
+        showToast("Erreur de recherche."); 
+      }
     }
 
+    // --- GESTION COLLECTION & WISHLIST ---
     async function addToCollection(id, title, poster, releaseDate = '') {
       if (collection.some(m => String(m.id) === String(id))) {
         return showToast("Déjà dans votre collection.");
       }
 
-      showToast("Sauvegarde dans le Cloud...");
+      showToast("Ajout à la collection...");
 
       let fetchedGenres = [];
       if (!String(id).startsWith('custom_')) {
@@ -722,8 +843,17 @@
         estimatedPrice: '',
         genres: fetchedGenres, 
         seen: false, 
+        isWishlist: false,
         addedAt: Date.now()
       };
+
+      // Si le film était en wishlist, on le retire de la wishlist
+      const wishItem = wishlist.find(m => String(m.id) === String(id));
+      if (wishItem && wishItem.cloud_id) {
+        await deleteMovieFromCloud(wishItem.cloud_id);
+        wishlist = wishlist.filter(m => String(m.id) !== String(id));
+        renderWishlist();
+      }
 
       const cloudId = await saveMovieToCloud(newMovie);
 
@@ -732,6 +862,31 @@
         collection.push(newMovie);
         renderCollection();
         showToast(`"${title}" ajouté à la collection !`);
+        if (currentSearchQuery) searchMovieTMDB();
+      }
+    }
+
+    async function addToWishlist(id, title, poster, releaseDate = '') {
+      if (wishlist.some(m => String(m.id) === String(id))) {
+        return showToast("Déjà dans votre wishlist.");
+      }
+
+      const wishMovie = { 
+        id: String(id), 
+        title: title, 
+        poster: poster, 
+        releaseDate: releaseDate,
+        isWishlist: true,
+        addedAt: Date.now()
+      };
+
+      const cloudId = await saveMovieToCloud(wishMovie);
+      if (cloudId) {
+        wishMovie.cloud_id = cloudId;
+        wishlist.push(wishMovie);
+        renderWishlist();
+        showToast(`"${title}" ajouté à la wishlist ! ✨`);
+        if (currentSearchQuery) searchMovieTMDB();
       }
     }
 
@@ -746,6 +901,17 @@
         await deleteMovieFromCloud(movie.cloud_id);
         showToast(`"${movie.title}" supprimé.`);
       }
+    }
+
+    async function removeFromWishlist(id, event) {
+      if (event) event.stopPropagation();
+      const movie = wishlist.find(m => String(m.id) === String(id));
+      if (!movie) return;
+
+      wishlist = wishlist.filter(m => String(m.id) !== String(id));
+      renderWishlist();
+      await deleteMovieFromCloud(movie.cloud_id);
+      showToast(`"${movie.title}" retiré de la wishlist.`);
     }
 
     async function updateMovieDetails(id, key, value) {
@@ -788,6 +954,7 @@
       `;
     }
 
+    // RENDER COLLECTION AVEC FILTRES AVANCÉS
     function renderCollection() {
       const collectionGrid = document.getElementById('collectionGrid');
       const recentGrid = document.getElementById('recentGrid');
@@ -801,27 +968,83 @@
         collectionGrid.classList.add('grid-cols-2', 'gap-4');
       }
 
-      if (collection.length === 0) {
-        collectionGrid.innerHTML = '<p class="text-gray-500 text-sm col-span-full text-center py-8">Aucun Blu-ray dans le cloud.</p>';
+      // Appliquer les Filtres
+      const filterFormat = document.getElementById('filterFormat')?.value || 'all';
+      const filterSeen = document.getElementById('filterSeen')?.value || 'all';
+      const filterText = (document.getElementById('filterText')?.value || '').toLowerCase().trim();
+
+      let filteredCollection = collection.filter(m => {
+        if (filterFormat !== 'all' && (m.format || 'Blu-ray 1080p') !== filterFormat) return false;
+        if (filterSeen === 'seen' && !m.seen) return false;
+        if (filterSeen === 'unseen' && m.seen) return false;
+        if (filterText && !m.title.toLowerCase().includes(filterText)) return false;
+        return true;
+      });
+
+      if (filteredCollection.length === 0) {
+        collectionGrid.innerHTML = '<p class="text-gray-400 text-xs col-span-full text-center py-8">Aucun film ne correspond aux critères.</p>';
+      } else {
+        // Appliquer le tri
+        const sortType = document.getElementById('sortSelect')?.value || 'added_desc';
+        filteredCollection.sort((a, b) => {
+          if (sortType === 'title_asc') return a.title.localeCompare(b.title);
+          if (sortType === 'title_desc') return b.title.localeCompare(a.title);
+          if (sortType === 'added_asc') return (a.addedAt || 0) - (b.addedAt || 0);
+          if (sortType === 'price_desc') return (parseFloat(b.purchasePrice) || 0) - (parseFloat(a.purchasePrice) || 0);
+          if (sortType === 'estimated_desc') return (parseFloat(b.estimatedPrice) || 0) - (parseFloat(a.estimatedPrice) || 0);
+          return (b.addedAt || 0) - (a.addedAt || 0);
+        });
+
+        filteredCollection.forEach(movie => {
+          collectionGrid.innerHTML += createMovieCardHTML(movie);
+        });
+      }
+
+      // Derniers ajouts (Accueil)
+      collection.slice(-6).reverse().forEach(movie => {
+        recentGrid.innerHTML += createMovieCardHTML(movie);
+      });
+    }
+
+    // RENDER WISHLIST
+    function renderWishlist() {
+      const wishlistGrid = document.getElementById('wishlistGrid');
+      const badge = document.getElementById('wishlistBadge');
+      const totalCountEl = document.getElementById('wishlistTotalCount');
+      
+      wishlistGrid.innerHTML = '';
+      totalCountEl.innerText = `${wishlist.length} film(s)`;
+
+      if (wishlist.length > 0) {
+        badge.innerText = wishlist.length;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+        wishlistGrid.innerHTML = '<p class="text-gray-400 text-xs col-span-full text-center py-8">Votre wishlist est vide.</p>';
         return;
       }
 
-      const sortType = document.getElementById('sortSelect').value;
-      const sortedCollection = [...collection].sort((a, b) => {
-        if (sortType === 'title_asc') return a.title.localeCompare(b.title);
-        if (sortType === 'title_desc') return b.title.localeCompare(a.title);
-        if (sortType === 'added_asc') return (a.addedAt || 0) - (b.addedAt || 0);
-        if (sortType === 'price_desc') return (parseFloat(b.purchasePrice) || 0) - (parseFloat(a.purchasePrice) || 0);
-        if (sortType === 'estimated_desc') return (parseFloat(b.estimatedPrice) || 0) - (parseFloat(a.estimatedPrice) || 0);
-        return (b.addedAt || 0) - (a.addedAt || 0);
-      });
+      wishlist.forEach(m => {
+        const year = m.releaseDate ? m.releaseDate.split('-')[0] : '';
+        const safeTitle = m.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
-      sortedCollection.forEach(movie => {
-        collectionGrid.innerHTML += createMovieCardHTML(movie);
-      });
-
-      collection.slice(-6).reverse().forEach(movie => {
-        recentGrid.innerHTML += createMovieCardHTML(movie);
+        wishlistGrid.innerHTML += `
+          <div class="glass-card p-2.5 rounded-2xl text-center text-xs flex flex-col justify-between border border-pink-500/20 relative">
+            <img src="${m.poster}" class="rounded-xl mb-2 w-full h-44 object-cover shadow">
+            <div>
+              <p class="font-bold truncate text-white mb-0.5">${m.title}</p>
+              <p class="text-gray-400 text-[10px] mb-2">${year}</p>
+              <div class="space-y-1.5">
+                <button onclick="addToCollection('${m.id}', '${safeTitle}', '${m.poster}', '${m.releaseDate}')" class="bg-indigo-600 hover:bg-indigo-500 py-1.5 px-2 rounded-xl text-[10px] font-semibold text-white transition active:scale-95 w-full">
+                  ➡️ Acquis ! (Vers Collection)
+                </button>
+                <button onclick="removeFromWishlist('${m.id}', event)" class="bg-red-500/10 hover:bg-red-500/20 text-red-300 py-1 px-2 rounded-xl text-[10px] w-full flex items-center justify-center gap-1">
+                  ${TRASH_ICON} <span>Retirer</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
       });
     }
 
@@ -967,7 +1190,6 @@
           const res = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&language=fr-FR&append_to_response=credits`);
           if (res.ok) {
             const data = await res.json();
-            
             const directorObj = data.credits?.crew?.find(person => person.job === 'Director');
             const directorName = directorObj ? directorObj.name : '';
             const mainCast = data.credits?.cast?.slice(0, 4).map(actor => actor.name) || [];
