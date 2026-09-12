@@ -127,11 +127,11 @@
 
     <!-- COLLECTION -->
     <div id="tabCollection" class="hidden space-y-4">
-      <!-- Zone Import Excel -->
+      <!-- Import Excel -->
       <div class="glass-card p-3 rounded-2xl flex items-center justify-between gap-2 border border-indigo-500/30">
         <div class="text-xs">
           <p class="font-bold text-indigo-300">Importer un fichier Excel</p>
-          <p class="text-[10px] text-gray-400">Fichiers .xlsx / .xls autorisés</p>
+          <p class="text-[10px] text-gray-400">Format .xlsx / .xls</p>
         </div>
         <label class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-3 py-2 rounded-xl text-xs cursor-pointer shadow transition active:scale-95">
           📥 Choisir
@@ -154,6 +154,7 @@
             <option class="bg-gray-900" value="added_asc">Date d'ajout (Anciens)</option>
             <option class="bg-gray-900" value="title_asc">Titre (A ➔ Z)</option>
             <option class="bg-gray-900" value="title_desc">Titre (Z ➔ A)</option>
+            <option class="bg-gray-900" value="price_desc">Prix (Cher ➔ Pas cher)</option>
           </select>
         </div>
       </div>
@@ -184,10 +185,22 @@
           <p id="statAvgPrice" class="text-2xl font-black text-indigo-400 mt-1">0 €</p>
         </div>
       </div>
+
+      <!-- Detail Formats -->
+      <div class="glass-card p-4 rounded-3xl space-y-2 border border-white/10">
+        <p class="text-xs font-bold text-gray-300 uppercase tracking-wider">Répartition par Format</p>
+        <div id="statFormatsList" class="space-y-1.5 text-xs text-gray-300"></div>
+      </div>
+
+      <!-- Detail Editions -->
+      <div class="glass-card p-4 rounded-3xl space-y-2 border border-white/10">
+        <p class="text-xs font-bold text-gray-300 uppercase tracking-wider">Répartition par Boîtier</p>
+        <div id="statEditionsList" class="space-y-1.5 text-xs text-gray-300"></div>
+      </div>
     </div>
   </main>
 
-  <!-- MODAL -->
+  <!-- MODAL DETAILS -->
   <div id="detailModal" class="fixed inset-0 bg-black/60 backdrop-blur-xl hidden flex items-center justify-center p-4 z-50">
     <div class="glass-card rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto p-5 border border-white/20 relative shadow-2xl">
       <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white font-bold bg-white/10 hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center transition">✕</button>
@@ -224,13 +237,13 @@
       await fetchCollectionFromCloud();
     });
 
-    // --- DIALOGUE AVEC SUPABASE ---
+    // --- SUPABASE SYNCHRO ---
     async function fetchCollectionFromCloud() {
       showToast("Chargement du cloud...");
       const { data, error } = await db.from('bluray').select('*');
       if (error) {
-        showToast("Erreur de synchronisation supabase");
-        console.error("Erreur Supabase Fetch:", error);
+        showToast("Erreur de synchronisation Supabase");
+        console.error("Fetch error:", error);
       } else {
         collection = data.map(item => ({ ...item.data, cloud_id: item.id }));
         renderCollection();
@@ -240,61 +253,55 @@
     async function saveMovieToCloud(movie) {
       const { data, error } = await db.from('bluray').insert([{ data: movie }]).select();
       if (error) {
-        showToast("⚠️ Erreur lors de la sauvegarde cloud !");
-        console.error("Erreur Insert Supabase:", error);
+        showToast("⚠️ Erreur de sauvegarde !");
+        console.error("Insert error:", error);
         return null;
       }
-      if (data && data.length > 0) {
-        return data[0].id;
-      }
-      return null;
+      return data[0]?.id || null;
     }
 
     async function updateMovieInCloud(movie) {
       if (!movie.cloud_id) return;
       const { cloud_id, ...cleanMovie } = movie;
       const { error } = await db.from('bluray').update({ data: cleanMovie }).eq('id', cloud_id);
-      if (error) console.error("Erreur Update Supabase:", error);
+      if (error) console.error("Update error:", error);
     }
 
     async function deleteMovieFromCloud(cloud_id) {
       const { error } = await db.from('bluray').delete().eq('id', cloud_id);
-      if (error) console.error("Erreur Delete Supabase:", error);
+      if (error) console.error("Delete error:", error);
     }
 
-    // --- IMPORTATION EXCEL ---
+    // --- IMPORT EXCEL ---
     async function importExcel(event) {
       const file = event.target.files[0];
       if (!file) return;
 
-      showToast("Lecture du fichier Excel...");
+      showToast("Lecture d'Excel...");
       const reader = new FileReader();
 
       reader.onload = async (e) => {
         try {
           const data = new Uint8Array(e.target.result);
           const workbook = XLSX.read(data, { type: 'array' });
-          const firstSheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[firstSheetName];
+          const worksheet = workbook.Sheets[workbook.SheetNames[0]];
           const json = XLSX.utils.sheet_to_json(worksheet);
 
-          if (json.length === 0) {
-            return showToast("Le fichier Excel est vide.");
-          }
+          if (json.length === 0) return showToast("Fichier vide.");
 
           let addedCount = 0;
-          showToast(`Importation de ${json.length} films...`);
+          showToast(`Import de ${json.length} films...`);
 
           for (const row of json) {
-            // Détection du titre dans le fichier Excel (sensible à la casse)
-            const title = row['Titre'] || row['titre'] || row['Title'] || row['TITLE'] || row['Nom'] || row['nom'];
+            const title = row['Titre'] || row['titre'] || row['Title'] || row['Nom'];
             if (!title) continue;
 
             const format = row['Format'] || row['format'] || 'Blu-ray 1080p';
-            const editionType = row['Boitier'] || row['boitier'] || row['Édition'] || row['Edition'] || 'Amaray';
+            const editionType = row['Boitier'] || row['boitier'] || row['Édition'] || 'Amaray';
             const price = row['Prix'] || row['prix'] || '';
+            const location = row['Lieu'] || row['Magasin'] || '';
             const seenRaw = String(row['Vu'] || row['vu'] || '').toLowerCase();
-            const seen = (seenRaw === 'oui' || seenRaw === 'true' || seenRaw === '1' || seenRaw === 'vrai');
+            const seen = (seenRaw === 'oui' || seenRaw === 'true' || seenRaw === '1');
 
             const newMovie = { 
               id: 'custom_' + Date.now() + '_' + Math.floor(Math.random() * 1000), 
@@ -303,7 +310,7 @@
               releaseDate: '',
               format: String(format), 
               editionType: String(editionType), 
-              purchaseLocation: '', 
+              purchaseLocation: String(location), 
               purchasePrice: price ? String(price) : '', 
               genres: [], 
               seen: seen, 
@@ -319,18 +326,16 @@
           }
 
           renderCollection();
-          showToast(`🎉 ${addedCount} film(s) importé(s) avec succès !`);
-          event.target.value = ''; // Réinitialise l'input
+          showToast(`🎉 ${addedCount} film(s) importé(s) !`);
+          event.target.value = '';
         } catch (err) {
-          console.error(err);
-          showToast("Erreur lors de la lecture du fichier Excel.");
+          showToast("Erreur lors de la lecture d'Excel.");
         }
       };
-
       reader.readAsArrayBuffer(file);
     }
 
-    // --- FONCTIONS SYSTÈME ---
+    // --- UTILS ---
     function showToast(message) {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
@@ -389,7 +394,7 @@
       if (tab === 'stats') renderStats();
     }
 
-    // --- SCANNER DE CODE-BARRES ---
+    // --- SCANNER ---
     function toggleScanner() {
       const container = document.getElementById('scanner-container');
       container.classList.toggle('hidden');
@@ -415,11 +420,11 @@
           document.getElementById('searchInput').value = data.product.product_name;
           document.getElementById('clearSearchBtn').classList.remove('hidden');
           searchMovie();
-        } else showToast("Code-barres non trouvé.");
-      } catch (err) { showToast("Erreur lecture code-barres."); }
+        } else showToast("Code-barres inconnu.");
+      } catch (err) { showToast("Erreur du scanner."); }
     }
 
-    // --- RECHERCHE ET AJOUT ---
+    // --- RECHERCHE & AJOUT ---
     async function searchMovie() {
       const query = document.getElementById('searchInput').value;
       if (!query) return;
@@ -459,7 +464,7 @@
         return showToast("Déjà dans votre collection.");
       }
 
-      showToast("Ajout au Cloud en cours...");
+      showToast("Sauvegarde dans le Cloud...");
 
       const newMovie = { 
         id: String(id), 
@@ -481,12 +486,12 @@
         newMovie.cloud_id = cloudId;
         collection.push(newMovie);
         renderCollection();
-        showToast(`"${title}" synchronisé avec succès !`);
+        showToast(`"${title}" ajouté à la collection !`);
       }
     }
 
     async function removeFromCollection(id, event) {
-      event.stopPropagation();
+      if (event) event.stopPropagation();
       const movie = collection.find(m => String(m.id) === String(id));
       if (!movie) return;
 
@@ -494,7 +499,7 @@
         collection = collection.filter(m => String(m.id) !== String(id));
         renderCollection();
         await deleteMovieFromCloud(movie.cloud_id);
-        showToast(`"${movie.title}" supprimé du cloud.`);
+        showToast(`"${movie.title}" supprimé.`);
       }
     }
 
@@ -503,7 +508,7 @@
       if (item) {
         item[key] = value;
         await updateMovieInCloud(item);
-        if(key === 'format' || key === 'seen' || key === 'editionType') renderCollection();
+        if(['format', 'seen', 'editionType', 'purchasePrice'].includes(key)) renderCollection();
       }
     }
 
@@ -513,6 +518,7 @@
       const format = movie.format || 'Blu-ray 1080p';
       const formatColor = format === '4K UHD' ? 'bg-red-600' : (format === 'DVD' ? 'bg-amber-600' : 'bg-blue-600');
       const seenBg = movie.seen ? 'bg-emerald-500/80' : 'bg-gray-600/80';
+      const priceTag = movie.purchasePrice ? `${parseFloat(movie.purchasePrice).toFixed(2)} €` : '';
 
       return `
         <div onclick="openMovieDetails('${movie.id}')" class="movie-card-item glass-card p-2.5 rounded-2xl text-center text-xs relative cursor-pointer hover:border-indigo-400/50 transition group">
@@ -525,7 +531,10 @@
           <img src="${movie.poster}" class="rounded-xl mb-2.5 w-full h-48 object-cover shadow-md">
           <div class="movie-card-info relative z-10">
             <p class="font-semibold truncate text-gray-100 mb-0.5">${movie.title}</p>
-            <p class="text-[10px] text-indigo-300/80 mb-2">${movie.editionType || 'Amaray'}</p>
+            <div class="flex items-center justify-center gap-2 text-[10px] text-indigo-300/80 mb-2">
+              <span>${movie.editionType || 'Amaray'}</span>
+              ${priceTag ? `<span class="bg-indigo-500/20 text-indigo-200 px-1.5 py-0.5 rounded-md font-bold">${priceTag}</span>` : ''}
+            </div>
             <button onclick="removeFromCollection('${movie.id}', event)" class="bg-red-500/10 hover:bg-red-500/30 text-red-300 border border-red-500/20 py-1 px-2 rounded-xl text-[11px] w-full flex items-center justify-center gap-1">
               ${TRASH_ICON} <span>Supprimer</span>
             </button>
@@ -552,12 +561,12 @@
         return;
       }
 
-      // Tri
       const sortType = document.getElementById('sortSelect').value;
       const sortedCollection = [...collection].sort((a, b) => {
         if (sortType === 'title_asc') return a.title.localeCompare(b.title);
         if (sortType === 'title_desc') return b.title.localeCompare(a.title);
         if (sortType === 'added_asc') return (a.addedAt || 0) - (b.addedAt || 0);
+        if (sortType === 'price_desc') return (parseFloat(b.purchasePrice) || 0) - (parseFloat(a.purchasePrice) || 0);
         return (b.addedAt || 0) - (a.addedAt || 0);
       });
 
@@ -577,6 +586,34 @@
       document.getElementById('statTotalValue').innerText = `${totalVal.toFixed(2)} €`;
       document.getElementById('statAvgPrice').innerText = prices.length > 0 ? `${(totalVal / prices.length).toFixed(2)} €` : '0.00 €';
       document.getElementById('statSeenMovies').innerText = `${collection.filter(m => m.seen).length} / ${collection.length}`;
+
+      // Formats
+      const formats = {};
+      collection.forEach(m => {
+        const fmt = m.format || 'Blu-ray 1080p';
+        formats[fmt] = (formats[fmt] || 0) + 1;
+      });
+      const fmtList = document.getElementById('statFormatsList');
+      fmtList.innerHTML = Object.entries(formats).map(([k, v]) => `
+        <div class="flex justify-between items-center bg-white/5 px-3 py-1.5 rounded-xl">
+          <span>${k}</span>
+          <span class="font-bold text-indigo-400">${v}</span>
+        </div>
+      `).join('');
+
+      // Boîtiers
+      const editions = {};
+      collection.forEach(m => {
+        const ed = m.editionType || 'Amaray';
+        editions[ed] = (editions[ed] || 0) + 1;
+      });
+      const edList = document.getElementById('statEditionsList');
+      edList.innerHTML = Object.entries(editions).map(([k, v]) => `
+        <div class="flex justify-between items-center bg-white/5 px-3 py-1.5 rounded-xl">
+          <span>${k}</span>
+          <span class="font-bold text-purple-400">${v}</span>
+        </div>
+      `).join('');
     }
 
     async function openMovieDetails(movieId) {
@@ -585,72 +622,91 @@
       modal.classList.remove('hidden');
 
       const localMovie = collection.find(m => String(m.id) === String(movieId));
-      if(!localMovie) return closeModal();
-
-      // Si c'un film custom importé d'Excel sans ID TMDB
-      if (String(movieId).startsWith('custom_')) {
-        content.innerHTML = `
-          <div class="flex flex-col gap-4">
-            <div class="text-left space-y-4">
-              <h3 class="text-lg font-extrabold text-white leading-tight">${localMovie.title}</h3>
-              <div class="grid grid-cols-2 gap-2 glass-card p-3 rounded-xl">
-                <div>
-                  <label class="block text-[10px] font-bold text-indigo-300 uppercase">Support :</label>
-                  <select onchange="updateMovieDetails('${localMovie.id}', 'format', this.value)" class="w-full glass-input text-white text-xs p-2 rounded-lg">
-                    <option class="bg-gray-900" value="Blu-ray 1080p" ${localMovie.format === 'Blu-ray 1080p' ? 'selected' : ''}>Blu-ray</option>
-                    <option class="bg-gray-900" value="4K UHD" ${localMovie.format === '4K UHD' ? 'selected' : ''}>4K UHD</option>
-                    <option class="bg-gray-900" value="DVD" ${localMovie.format === 'DVD' ? 'selected' : ''}>DVD</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-[10px] font-bold text-indigo-300 uppercase">Boîtier :</label>
-                  <select onchange="updateMovieDetails('${localMovie.id}', 'editionType', this.value)" class="w-full glass-input text-white text-xs p-2 rounded-lg">
-                    <option class="bg-gray-900" value="Amaray" ${localMovie.editionType === 'Amaray' ? 'selected' : ''}>Amaray</option>
-                    <option class="bg-gray-900" value="Steelbook" ${localMovie.editionType === 'Steelbook' ? 'selected' : ''}>Steelbook</option>
-                    <option class="bg-gray-900" value="Coffret" ${localMovie.editionType === 'Coffret' ? 'selected' : ''}>Coffret</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-        return;
-      }
+      if (!localMovie) return closeModal();
 
       content.innerHTML = '<p class="text-center text-gray-400 py-8">Chargement...</p>';
 
-      try {
-        const res = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&language=fr-FR`);
-        const movie = await res.json();
+      let movieDetails = {
+        title: localMovie.title,
+        overview: 'Aucun synopsis disponible.',
+        release_date: localMovie.releaseDate || '',
+        runtime: null,
+        genres: []
+      };
 
-        content.innerHTML = `
-          <div class="flex flex-col gap-4">
-            <img src="${localMovie.poster}" class="w-40 h-56 object-cover rounded-2xl mx-auto shadow-2xl border border-white/10">
-            <div class="text-left space-y-4">
-              <h3 class="text-lg font-extrabold text-white leading-tight">${movie.title}</h3>
-              <div class="grid grid-cols-2 gap-2 glass-card p-3 rounded-xl">
-                <div>
-                  <label class="block text-[10px] font-bold text-indigo-300 uppercase">Support :</label>
-                  <select onchange="updateMovieDetails('${movie.id}', 'format', this.value)" class="w-full glass-input text-white text-xs p-2 rounded-lg">
-                    <option class="bg-gray-900" value="Blu-ray 1080p" ${localMovie.format === 'Blu-ray 1080p' ? 'selected' : ''}>Blu-ray</option>
-                    <option class="bg-gray-900" value="4K UHD" ${localMovie.format === '4K UHD' ? 'selected' : ''}>4K UHD</option>
-                    <option class="bg-gray-900" value="DVD" ${localMovie.format === 'DVD' ? 'selected' : ''}>DVD</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-[10px] font-bold text-indigo-300 uppercase">Boîtier :</label>
-                  <select onchange="updateMovieDetails('${movie.id}', 'editionType', this.value)" class="w-full glass-input text-white text-xs p-2 rounded-lg">
-                    <option class="bg-gray-900" value="Amaray" ${localMovie.editionType === 'Amaray' ? 'selected' : ''}>Amaray</option>
-                    <option class="bg-gray-900" value="Steelbook" ${localMovie.editionType === 'Steelbook' ? 'selected' : ''}>Steelbook</option>
-                    <option class="bg-gray-900" value="Coffret" ${localMovie.editionType === 'Coffret' ? 'selected' : ''}>Coffret</option>
-                  </select>
-                </div>
-              </div>
-              <p class="text-xs text-gray-300">${movie.overview || ''}</p>
+      // Tente de récupérer les infos fraîches depuis TMDB
+      if (!String(movieId).startsWith('custom_')) {
+        try {
+          const res = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&language=fr-FR`);
+          if (res.ok) {
+            const data = await res.json();
+            movieDetails = { ...movieDetails, ...data };
+          }
+        } catch (e) { console.error(e); }
+      }
+
+      const genresStr = movieDetails.genres ? movieDetails.genres.map(g => g.name).join(', ') : '';
+      const runtimeStr = movieDetails.runtime ? `${movieDetails.runtime} min` : '';
+
+      content.innerHTML = `
+        <div class="flex flex-col gap-4 text-left">
+          <div class="flex gap-4 items-start">
+            <img src="${localMovie.poster}" class="w-28 h-40 object-cover rounded-xl shadow-xl border border-white/10 flex-shrink-0">
+            <div class="space-y-1">
+              <h3 class="text-base font-extrabold text-white leading-snug">${movieDetails.title}</h3>
+              <p class="text-[11px] text-gray-400">${movieDetails.release_date ? movieDetails.release_date.split('-')[0] : ''} ${runtimeStr ? '• ' + runtimeStr : ''}</p>
+              ${genresStr ? `<p class="text-[10px] text-indigo-300 font-medium">${genresStr}</p>` : ''}
+              <button onclick="toggleSeen('${localMovie.id}'); openMovieDetails('${localMovie.id}')" class="mt-2 text-xs font-semibold px-3 py-1 rounded-xl transition ${localMovie.seen ? 'bg-emerald-500/80 text-white' : 'bg-gray-700 text-gray-300'}">
+                ${localMovie.seen ? '🍿 Vu' : '👁️ Marquer comme vu'}
+              </button>
             </div>
           </div>
-        `;
-      } catch (err) { content.innerHTML = '<p class="text-center text-red-400 py-4">Erreur de chargement.</p>'; }
+
+          <!-- OPTION D'ÉDITION DES INFOS D'ACHAT ET DE FORMAT -->
+          <div class="space-y-3 glass-card p-3 rounded-2xl border border-white/10">
+            <p class="text-[11px] font-bold text-gray-300 uppercase tracking-wider">Informations Édition & Achat</p>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[10px] text-gray-400 font-semibold mb-1">Support :</label>
+                <select onchange="updateMovieDetails('${localMovie.id}', 'format', this.value)" class="w-full glass-input text-white text-xs p-2 rounded-xl focus:outline-none">
+                  <option class="bg-gray-900" value="Blu-ray 1080p" ${localMovie.format === 'Blu-ray 1080p' ? 'selected' : ''}>Blu-ray 1080p</option>
+                  <option class="bg-gray-900" value="4K UHD" ${localMovie.format === '4K UHD' ? 'selected' : ''}>4K UHD</option>
+                  <option class="bg-gray-900" value="DVD" ${localMovie.format === 'DVD' ? 'selected' : ''}>DVD</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-[10px] text-gray-400 font-semibold mb-1">Type de Boîtier :</label>
+                <select onchange="updateMovieDetails('${localMovie.id}', 'editionType', this.value)" class="w-full glass-input text-white text-xs p-2 rounded-xl focus:outline-none">
+                  <option class="bg-gray-900" value="Amaray" ${localMovie.editionType === 'Amaray' ? 'selected' : ''}>Amaray (Standard)</option>
+                  <option class="bg-gray-900" value="Steelbook" ${localMovie.editionType === 'Steelbook' ? 'selected' : ''}>Steelbook (Métal)</option>
+                  <option class="bg-gray-900" value="Coffret" ${localMovie.editionType === 'Coffret' ? 'selected' : ''}>Coffret / Collector</option>
+                  <option class="bg-gray-900" value="Digibook" ${localMovie.editionType === 'Digibook' ? 'selected' : ''}>Digibook / Mediabook</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[10px] text-gray-400 font-semibold mb-1">Prix d'achat (€) :</label>
+                <input type="number" step="0.01" placeholder="ex: 19.99" value="${localMovie.purchasePrice || ''}" onchange="updateMovieDetails('${localMovie.id}', 'purchasePrice', this.value)" class="w-full glass-input text-white text-xs p-2 rounded-xl focus:outline-none">
+              </div>
+
+              <div>
+                <label class="block text-[10px] text-gray-400 font-semibold mb-1">Lieu d'achat :</label>
+                <input type="text" placeholder="ex: Fnac, Amazon..." value="${localMovie.purchaseLocation || ''}" onchange="updateMovieDetails('${localMovie.id}', 'purchaseLocation', this.value)" class="w-full glass-input text-white text-xs p-2 rounded-xl focus:outline-none">
+              </div>
+            </div>
+          </div>
+
+          <!-- SYNOPSIS -->
+          <div class="space-y-1">
+            <p class="text-[11px] font-bold text-gray-400 uppercase">Synopsis</p>
+            <p class="text-xs text-gray-300 leading-relaxed max-h-32 overflow-y-auto pr-1">${movieDetails.overview}</p>
+          </div>
+        </div>
+      `;
     }
 
     function closeModal() { document.getElementById('detailModal').classList.add('hidden'); }
