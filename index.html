@@ -244,12 +244,12 @@
 
       <div class="grid grid-cols-2 gap-3">
         <div class="glass-card p-4 rounded-3xl text-center">
-          <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Blu-ray</p>
+          <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Films Uniques</p>
           <p id="statTotalMovies" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400 mt-1">0</p>
         </div>
         <div class="glass-card p-4 rounded-3xl text-center">
-          <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Films Vus</p>
-          <p id="statSeenMovies" class="text-3xl font-black text-emerald-400 mt-1">0</p>
+          <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Éditions/Boîtiers</p>
+          <p id="statTotalEditions" class="text-3xl font-black text-indigo-300 mt-1">0</p>
         </div>
       </div>
 
@@ -264,9 +264,20 @@
         </div>
       </div>
 
-      <div class="glass-card p-3 rounded-2xl text-center">
-        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Prix d'Achat Moyen</p>
-        <p id="statAvgPrice" class="text-xl font-black text-indigo-400 mt-0.5">0 €</p>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="glass-card p-3 rounded-2xl text-center">
+          <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Prix Moyen / Film</p>
+          <p id="statAvgPriceMovie" class="text-lg font-black text-indigo-400 mt-0.5">0 €</p>
+        </div>
+        <div class="glass-card p-3 rounded-2xl text-center">
+          <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Prix Moyen / Édition</p>
+          <p id="statAvgPriceEdition" class="text-lg font-black text-teal-400 mt-0.5">0 €</p>
+        </div>
+      </div>
+
+      <div class="glass-card p-4 rounded-3xl text-center">
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Films Vus</p>
+        <p id="statSeenMovies" class="text-2xl font-black text-emerald-400 mt-1">0</p>
       </div>
 
       <div class="glass-card p-4 rounded-3xl space-y-3 border border-white/10">
@@ -381,8 +392,12 @@
       <div class="glass-card p-4 rounded-3xl border border-white/10 space-y-2 text-xs text-gray-300">
         <h3 class="text-sm font-bold text-white mb-1">ℹ️ Informations</h3>
         <div class="flex justify-between border-b border-white/10 py-1.5">
-          <span class="text-gray-400">Total Blu-ray :</span>
+          <span class="text-gray-400">Total Films :</span>
           <span id="settingsTotalCount" class="font-bold text-indigo-300">0</span>
+        </div>
+        <div class="flex justify-between border-b border-white/10 py-1.5">
+          <span class="text-gray-400">Total Éditions :</span>
+          <span id="settingsTotalEditionsCount" class="font-bold text-indigo-300">0</span>
         </div>
         <div class="flex justify-between border-b border-white/10 py-1.5">
           <span class="text-gray-400">Films en Wishlist :</span>
@@ -455,6 +470,15 @@
       await fetchCollectionFromCloud();
     });
 
+    function showToast(msg) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerText = msg;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
     function changeTheme(themeClass) {
       document.body.className = `${themeClass} text-gray-100 min-h-screen pb-10 selection:bg-indigo-500 selection:text-white`;
       localStorage.setItem('app_theme', themeClass);
@@ -479,6 +503,37 @@
       fetchCollectionFromCloud();
     }
 
+    // --- NORMALISATION DES DONNÉES (POUR LES ÉDITIONS MULTIPLES) ---
+    function normalizeMovieData(movie) {
+      if (!movie.editions || !Array.isArray(movie.editions) || movie.editions.length === 0) {
+        movie.editions = [{
+          id: 'ed_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+          title: movie.editionName || 'Édition Standard',
+          format: movie.format || 'Blu-ray 1080p',
+          editionType: movie.editionType || 'Amaray',
+          purchasePrice: movie.purchasePrice !== undefined ? movie.purchasePrice : '',
+          estimatedPrice: movie.estimatedPrice !== undefined ? movie.estimatedPrice : '',
+          purchaseLocation: movie.purchaseLocation || ''
+        }];
+      }
+      return movie;
+    }
+
+    function calculateMovieTotals(movie) {
+      normalizeMovieData(movie);
+      let purchase = 0;
+      let estimated = 0;
+      movie.editions.forEach(ed => {
+        purchase += parseFloat(ed.purchasePrice) || 0;
+        estimated += parseFloat(ed.estimatedPrice) || 0;
+      });
+      return {
+        totalPurchase: purchase,
+        totalEstimated: estimated,
+        count: movie.editions.length
+      };
+    }
+
     // --- SUPABASE SYNCHRO ---
     async function fetchCollectionFromCloud() {
       showToast("Chargement du cloud...");
@@ -491,7 +546,8 @@
           collection = [];
           wishlist = [];
           data.forEach(item => {
-            const m = { ...item.data, cloud_id: item.id };
+            let m = { ...item.data, cloud_id: item.id };
+            m = normalizeMovieData(m);
             if (m.isWishlist) wishlist.push(m);
             else collection.push(m);
           });
@@ -504,6 +560,7 @@
     }
 
     async function saveMovieToCloud(movie) {
+      normalizeMovieData(movie);
       const { data, error } = await db.from('bluray').insert([{ data: movie }]).select();
       if (error) {
         showToast("⚠️ Erreur de sauvegarde !");
@@ -515,6 +572,7 @@
 
     async function updateMovieInCloud(movie) {
       if (!movie.cloud_id) return;
+      normalizeMovieData(movie);
       const { cloud_id, ...cleanMovie } = movie;
       const { error } = await db.from('bluray').update({ data: cleanMovie }).eq('id', cloud_id);
       if (error) console.error("Update error:", error);
@@ -525,22 +583,730 @@
       if (error) console.error("Delete error:", error);
     }
 
-    // --- EXPORTS ---
+    // --- NAVIGATION ET TABS ---
+    function switchTab(tab) {
+      ['tabHome', 'tabCollection', 'tabWishlist', 'tabStats', 'tabSettings'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+
+      ['tabHomeBtn', 'tabCollectionBtn', 'tabWishlistBtn', 'tabStatsBtn', 'tabSettingsBtn'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+          btn.className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white";
+        }
+      });
+
+      if (tab === 'home') {
+        document.getElementById('tabHome').classList.remove('hidden');
+        document.getElementById('tabHomeBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 bg-indigo-600/80 text-white shadow-md";
+        renderHomeRecent();
+      } else if (tab === 'collection') {
+        document.getElementById('tabCollection').classList.remove('hidden');
+        document.getElementById('tabCollectionBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 bg-indigo-600/80 text-white shadow-md";
+        renderCollection();
+      } else if (tab === 'wishlist') {
+        document.getElementById('tabWishlist').classList.remove('hidden');
+        document.getElementById('tabWishlistBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 bg-pink-600/80 text-white shadow-md";
+        renderWishlist();
+      } else if (tab === 'stats') {
+        document.getElementById('tabStats').classList.remove('hidden');
+        document.getElementById('tabStatsBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 bg-indigo-600/80 text-white shadow-md";
+        renderStats();
+      } else if (tab === 'settings') {
+        document.getElementById('tabSettings').classList.remove('hidden');
+        document.getElementById('tabSettingsBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 bg-indigo-600/80 text-white shadow-md";
+        updateSettingsCounters();
+      }
+    }
+
+    function toggleViewMode() {
+      isListView = !isListView;
+      document.getElementById('viewModeLabel').innerText = isListView ? "Vue Grille" : "Vue Liste";
+      renderCollection();
+    }
+
+    // --- RECHERCHE TMDB ---
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('searchResultsContainer').classList.add('hidden');
+      document.getElementById('clearSearchBtn').classList.add('hidden');
+    }
+
+    function triggerNewSearch() {
+      currentSearchQuery = document.getElementById('searchInput').value.trim();
+      if (!currentSearchQuery) return;
+      currentSearchPage = 1;
+      searchTMDB();
+    }
+
+    function changeSearchPage(delta) {
+      currentSearchPage += delta;
+      if (currentSearchPage < 1) currentSearchPage = 1;
+      if (currentSearchPage > totalSearchPages) currentSearchPage = totalSearchPages;
+      searchTMDB();
+    }
+
+    async function searchTMDB() {
+      if (!currentSearchQuery) return;
+      showToast("Recherche en cours...");
+      try {
+        const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(currentSearchQuery)}&language=fr-FR&page=${currentSearchPage}`);
+        const data = await res.json();
+        
+        totalSearchPages = data.total_pages || 1;
+        displaySearchResults(data.results || []);
+      } catch (e) {
+        showToast("Erreur lors de la recherche TMDB");
+      }
+    }
+
+    function displaySearchResults(results) {
+      const container = document.getElementById('searchResults');
+      const box = document.getElementById('searchResultsContainer');
+      const pageInfo = document.getElementById('searchPageInfo');
+      const pagination = document.getElementById('searchPagination');
+
+      container.innerHTML = '';
+      box.classList.remove('hidden');
+
+      if (results.length === 0) {
+        container.innerHTML = `<p class="text-xs text-gray-400 p-3 text-center">Aucun film trouvé.</p>`;
+        pagination.classList.add('hidden');
+        return;
+      }
+
+      pageInfo.innerText = `Page ${currentSearchPage} / ${totalSearchPages}`;
+      pagination.classList.remove('hidden');
+
+      document.getElementById('prevPageBtn').disabled = (currentSearchPage <= 1);
+      document.getElementById('nextPageBtn').disabled = (currentSearchPage >= totalSearchPages);
+
+      results.forEach(m => {
+        const poster = m.poster_path ? `https://image.tmdb.org/t/p/w200${m.poster_path}` : 'https://via.placeholder.com/200x300?text=Pas+d+image';
+        const year = m.release_date ? m.release_date.split('-')[0] : 'N/A';
+
+        const item = document.createElement('div');
+        item.className = 'glass-card p-2 rounded-2xl flex items-center gap-3 border border-white/10';
+        item.innerHTML = `
+          <img src="${poster}" class="w-12 h-16 object-cover rounded-xl shadow">
+          <div class="flex-1 min-width-0">
+            <h4 class="text-xs font-bold text-white truncate">${m.title}</h4>
+            <p class="text-[10px] text-gray-400">${year}</p>
+          </div>
+          <div class="flex flex-col gap-1">
+            <button onclick='addMovieFromTMDB(${JSON.stringify(m).replace(/'/g, "&apos;")}, false)' class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition">
+              + Collection
+            </button>
+            <button onclick='addMovieFromTMDB(${JSON.stringify(m).replace(/'/g, "&apos;")}, true)' class="bg-pink-600 hover:bg-pink-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition">
+              + Wishlist
+            </button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    async function addMovieFromTMDB(tmdbData, isWishlist = false) {
+      let genres = [];
+      try {
+        const detailRes = await fetch(`https://api.themoviedb.org/3/movie/${tmdbData.id}?api_key=${API_KEY}&language=fr-FR`);
+        const detail = await detailRes.json();
+        genres = detail.genres ? detail.genres.map(g => g.name) : [];
+      } catch(e) {}
+
+      const movie = {
+        id: 'tmdb_' + tmdbData.id + '_' + Date.now(),
+        tmdb_id: tmdbData.id,
+        title: tmdbData.title,
+        poster: tmdbData.poster_path ? `https://image.tmdb.org/t/p/w500${tmdbData.poster_path}` : 'https://via.placeholder.com/300x450?text=Pas+d+image',
+        releaseDate: tmdbData.release_date || '',
+        overview: tmdbData.overview || '',
+        genres: genres,
+        seen: false,
+        isWishlist: isWishlist,
+        addedAt: new Date().toISOString(),
+        editions: [{
+          id: 'ed_' + Date.now(),
+          title: 'Édition Standard',
+          format: 'Blu-ray 1080p',
+          editionType: 'Amaray',
+          purchasePrice: '',
+          estimatedPrice: '',
+          purchaseLocation: ''
+        }]
+      };
+
+      const cloudId = await saveMovieToCloud(movie);
+      if (cloudId) {
+        movie.cloud_id = cloudId;
+        if (isWishlist) {
+          wishlist.push(movie);
+          renderWishlist();
+          showToast("Ajouté à la Wishlist ! ✨");
+        } else {
+          collection.push(movie);
+          renderCollection();
+          showToast("Ajouté à la Collection ! 💿");
+        }
+      }
+    }
+
+    // --- ACCUEIL ---
+    function renderHomeRecent() {
+      const grid = document.getElementById('recentGrid');
+      grid.innerHTML = '';
+
+      const recent = [...collection].sort((a,b) => new Date(b.addedAt || 0) - new Date(a.addedAt || 0)).slice(0, 6);
+      if (recent.length === 0) {
+        grid.innerHTML = `<p class="text-xs text-gray-400 col-span-2 sm:col-span-3 text-center p-4">Aucun film dans votre collection.</p>`;
+        return;
+      }
+
+      recent.forEach(m => {
+        const totals = calculateMovieTotals(m);
+        const card = document.createElement('div');
+        card.className = 'glass-card p-2 rounded-2xl text-center space-y-1.5 border border-white/10 hover:border-indigo-500/50 transition cursor-pointer';
+        card.onclick = () => openMovieDetail(m.id);
+        card.innerHTML = `
+          <img src="${m.poster}" class="w-full h-36 object-cover rounded-xl shadow">
+          <h4 class="text-[11px] font-bold text-white truncate">${m.title}</h4>
+          <p class="text-[9px] text-indigo-300 font-semibold">${totals.count} éd. • ${totals.totalPurchase.toFixed(2)} €</p>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function pickRandomMovie() {
+      if (collection.length === 0) return showToast("Votre collection est vide.");
+      const filter = document.getElementById('randomFilter').value;
+      let pool = collection;
+
+      if (filter === 'unseen') {
+        pool = collection.filter(m => !m.seen);
+      } else if (filter === '4k') {
+        pool = collection.filter(m => m.editions && m.editions.some(e => e.format === '4K UHD'));
+      }
+
+      if (pool.length === 0) return showToast("Aucun film ne correspond au filtre sélectionné.");
+      const random = pool[Math.floor(Math.random() * pool.length)];
+      openMovieDetail(random.id);
+    }
+
+    // --- RENDU COLLECTION ET WISHLIST ---
+    function renderCollection() {
+      const grid = document.getElementById('collectionGrid');
+      grid.innerHTML = '';
+
+      if (isListView) {
+        grid.className = "list-view-container";
+      } else {
+        grid.className = "grid grid-cols-2 gap-4";
+      }
+
+      let filtered = [...collection];
+      const formatFilter = document.getElementById('filterFormat').value;
+      const seenFilter = document.getElementById('filterSeen').value;
+      const sortVal = document.getElementById('sortSelect').value;
+      const textFilter = document.getElementById('filterText').value.toLowerCase().trim();
+
+      if (formatFilter !== 'all') {
+        filtered = filtered.filter(m => m.editions && m.editions.some(e => e.format === formatFilter));
+      }
+
+      if (seenFilter === 'seen') filtered = filtered.filter(m => m.seen);
+      if (seenFilter === 'unseen') filtered = filtered.filter(m => !m.seen);
+
+      if (textFilter) {
+        filtered = filtered.filter(m => m.title.toLowerCase().includes(textFilter));
+      }
+
+      // Tri
+      filtered.sort((a, b) => {
+        const totA = calculateMovieTotals(a);
+        const totB = calculateMovieTotals(b);
+        if (sortVal === 'added_desc') return new Date(b.addedAt || 0) - new Date(a.addedAt || 0);
+        if (sortVal === 'added_asc') return new Date(a.addedAt || 0) - new Date(b.addedAt || 0);
+        if (sortVal === 'title_asc') return a.title.localeCompare(b.title);
+        if (sortVal === 'title_desc') return b.title.localeCompare(a.title);
+        if (sortVal === 'price_desc') return totB.totalPurchase - totA.totalPurchase;
+        if (sortVal === 'estimated_desc') return totB.totalEstimated - totA.totalEstimated;
+        return 0;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<p class="text-xs text-gray-400 col-span-2 text-center p-6">Aucun film ne correspond.</p>`;
+        return;
+      }
+
+      filtered.forEach(m => {
+        const totals = calculateMovieTotals(m);
+        const card = document.createElement('div');
+        card.className = `glass-card p-2.5 rounded-2xl border border-white/10 hover:border-indigo-500/50 transition cursor-pointer movie-card-item relative ${isListView ? '' : 'flex flex-col items-center text-center'}`;
+        card.onclick = () => openMovieDetail(m.id);
+
+        card.innerHTML = `
+          <img src="${m.poster}" class="${isListView ? 'w-16 h-24' : 'w-full h-44'} object-cover rounded-xl shadow mb-2">
+          <div class="movie-card-info w-full">
+            <h4 class="text-xs font-bold text-white truncate">${m.title}</h4>
+            <div class="flex items-center justify-between text-[10px] text-gray-400 mt-1">
+              <span class="text-indigo-300 font-semibold">${totals.count} éd.</span>
+              <span class="font-bold text-emerald-400">${totals.totalPurchase.toFixed(2)} €</span>
+            </div>
+            <div class="flex items-center gap-1 mt-1">
+              ${m.seen ? '<span class="text-[10px]">🍿 Vu</span>' : '<span class="text-[10px] text-gray-500">👁️ Non vu</span>'}
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function renderWishlist() {
+      const grid = document.getElementById('wishlistGrid');
+      const badge = document.getElementById('wishlistBadge');
+      const countLabel = document.getElementById('wishlistTotalCount');
+
+      grid.innerHTML = '';
+      if (badge) {
+        badge.innerText = wishlist.length;
+        if (wishlist.length > 0) badge.classList.remove('hidden');
+        else badge.classList.add('hidden');
+      }
+      if (countLabel) countLabel.innerText = `${wishlist.length} film${wishlist.length > 1 ? 's' : ''}`;
+
+      if (wishlist.length === 0) {
+        grid.innerHTML = `<p class="text-xs text-gray-400 col-span-2 text-center p-6">Votre wishlist est vide.</p>`;
+        return;
+      }
+
+      wishlist.forEach(m => {
+        const totals = calculateMovieTotals(m);
+        const card = document.createElement('div');
+        card.className = 'glass-card p-2.5 rounded-2xl border border-pink-500/20 hover:border-pink-500/50 transition cursor-pointer flex flex-col items-center text-center';
+        card.onclick = () => openMovieDetail(m.id);
+
+        card.innerHTML = `
+          <img src="${m.poster}" class="w-full h-44 object-cover rounded-xl shadow mb-2">
+          <h4 class="text-xs font-bold text-white truncate w-full">${m.title}</h4>
+          <div class="flex items-center justify-between w-full text-[10px] text-pink-300 mt-1 font-semibold">
+            <span>Wishlist</span>
+            <span>${totals.totalPurchase > 0 ? totals.totalPurchase.toFixed(2) + ' €' : ''}</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // --- MODAL & ÉDITION AVANCÉE DES ÉDITIONS ---
+    function openMovieDetail(movieId) {
+      let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+      if (!movie) return;
+
+      movie = normalizeMovieData(movie);
+      const modal = document.getElementById('detailModal');
+      const content = document.getElementById('modalContent');
+
+      let editionsHtml = movie.editions.map((ed, idx) => `
+        <div class="glass-pill p-3 rounded-2xl space-y-2 border border-white/10 relative">
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-bold text-indigo-300">Édition #${idx + 1}</span>
+            ${movie.editions.length > 1 ? `<button onclick="removeEdition('${movie.id}', ${idx})" class="text-red-400 hover:text-red-300 text-[10px] font-bold">✕ Supprimer</button>` : ''}
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div>
+              <label class="block text-[9px] text-gray-400 uppercase">Nom de l'édition</label>
+              <input type="text" value="${ed.title || ''}" onchange="updateEditionField('${movie.id}', ${idx}, 'title', this.value)" placeholder="ex: Steelbook 4K" class="w-full glass-input text-white p-1.5 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-[9px] text-gray-400 uppercase">Format</label>
+              <select onchange="updateEditionField('${movie.id}', ${idx}, 'format', this.value)" class="w-full glass-input text-white p-1.5 rounded-xl">
+                <option class="bg-gray-900" value="4K UHD" ${ed.format === '4K UHD' ? 'selected' : ''}>4K UHD</option>
+                <option class="bg-gray-900" value="Blu-ray 1080p" ${ed.format === 'Blu-ray 1080p' ? 'selected' : ''}>Blu-ray 1080p</option>
+                <option class="bg-gray-900" value="DVD" ${ed.format === 'DVD' ? 'selected' : ''}>DVD</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[9px] text-gray-400 uppercase">Boîtier</label>
+              <select onchange="updateEditionField('${movie.id}', ${idx}, 'editionType', this.value)" class="w-full glass-input text-white p-1.5 rounded-xl">
+                <option class="bg-gray-900" value="Amaray" ${ed.editionType === 'Amaray' ? 'selected' : ''}>Amaray</option>
+                <option class="bg-gray-900" value="Steelbook" ${ed.editionType === 'Steelbook' ? 'selected' : ''}>Steelbook</option>
+                <option class="bg-gray-900" value="Digibook" ${ed.editionType === 'Digibook' ? 'selected' : ''}>Digibook</option>
+                <option class="bg-gray-900" value="Coffret Collector" ${ed.editionType === 'Coffret Collector' ? 'selected' : ''}>Coffret Collector</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[9px] text-gray-400 uppercase">Lieu d'achat</label>
+              <input type="text" value="${ed.purchaseLocation || ''}" onchange="updateEditionField('${movie.id}', ${idx}, 'purchaseLocation', this.value)" placeholder="ex: Fnac" class="w-full glass-input text-white p-1.5 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-[9px] text-gray-400 uppercase">Prix d'Achat (€)</label>
+              <input type="number" step="0.01" value="${ed.purchasePrice !== undefined ? ed.purchasePrice : ''}" onchange="updateEditionField('${movie.id}', ${idx}, 'purchasePrice', this.value)" placeholder="0.00" class="w-full glass-input text-white p-1.5 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-[9px] text-gray-400 uppercase">Prix Estimé (€)</label>
+              <input type="number" step="0.01" value="${ed.estimatedPrice !== undefined ? ed.estimatedPrice : ''}" onchange="updateEditionField('${movie.id}', ${idx}, 'estimatedPrice', this.value)" placeholder="0.00" class="w-full glass-input text-white p-1.5 rounded-xl">
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      const totals = calculateMovieTotals(movie);
+
+      content.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex gap-4 items-start">
+            <img src="${movie.poster}" class="w-24 h-36 object-cover rounded-2xl shadow-lg border border-white/10">
+            <div class="flex-1 min-w-0">
+              <h3 class="text-base font-extrabold text-white leading-snug">${movie.title}</h3>
+              <p class="text-[11px] text-gray-400 mt-1">${movie.releaseDate ? movie.releaseDate.split('-')[0] : ''}</p>
+              <p class="text-[10px] text-indigo-300 mt-1">${movie.genres ? movie.genres.join(', ') : ''}</p>
+              
+              <div class="mt-3 flex items-center gap-2">
+                <button onclick="toggleMovieSeen('${movie.id}')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition ${movie.seen ? 'bg-emerald-600 text-white' : 'glass-pill text-gray-300'}">
+                  ${movie.seen ? '🍿 Vu' : '👁️ Marquer comme vu'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-card p-3 rounded-2xl space-y-3 border border-white/10">
+            <div class="flex items-center justify-between border-b border-white/10 pb-2">
+              <h4 class="text-xs font-bold text-gray-300 uppercase tracking-wider">Éditions Possédées (${movie.editions.length})</h4>
+              <button onclick="addEditionToMovie('${movie.id}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1 rounded-xl text-[10px] font-bold shadow transition">
+                + Ajouter une édition
+              </button>
+            </div>
+
+            <div class="space-y-2 max-h-60 overflow-y-auto pr-1">
+              ${editionsHtml}
+            </div>
+
+            <div class="flex justify-between items-center text-xs pt-2 border-t border-white/10 font-bold">
+              <span class="text-gray-400">Total cumulé :</span>
+              <span class="text-emerald-400">${totals.totalPurchase.toFixed(2)} € (Achat) / ${totals.totalEstimated.toFixed(2)} € (Est.)</span>
+            </div>
+          </div>
+
+          <div class="flex gap-2 pt-2">
+            ${movie.isWishlist ? `
+              <button onclick="moveWishlistToCollection('${movie.id}')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg transition">
+                📥 Transférer en Collection
+              </button>
+            ` : ''}
+            <button onclick="deleteMovie('${movie.id}')" class="bg-red-600/80 hover:bg-red-600 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition">
+              🗑️ Supprimer
+            </button>
+          </div>
+        </div>
+      `;
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('detailModal').classList.add('hidden');
+    }
+
+    async function toggleMovieSeen(movieId) {
+      let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+      if (!movie) return;
+      movie.seen = !movie.seen;
+      await updateMovieInCloud(movie);
+      openMovieDetail(movieId);
+      renderCollection();
+    }
+
+    async function addEditionToMovie(movieId) {
+      let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+      if (!movie) return;
+
+      movie.editions.push({
+        id: 'ed_' + Date.now(),
+        title: 'Nouvelle Édition',
+        format: 'Blu-ray 1080p',
+        editionType: 'Amaray',
+        purchasePrice: '',
+        estimatedPrice: '',
+        purchaseLocation: ''
+      });
+
+      await updateMovieInCloud(movie);
+      openMovieDetail(movieId);
+      renderCollection();
+      renderWishlist();
+    }
+
+    async function removeEdition(movieId, editionIdx) {
+      let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+      if (!movie || movie.editions.length <= 1) return;
+
+      movie.editions.splice(editionIdx, 1);
+      await updateMovieInCloud(movie);
+      openMovieDetail(movieId);
+      renderCollection();
+      renderWishlist();
+    }
+
+    async function updateEditionField(movieId, editionIdx, field, val) {
+      let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+      if (!movie || !movie.editions[editionIdx]) return;
+
+      movie.editions[editionIdx][field] = val;
+      await updateMovieInCloud(movie);
+      renderCollection();
+      renderWishlist();
+    }
+
+    async function moveWishlistToCollection(movieId) {
+      const idx = wishlist.findIndex(m => m.id === movieId);
+      if (idx === -1) return;
+
+      const movie = wishlist.splice(idx, 1)[0];
+      movie.isWishlist = false;
+      collection.push(movie);
+
+      await updateMovieInCloud(movie);
+      closeModal();
+      renderWishlist();
+      renderCollection();
+      showToast("Film transféré dans votre collection ! 💿");
+    }
+
+    async function deleteMovie(movieId) {
+      if (!confirm("Voulez-vous vraiment supprimer ce film ?")) return;
+
+      let idx = collection.findIndex(m => m.id === movieId);
+      let isWish = false;
+      if (idx === -1) {
+        idx = wishlist.findIndex(m => m.id === movieId);
+        isWish = true;
+      }
+
+      if (idx !== -1) {
+        const movie = isWish ? wishlist[idx] : collection[idx];
+        if (movie.cloud_id) await deleteMovieFromCloud(movie.cloud_id);
+
+        if (isWish) wishlist.splice(idx, 1);
+        else collection.splice(idx, 1);
+
+        closeModal();
+        renderCollection();
+        renderWishlist();
+        showToast("Film supprimé.");
+      }
+    }
+
+    // --- STATISTIQUES UNIFIÉES ET INTELLIGENTES ---
+    function setChartStyle(style) {
+      chartStyle = style;
+      document.getElementById('chartStyleBarsBtn').className = style === 'bars' ? 'flex-1 py-2 rounded-xl font-bold text-xs transition bg-indigo-600 text-white shadow' : 'flex-1 py-2 rounded-xl font-bold text-xs transition text-gray-400 hover:text-white';
+      document.getElementById('chartStylePieBtn').className = style === 'pie' ? 'flex-1 py-2 rounded-xl font-bold text-xs transition bg-indigo-600 text-white shadow' : 'flex-1 py-2 rounded-xl font-bold text-xs transition text-gray-400 hover:text-white';
+      renderStats();
+    }
+
+    function renderStats() {
+      const totalMovies = collection.length;
+      let totalEditions = 0;
+      let totalPurchaseVal = 0;
+      let totalEstimatedVal = 0;
+      let seenCount = 0;
+
+      const formatsMap = {};
+      const editionsMap = {};
+      const locationsMap = {};
+      const genresMap = {};
+
+      collection.forEach(m => {
+        if (m.seen) seenCount++;
+
+        // Genres calculés au niveau du film
+        if (m.genres && Array.isArray(m.genres)) {
+          m.genres.forEach(g => {
+            const gName = typeof g === 'object' ? g.name : g;
+            if (gName) genresMap[gName] = (genresMap[gName] || 0) + 1;
+          });
+        }
+
+        // Stats agrégées au niveau des éditions
+        normalizeMovieData(m);
+        m.editions.forEach(ed => {
+          totalEditions++;
+          const p = parseFloat(ed.purchasePrice) || 0;
+          const e = parseFloat(ed.estimatedPrice) || 0;
+
+          totalPurchaseVal += p;
+          totalEstimatedVal += e;
+
+          const fmt = ed.format || 'Blu-ray 1080p';
+          formatsMap[fmt] = (formatsMap[fmt] || 0) + 1;
+
+          const type = ed.editionType || 'Amaray';
+          editionsMap[type] = (editionsMap[type] || 0) + 1;
+
+          const loc = ed.purchaseLocation || 'Non spécifié';
+          locationsMap[loc] = (locationsMap[loc] || 0) + 1;
+        });
+      });
+
+      document.getElementById('statTotalMovies').innerText = totalMovies;
+      document.getElementById('statTotalEditions').innerText = totalEditions;
+      document.getElementById('statSeenMovies').innerText = `${seenCount} / ${totalMovies}`;
+      document.getElementById('statTotalValue').innerText = `${totalPurchaseVal.toFixed(2)} €`;
+      document.getElementById('statTotalEstimatedValue').innerText = `${totalEstimatedVal.toFixed(2)} €`;
+
+      const avgPriceMovie = totalMovies > 0 ? (totalPurchaseVal / totalMovies) : 0;
+      const avgPriceEdition = totalEditions > 0 ? (totalPurchaseVal / totalEditions) : 0;
+
+      document.getElementById('statAvgPriceMovie').innerText = `${avgPriceMovie.toFixed(2)} €`;
+      document.getElementById('statAvgPriceEdition').innerText = `${avgPriceEdition.toFixed(2)} €`;
+
+      renderStatListAndChart('Format', formatsMap, 'statFormatsList', 'chartContainerFormat', 'chartFormat');
+      renderStatListAndChart('Boîtier', editionsMap, 'statEditionsList', 'chartContainerEdition', 'chartEdition');
+      renderStatListAndChart('Lieu', locationsMap, 'statLocationsList', 'chartContainerLocation', 'chartLocation');
+      renderStatListAndChart('Genre', genresMap, 'statGenresList', 'chartContainerGenre', 'chartGenre');
+    }
+
+    function renderStatListAndChart(labelKey, dataMap, listElemId, chartContainerId, canvasId) {
+      const listElem = document.getElementById(listElemId);
+      const chartContainer = document.getElementById(chartContainerId);
+      listElem.innerHTML = '';
+
+      const entries = Object.entries(dataMap).sort((a,b) => b[1] - a[1]);
+
+      if (entries.length === 0) {
+        listElem.innerHTML = `<p class="text-[10px] text-gray-500">Aucune donnée disponible.</p>`;
+        chartContainer.classList.add('hidden');
+        return;
+      }
+
+      entries.forEach(([key, val]) => {
+        const item = document.createElement('div');
+        item.className = "flex justify-between items-center py-1 border-b border-white/5";
+        item.innerHTML = `<span class="text-gray-300">${key}</span><span class="font-bold text-indigo-400">${val}</span>`;
+        listElem.appendChild(item);
+      });
+
+      if (chartStyle === 'pie') {
+        chartContainer.classList.remove('hidden');
+        renderPieChart(canvasId, entries.map(e => e[0]), entries.map(e => e[1]));
+      } else {
+        chartContainer.classList.add('hidden');
+      }
+    }
+
+    function renderPieChart(canvasId, labels, data) {
+      if (chartInstances[canvasId]) {
+        chartInstances[canvasId].destroy();
+      }
+
+      const ctx = document.getElementById(canvasId).getContext('2d');
+      chartInstances[canvasId] = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: [
+              '#6366f1', '#ec4899', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#14b8a6'
+            ],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    }
+
+    function updateSettingsCounters() {
+      let totalEditions = 0;
+      collection.forEach(m => {
+        normalizeMovieData(m);
+        totalEditions += m.editions.length;
+      });
+
+      document.getElementById('settingsTotalCount').innerText = collection.length;
+      document.getElementById('settingsTotalEditionsCount').innerText = totalEditions;
+      document.getElementById('settingsWishlistCount').innerText = wishlist.length;
+    }
+
+    // --- SCANNER CODE-BARRES ---
+    function toggleScanner() {
+      const container = document.getElementById('scanner-container');
+      if (container.classList.contains('hidden')) {
+        container.classList.remove('hidden');
+        startScanner();
+      } else {
+        stopScanner();
+      }
+    }
+
+    function startScanner() {
+      html5QrcodeScanner = new Html5Qrcode("reader");
+      html5QrcodeScanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 150 } },
+        onScanSuccess
+      ).catch(err => {
+        showToast("Impossible d'ouvrir la caméra.");
+      });
+    }
+
+    function stopScanner() {
+      if (html5QrcodeScanner) {
+        html5QrcodeScanner.stop().then(() => {
+          document.getElementById('scanner-container').classList.add('hidden');
+        }).catch(() => {
+          document.getElementById('scanner-container').classList.add('hidden');
+        });
+      } else {
+        document.getElementById('scanner-container').classList.add('hidden');
+      }
+    }
+
+    async function onScanSuccess(decodedText) {
+      stopScanner();
+      showToast(`Code scanné : ${decodedText}`);
+      try {
+        const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(decodedText)}&language=fr-FR`);
+        const data = await res.json();
+        if (data.results && data.results.length > 0) {
+          displaySearchResults(data.results);
+        } else {
+          document.getElementById('searchInput').value = decodedText;
+          triggerNewSearch();
+        }
+      } catch (e) {
+        showToast("Erreur lors de la recherche du code-barres.");
+      }
+    }
+
+    // --- EXPORTS / IMPORTS ---
     function exportToExcel() {
       if (collection.length === 0) return showToast("Votre collection est vide.");
-      const excelData = collection.map(m => {
+      const excelData = [];
+
+      collection.forEach(m => {
+        normalizeMovieData(m);
         const genresStr = m.genres ? m.genres.map(g => typeof g === 'object' ? g.name : g).join(', ') : '';
-        return {
-          'Titre': m.title,
-          'Format': m.format || 'Blu-ray 1080p',
-          'Boîtier': m.editionType || 'Amaray',
-          'Prix d\'achat (€)': m.purchasePrice ? parseFloat(m.purchasePrice) : '',
-          'Valeur Estimée (€)': m.estimatedPrice ? parseFloat(m.estimatedPrice) : '',
-          'Lieu d\'achat': m.purchaseLocation || '',
-          'Genres': genresStr,
-          'Vu': m.seen ? 'Oui' : 'Non',
-          'Date d\'ajout': m.addedAt ? new Date(m.addedAt).toLocaleDateString('fr-FR') : ''
-        };
+        m.editions.forEach(ed => {
+          excelData.push({
+            'Titre': m.title,
+            'Édition': ed.title || '',
+            'Format': ed.format || 'Blu-ray 1080p',
+            'Boîtier': ed.editionType || 'Amaray',
+            'Prix d\'achat (€)': ed.purchasePrice ? parseFloat(ed.purchasePrice) : '',
+            'Valeur Estimée (€)': ed.estimatedPrice ? parseFloat(ed.estimatedPrice) : '',
+            'Lieu d\'achat': ed.purchaseLocation || '',
+            'Genres': genresStr,
+            'Vu': m.seen ? 'Oui' : 'Non',
+            'Date d\'ajout': m.addedAt ? new Date(m.addedAt).toLocaleDateString('fr-FR') : ''
+          });
+        });
       });
 
       const worksheet = XLSX.utils.json_to_sheet(excelData);
@@ -576,14 +1342,14 @@
           const json = XLSX.utils.sheet_to_json(worksheet);
 
           if (json.length === 0) return showToast("Fichier vide.");
-          let addedCount = 0;
 
           for (const row of json) {
             const title = row['Titre'] || row['titre'] || row['Title'] || row['Nom'];
             if (!title) continue;
 
+            const editionTitle = row['Édition'] || row['Edition'] || 'Édition Standard';
             const format = row['Format'] || row['format'] || 'Blu-ray 1080p';
-            const editionType = row['Boitier'] || row['boitier'] || row['Édition'] || 'Amaray';
+            const editionType = row['Boitier'] || row['boitier'] || row['Boîtier'] || 'Amaray';
             const price = row['Prix'] || row['prix'] || row['Prix d\'achat'] || row['Prix d\'achat (€)'] || '';
             const estimatedPrice = row['Estimation'] || row['estimation'] || row['Valeur Estimée (€)'] || '';
             const location = row['Lieu'] || row['Magasin'] || row['Lieu d\'achat'] || '';
@@ -593,716 +1359,58 @@
 
             const genresArray = genre ? String(genre).split(',').map(g => g.trim()) : [];
 
-            const newMovie = { 
-              id: 'custom_' + Date.now() + '_' + Math.floor(Math.random() * 1000), 
-              title: String(title), 
-              poster: 'https://via.placeholder.com/150x225?text=' + encodeURIComponent(title), 
-              releaseDate: '',
-              format: String(format), 
-              editionType: String(editionType), 
-              purchaseLocation: String(location), 
-              purchasePrice: price ? String(price) : '', 
-              estimatedPrice: estimatedPrice ? String(estimatedPrice) : '',
-              genres: genresArray, 
-              seen: seen, 
-              isWishlist: false,
-              addedAt: Date.now()
-            };
+            // On cherche si le film existe déjà pour regrouper les éditions
+            let existingMovie = collection.find(m => m.title.toLowerCase() === String(title).toLowerCase());
 
-            const cloudId = await saveMovieToCloud(newMovie);
-            if (cloudId) {
-              newMovie.cloud_id = cloudId;
-              collection.push(newMovie);
-              addedCount++;
+            if (existingMovie) {
+              existingMovie.editions.push({
+                id: 'ed_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+                title: String(editionTitle),
+                format: String(format),
+                editionType: String(editionType),
+                purchasePrice: price,
+                estimatedPrice: estimatedPrice,
+                purchaseLocation: String(location)
+              });
+              await updateMovieInCloud(existingMovie);
+            } else {
+              const newMovie = { 
+                id: 'custom_' + Date.now() + '_' + Math.floor(Math.random() * 1000), 
+                title: String(title), 
+                poster: 'https://via.placeholder.com/150x225?text=' + encodeURIComponent(title), 
+                releaseDate: '',
+                genres: genresArray,
+                seen: seen,
+                isWishlist: false,
+                addedAt: new Date().toISOString(),
+                editions: [{
+                  id: 'ed_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+                  title: String(editionTitle),
+                  format: String(format),
+                  editionType: String(editionType),
+                  purchasePrice: price,
+                  estimatedPrice: estimatedPrice,
+                  purchaseLocation: String(location)
+                }]
+              };
+              const cloudId = await saveMovieToCloud(newMovie);
+              if (cloudId) {
+                newMovie.cloud_id = cloudId;
+                collection.push(newMovie);
+              }
             }
           }
 
           renderCollection();
-          showToast(`🎉 ${addedCount} film(s) importé(s) !`);
-          event.target.value = '';
+          showToast("Importation terminée avec succès ! 🎉");
         } catch (err) {
-          showToast("Erreur lors de la lecture d'Excel.");
+          showToast("Erreur lors de l'importation de l'Excel.");
+          console.error(err);
         }
       };
+
       reader.readAsArrayBuffer(file);
     }
-
-    // --- UTILS ---
-    function showToast(message) {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      toast.className = 'toast';
-      toast.innerText = message;
-      container.appendChild(toast);
-      setTimeout(() => toast.remove(), 3000);
-    }
-
-    function clearSearch() {
-      document.getElementById('searchInput').value = '';
-      document.getElementById('clearSearchBtn').classList.add('hidden');
-      document.getElementById('searchResultsContainer').classList.add('hidden');
-      document.getElementById('searchResults').innerHTML = '';
-    }
-
-    function toggleViewMode() {
-      isListView = !isListView;
-      document.getElementById('viewModeLabel').innerText = isListView ? "Vue Grille" : "Vue Liste";
-      renderCollection();
-    }
-
-    function pickRandomMovie() {
-      if (collection.length === 0) return showToast("Votre collection est vide !");
-      const filter = document.getElementById('randomFilter').value;
-      let pool = collection;
-
-      if (filter === 'unseen') pool = collection.filter(m => !m.seen);
-      else if (filter === '4k') pool = collection.filter(m => m.format === '4K UHD');
-
-      if (pool.length === 0) return showToast("Aucun film ne correspond.");
-      const randomMovie = pool[Math.floor(Math.random() * pool.length)];
-      openMovieDetails(randomMovie.id);
-    }
-
-    async function toggleSeen(id, event) {
-      if (event) event.stopPropagation();
-      const movie = collection.find(m => String(m.id) === String(id));
-      if (movie) {
-        movie.seen = !movie.seen;
-        renderCollection();
-        await updateMovieInCloud(movie);
-        showToast(movie.seen ? `Vu : ${movie.title}` : `Non vu : ${movie.title}`);
-      }
-    }
-
-    function switchTab(tab) {
-      const tabs = ['Home', 'Collection', 'Wishlist', 'Stats', 'Settings'];
-      tabs.forEach(t => {
-        document.getElementById(`tab${t}`).classList.add('hidden');
-        document.getElementById(`tab${t}Btn`).className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white";
-      });
-
-      document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.remove('hidden');
-      document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}Btn`).className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 bg-indigo-600/80 text-white shadow-md";
-
-      if (tab === 'stats') renderStats();
-      if (tab === 'settings') {
-        document.getElementById('settingsTotalCount').innerText = collection.length;
-        document.getElementById('settingsWishlistCount').innerText = wishlist.length;
-      }
-    }
-
-    // --- SCANNER ---
-    function toggleScanner() {
-      const container = document.getElementById('scanner-container');
-      container.classList.toggle('hidden');
-      if (!container.classList.contains('hidden')) {
-        html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 150} });
-        html5QrcodeScanner.render(onScanSuccess);
-      } else stopScanner();
-    }
-
-    function stopScanner() {
-      if (html5QrcodeScanner) {
-        html5QrcodeScanner.clear();
-        document.getElementById('scanner-container').classList.add('hidden');
-      }
-    }
-
-    async function onScanSuccess(decodedText) {
-      stopScanner();
-      try {
-        const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${decodedText}.json`);
-        const data = await res.json();
-        if (data.status === 1 && data.product.product_name) {
-          document.getElementById('searchInput').value = data.product.product_name;
-          document.getElementById('clearSearchBtn').classList.remove('hidden');
-          triggerNewSearch();
-        } else showToast("Code-barres inconnu.");
-      } catch (err) { showToast("Erreur du scanner."); }
-    }
-
-    // --- RECHERCHE TMDB AMÉLIORÉE AVEC PAGINATION & INFOS COMPLÈTES ---
-    function triggerNewSearch() {
-      currentSearchQuery = document.getElementById('searchInput').value.trim();
-      if (!currentSearchQuery) return;
-      currentSearchPage = 1;
-      searchMovieTMDB();
-    }
-
-    function changeSearchPage(delta) {
-      currentSearchPage += delta;
-      if (currentSearchPage < 1) currentSearchPage = 1;
-      if (currentSearchPage > totalSearchPages) currentSearchPage = totalSearchPages;
-      searchMovieTMDB();
-    }
-
-    async function searchMovieTMDB() {
-      if (!currentSearchQuery) return;
-      showToast(`Recherche page ${currentSearchPage}...`);
-
-      try {
-        const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(currentSearchQuery)}&language=fr-FR&page=${currentSearchPage}`);
-        const data = await res.json();
-        
-        const container = document.getElementById('searchResultsContainer');
-        const resultsDiv = document.getElementById('searchResults');
-        const paginationDiv = document.getElementById('searchPagination');
-        
-        container.classList.remove('hidden');
-        resultsDiv.innerHTML = '';
-
-        if (!data.results || data.results.length === 0) {
-            resultsDiv.innerHTML = '<p class="text-gray-400 text-xs text-center py-4">Aucun film trouvé.</p>';
-            paginationDiv.classList.add('hidden');
-            return;
-        }
-
-        totalSearchPages = data.total_pages || 1;
-        document.getElementById('searchPageInfo').innerText = `Page ${currentSearchPage} / ${totalSearchPages}`;
-        
-        document.getElementById('prevPageBtn').disabled = (currentSearchPage <= 1);
-        document.getElementById('nextPageBtn').disabled = (currentSearchPage >= totalSearchPages);
-        paginationDiv.classList.remove('hidden');
-
-        data.results.forEach(movie => {
-          const poster = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'https://via.placeholder.com/150x225?text=Pas+d+affiche';
-          const releaseDate = movie.release_date || '';
-          const year = releaseDate ? releaseDate.split('-')[0] : 'N/A';
-          const safeTitle = movie.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-          const rating = movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A';
-          const overview = movie.overview ? (movie.overview.slice(0, 100) + '...') : 'Pas de description.';
-
-          const inCol = collection.some(m => String(m.id) === String(movie.id));
-          const inWish = wishlist.some(m => String(m.id) === String(movie.id));
-
-          resultsDiv.innerHTML += `
-            <div class="glass-card p-3 rounded-2xl flex gap-3 items-center border border-white/10 relative">
-              <img src="${poster}" class="w-16 h-24 object-cover rounded-xl shadow-md flex-shrink-0">
-              <div class="flex-1 min-w-0 text-left space-y-1">
-                <div class="flex justify-between items-start">
-                  <p class="font-bold text-xs text-white truncate pr-2">${movie.title}</p>
-                  <span class="text-[10px] bg-indigo-500/30 text-indigo-200 px-1.5 py-0.5 rounded font-semibold flex-shrink-0">⭐ ${rating}</span>
-                </div>
-                <p class="text-[10px] text-gray-400">${year}</p>
-                <p class="text-[10px] text-gray-300 leading-tight line-clamp-2">${overview}</p>
-                
-                <div class="flex gap-2 pt-1">
-                  ${inCol ? `
-                    <span class="text-[10px] font-bold text-emerald-400 py-1">✓ En collection</span>
-                  ` : `
-                    <button onclick="addToCollection('${movie.id}', '${safeTitle}', '${poster}', '${releaseDate}')" class="bg-indigo-600 hover:bg-indigo-500 py-1 px-2.5 rounded-xl text-[10px] font-semibold text-white transition active:scale-95 flex-1">
-                      + Collection
-                    </button>
-                  `}
-
-                  ${inWish ? `
-                    <span class="text-[10px] font-bold text-pink-400 py-1">✨ En wishlist</span>
-                  ` : `
-                    <button onclick="addToWishlist('${movie.id}', '${safeTitle}', '${poster}', '${releaseDate}')" class="bg-pink-600/80 hover:bg-pink-500 py-1 px-2.5 rounded-xl text-[10px] font-semibold text-white transition active:scale-95">
-                      + Wishlist
-                    </button>
-                  `}
-                </div>
-              </div>
-            </div>
-          `;
-        });
-      } catch (err) { 
-        showToast("Erreur de recherche."); 
-      }
-    }
-
-    // --- GESTION COLLECTION & WISHLIST ---
-    async function addToCollection(id, title, poster, releaseDate = '') {
-      if (collection.some(m => String(m.id) === String(id))) {
-        return showToast("Déjà dans votre collection.");
-      }
-
-      showToast("Ajout à la collection...");
-
-      let fetchedGenres = [];
-      if (!String(id).startsWith('custom_')) {
-        try {
-          const res = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=fr-FR`);
-          if (res.ok) {
-            const data = await res.json();
-            fetchedGenres = data.genres ? data.genres.map(g => g.name) : [];
-          }
-        } catch (e) { console.error(e); }
-      }
-
-      const newMovie = { 
-        id: String(id), 
-        title: title, 
-        poster: poster, 
-        releaseDate: releaseDate,
-        format: 'Blu-ray 1080p', 
-        editionType: 'Amaray', 
-        purchaseLocation: '', 
-        purchasePrice: '', 
-        estimatedPrice: '',
-        genres: fetchedGenres, 
-        seen: false, 
-        isWishlist: false,
-        addedAt: Date.now()
-      };
-
-      // Si le film était en wishlist, on le retire de la wishlist
-      const wishItem = wishlist.find(m => String(m.id) === String(id));
-      if (wishItem && wishItem.cloud_id) {
-        await deleteMovieFromCloud(wishItem.cloud_id);
-        wishlist = wishlist.filter(m => String(m.id) !== String(id));
-        renderWishlist();
-      }
-
-      const cloudId = await saveMovieToCloud(newMovie);
-
-      if (cloudId) {
-        newMovie.cloud_id = cloudId;
-        collection.push(newMovie);
-        renderCollection();
-        showToast(`"${title}" ajouté à la collection !`);
-        if (currentSearchQuery) searchMovieTMDB();
-      }
-    }
-
-    async function addToWishlist(id, title, poster, releaseDate = '') {
-      if (wishlist.some(m => String(m.id) === String(id))) {
-        return showToast("Déjà dans votre wishlist.");
-      }
-
-      const wishMovie = { 
-        id: String(id), 
-        title: title, 
-        poster: poster, 
-        releaseDate: releaseDate,
-        isWishlist: true,
-        addedAt: Date.now()
-      };
-
-      const cloudId = await saveMovieToCloud(wishMovie);
-      if (cloudId) {
-        wishMovie.cloud_id = cloudId;
-        wishlist.push(wishMovie);
-        renderWishlist();
-        showToast(`"${title}" ajouté à la wishlist ! ✨`);
-        if (currentSearchQuery) searchMovieTMDB();
-      }
-    }
-
-    async function removeFromCollection(id, event) {
-      if (event) event.stopPropagation();
-      const movie = collection.find(m => String(m.id) === String(id));
-      if (!movie) return;
-
-      if(confirm(`Supprimer "${movie.title}" ?`)) {
-        collection = collection.filter(m => String(m.id) !== String(id));
-        renderCollection();
-        await deleteMovieFromCloud(movie.cloud_id);
-        showToast(`"${movie.title}" supprimé.`);
-      }
-    }
-
-    async function removeFromWishlist(id, event) {
-      if (event) event.stopPropagation();
-      const movie = wishlist.find(m => String(m.id) === String(id));
-      if (!movie) return;
-
-      wishlist = wishlist.filter(m => String(m.id) !== String(id));
-      renderWishlist();
-      await deleteMovieFromCloud(movie.cloud_id);
-      showToast(`"${movie.title}" retiré de la wishlist.`);
-    }
-
-    async function updateMovieDetails(id, key, value) {
-      const item = collection.find(m => String(m.id) === String(id));
-      if (item) {
-        item[key] = value;
-        await updateMovieInCloud(item);
-        if(['format', 'seen', 'editionType', 'purchasePrice', 'estimatedPrice', 'purchaseLocation'].includes(key)) renderCollection();
-      }
-    }
-
-    const TRASH_ICON = `<svg class="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>`;
-
-    function createMovieCardHTML(movie) {
-      const format = movie.format || 'Blu-ray 1080p';
-      const formatColor = format === '4K UHD' ? 'bg-red-600' : (format === 'DVD' ? 'bg-amber-600' : 'bg-blue-600');
-      const seenBg = movie.seen ? 'bg-emerald-500/80' : 'bg-gray-600/80';
-      const priceTag = movie.purchasePrice ? `${parseFloat(movie.purchasePrice).toFixed(2)} €` : '';
-
-      return `
-        <div onclick="openMovieDetails('${movie.id}')" class="movie-card-item glass-card p-2.5 rounded-2xl text-center text-xs relative cursor-pointer hover:border-indigo-400/50 transition group">
-          <div class="absolute top-4 left-4 z-10 flex gap-1 pointer-events-none">
-            <span class="${formatColor} text-white text-[8px] font-black px-1.5 py-0.5 rounded shadow uppercase">${format.replace(' 1080p', '')}</span>
-          </div>
-          <button onclick="toggleSeen('${movie.id}', event)" class="absolute top-4 right-4 ${seenBg} text-white text-[9px] font-bold px-2 py-0.5 rounded-full z-10">
-            ${movie.seen ? '🍿 Vu' : '👁️ Non vu'}
-          </button>
-          <img src="${movie.poster}" class="rounded-xl mb-2.5 w-full h-48 object-cover shadow-md">
-          <div class="movie-card-info relative z-10">
-            <p class="font-semibold truncate text-gray-100 mb-0.5">${movie.title}</p>
-            <div class="flex items-center justify-center gap-2 text-[10px] text-indigo-300/80 mb-2">
-              <span>${movie.editionType || 'Amaray'}</span>
-              ${priceTag ? `<span class="bg-indigo-500/20 text-indigo-200 px-1.5 py-0.5 rounded-md font-bold">${priceTag}</span>` : ''}
-            </div>
-            <button onclick="removeFromCollection('${movie.id}', event)" class="bg-red-500/10 hover:bg-red-500/30 text-red-300 border border-red-500/20 py-1 px-2 rounded-xl text-[11px] w-full flex items-center justify-center gap-1">
-              ${TRASH_ICON} <span>Supprimer</span>
-            </button>
-          </div>
-        </div>
-      `;
-    }
-
-    // RENDER COLLECTION AVEC FILTRES AVANCÉS
-    function renderCollection() {
-      const collectionGrid = document.getElementById('collectionGrid');
-      const recentGrid = document.getElementById('recentGrid');
-      collectionGrid.innerHTML = ''; recentGrid.innerHTML = '';
-
-      if (isListView) {
-        collectionGrid.classList.add('list-view-container');
-        collectionGrid.classList.remove('grid-cols-2', 'gap-4');
-      } else {
-        collectionGrid.classList.remove('list-view-container');
-        collectionGrid.classList.add('grid-cols-2', 'gap-4');
-      }
-
-      // Appliquer les Filtres
-      const filterFormat = document.getElementById('filterFormat')?.value || 'all';
-      const filterSeen = document.getElementById('filterSeen')?.value || 'all';
-      const filterText = (document.getElementById('filterText')?.value || '').toLowerCase().trim();
-
-      let filteredCollection = collection.filter(m => {
-        if (filterFormat !== 'all' && (m.format || 'Blu-ray 1080p') !== filterFormat) return false;
-        if (filterSeen === 'seen' && !m.seen) return false;
-        if (filterSeen === 'unseen' && m.seen) return false;
-        if (filterText && !m.title.toLowerCase().includes(filterText)) return false;
-        return true;
-      });
-
-      if (filteredCollection.length === 0) {
-        collectionGrid.innerHTML = '<p class="text-gray-400 text-xs col-span-full text-center py-8">Aucun film ne correspond aux critères.</p>';
-      } else {
-        // Appliquer le tri
-        const sortType = document.getElementById('sortSelect')?.value || 'added_desc';
-        filteredCollection.sort((a, b) => {
-          if (sortType === 'title_asc') return a.title.localeCompare(b.title);
-          if (sortType === 'title_desc') return b.title.localeCompare(a.title);
-          if (sortType === 'added_asc') return (a.addedAt || 0) - (b.addedAt || 0);
-          if (sortType === 'price_desc') return (parseFloat(b.purchasePrice) || 0) - (parseFloat(a.purchasePrice) || 0);
-          if (sortType === 'estimated_desc') return (parseFloat(b.estimatedPrice) || 0) - (parseFloat(a.estimatedPrice) || 0);
-          return (b.addedAt || 0) - (a.addedAt || 0);
-        });
-
-        filteredCollection.forEach(movie => {
-          collectionGrid.innerHTML += createMovieCardHTML(movie);
-        });
-      }
-
-      // Derniers ajouts (Accueil)
-      collection.slice(-6).reverse().forEach(movie => {
-        recentGrid.innerHTML += createMovieCardHTML(movie);
-      });
-    }
-
-    // RENDER WISHLIST
-    function renderWishlist() {
-      const wishlistGrid = document.getElementById('wishlistGrid');
-      const badge = document.getElementById('wishlistBadge');
-      const totalCountEl = document.getElementById('wishlistTotalCount');
-      
-      wishlistGrid.innerHTML = '';
-      totalCountEl.innerText = `${wishlist.length} film(s)`;
-
-      if (wishlist.length > 0) {
-        badge.innerText = wishlist.length;
-        badge.classList.remove('hidden');
-      } else {
-        badge.classList.add('hidden');
-        wishlistGrid.innerHTML = '<p class="text-gray-400 text-xs col-span-full text-center py-8">Votre wishlist est vide.</p>';
-        return;
-      }
-
-      wishlist.forEach(m => {
-        const year = m.releaseDate ? m.releaseDate.split('-')[0] : '';
-        const safeTitle = m.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-
-        wishlistGrid.innerHTML += `
-          <div class="glass-card p-2.5 rounded-2xl text-center text-xs flex flex-col justify-between border border-pink-500/20 relative">
-            <img src="${m.poster}" class="rounded-xl mb-2 w-full h-44 object-cover shadow">
-            <div>
-              <p class="font-bold truncate text-white mb-0.5">${m.title}</p>
-              <p class="text-gray-400 text-[10px] mb-2">${year}</p>
-              <div class="space-y-1.5">
-                <button onclick="addToCollection('${m.id}', '${safeTitle}', '${m.poster}', '${m.releaseDate}')" class="bg-indigo-600 hover:bg-indigo-500 py-1.5 px-2 rounded-xl text-[10px] font-semibold text-white transition active:scale-95 w-full">
-                  ➡️ Acquis ! (Vers Collection)
-                </button>
-                <button onclick="removeFromWishlist('${m.id}', event)" class="bg-red-500/10 hover:bg-red-500/20 text-red-300 py-1 px-2 rounded-xl text-[10px] w-full flex items-center justify-center gap-1">
-                  ${TRASH_ICON} <span>Retirer</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-    }
-
-    // --- GESTION DES STATS ---
-    function setChartStyle(style) {
-      chartStyle = style;
-      document.getElementById('chartStyleBarsBtn').className = style === 'bars' ? "flex-1 py-2 rounded-xl font-bold text-xs transition bg-indigo-600 text-white shadow" : "flex-1 py-2 rounded-xl font-bold text-xs transition text-gray-400 hover:text-white";
-      document.getElementById('chartStylePieBtn').className = style === 'pie' ? "flex-1 py-2 rounded-xl font-bold text-xs transition bg-indigo-600 text-white shadow" : "flex-1 py-2 rounded-xl font-bold text-xs transition text-gray-400 hover:text-white";
-      renderStats();
-    }
-
-    function renderStats() {
-      document.getElementById('statTotalMovies').innerText = collection.length;
-      
-      const prices = collection.map(m => parseFloat(m.purchasePrice)).filter(p => !isNaN(p) && p > 0);
-      const totalVal = prices.reduce((a, b) => a + b, 0);
-      document.getElementById('statTotalValue').innerText = `${totalVal.toFixed(2)} €`;
-      document.getElementById('statAvgPrice').innerText = prices.length > 0 ? `${(totalVal / prices.length).toFixed(2)} €` : '0.00 €';
-
-      const estimatedPrices = collection.map(m => parseFloat(m.estimatedPrice)).filter(p => !isNaN(p) && p > 0);
-      const totalEstimatedVal = estimatedPrices.reduce((a, b) => a + b, 0);
-      document.getElementById('statTotalEstimatedValue').innerText = `${totalEstimatedVal.toFixed(2)} €`;
-
-      document.getElementById('statSeenMovies').innerText = `${collection.filter(m => m.seen).length} / ${collection.length}`;
-
-      const formats = {};
-      collection.forEach(m => {
-        const fmt = m.format || 'Blu-ray 1080p';
-        formats[fmt] = (formats[fmt] || 0) + 1;
-      });
-
-      const editions = {};
-      collection.forEach(m => {
-        const ed = m.editionType || 'Amaray';
-        editions[ed] = (editions[ed] || 0) + 1;
-      });
-
-      const locations = {};
-      collection.forEach(m => {
-        const loc = (m.purchaseLocation && m.purchaseLocation.trim() !== '') ? m.purchaseLocation.trim() : 'Non renseigné';
-        locations[loc] = (locations[loc] || 0) + 1;
-      });
-
-      const genres = {};
-      collection.forEach(m => {
-        if (m.genres && Array.isArray(m.genres) && m.genres.length > 0) {
-          m.genres.forEach(g => {
-            const genreName = typeof g === 'object' ? g.name : String(g);
-            genres[genreName] = (genres[genreName] || 0) + 1;
-          });
-        } else {
-          genres['Non renseigné'] = (genres['Non renseigné'] || 0) + 1;
-        }
-      });
-
-      renderStatCategory('Format', formats, 'statFormatsList', 'chartContainerFormat', 'chartFormat', ['#3b82f6', '#ef4444', '#d97706', '#8b5cf6']);
-      renderStatCategory('Boîtier', editions, 'statEditionsList', 'chartContainerEdition', 'chartEdition', ['#a855f7', '#ec4899', '#6366f1', '#14b8a6', '#f59e0b']);
-      renderStatCategory('Lieu', locations, 'statLocationsList', 'chartContainerLocation', 'chartLocation', ['#10b981', '#06b6d4', '#f97316', '#64748b', '#84cc16']);
-      renderStatCategory('Genre', genres, 'statGenresList', 'chartContainerGenre', 'chartGenre', ['#8b5cf6', '#ec4899', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#64748b']);
-    }
-
-    function renderStatCategory(label, dataObj, listId, chartContainerId, canvasId, colors) {
-      const listEl = document.getElementById(listId);
-      const containerEl = document.getElementById(chartContainerId);
-      const totalCount = collection.length || 1;
-
-      if (chartStyle === 'bars') {
-        containerEl.classList.add('hidden');
-        listEl.classList.remove('hidden');
-
-        listEl.innerHTML = Object.entries(dataObj).map(([k, v], idx) => {
-          const pct = Math.round((v / totalCount) * 100);
-          const color = colors[idx % colors.length];
-          return `
-            <div class="space-y-1">
-              <div class="flex justify-between items-center text-xs">
-                <span>${k}</span>
-                <span class="font-bold text-gray-200">${v} <span class="text-[10px] text-gray-400 font-normal">(${pct}%)</span></span>
-              </div>
-              <div class="w-full bg-white/10 rounded-full h-2 overflow-hidden">
-                <div class="h-2 rounded-full transition-all duration-500" style="width: ${pct}%; background-color: ${color}"></div>
-              </div>
-            </div>
-          `;
-        }).join('');
-      } else {
-        listEl.classList.add('hidden');
-        containerEl.classList.remove('hidden');
-
-        const labels = Object.keys(dataObj);
-        const dataValues = Object.values(dataObj);
-
-        if (chartInstances[canvasId]) {
-          chartInstances[canvasId].destroy();
-        }
-
-        const ctx = document.getElementById(canvasId).getContext('2d');
-        chartInstances[canvasId] = new Chart(ctx, {
-          type: 'doughnut',
-          data: {
-            labels: labels,
-            datasets: [{
-              data: dataValues,
-              backgroundColor: colors.slice(0, labels.length),
-              borderWidth: 0
-            }]
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              legend: {
-                position: 'bottom',
-                labels: { color: '#e2e8f0', font: { size: 10 } }
-              }
-            }
-          }
-        });
-      }
-    }
-
-    async function openMovieDetails(movieId) {
-      const modal = document.getElementById('detailModal');
-      const content = document.getElementById('modalContent');
-      modal.classList.remove('hidden');
-
-      const localMovie = collection.find(m => String(m.id) === String(movieId));
-      if (!localMovie) return closeModal();
-
-      content.innerHTML = '<p class="text-center text-gray-400 py-8">Chargement des données TMDB...</p>';
-
-      let movieDetails = {
-        title: localMovie.title,
-        overview: 'Aucun synopsis disponible.',
-        release_date: localMovie.releaseDate || '',
-        runtime: null,
-        genres: localMovie.genres || [],
-        director: '',
-        cast: []
-      };
-
-      if (!String(movieId).startsWith('custom_')) {
-        try {
-          const res = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&language=fr-FR&append_to_response=credits`);
-          if (res.ok) {
-            const data = await res.json();
-            const directorObj = data.credits?.crew?.find(person => person.job === 'Director');
-            const directorName = directorObj ? directorObj.name : '';
-            const mainCast = data.credits?.cast?.slice(0, 4).map(actor => actor.name) || [];
-
-            movieDetails = { 
-              ...movieDetails, 
-              ...data,
-              director: directorName,
-              cast: mainCast
-            };
-
-            if (data.genres && data.genres.length > 0) {
-              const genreNames = data.genres.map(g => g.name);
-              if (JSON.stringify(localMovie.genres) !== JSON.stringify(genreNames)) {
-                updateMovieDetails(localMovie.id, 'genres', genreNames);
-              }
-            }
-          }
-        } catch (e) { console.error("Erreur TMDB Details:", e); }
-      }
-
-      const genresStr = movieDetails.genres ? movieDetails.genres.map(g => typeof g === 'object' ? g.name : g).join(', ') : '';
-      
-      let runtimeFormatted = '';
-      if (movieDetails.runtime) {
-        const hours = Math.floor(movieDetails.runtime / 60);
-        const mins = movieDetails.runtime % 60;
-        runtimeFormatted = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
-      }
-
-      content.innerHTML = `
-        <div class="flex flex-col gap-4 text-left">
-          <div class="flex gap-4 items-start">
-            <img src="${localMovie.poster}" class="w-28 h-40 object-cover rounded-xl shadow-xl border border-white/10 flex-shrink-0">
-            <div class="space-y-1.5 flex-1 min-w-0">
-              <h3 class="text-base font-extrabold text-white leading-snug truncate">${movieDetails.title}</h3>
-              
-              <div class="text-[11px] text-gray-300 space-y-0.5">
-                <p class="text-gray-400">${movieDetails.release_date ? movieDetails.release_date.split('-')[0] : 'N/A'} ${runtimeFormatted ? '• ' + runtimeFormatted : ''}</p>
-                ${genresStr ? `<p class="text-indigo-300 font-medium text-[10px] truncate">${genresStr}</p>` : ''}
-              </div>
-
-              ${movieDetails.director ? `
-                <p class="text-[11px] text-gray-200">
-                  <span class="text-gray-400 font-semibold">Réalisateur :</span> <br>
-                  <span class="text-indigo-200 font-bold">${movieDetails.director}</span>
-                </p>
-              ` : ''}
-
-              <button onclick="toggleSeen('${localMovie.id}'); openMovieDetails('${localMovie.id}')" class="mt-2 text-xs font-semibold px-3 py-1 rounded-xl transition ${localMovie.seen ? 'bg-emerald-500/80 text-white' : 'bg-gray-700 text-gray-300'}">
-                ${localMovie.seen ? '🍿 Vu' : '👁️ Marquer comme vu'}
-              </button>
-            </div>
-          </div>
-
-          ${movieDetails.cast && movieDetails.cast.length > 0 ? `
-            <div class="glass-card p-2.5 rounded-2xl border border-white/10 text-xs">
-              <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Acteurs principaux :</p>
-              <p class="text-gray-200 text-[11px]">${movieDetails.cast.join(', ')}</p>
-            </div>
-          ` : ''}
-
-          <div class="space-y-3 glass-card p-3 rounded-2xl border border-white/10">
-            <p class="text-[11px] font-bold text-gray-300 uppercase tracking-wider">Informations Édition, Prix & Estimation</p>
-
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="block text-[10px] text-gray-400 font-semibold mb-1">Support :</label>
-                <select onchange="updateMovieDetails('${localMovie.id}', 'format', this.value)" class="w-full glass-input text-white text-xs p-2 rounded-xl focus:outline-none">
-                  <option class="bg-gray-900" value="Blu-ray 1080p" ${localMovie.format === 'Blu-ray 1080p' ? 'selected' : ''}>Blu-ray 1080p</option>
-                  <option class="bg-gray-900" value="4K UHD" ${localMovie.format === '4K UHD' ? 'selected' : ''}>4K UHD</option>
-                  <option class="bg-gray-900" value="DVD" ${localMovie.format === 'DVD' ? 'selected' : ''}>DVD</option>
-                </select>
-              </div>
-
-              <div>
-                <label class="block text-[10px] text-gray-400 font-semibold mb-1">Type de Boîtier :</label>
-                <select onchange="updateMovieDetails('${localMovie.id}', 'editionType', this.value)" class="w-full glass-input text-white text-xs p-2 rounded-xl focus:outline-none">
-                  <option class="bg-gray-900" value="Amaray" ${localMovie.editionType === 'Amaray' ? 'selected' : ''}>Amaray (Standard)</option>
-                  <option class="bg-gray-900" value="Steelbook" ${localMovie.editionType === 'Steelbook' ? 'selected' : ''}>Steelbook (Métal)</option>
-                  <option class="bg-gray-900" value="Coffret" ${localMovie.editionType === 'Coffret' ? 'selected' : ''}>Coffret / Collector</option>
-                  <option class="bg-gray-900" value="Digibook" ${localMovie.editionType === 'Digibook' ? 'selected' : ''}>Digibook / Mediabook</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="block text-[10px] text-gray-400 font-semibold mb-1">Prix d'achat (€) :</label>
-                <input type="number" step="0.01" placeholder="ex: 19.99" value="${localMovie.purchasePrice || ''}" onchange="updateMovieDetails('${localMovie.id}', 'purchasePrice', this.value)" class="w-full glass-input text-white text-xs p-2 rounded-xl focus:outline-none">
-              </div>
-
-              <div>
-                <label class="block text-[10px] text-purple-300 font-semibold mb-1">Valeur Estimée (€) :</label>
-                <input type="number" step="0.01" placeholder="ex: 35.00" value="${localMovie.estimatedPrice || ''}" onchange="updateMovieDetails('${localMovie.id}', 'estimatedPrice', this.value)" class="w-full glass-input text-white text-xs p-2 rounded-xl focus:outline-none border-purple-500/40">
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-[10px] text-gray-400 font-semibold mb-1">Lieu d'achat :</label>
-              <input type="text" placeholder="ex: Fnac, Amazon, Brocante..." value="${localMovie.purchaseLocation || ''}" onchange="updateMovieDetails('${localMovie.id}', 'purchaseLocation', this.value)" class="w-full glass-input text-white text-xs p-2 rounded-xl focus:outline-none">
-            </div>
-          </div>
-
-          <div class="space-y-1">
-            <p class="text-[11px] font-bold text-gray-400 uppercase">Synopsis</p>
-            <p class="text-xs text-gray-300 leading-relaxed max-h-28 overflow-y-auto pr-1">${movieDetails.overview}</p>
-          </div>
-        </div>
-      `;
-    }
-
-    function closeModal() { document.getElementById('detailModal').classList.add('hidden'); }
   </script>
 </body>
 </html>
