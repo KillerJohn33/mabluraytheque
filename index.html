@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ma Collection Blu-ray</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <!-- SDK SUPABASE -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      background: radial-gradient(circle at 50% -20%, #2e1065, #0f172a, #030712);
+      background-attachment: fixed;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+    .glass-pill {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .glass-input {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+    }
+    .list-view-container {
+      display: flex !important; flex-direction: column !important; gap: 0.75rem !important;
+    }
+    .list-view-container .movie-card-item {
+      display: flex !important; flex-direction: row !important; align-items: center !important; text-align: left !important; padding: 0.5rem !important; gap: 0.75rem !important;
+    }
+    .list-view-container .movie-card-item img {
+      width: 4rem !important; height: 5.5rem !important; margin-bottom: 0 !important; flex-shrink: 0;
+    }
+    .list-view-container .movie-card-info { flex: 1; min-width: 0; }
+    #toast-container {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none;
+    }
+    .toast {
+      background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; padding: 10px 18px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); animation: fadeIn 0.3s forwards, fadeOut 0.3s 2.7s forwards;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-10px); } }
+  </style>
+</head>
+<body class="text-gray-100 min-h-screen pb-10 selection:bg-indigo-500 selection:text-white">
+
+  <header class="sticky top-0 z-40 p-4 glass-card border-b-0 border-b-[0.5px] border-white/10 text-center font-extrabold text-xl tracking-wide flex items-center justify-center gap-2">
+    <span class="text-2xl">💿</span>
+    <span class="bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">Blu-raythèque Cloud</span>
+  </header>
+
+  <main class="p-4 max-w-md mx-auto space-y-6">
+    <nav class="glass-pill p-1.5 rounded-2xl flex justify-between items-center shadow-lg">
+      <button id="tabHomeBtn" onclick="switchTab('home')" class="flex-1 py-2.5 rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 bg-indigo-600/80 text-white shadow-md shadow-indigo-500/30">
+        <span>🏠</span> <span>Accueil</span>
+      </button>
+      <button id="tabCollectionBtn" onclick="switchTab('collection')" class="flex-1 py-2.5 rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 text-gray-400 hover:text-white">
+        <span>📚</span> <span>Ma Collection</span>
+      </button>
+      <button id="tabStatsBtn" onclick="switchTab('stats')" class="flex-1 py-2.5 rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 text-gray-400 hover:text-white">
+        <span>📊</span> <span>Stats</span>
+      </button>
+    </nav>
+
+    <div class="space-y-6">
+      <div class="space-y-2">
+        <div class="flex gap-2">
+          <input id="searchInput" type="text" placeholder="Rechercher un film..." class="flex-1 px-4 py-3 rounded-2xl glass-input text-white text-sm placeholder-gray-400 focus:outline-none transition">
+          <button onclick="searchMovie()" class="bg-indigo-600 hover:bg-indigo-500 px-5 py-3 rounded-2xl font-semibold text-sm shadow-lg shadow-indigo-600/30 transition transform active:scale-95">Chercher</button>
+        </div>
+        <div class="flex justify-start px-2">
+          <button id="clearSearchBtn" onclick="clearSearch()" class="hidden text-[11px] text-gray-400 hover:text-red-400 transition flex items-center gap-1">
+            <span>✕</span> <span>Effacer la recherche</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 gap-3">
+        <button onclick="toggleScanner()" class="w-full glass-card hover:bg-white/10 text-white font-semibold py-3 rounded-2xl flex items-center justify-center gap-2 shadow transition transform active:scale-95 text-sm">
+          📷 Scanner un code-barres
+        </button>
+      </div>
+
+      <div id="scanner-container" class="hidden glass-card p-4 rounded-3xl border border-white/20 overflow-hidden">
+        <div id="reader" class="w-full rounded-2xl overflow-hidden"></div>
+        <button onclick="stopScanner()" class="mt-3 w-full bg-red-500/80 hover:bg-red-500 text-white py-2 rounded-xl text-xs font-semibold backdrop-blur-md transition">Fermer la caméra</button>
+      </div>
+    </div>
+
+    <div id="searchResults" class="grid grid-cols-2 gap-4"></div>
+
+    <!-- ACCUEIL -->
+    <div id="tabHome" class="space-y-6">
+      <div>
+        <div class="flex items-center justify-between mb-3 px-1">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-gray-400">Derniers ajouts</h2>
+          <button onclick="switchTab('collection')" class="text-indigo-400 hover:text-indigo-300 text-xs font-semibold">Tout voir →</button>
+        </div>
+        <div id="recentGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+      </div>
+
+      <div class="glass-card p-4 rounded-2xl space-y-3 border border-white/10">
+        <h3 class="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+          <span>🎲</span> <span>Choisis un film pour moi !</span>
+        </h3>
+        <div class="flex gap-2">
+          <select id="randomFilter" class="glass-input text-white text-xs px-3 py-2 rounded-xl focus:outline-none flex-1">
+            <option class="bg-gray-900" value="all">N'importe quel film</option>
+            <option class="bg-gray-900" value="unseen">Seulement les films NON VUS 🍿</option>
+            <option class="bg-gray-900" value="4k">Seulement les films en 4K UHD 📀</option>
+          </select>
+          <button onclick="pickRandomMovie()" class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:opacity-90 text-white font-extrabold px-4 py-2 rounded-xl text-xs shadow-lg transition transform active:scale-95 flex items-center gap-1">
+            <span>Lancer</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLLECTION -->
+    <div id="tabCollection" class="hidden space-y-4">
+      <div class="flex flex-col gap-2 px-1">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-gray-400">Tous mes Blu-ray</h2>
+          <button onclick="toggleViewMode()" id="toggleViewBtn" class="glass-pill px-3 py-1.5 rounded-xl text-xs text-indigo-300 hover:text-white flex items-center gap-1 transition">
+            <span>☰</span> <span id="viewModeLabel">Vue Liste</span>
+          </button>
+        </div>
+        
+        <div class="flex items-center justify-between gap-2">
+          <label for="sortSelect" class="text-xs text-gray-400 font-medium">Trier par :</label>
+          <select id="sortSelect" onchange="renderCollection()" class="glass-input text-white text-xs px-3 py-1.5 rounded-xl focus:outline-none">
+            <option class="bg-gray-900" value="added_desc">Date d'ajout (Récents)</option>
+            <option class="bg-gray-900" value="added_asc">Date d'ajout (Anciens)</option>
+            <option class="bg-gray-900" value="title_asc">Titre (A ➔ Z)</option>
+            <option class="bg-gray-900" value="title_desc">Titre (Z ➔ A)</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="collectionGrid" class="grid grid-cols-2 gap-4"></div>
+    </div>
+
+    <!-- STATS -->
+    <div id="tabStats" class="hidden space-y-4">
+      <div class="grid grid-cols-2 gap-3">
+        <div class="glass-card p-4 rounded-3xl text-center">
+          <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Blu-ray</p>
+          <p id="statTotalMovies" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400 mt-1">0</p>
+        </div>
+        <div class="glass-card p-4 rounded-3xl text-center">
+          <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Valeur Totale</p>
+          <p id="statTotalValue" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 mt-1">0 €</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div class="glass-card p-4 rounded-3xl text-center">
+          <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Films Vus</p>
+          <p id="statSeenMovies" class="text-2xl font-black text-emerald-400 mt-1">0</p>
+        </div>
+        <div class="glass-card p-4 rounded-3xl text-center">
+          <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Prix Moyen</p>
+          <p id="statAvgPrice" class="text-2xl font-black text-indigo-400 mt-1">0 €</p>
+        </div>
+      </div>
+
+      <div class="glass-card p-5 rounded-3xl space-y-3">
+        <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-wider">📅 Films par Décennie</h3>
+        <div id="statsDecades" class="space-y-3 text-xs"></div>
+      </div>
+
+      <div class="glass-card p-5 rounded-3xl space-y-3">
+        <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-wider">📦 Types de boîtier</h3>
+        <div id="statsEditions" class="space-y-3 text-xs"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL -->
+  <div id="detailModal" class="fixed inset-0 bg-black/60 backdrop-blur-xl hidden flex items-center justify-center p-4 z-50">
+    <div class="glass-card rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto p-5 border border-white/20 relative shadow-2xl">
+      <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white font-bold bg-white/10 hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center transition">✕</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script>
+    // --- CONFIGURATION ---
+    const API_KEY = '6fbfd02937fa91630bd1987257207b01'; 
+    const SUPABASE_URL = 'https://vshugonvufhubjwjkuhq.supabase.co/rest/v1/';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzaHVnb252dWZodWJqd2prdWhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyMjMwNjUsImV4cCI6MjEwNDc5OTA2NX0.pHsW1O_IQWqQcfFtTz6_pHxZ2-iCpVe9v-UnzsLXpjQ';
+
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let collection = [];
+    let isListView = false;
+    let html5QrcodeScanner = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const searchInput = document.getElementById('searchInput');
+      const clearBtn = document.getElementById('clearSearchBtn');
+      
+      searchInput.addEventListener('input', () => {
+        if (searchInput.value.trim().length > 0) clearBtn.classList.remove('hidden');
+        else {
+          clearBtn.classList.add('hidden');
+          document.getElementById('searchResults').innerHTML = '';
+        }
+      });
+
+      // Synchronisation initiale avec le cloud Supabase
+      await fetchCollectionFromCloud();
+    });
+
+    // --- DIALOGUE AVEC SUPABASE ---
+    async function fetchCollectionFromCloud() {
+      showToast("Chargement du cloud...");
+      const { data, error } = await db.from('bluray').select('*');
+      if (error) {
+        showToast("Erreur de synchronisation Supabase");
+        console.error(error);
+      } else {
+        collection = data.map(item => ({ ...item.data, cloud_id: item.id }));
+        renderCollection();
+      }
+    }
+
+    async function saveMovieToCloud(movie) {
+      const { data, error } = await db.from('bluray').insert([{ data: movie }]).select();
+      if (!error && data.length > 0) {
+        movie.cloud_id = data[0].id;
+      }
+    }
+
+    async function updateMovieInCloud(movie) {
+      if (!movie.cloud_id) return;
+      const { cloud_id, ...cleanMovie } = movie;
+      await db.from('bluray').update({ data: cleanMovie }).eq('id', cloud_id);
+    }
+
+    async function deleteMovieFromCloud(cloud_id) {
+      await db.from('bluray').delete().eq('id', cloud_id);
+    }
+
+    // --- FONCTIONS SYSTÈME ---
+    function showToast(message) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerText = message;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('clearSearchBtn').classList.add('hidden');
+      document.getElementById('searchResults').innerHTML = '';
+    }
+
+    function toggleViewMode() {
+      isListView = !isListView;
+      document.getElementById('viewModeLabel').innerText = isListView ? "Vue Grille" : "Vue Liste";
+      renderCollection();
+    }
+
+    function pickRandomMovie() {
+      if (collection.length === 0) return showToast("Votre collection est vide !");
+      const filter = document.getElementById('randomFilter').value;
+      let pool = collection;
+
+      if (filter === 'unseen') pool = collection.filter(m => !m.seen);
+      else if (filter === '4k') pool = collection.filter(m => m.format === '4K UHD');
+
+      if (pool.length === 0) return showToast("Aucun film ne correspond.");
+      const randomMovie = pool[Math.floor(Math.random() * pool.length)];
+      openMovieDetails(randomMovie.id);
+    }
+
+    async function toggleSeen(id, event) {
+      if (event) event.stopPropagation();
+      const movie = collection.find(m => m.id === id);
+      if (movie) {
+        movie.seen = !movie.seen;
+        renderCollection();
+        await updateMovieInCloud(movie);
+        showToast(movie.seen ? `Vu : ${movie.title}` : `Non vu : ${movie.title}`);
+      }
+    }
+
+    function switchTab(tab) {
+      const tabs = ['Home', 'Collection', 'Stats'];
+      tabs.forEach(t => {
+        document.getElementById(`tab${t}`).classList.add('hidden');
+        document.getElementById(`tab${t}Btn`).className = "flex-1 py-2.5 rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 text-gray-400 hover:text-white";
+      });
+
+      document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.remove('hidden');
+      document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}Btn`).className = "flex-1 py-2.5 rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 bg-indigo-600/80 text-white shadow-md shadow-indigo-500/30";
+
+      if (tab === 'stats') renderStats();
+    }
+
+    // --- SCANNER DE CODE-BARRES ---
+    function toggleScanner() {
+      const container = document.getElementById('scanner-container');
+      container.classList.toggle('hidden');
+      if (!container.classList.contains('hidden')) {
+        html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 150} });
+        html5QrcodeScanner.render(onScanSuccess);
+      } else stopScanner();
+    }
+
+    function stopScanner() {
+      if (html5QrcodeScanner) {
+        html5QrcodeScanner.clear();
+        document.getElementById('scanner-container').classList.add('hidden');
+      }
+    }
+
+    async function onScanSuccess(decodedText) {
+      stopScanner();
+      try {
+        const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${decodedText}.json`);
+        const data = await res.json();
+        if (data.status === 1 && data.product.product_name) {
+          document.getElementById('searchInput').value = data.product.product_name;
+          document.getElementById('clearSearchBtn').classList.remove('hidden');
+          searchMovie();
+        } else showToast("Code-barres non trouvé.");
+      } catch (err) { showToast("Erreur lecture code-barres."); }
+    }
+
+    // --- RECHERCHE ET AJOUT ---
+    async function searchMovie() {
+      const query = document.getElementById('searchInput').value;
+      if (!query) return;
+      showToast("Recherche...");
+
+      try {
+        const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=fr-FR`);
+        const data = await res.json();
+        const resultsDiv = document.getElementById('searchResults');
+        resultsDiv.innerHTML = '';
+
+        if (!data.results || data.results.length === 0) {
+            resultsDiv.innerHTML = '<p class="text-gray-500 text-sm col-span-2 text-center py-4">Aucun film trouvé.</p>';
+            return;
+        }
+
+        data.results.slice(0, 4).forEach(movie => {
+          const poster = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'https://via.placeholder.com/150x225?text=Pas+d+affiche';
+          const releaseDate = movie.release_date || '';
+          resultsDiv.innerHTML += `
+            <div class="glass-card p-2.5 rounded-2xl text-center text-xs flex flex-col justify-between border border-white/10 relative">
+              <img src="${poster}" class="rounded-xl mb-2 w-full h-44 object-cover shadow relative z-0">
+              <div class="relative z-10">
+                <p class="font-bold truncate text-white mb-0.5">${movie.title}</p>
+                <p class="text-gray-400 text-[10px] mb-2">${releaseDate ? releaseDate.split('-')[0] : 'N/A'}</p>
+                <button onclick="addToCollection('${movie.id}', \`${movie.title.replace(/'/g, "\\'")}\`, '${poster}', '${releaseDate}')" class="bg-indigo-600 hover:bg-indigo-500 py-1.5 px-2 rounded-xl font-semibold text-white transition active:scale-95 w-full">+ Ajouter</button>
+              </div>
+            </div>
+          `;
+        });
+      } catch (err) { showToast("Erreur de recherche."); }
+    }
+
+    async function addToCollection(id, title, poster, releaseDate = '') {
+      if (!collection.some(m => String(m.id) === String(id))) {
+        let genres = [];
+        try {
+          const res = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=fr-FR`);
+          const data = await res.json();
+          genres = data.genres ? data.genres.map(g => g.name) : [];
+        } catch (e) {}
+
+        const newMovie = { 
+          id: String(id), title, poster, releaseDate,
+          format: 'Blu-ray 1080p', editionType: 'Amaray', purchaseLocation: '', purchasePrice: '', genres, seen: false, addedAt: Date.now()
+        };
+
+        collection.push(newMovie);
+        renderCollection();
+        await saveMovieToCloud(newMovie);
+        showToast(`"${title}" synchronisé au cloud !`);
+      } else showToast("Déjà dans votre collection.");
+    }
+
+    async function removeFromCollection(id, event) {
+      event.stopPropagation();
+      const movie = collection.find(m => String(m.id) === String(id));
+      if (!movie) return;
+
+      if(confirm(`Supprimer "${movie.title}" ?`)) {
+        collection = collection.filter(m => String(m.id) !== String(id));
+        renderCollection();
+        await deleteMovieFromCloud(movie.cloud_id);
+        showToast(`"${movie.title}" supprimé du cloud.`);
+      }
+    }
+
+    async function updateMovieDetails(id, key, value) {
+      const item = collection.find(m => String(m.id) === String(id));
+      if (item) {
+        item[key] = value;
+        await updateMovieInCloud(item);
+        if(key === 'format' || key === 'seen' || key === 'editionType') renderCollection();
+      }
+    }
+
+    const TRASH_ICON = `<svg class="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>`;
+
+    function createMovieCardHTML(movie) {
+      const format = movie.format || 'Blu-ray 1080p';
+      const formatColor = format === '4K UHD' ? 'bg-red-600' : (format === 'DVD' ? 'bg-amber-600' : 'bg-blue-600');
+      const seenBg = movie.seen ? 'bg-emerald-500/80' : 'bg-gray-600/80';
+
+      return `
+        <div onclick="openMovieDetails('${movie.id}')" class="movie-card-item glass-card p-2.5 rounded-2xl text-center text-xs relative cursor-pointer hover:border-indigo-400/50 transition group">
+          <div class="absolute top-4 left-4 z-10 flex gap-1 pointer-events-none">
+            <span class="${formatColor} text-white text-[8px] font-black px-1.5 py-0.5 rounded shadow uppercase">${format.replace(' 1080p', '')}</span>
+          </div>
+          <button onclick="toggleSeen('${movie.id}', event)" class="absolute top-4 right-4 ${seenBg} text-white text-[9px] font-bold px-2 py-0.5 rounded-full z-10">
+            ${movie.seen ? '🍿 Vu' : '👁️ Non vu'}
+          </button>
+          <img src="${movie.poster}" class="rounded-xl mb-2.5 w-full h-48 object-cover shadow-md">
+          <div class="movie-card-info relative z-10">
+            <p class="font-semibold truncate text-gray-100 mb-0.5">${movie.title}</p>
+            <p class="text-[10px] text-indigo-300/80 mb-2">${movie.editionType || 'Amaray'}</p>
+            <button onclick="removeFromCollection('${movie.id}', event)" class="bg-red-500/10 hover:bg-red-500/30 text-red-300 border border-red-500/20 py-1 px-2 rounded-xl text-[11px] w-full flex items-center justify-center gap-1">
+              ${TRASH_ICON} <span>Supprimer</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderCollection() {
+      const collectionGrid = document.getElementById('collectionGrid');
+      const recentGrid = document.getElementById('recentGrid');
+      collectionGrid.innerHTML = ''; recentGrid.innerHTML = '';
+
+      if (isListView) {
+        collectionGrid.classList.add('list-view-container');
+        collectionGrid.classList.remove('grid-cols-2', 'gap-4');
+      } else {
+        collectionGrid.classList.remove('list-view-container');
+        collectionGrid.classList.add('grid-cols-2', 'gap-4');
+      }
+
+      if (collection.length === 0) {
+        collectionGrid.innerHTML = '<p class="text-gray-500 text-sm col-span-full text-center py-8">Aucun Blu-ray dans le cloud.</p>';
+        return;
+      }
+
+      collection.forEach(movie => {
+        collectionGrid.innerHTML += createMovieCardHTML(movie);
+      });
+
+      collection.slice(-6).reverse().forEach(movie => {
+        recentGrid.innerHTML += createMovieCardHTML(movie);
+      });
+    }
+
+    function renderStats() {
+      document.getElementById('statTotalMovies').innerText = collection.length;
+      const prices = collection.map(m => parseFloat(m.purchasePrice)).filter(p => !isNaN(p) && p > 0);
+      const totalVal = prices.reduce((a, b) => a + b, 0);
+      document.getElementById('statTotalValue').innerText = `${totalVal.toFixed(2)} €`;
+      document.getElementById('statAvgPrice').innerText = prices.length > 0 ? `${(totalVal / prices.length).toFixed(2)} €` : '0.00 €';
+      document.getElementById('statSeenMovies').innerText = `${collection.filter(m => m.seen).length} / ${collection.length}`;
+    }
+
+    async function openMovieDetails(movieId) {
+      const modal = document.getElementById('detailModal');
+      const content = document.getElementById('modalContent');
+      modal.classList.remove('hidden');
+      content.innerHTML = '<p class="text-center text-gray-400 py-8">Chargement...</p>';
+
+      const localMovie = collection.find(m => String(m.id) === String(movieId));
+      if(!localMovie) return closeModal();
+
+      try {
+        const res = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&language=fr-FR&append_to_response=credits`);
+        const movie = await res.json();
+
+        content.innerHTML = `
+          <div class="flex flex-col gap-4">
+            <img src="${localMovie.poster}" class="w-40 h-56 object-cover rounded-2xl mx-auto shadow-2xl border border-white/10">
+            <div class="text-left space-y-4">
+              <h3 class="text-lg font-extrabold text-white leading-tight">${movie.title}</h3>
+              <div class="grid grid-cols-2 gap-2 glass-card p-3 rounded-xl">
+                <div>
+                  <label class="block text-[10px] font-bold text-indigo-300 uppercase">Support :</label>
+                  <select onchange="updateMovieDetails('${movie.id}', 'format', this.value)" class="w-full glass-input text-white text-xs p-2 rounded-lg">
+                    <option class="bg-gray-900" value="Blu-ray 1080p" ${localMovie.format === 'Blu-ray 1080p' ? 'selected' : ''}>Blu-ray</option>
+                    <option class="bg-gray-900" value="4K UHD" ${localMovie.format === '4K UHD' ? 'selected' : ''}>4K UHD</option>
+                    <option class="bg-gray-900" value="DVD" ${localMovie.format === 'DVD' ? 'selected' : ''}>DVD</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-indigo-300 uppercase">Boîtier :</label>
+                  <select onchange="updateMovieDetails('${movie.id}', 'editionType', this.value)" class="w-full glass-input text-white text-xs p-2 rounded-lg">
+                    <option class="bg-gray-900" value="Amaray" ${localMovie.editionType === 'Amaray' ? 'selected' : ''}>Amaray</option>
+                    <option class="bg-gray-900" value="Steelbook" ${localMovie.editionType === 'Steelbook' ? 'selected' : ''}>Steelbook</option>
+                    <option class="bg-gray-900" value="Coffret" ${localMovie.editionType === 'Coffret' ? 'selected' : ''}>Coffret</option>
+                  </select>
+                </div>
+              </div>
+              <p class="text-xs text-gray-300">${movie.overview || ''}</p>
+            </div>
+          </div>
+        `;
+      } catch (err) { content.innerHTML = '<p class="text-center text-red-400 py-4">Erreur.</p>'; }
+    }
+
+    function closeModal() { document.getElementById('detailModal').classList.add('hidden'); }
+  </script>
+</body>
+</html>
