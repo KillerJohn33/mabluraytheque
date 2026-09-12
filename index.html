@@ -170,16 +170,6 @@
           <p id="statAvgPrice" class="text-2xl font-black text-indigo-400 mt-1">0 €</p>
         </div>
       </div>
-
-      <div class="glass-card p-5 rounded-3xl space-y-3">
-        <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-wider">📅 Films par Décennie</h3>
-        <div id="statsDecades" class="space-y-3 text-xs"></div>
-      </div>
-
-      <div class="glass-card p-5 rounded-3xl space-y-3">
-        <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-wider">📦 Types de boîtier</h3>
-        <div id="statsEditions" class="space-y-3 text-xs"></div>
-      </div>
     </div>
   </main>
 
@@ -217,7 +207,6 @@
         }
       });
 
-      // Synchronisation initiale avec le cloud Supabase
       await fetchCollectionFromCloud();
     });
 
@@ -226,8 +215,8 @@
       showToast("Chargement du cloud...");
       const { data, error } = await db.from('bluray').select('*');
       if (error) {
-        showToast("Erreur de synchronisation Supabase");
-        console.error(error);
+        showToast("Erreur de synchronisation supabase");
+        console.error("Erreur Supabase Fetch:", error);
       } else {
         collection = data.map(item => ({ ...item.data, cloud_id: item.id }));
         renderCollection();
@@ -236,19 +225,27 @@
 
     async function saveMovieToCloud(movie) {
       const { data, error } = await db.from('bluray').insert([{ data: movie }]).select();
-      if (!error && data.length > 0) {
-        movie.cloud_id = data[0].id;
+      if (error) {
+        showToast("⚠️ Erreur lors de la sauvegarde cloud !");
+        console.error("Erreur Insert Supabase:", error);
+        return null;
       }
+      if (data && data.length > 0) {
+        return data[0].id;
+      }
+      return null;
     }
 
     async function updateMovieInCloud(movie) {
       if (!movie.cloud_id) return;
       const { cloud_id, ...cleanMovie } = movie;
-      await db.from('bluray').update({ data: cleanMovie }).eq('id', cloud_id);
+      const { error } = await db.from('bluray').update({ data: cleanMovie }).eq('id', cloud_id);
+      if (error) console.error("Erreur Update Supabase:", error);
     }
 
     async function deleteMovieFromCloud(cloud_id) {
-      await db.from('bluray').delete().eq('id', cloud_id);
+      const { error } = await db.from('bluray').delete().eq('id', cloud_id);
+      if (error) console.error("Erreur Delete Supabase:", error);
     }
 
     // --- FONCTIONS SYSTÈME ---
@@ -288,7 +285,7 @@
 
     async function toggleSeen(id, event) {
       if (event) event.stopPropagation();
-      const movie = collection.find(m => m.id === id);
+      const movie = collection.find(m => String(m.id) === String(id));
       if (movie) {
         movie.seen = !movie.seen;
         renderCollection();
@@ -360,13 +357,14 @@
         data.results.slice(0, 4).forEach(movie => {
           const poster = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'https://via.placeholder.com/150x225?text=Pas+d+affiche';
           const releaseDate = movie.release_date || '';
+          const safeTitle = movie.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
           resultsDiv.innerHTML += `
             <div class="glass-card p-2.5 rounded-2xl text-center text-xs flex flex-col justify-between border border-white/10 relative">
               <img src="${poster}" class="rounded-xl mb-2 w-full h-44 object-cover shadow relative z-0">
               <div class="relative z-10">
                 <p class="font-bold truncate text-white mb-0.5">${movie.title}</p>
                 <p class="text-gray-400 text-[10px] mb-2">${releaseDate ? releaseDate.split('-')[0] : 'N/A'}</p>
-                <button onclick="addToCollection('${movie.id}', \`${movie.title.replace(/'/g, "\\'")}\`, '${poster}', '${releaseDate}')" class="bg-indigo-600 hover:bg-indigo-500 py-1.5 px-2 rounded-xl font-semibold text-white transition active:scale-95 w-full">+ Ajouter</button>
+                <button onclick="addToCollection('${movie.id}', '${safeTitle}', '${poster}', '${releaseDate}')" class="bg-indigo-600 hover:bg-indigo-500 py-1.5 px-2 rounded-xl font-semibold text-white transition active:scale-95 w-full">+ Ajouter</button>
               </div>
             </div>
           `;
@@ -375,24 +373,34 @@
     }
 
     async function addToCollection(id, title, poster, releaseDate = '') {
-      if (!collection.some(m => String(m.id) === String(id))) {
-        let genres = [];
-        try {
-          const res = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=fr-FR`);
-          const data = await res.json();
-          genres = data.genres ? data.genres.map(g => g.name) : [];
-        } catch (e) {}
+      if (collection.some(m => String(m.id) === String(id))) {
+        return showToast("Déjà dans votre collection.");
+      }
 
-        const newMovie = { 
-          id: String(id), title, poster, releaseDate,
-          format: 'Blu-ray 1080p', editionType: 'Amaray', purchaseLocation: '', purchasePrice: '', genres, seen: false, addedAt: Date.now()
-        };
+      showToast("Ajout au Cloud en cours...");
 
+      const newMovie = { 
+        id: String(id), 
+        title: title, 
+        poster: poster, 
+        releaseDate: releaseDate,
+        format: 'Blu-ray 1080p', 
+        editionType: 'Amaray', 
+        purchaseLocation: '', 
+        purchasePrice: '', 
+        genres: [], 
+        seen: false, 
+        addedAt: Date.now()
+      };
+
+      const cloudId = await saveMovieToCloud(newMovie);
+
+      if (cloudId) {
+        newMovie.cloud_id = cloudId;
         collection.push(newMovie);
         renderCollection();
-        await saveMovieToCloud(newMovie);
-        showToast(`"${title}" synchronisé au cloud !`);
-      } else showToast("Déjà dans votre collection.");
+        showToast(`"${title}" synchronisé avec succès !`);
+      }
     }
 
     async function removeFromCollection(id, event) {
@@ -490,7 +498,7 @@
       if(!localMovie) return closeModal();
 
       try {
-        const res = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&language=fr-FR&append_to_response=credits`);
+        const res = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&language=fr-FR`);
         const movie = await res.json();
 
         content.innerHTML = `
@@ -520,7 +528,7 @@
             </div>
           </div>
         `;
-      } catch (err) { content.innerHTML = '<p class="text-center text-red-400 py-4">Erreur.</p>'; }
+      } catch (err) { content.innerHTML = '<p class="text-center text-red-400 py-4">Erreur de chargement.</p>'; }
     }
 
     function closeModal() { document.getElementById('detailModal').classList.add('hidden'); }
