@@ -8,6 +8,8 @@
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <!-- SDK SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- LIBRAIRIE EXCEL (SheetJS) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     body {
       background: radial-gradient(circle at 50% -20%, #2e1065, #0f172a, #030712);
@@ -125,6 +127,18 @@
 
     <!-- COLLECTION -->
     <div id="tabCollection" class="hidden space-y-4">
+      <!-- Zone Import Excel -->
+      <div class="glass-card p-3 rounded-2xl flex items-center justify-between gap-2 border border-indigo-500/30">
+        <div class="text-xs">
+          <p class="font-bold text-indigo-300">Importer un fichier Excel</p>
+          <p class="text-[10px] text-gray-400">Fichiers .xlsx / .xls autorisés</p>
+        </div>
+        <label class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-3 py-2 rounded-xl text-xs cursor-pointer shadow transition active:scale-95">
+          📥 Choisir
+          <input type="file" id="excelInput" accept=".xlsx, .xls" class="hidden" onchange="importExcel(event)">
+        </label>
+      </div>
+
       <div class="flex flex-col gap-2 px-1">
         <div class="flex items-center justify-between">
           <h2 class="text-xs font-bold uppercase tracking-wider text-gray-400">Tous mes Blu-ray</h2>
@@ -246,6 +260,74 @@
     async function deleteMovieFromCloud(cloud_id) {
       const { error } = await db.from('bluray').delete().eq('id', cloud_id);
       if (error) console.error("Erreur Delete Supabase:", error);
+    }
+
+    // --- IMPORTATION EXCEL ---
+    async function importExcel(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      showToast("Lecture du fichier Excel...");
+      const reader = new FileReader();
+
+      reader.onload = async (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          const json = XLSX.utils.sheet_to_json(worksheet);
+
+          if (json.length === 0) {
+            return showToast("Le fichier Excel est vide.");
+          }
+
+          let addedCount = 0;
+          showToast(`Importation de ${json.length} films...`);
+
+          for (const row of json) {
+            // Détection du titre dans le fichier Excel (sensible à la casse)
+            const title = row['Titre'] || row['titre'] || row['Title'] || row['TITLE'] || row['Nom'] || row['nom'];
+            if (!title) continue;
+
+            const format = row['Format'] || row['format'] || 'Blu-ray 1080p';
+            const editionType = row['Boitier'] || row['boitier'] || row['Édition'] || row['Edition'] || 'Amaray';
+            const price = row['Prix'] || row['prix'] || '';
+            const seenRaw = String(row['Vu'] || row['vu'] || '').toLowerCase();
+            const seen = (seenRaw === 'oui' || seenRaw === 'true' || seenRaw === '1' || seenRaw === 'vrai');
+
+            const newMovie = { 
+              id: 'custom_' + Date.now() + '_' + Math.floor(Math.random() * 1000), 
+              title: String(title), 
+              poster: 'https://via.placeholder.com/150x225?text=' + encodeURIComponent(title), 
+              releaseDate: '',
+              format: String(format), 
+              editionType: String(editionType), 
+              purchaseLocation: '', 
+              purchasePrice: price ? String(price) : '', 
+              genres: [], 
+              seen: seen, 
+              addedAt: Date.now()
+            };
+
+            const cloudId = await saveMovieToCloud(newMovie);
+            if (cloudId) {
+              newMovie.cloud_id = cloudId;
+              collection.push(newMovie);
+              addedCount++;
+            }
+          }
+
+          renderCollection();
+          showToast(`🎉 ${addedCount} film(s) importé(s) avec succès !`);
+          event.target.value = ''; // Réinitialise l'input
+        } catch (err) {
+          console.error(err);
+          showToast("Erreur lors de la lecture du fichier Excel.");
+        }
+      };
+
+      reader.readAsArrayBuffer(file);
     }
 
     // --- FONCTIONS SYSTÈME ---
@@ -470,7 +552,16 @@
         return;
       }
 
-      collection.forEach(movie => {
+      // Tri
+      const sortType = document.getElementById('sortSelect').value;
+      const sortedCollection = [...collection].sort((a, b) => {
+        if (sortType === 'title_asc') return a.title.localeCompare(b.title);
+        if (sortType === 'title_desc') return b.title.localeCompare(a.title);
+        if (sortType === 'added_asc') return (a.addedAt || 0) - (b.addedAt || 0);
+        return (b.addedAt || 0) - (a.addedAt || 0);
+      });
+
+      sortedCollection.forEach(movie => {
         collectionGrid.innerHTML += createMovieCardHTML(movie);
       });
 
@@ -492,10 +583,41 @@
       const modal = document.getElementById('detailModal');
       const content = document.getElementById('modalContent');
       modal.classList.remove('hidden');
-      content.innerHTML = '<p class="text-center text-gray-400 py-8">Chargement...</p>';
 
       const localMovie = collection.find(m => String(m.id) === String(movieId));
       if(!localMovie) return closeModal();
+
+      // Si c'un film custom importé d'Excel sans ID TMDB
+      if (String(movieId).startsWith('custom_')) {
+        content.innerHTML = `
+          <div class="flex flex-col gap-4">
+            <div class="text-left space-y-4">
+              <h3 class="text-lg font-extrabold text-white leading-tight">${localMovie.title}</h3>
+              <div class="grid grid-cols-2 gap-2 glass-card p-3 rounded-xl">
+                <div>
+                  <label class="block text-[10px] font-bold text-indigo-300 uppercase">Support :</label>
+                  <select onchange="updateMovieDetails('${localMovie.id}', 'format', this.value)" class="w-full glass-input text-white text-xs p-2 rounded-lg">
+                    <option class="bg-gray-900" value="Blu-ray 1080p" ${localMovie.format === 'Blu-ray 1080p' ? 'selected' : ''}>Blu-ray</option>
+                    <option class="bg-gray-900" value="4K UHD" ${localMovie.format === '4K UHD' ? 'selected' : ''}>4K UHD</option>
+                    <option class="bg-gray-900" value="DVD" ${localMovie.format === 'DVD' ? 'selected' : ''}>DVD</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-indigo-300 uppercase">Boîtier :</label>
+                  <select onchange="updateMovieDetails('${localMovie.id}', 'editionType', this.value)" class="w-full glass-input text-white text-xs p-2 rounded-lg">
+                    <option class="bg-gray-900" value="Amaray" ${localMovie.editionType === 'Amaray' ? 'selected' : ''}>Amaray</option>
+                    <option class="bg-gray-900" value="Steelbook" ${localMovie.editionType === 'Steelbook' ? 'selected' : ''}>Steelbook</option>
+                    <option class="bg-gray-900" value="Coffret" ${localMovie.editionType === 'Coffret' ? 'selected' : ''}>Coffret</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      content.innerHTML = '<p class="text-center text-gray-400 py-8">Chargement...</p>';
 
       try {
         const res = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&language=fr-FR`);
