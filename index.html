@@ -186,13 +186,11 @@
         </div>
       </div>
 
-      <!-- Detail Formats -->
       <div class="glass-card p-4 rounded-3xl space-y-2 border border-white/10">
         <p class="text-xs font-bold text-gray-300 uppercase tracking-wider">Répartition par Format</p>
         <div id="statFormatsList" class="space-y-1.5 text-xs text-gray-300"></div>
       </div>
 
-      <!-- Detail Editions -->
       <div class="glass-card p-4 rounded-3xl space-y-2 border border-white/10">
         <p class="text-xs font-bold text-gray-300 uppercase tracking-wider">Répartition par Boîtier</p>
         <div id="statEditionsList" class="space-y-1.5 text-xs text-gray-300"></div>
@@ -203,7 +201,7 @@
   <!-- MODAL DETAILS -->
   <div id="detailModal" class="fixed inset-0 bg-black/60 backdrop-blur-xl hidden flex items-center justify-center p-4 z-50">
     <div class="glass-card rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto p-5 border border-white/20 relative shadow-2xl">
-      <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white font-bold bg-white/10 hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center transition">✕</button>
+      <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white font-bold bg-white/10 hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center transition z-20">✕</button>
       <div id="modalContent"></div>
     </div>
   </div>
@@ -587,7 +585,6 @@
       document.getElementById('statAvgPrice').innerText = prices.length > 0 ? `${(totalVal / prices.length).toFixed(2)} €` : '0.00 €';
       document.getElementById('statSeenMovies').innerText = `${collection.filter(m => m.seen).length} / ${collection.length}`;
 
-      // Formats
       const formats = {};
       collection.forEach(m => {
         const fmt = m.format || 'Blu-ray 1080p';
@@ -601,7 +598,6 @@
         </div>
       `).join('');
 
-      // Boîtiers
       const editions = {};
       collection.forEach(m => {
         const ed = m.editionType || 'Amaray';
@@ -624,45 +620,86 @@
       const localMovie = collection.find(m => String(m.id) === String(movieId));
       if (!localMovie) return closeModal();
 
-      content.innerHTML = '<p class="text-center text-gray-400 py-8">Chargement...</p>';
+      content.innerHTML = '<p class="text-center text-gray-400 py-8">Chargement des données TMDB...</p>';
 
       let movieDetails = {
         title: localMovie.title,
         overview: 'Aucun synopsis disponible.',
         release_date: localMovie.releaseDate || '',
         runtime: null,
-        genres: []
+        genres: [],
+        director: '',
+        cast: []
       };
 
-      // Tente de récupérer les infos fraîches depuis TMDB
+      // Récupération enrichie via TMDB API (crédits + détails)
       if (!String(movieId).startsWith('custom_')) {
         try {
-          const res = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&language=fr-FR`);
+          const res = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&language=fr-FR&append_to_response=credits`);
           if (res.ok) {
             const data = await res.json();
-            movieDetails = { ...movieDetails, ...data };
+            
+            // Extraction du Réalisateur
+            const directorObj = data.credits?.crew?.find(person => person.job === 'Director');
+            const directorName = directorObj ? directorObj.name : '';
+
+            // Extraction des 4 Acteurs Principaux
+            const mainCast = data.credits?.cast?.slice(0, 4).map(actor => actor.name) || [];
+
+            movieDetails = { 
+              ...movieDetails, 
+              ...data,
+              director: directorName,
+              cast: mainCast
+            };
           }
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error("Erreur TMDB Details:", e); }
       }
 
       const genresStr = movieDetails.genres ? movieDetails.genres.map(g => g.name).join(', ') : '';
-      const runtimeStr = movieDetails.runtime ? `${movieDetails.runtime} min` : '';
+      
+      // Formater la durée (ex: 2h 15m)
+      let runtimeFormatted = '';
+      if (movieDetails.runtime) {
+        const hours = Math.floor(movieDetails.runtime / 60);
+        const mins = movieDetails.runtime % 60;
+        runtimeFormatted = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+      }
 
       content.innerHTML = `
         <div class="flex flex-col gap-4 text-left">
           <div class="flex gap-4 items-start">
             <img src="${localMovie.poster}" class="w-28 h-40 object-cover rounded-xl shadow-xl border border-white/10 flex-shrink-0">
-            <div class="space-y-1">
-              <h3 class="text-base font-extrabold text-white leading-snug">${movieDetails.title}</h3>
-              <p class="text-[11px] text-gray-400">${movieDetails.release_date ? movieDetails.release_date.split('-')[0] : ''} ${runtimeStr ? '• ' + runtimeStr : ''}</p>
-              ${genresStr ? `<p class="text-[10px] text-indigo-300 font-medium">${genresStr}</p>` : ''}
+            <div class="space-y-1.5 flex-1 min-w-0">
+              <h3 class="text-base font-extrabold text-white leading-snug truncate">${movieDetails.title}</h3>
+              
+              <div class="text-[11px] text-gray-300 space-y-0.5">
+                <p class="text-gray-400">${movieDetails.release_date ? movieDetails.release_date.split('-')[0] : 'N/A'} ${runtimeFormatted ? '• ' + runtimeFormatted : ''}</p>
+                ${genresStr ? `<p class="text-indigo-300 font-medium text-[10px] truncate">${genresStr}</p>` : ''}
+              </div>
+
+              ${movieDetails.director ? `
+                <p class="text-[11px] text-gray-200">
+                  <span class="text-gray-400 font-semibold">Réalisateur :</span> <br>
+                  <span class="text-indigo-200 font-bold">${movieDetails.director}</span>
+                </p>
+              ` : ''}
+
               <button onclick="toggleSeen('${localMovie.id}'); openMovieDetails('${localMovie.id}')" class="mt-2 text-xs font-semibold px-3 py-1 rounded-xl transition ${localMovie.seen ? 'bg-emerald-500/80 text-white' : 'bg-gray-700 text-gray-300'}">
                 ${localMovie.seen ? '🍿 Vu' : '👁️ Marquer comme vu'}
               </button>
             </div>
           </div>
 
-          <!-- OPTION D'ÉDITION DES INFOS D'ACHAT ET DE FORMAT -->
+          <!-- ACTEURS PRINCIPAUX -->
+          ${movieDetails.cast && movieDetails.cast.length > 0 ? `
+            <div class="glass-card p-2.5 rounded-2xl border border-white/10 text-xs">
+              <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Acteurs principaux :</p>
+              <p class="text-gray-200 text-[11px]">${movieDetails.cast.join(', ')}</p>
+            </div>
+          ` : ''}
+
+          <!-- INFORMATIONS D'ACHAT ET DE FORMAT -->
           <div class="space-y-3 glass-card p-3 rounded-2xl border border-white/10">
             <p class="text-[11px] font-bold text-gray-300 uppercase tracking-wider">Informations Édition & Achat</p>
 
@@ -703,7 +740,7 @@
           <!-- SYNOPSIS -->
           <div class="space-y-1">
             <p class="text-[11px] font-bold text-gray-400 uppercase">Synopsis</p>
-            <p class="text-xs text-gray-300 leading-relaxed max-h-32 overflow-y-auto pr-1">${movieDetails.overview}</p>
+            <p class="text-xs text-gray-300 leading-relaxed max-h-28 overflow-y-auto pr-1">${movieDetails.overview}</p>
           </div>
         </div>
       `;
