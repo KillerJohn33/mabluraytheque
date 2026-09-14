@@ -129,11 +129,10 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
   #statsTopGrid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
   #statBreakdownGrid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 
-  #tabSettings:not(.hidden) {
-    display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 1rem !important;
-    align-items: start !important;
+  #tabSettings {
+    max-width: 640px;
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
   #tabSettings > div { margin: 0 !important; }
 
@@ -395,8 +394,8 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 
 <!-- PARAMETRES -->
-<div id="tabSettings" class="hidden space-y-4">
-<div class="glass-card p-4 rounded-3xl border border-white/10 space-y-3">
+<div id="tabSettings" class="hidden glass-card rounded-3xl border border-white/10 divide-y divide-white/10 overflow-hidden">
+<div class="p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="text-xl">📊</span>
 <div>
@@ -414,7 +413,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 
-<div class="glass-card p-4 rounded-3xl border border-white/10 space-y-3">
+<div class="p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="text-xl">🎨</span>
 <div>
@@ -442,7 +441,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 
-<div class="glass-card p-4 rounded-3xl border border-white/10 space-y-3">
+<div class="p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="text-xl">🔑</span>
 <div>
@@ -470,7 +469,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 
-<div class="glass-card p-4 rounded-3xl border border-white/10 space-y-3">
+<div class="p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="text-xl">🔄</span>
 <div>
@@ -484,7 +483,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <p class="text-[10px] text-gray-500">Récupère la durée, le réalisateur et les acteurs principaux pour tous les films déjà dans votre collection et votre wishlist.</p>
 </div>
 
-<div class="glass-card p-4 rounded-3xl border border-white/10 space-y-2 text-xs text-gray-300">
+<div class="p-4 md:p-5 space-y-2 text-xs text-gray-300">
 <h3 class="text-sm font-bold text-white mb-1">ℹ️ Informations</h3>
 <div class="flex justify-between border-b border-white/10 py-1.5">
 <span class="text-gray-400">Total Films :</span>
