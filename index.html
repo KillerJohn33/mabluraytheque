@@ -1570,9 +1570,11 @@ ${movie.seen ? `${ic('check','w-3.5 h-3.5')} Vu` : `${ic('eye','w-3.5 h-3.5')} M
 </button>
 </div>
 
-${movieInfoHtml}
+<div class="hidden md:block">${movieInfoHtml}</div>
 </div>
 </div>
+
+<div class="md:hidden">${movieInfoHtml}</div>
 
 <div class="glass-card p-3 rounded-2xl space-y-3 border border-white/10">
 <div class="flex items-center justify-between border-b border-white/10 pb-2">
