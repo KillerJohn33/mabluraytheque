@@ -1125,6 +1125,8 @@ let runtime = null;
 let director = '';
 let cast = [];
 let imdbId = null;
+let voteAverage = null;
+let voteCount = null;
 
 try {
 // On combine détails + crédits en un seul appel via append_to_response
@@ -1134,6 +1136,8 @@ const detail = await detailRes.json();
 genres = detail.genres ? detail.genres.map(g => g.name) : [];
 runtime = detail.runtime || null;
 imdbId = detail.imdb_id || null;
+voteAverage = typeof detail.vote_average === 'number' ? detail.vote_average : null;
+voteCount = typeof detail.vote_count === 'number' ? detail.vote_count : null;
 
 if (detail.credits) {
 const crew = detail.credits.crew || [];
@@ -1157,6 +1161,8 @@ genres: genres,
 runtime: runtime,
 director: director,
 cast: cast,
+voteAverage: voteAverage,
+voteCount: voteCount,
 seen: false,
 isWishlist: isWishlist,
 addedAt: new Date().toISOString(),
@@ -1193,6 +1199,8 @@ let runtime = null;
 let director = '';
 let cast = [];
 let imdbId = null;
+let voteAverage = null;
+let voteCount = null;
 
 try {
 const detailRes = await fetch(`https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${API_KEY}&language=fr-FR&append_to_response=credits`);
@@ -1201,6 +1209,8 @@ const detail = await detailRes.json();
 genres = detail.genres ? detail.genres.map(g => g.name) : [];
 runtime = detail.runtime || null;
 imdbId = detail.imdb_id || null;
+voteAverage = typeof detail.vote_average === 'number' ? detail.vote_average : null;
+voteCount = typeof detail.vote_count === 'number' ? detail.vote_count : null;
 
 if (detail.credits) {
 const crew = detail.credits.crew || [];
@@ -1212,7 +1222,7 @@ cast = castList.slice(0, 5).map(p => p.name);
 }
 } catch (e) {}
 
-return { genres, runtime, director, cast, imdbId };
+return { genres, runtime, director, cast, imdbId, voteAverage, voteCount };
 }
 
 async function refreshAllTMDBInfo() {
@@ -1240,6 +1250,8 @@ movie.runtime = info.runtime !== null ? info.runtime : (movie.runtime || null);
 movie.director = info.director || movie.director || '';
 movie.cast = info.cast.length ? info.cast : (movie.cast || []);
 movie.imdb_id = info.imdbId || movie.imdb_id || null;
+movie.voteAverage = info.voteAverage !== null ? info.voteAverage : (movie.voteAverage ?? null);
+movie.voteCount = info.voteCount !== null ? info.voteCount : (movie.voteCount ?? null);
 
 await updateMovieInCloud(movie);
 updated++;
@@ -1531,6 +1543,11 @@ ${infoCast ? `
 <div class="flex items-start gap-2 text-gray-300">
 <span class="text-gray-500 mt-0.5">${ic('users','w-3.5 h-3.5')}</span>
 <span><span class="text-gray-500">Avec : </span>${infoCast}</span>
+</div>` : ''}
+${(typeof movie.voteAverage === 'number' && movie.voteAverage > 0) ? `
+<div class="flex items-center gap-2 text-gray-300">
+<span class="text-sky-400">${ic('trend','w-3.5 h-3.5')}</span>
+<span><span class="text-gray-500">Note moyenne des utilisateurs : </span><span class="text-sky-400 font-bold">${movie.voteAverage.toFixed(1)}/10</span>${movie.voteCount ? `<span class="text-gray-500"> (${movie.voteCount.toLocaleString('fr-FR')} votes)</span>` : ''}</span>
 </div>` : ''}
 ${(movie.imdbUserRating !== undefined && movie.imdbUserRating !== null) ? `
 <div class="flex items-center gap-2 text-gray-300">
