@@ -30,18 +30,98 @@ body.theme-emerald { background: radial-gradient(circle at 50% -20%, #064e3b, #0
 background: rgba(255, 255, 255, 0.05);
 backdrop-filter: blur(16px);
 border: 1px solid rgba(255, 255, 255, 0.12);
-box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+position: relative;
+overflow: hidden;
+}
+.glass-card::before {
+content: "";
+position: absolute;
+inset: 0;
+background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 32%, rgba(255,255,255,0) 55%);
+pointer-events: none;
 }
 .glass-pill {
 background: rgba(255, 255, 255, 0.08);
 backdrop-filter: blur(20px);
 border: 1px solid rgba(255, 255, 255, 0.15);
+box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 4px 14px rgba(0, 0, 0, 0.25);
+position: relative;
+overflow: hidden;
+}
+.glass-pill::before {
+content: "";
+position: absolute;
+inset: 0;
+background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 45%);
+pointer-events: none;
 }
 .glass-input {
 background: rgba(0, 0, 0, 0.3);
 border: 1px solid rgba(255, 255, 255, 0.15);
 backdrop-filter: blur(10px);
+box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
+
+/* ===== Boutons brillants (effet verre/plastique glossy) ===== */
+.shine-btn {
+position: relative;
+overflow: hidden;
+box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 -6px 10px rgba(0, 0, 0, 0.15), 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+.shine-btn::before {
+content: "";
+position: absolute;
+inset: 0;
+background: linear-gradient(120deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 42%);
+pointer-events: none;
+}
+
+/* ===== Système d'icônes unifié (pastilles glossy, un seul ton) ===== */
+.icon-chip {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+flex-shrink: 0;
+width: 2.1rem;
+height: 2.1rem;
+border-radius: 0.8rem;
+background: linear-gradient(155deg, #818cf8 0%, #6366f1 55%, #7c3aed 100%);
+box-shadow: inset 0 1px 0 rgba(255,255,255,.55), inset 0 -6px 10px rgba(0,0,0,.28), 0 3px 10px rgba(0,0,0,.35);
+color: #fff;
+position: relative;
+overflow: hidden;
+}
+.icon-chip::after {
+content: "";
+position: absolute;
+inset: 0;
+background: linear-gradient(120deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 45%);
+}
+.icon-chip svg {
+width: 1.1rem;
+height: 1.1rem;
+position: relative;
+z-index: 1;
+filter: drop-shadow(0 1px 1px rgba(0,0,0,.3));
+}
+.icon-chip.chip-sm { width: 1.65rem; height: 1.65rem; border-radius: 0.6rem; }
+.icon-chip.chip-sm svg { width: 0.9rem; height: 0.9rem; }
+.icon-chip.chip-lg { width: 2.6rem; height: 2.6rem; border-radius: 1rem; }
+.icon-chip.chip-lg svg { width: 1.35rem; height: 1.35rem; }
+.icon-chip.chip-flat {
+background: rgba(255,255,255,0.1);
+box-shadow: inset 0 1px 0 rgba(255,255,255,.25), inset 0 -3px 6px rgba(0,0,0,.15);
+}
+.icon-inline {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+flex-shrink: 0;
+color: currentColor;
+}
+.icon-inline svg { width: 1em; height: 1em; }
+
 .list-view-container {
 display: flex !important; flex-direction: column !important; gap: 0.75rem !important;
 }
@@ -151,29 +231,29 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </head>
 <body class="theme-purple text-gray-100 min-h-screen pb-10 selection:bg-indigo-500 selection:text-white">
 
-<header class="sticky top-0 z-40 p-4 glass-card border-b-0 border-b-[0.5px] border-white/10 text-center font-extrabold text-xl tracking-wide flex items-center justify-center gap-2">
-<span class="text-2xl">💿</span>
+<header class="sticky top-0 z-40 p-4 glass-card border-b-0 border-b-[0.5px] border-white/10 text-center font-extrabold text-xl tracking-wide flex items-center justify-center gap-2.5">
+<span class="icon-chip chip-lg" data-icon="disc"></span>
 <span class="bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">Blu-raythèque Cloud</span>
 </header>
 
 <main class="p-4 max-w-md mx-auto space-y-5">
 <!-- NAVIGATION BAR -->
 <nav class="glass-pill p-1.5 rounded-2xl flex justify-between items-center shadow-lg gap-1">
-<button id="tabHomeBtn" onclick="switchTab('home')" class="flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 bg-indigo-600/80 text-white shadow-md">
-<span>🏠</span> <span>Accueil</span>
+<button id="tabHomeBtn" onclick="switchTab('home')" class="flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 shine-btn bg-indigo-600/80 text-white shadow-md">
+<span class="icon-inline w-3.5 h-3.5" data-icon="home"></span> <span>Accueil</span>
 </button>
 <button id="tabCollectionBtn" onclick="switchTab('collection')" class="flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white">
-<span>📚</span> <span>Collection</span>
+<span class="icon-inline w-3.5 h-3.5" data-icon="book"></span> <span>Collection</span>
 </button>
 <button id="tabWishlistBtn" onclick="switchTab('wishlist')" class="flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white relative">
-<span>✨</span> <span>Wishlist</span>
+<span class="icon-inline w-3.5 h-3.5" data-icon="sparkles"></span> <span>Wishlist</span>
 <span id="wishlistBadge" class="hidden bg-pink-500 text-white text-[9px] font-black px-1.5 py-0.2 rounded-full ml-0.5">0</span>
 </button>
 <button id="tabStatsBtn" onclick="switchTab('stats')" class="flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white">
-<span>📊</span> <span>Stats</span>
+<span class="icon-inline w-3.5 h-3.5" data-icon="barchart"></span> <span>Stats</span>
 </button>
 <button id="tabSettingsBtn" onclick="switchTab('settings')" class="flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white">
-<span>⚙️</span> <span>Options</span>
+<span class="icon-inline w-3.5 h-3.5" data-icon="settings"></span> <span>Options</span>
 </button>
 </nav>
 
@@ -181,18 +261,21 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <div class="space-y-4">
 <div class="space-y-2">
 <div class="flex gap-2">
-<input id="searchInput" type="text" placeholder="Chercher un film (TMDB)..." class="flex-1 px-4 py-3 rounded-2xl glass-input text-white text-sm placeholder-gray-400 focus:outline-none transition">
-<button onclick="triggerNewSearch()" class="bg-indigo-600 hover:bg-indigo-500 px-5 py-3 rounded-2xl font-semibold text-sm shadow-lg shadow-indigo-600/30 transition transform active:scale-95">Chercher</button>
+<div class="relative flex-1">
+<span class="icon-inline w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" data-icon="search"></span>
+<input id="searchInput" type="text" placeholder="Chercher un film (TMDB)..." class="w-full pl-10 pr-4 py-3 rounded-2xl glass-input text-white text-sm placeholder-gray-400 focus:outline-none transition">
+</div>
+<button onclick="triggerNewSearch()" class="shine-btn bg-indigo-600 hover:bg-indigo-500 px-5 py-3 rounded-2xl font-semibold text-sm shadow-lg shadow-indigo-600/30 transition transform active:scale-95">Chercher</button>
 </div>
 <div class="flex justify-start px-2">
 <button id="clearSearchBtn" onclick="clearSearch()" class="hidden text-[11px] text-gray-400 hover:text-red-400 transition flex items-center gap-1">
-<span>✕</span> <span>Effacer les résultats de recherche</span>
+<span class="icon-inline w-3 h-3" data-icon="x"></span> <span>Effacer les résultats de recherche</span>
 </button>
 </div>
 </div>
 
-<button onclick="toggleScanner()" class="w-full glass-card hover:bg-white/10 text-white font-semibold py-2.5 rounded-2xl flex items-center justify-center gap-2 shadow transition transform active:scale-95 text-xs">
-📷 Scanner un code-barres
+<button onclick="toggleScanner()" class="shine-btn w-full glass-card hover:bg-white/10 text-white font-semibold py-2.5 rounded-2xl flex items-center justify-center gap-2 shadow transition transform active:scale-95 text-xs">
+<span class="icon-chip chip-sm" data-icon="camera"></span> <span>Scanner un code-barres</span>
 </button>
 
 <div id="scanner-container" class="hidden glass-card p-4 rounded-3xl border border-white/20 overflow-hidden">
@@ -227,16 +310,17 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 
 <div class="glass-card p-4 rounded-2xl space-y-3 border border-white/10">
-<h3 class="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-<span>🎲</span> <span>Choisis un film pour moi !</span>
-</h3>
+<div class="flex items-center gap-2">
+<span class="icon-chip chip-sm" data-icon="dice"></span>
+<h3 class="text-xs font-bold text-gray-300 uppercase tracking-wider">Choisis un film pour moi !</h3>
+</div>
 <div class="flex gap-2">
 <select id="randomFilter" class="glass-input text-white text-xs px-3 py-2 rounded-xl focus:outline-none flex-1">
 <option class="bg-gray-900" value="all">N'importe quel film</option>
-<option class="bg-gray-900" value="unseen">Seulement les films NON VUS 🍿</option>
-<option class="bg-gray-900" value="4k">Seulement les films en 4K UHD 📀</option>
+<option class="bg-gray-900" value="unseen">Seulement les films NON VUS</option>
+<option class="bg-gray-900" value="4k">Seulement les films en 4K UHD</option>
 </select>
-<button onclick="pickRandomMovie()" class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:opacity-90 text-white font-extrabold px-4 py-2 rounded-xl text-xs shadow-lg transition transform active:scale-95 flex items-center gap-1">
+<button onclick="pickRandomMovie()" class="shine-btn bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:opacity-90 text-white font-extrabold px-4 py-2 rounded-xl text-xs shadow-lg transition transform active:scale-95 flex items-center gap-1">
 <span>Lancer</span>
 </button>
 </div>
@@ -248,9 +332,9 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <!-- BARRE DE FILTRES ET DE TRI AVANCÉS -->
 <div class="glass-card p-3 rounded-2xl space-y-2 border border-white/10">
 <div class="flex items-center justify-between border-b border-white/10 pb-2">
-<span class="text-[11px] font-bold text-gray-300 flex items-center gap-1">⚡ Filtres & Tri</span>
+<span class="text-[11px] font-bold text-gray-300 flex items-center gap-1.5"><span class="icon-inline w-3.5 h-3.5 text-indigo-300" data-icon="filter"></span> Filtres & Tri</span>
 <button onclick="toggleViewMode()" id="toggleViewBtn" class="glass-pill px-2.5 py-1 rounded-xl text-[11px] text-indigo-300 hover:text-white flex items-center gap-1 transition">
-<span>☰</span> <span id="viewModeLabel">Vue Liste</span>
+<span class="icon-inline w-3.5 h-3.5" data-icon="list"></span> <span id="viewModeLabel">Vue Liste</span>
 </button>
 </div>
 
@@ -300,9 +384,12 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <!-- ONGLET WISHLIST -->
 <div id="tabWishlist" class="hidden space-y-4">
 <div class="glass-card p-3 rounded-2xl border border-pink-500/30 flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="icon-chip chip-sm" data-icon="sparkles"></span>
 <div>
 <h2 class="text-xs font-bold text-pink-300">Ma Liste de Souhaits</h2>
 <p class="text-[10px] text-gray-400">Les films que vous prévoyez d'acheter.</p>
+</div>
 </div>
 <span id="wishlistTotalCount" class="bg-pink-500/20 text-pink-300 font-black text-xs px-2.5 py-1 rounded-xl border border-pink-500/30">0 film</span>
 </div>
@@ -314,25 +401,25 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <div id="tabStats" class="hidden glass-card rounded-3xl border border-white/10 divide-y divide-white/10 overflow-hidden">
 <div class="p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
-<span class="text-xl">📈</span>
+<span class="icon-chip" data-icon="pie"></span>
 <div>
 <h3 class="text-sm font-bold text-white">Affichage des graphiques</h3>
 <p class="text-[11px] text-gray-400">Choisir comment les répartitions sont visualisées.</p>
 </div>
 </div>
 <div class="glass-pill p-1.5 rounded-2xl flex justify-between items-center shadow-md">
-<button id="chartStyleBarsBtn" onclick="setChartStyle('bars')" class="flex-1 py-2 rounded-xl font-bold text-xs transition bg-indigo-600 text-white shadow">
-📊 Mode Barres
+<button id="chartStyleBarsBtn" onclick="setChartStyle('bars')" class="flex-1 py-2 rounded-xl font-bold text-xs transition bg-indigo-600 text-white shadow flex items-center justify-center gap-1.5">
+<span class="icon-inline w-3.5 h-3.5" data-icon="barchart"></span> Mode Barres
 </button>
-<button id="chartStylePieBtn" onclick="setChartStyle('pie')" class="flex-1 py-2 rounded-xl font-bold text-xs transition text-gray-400 hover:text-white">
-⭕ Diagramme Circulaire
+<button id="chartStylePieBtn" onclick="setChartStyle('pie')" class="flex-1 py-2 rounded-xl font-bold text-xs transition text-gray-400 hover:text-white flex items-center justify-center gap-1.5">
+<span class="icon-inline w-3.5 h-3.5" data-icon="pie"></span> Diagramme Circulaire
 </button>
 </div>
 </div>
 
 <div class="p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
-<span class="text-xl">🧮</span>
+<span class="icon-chip" data-icon="grid"></span>
 <div>
 <h3 class="text-sm font-bold text-white">Vue d'ensemble</h3>
 <p class="text-[11px] text-gray-400">Aperçu global de votre collection.</p>
@@ -372,7 +459,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 <div class="p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
-<span class="text-xl">💽</span>
+<span class="icon-chip" data-icon="disc"></span>
 <div>
 <h3 class="text-sm font-bold text-white">Répartition par Format</h3>
 <p class="text-[11px] text-gray-400">4K UHD, Blu-ray, DVD...</p>
@@ -386,7 +473,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 <div class="p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
-<span class="text-xl">📦</span>
+<span class="icon-chip" data-icon="package"></span>
 <div>
 <h3 class="text-sm font-bold text-white">Répartition par Boîtier</h3>
 <p class="text-[11px] text-gray-400">Amaray, Steelbook, Digibook...</p>
@@ -400,7 +487,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 <div class="p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
-<span class="text-xl">🏬</span>
+<span class="icon-chip" data-icon="store"></span>
 <div>
 <h3 class="text-sm font-bold text-white">Répartition par Lieu d'achat</h3>
 <p class="text-[11px] text-gray-400">Où vous achetez le plus souvent.</p>
@@ -414,7 +501,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 <div class="p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
-<span class="text-xl">🎭</span>
+<span class="icon-chip" data-icon="tag"></span>
 <div>
 <h3 class="text-sm font-bold text-white">Répartition par Genre</h3>
 <p class="text-[11px] text-gray-400">Les genres les plus présents.</p>
@@ -431,25 +518,25 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <div id="tabSettings" class="hidden glass-card rounded-3xl border border-white/10 divide-y divide-white/10 overflow-hidden">
 <div class="p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
-<span class="text-xl">📊</span>
+<span class="icon-chip" data-icon="download"></span>
 <div>
 <h3 class="text-sm font-bold text-white">Sauvegarde & Exportation</h3>
 <p class="text-[11px] text-gray-400">Exporter les données au format Excel ou JSON.</p>
 </div>
 </div>
 <div class="grid grid-cols-2 gap-2">
-<button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-3 rounded-2xl text-xs shadow-lg transition transform active:scale-95 flex items-center justify-center gap-1.5">
-<span>📊 Excel (.xlsx)</span>
+<button onclick="exportToExcel()" class="shine-btn bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-3 rounded-2xl text-xs shadow-lg transition transform active:scale-95 flex items-center justify-center gap-1.5">
+<span class="icon-inline w-3.5 h-3.5" data-icon="barchart"></span><span>Excel (.xlsx)</span>
 </button>
-<button onclick="exportToJSON()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 px-3 rounded-2xl text-xs shadow-lg transition transform active:scale-95 flex items-center justify-center gap-1.5">
-<span>💾 JSON (.json)</span>
+<button onclick="exportToJSON()" class="shine-btn bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 px-3 rounded-2xl text-xs shadow-lg transition transform active:scale-95 flex items-center justify-center gap-1.5">
+<span class="icon-inline w-3.5 h-3.5" data-icon="download"></span><span>JSON (.json)</span>
 </button>
 </div>
 </div>
 
 <div class="p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
-<span class="text-xl">🎨</span>
+<span class="icon-chip" data-icon="palette"></span>
 <div>
 <h3 class="text-sm font-bold text-white">Apparence & Préférences</h3>
 <p class="text-[11px] text-gray-400">Personnaliser le thème et l'affichage.</p>
@@ -477,7 +564,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 <div class="p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
-<span class="text-xl">🔑</span>
+<span class="icon-chip" data-icon="key"></span>
 <div>
 <h3 class="text-sm font-bold text-white">Connexions & Identifiants</h3>
 <p class="text-[11px] text-gray-400">Gérer vos accès Supabase et TMDB.</p>
@@ -497,28 +584,28 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <label class="block text-[10px] text-gray-400 font-semibold mb-1">Clé Anon Supabase :</label>
 <input type="password" id="settingSupaKey" class="w-full glass-input text-white text-xs p-2 rounded-xl focus:outline-none">
 </div>
-<button onclick="saveApiKeysFromSettings()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-xl text-xs transition active:scale-95">
-💾 Enregistrer la configuration
+<button onclick="saveApiKeysFromSettings()" class="shine-btn w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-xl text-xs transition active:scale-95 flex items-center justify-center gap-1.5">
+<span class="icon-inline w-3.5 h-3.5" data-icon="check"></span><span>Enregistrer la configuration</span>
 </button>
 </div>
 </div>
 
 <div class="p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
-<span class="text-xl">🔄</span>
+<span class="icon-chip" data-icon="refresh"></span>
 <div>
 <h3 class="text-sm font-bold text-white">Maintenance</h3>
 <p class="text-[11px] text-gray-400">Mettre à jour les fiches films déjà ajoutées.</p>
 </div>
 </div>
-<button id="refreshTmdbBtn" onclick="refreshAllTMDBInfo()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-2xl text-xs shadow-lg transition transform active:scale-95 flex items-center justify-center gap-1.5">
-<span>🔄 Rafraîchir les infos TMDB (durée, réalisateur, acteurs...)</span>
+<button id="refreshTmdbBtn" onclick="refreshAllTMDBInfo()" class="shine-btn w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-2xl text-xs shadow-lg transition transform active:scale-95 flex items-center justify-center gap-1.5">
+<span class="icon-inline w-3.5 h-3.5" data-icon="refresh"></span><span id="refreshTmdbBtnText">Rafraîchir les infos TMDB (durée, réalisateur, acteurs...)</span>
 </button>
 <p class="text-[10px] text-gray-500">Récupère la durée, le réalisateur et les acteurs principaux pour tous les films déjà dans votre collection et votre wishlist.</p>
 </div>
 
 <div class="p-4 md:p-5 space-y-2 text-xs text-gray-300">
-<h3 class="text-sm font-bold text-white mb-1">ℹ️ Informations</h3>
+<div class="flex items-center gap-2 mb-1"><span class="icon-chip chip-sm" data-icon="info"></span><h3 class="text-sm font-bold text-white">Informations</h3></div>
 <div class="flex justify-between border-b border-white/10 py-1.5">
 <span class="text-gray-400">Total Films :</span>
 <span id="settingsTotalCount" class="font-bold text-indigo-300">0</span>
@@ -533,7 +620,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 <div class="flex justify-between py-1.5">
 <span class="text-gray-400">Statut Synchro :</span>
-<span class="font-bold text-emerald-400">Connecté au Cloud ☁️</span>
+<span class="font-bold text-emerald-400 flex items-center gap-1.5">Connecté au Cloud <span class="icon-inline w-3.5 h-3.5" data-icon="cloud"></span></span>
 </div>
 </div>
 </div>
@@ -542,7 +629,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <!-- MODAL DETAILS -->
 <div id="detailModal" class="fixed inset-0 bg-black/60 backdrop-blur-xl hidden flex items-center justify-center p-4 z-50">
 <div class="glass-card rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto p-5 border border-white/20 relative shadow-2xl">
-<button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white font-bold bg-white/10 hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center transition z-20">✕</button>
+<button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white font-bold bg-white/10 hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center transition z-20"><span class="icon-inline w-3.5 h-3.5" data-icon="x"></span></button>
 <div id="modalContent"></div>
 </div>
 </div>
@@ -550,6 +637,59 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <div id="toast-container"></div>
 
 <script>
+// --- SYSTÈME D'ICÔNES UNIFIÉ (traits fins, un seul ton) ---
+const ICON_SVG = {
+home: '<path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h3m6 0h3a1 1 0 001-1V10"/><path d="M9 21V12h6v9"/>',
+book: '<path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/>',
+sparkles: '<path d="M12 3l1.8 4.9L19 9.5l-4.9 1.8L12 16l-1.8-4.7L5 9.5l5.2-1.6L12 3z"/><path d="M19 15l.7 1.8L22 18l-1.8.9L19 21l-.9-2.1L16 18l2.1-.7L19 15z"/>',
+barchart: '<path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/>',
+settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>',
+dice: '<rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8" cy="8" r="1.4" fill="currentColor" stroke="none"/><circle cx="16" cy="8" r="1.4" fill="currentColor" stroke="none"/><circle cx="8" cy="16" r="1.4" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/>',
+filter: '<path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>',
+camera: '<path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/>',
+disc: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.2"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/>',
+download: '<path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/>',
+palette: '<path d="M12 3a9 9 0 100 18c1.4 0 2.2-.9 2.2-2 0-.55-.2-1-.5-1.35-.3-.4-.5-.8-.5-1.3 0-1 .8-1.85 1.8-1.85H17a4 4 0 004-4c0-4.4-4-7.5-9-7.5z"/><circle cx="7.3" cy="10.7" r="1.15" fill="currentColor" stroke="none"/><circle cx="10.3" cy="6.8" r="1.15" fill="currentColor" stroke="none"/><circle cx="15.2" cy="7.3" r="1.15" fill="currentColor" stroke="none"/><circle cx="17.1" cy="11.6" r="1.15" fill="currentColor" stroke="none"/>',
+key: '<path d="M15.5 7.5a4 4 0 10-3.99 4.9L4 20v3h3l7.5-7.51A4 4 0 0015.5 7.5z"/><circle cx="15.5" cy="7.5" r="1" fill="currentColor" stroke="none"/>',
+refresh: '<path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.13-3.36L23 10M1 14l5.36 4.36A9 9 0 0020.49 15"/>',
+info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+package: '<path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v9"/>',
+store: '<path d="M3 9l1-5h16l1 5"/><path d="M4 9v10a1 1 0 001 1h14a1 1 0 001-1V9"/><path d="M9 20v-6h6v6"/><path d="M3 9a2 2 0 004 0 2 2 0 004 0 2 2 0 004 0 2 2 0 004 0"/>',
+tag: '<path d="M20.59 13.41L11 3.83A2 2 0 009.5 3H4a1 1 0 00-1 1v5.5a2 2 0 00.59 1.41l9.58 9.58a2 2 0 002.83 0l5.59-5.59a2 2 0 000-2.83z"/><circle cx="7.5" cy="7.5" r="1.3" fill="currentColor" stroke="none"/>',
+pie: '<path d="M21.21 15.89A10 10 0 118 2.83"/><path d="M22 12A10 10 0 0012 2v10z"/>',
+grid: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/>',
+list: '<path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/>',
+eye: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+check: '<path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/>',
+calendar: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+users: '<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>',
+clapper: '<rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 7h20M2 17h20"/>',
+trash: '<path d="M3 6h18"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/><path d="M10 11v6M14 11v6"/>',
+plus: '<path d="M12 5v14M5 12h14"/>',
+x: '<path d="M18 6L6 18"/><path d="M6 6l12 12"/>',
+cloud: '<path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/>',
+search: '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/>'
+};
+
+function svgMarkup(name) {
+return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICON_SVG[name] || ''}</svg>`;
+}
+
+function chip(name, size = '') {
+return `<span class="icon-chip ${size}">${svgMarkup(name)}</span>`;
+}
+
+function ic(name, cls = 'w-3.5 h-3.5') {
+return `<span class="icon-inline ${cls}">${svgMarkup(name)}</span>`;
+}
+
+function applyStaticIcons() {
+document.querySelectorAll('[data-icon]').forEach(el => {
+const name = el.dataset.icon;
+if (ICON_SVG[name]) el.innerHTML = svgMarkup(name);
+});
+}
+
 // --- CONFIGURATION PAR DÉFAUT ---
 let API_KEY = localStorage.getItem('tmdb_key') || '6fbfd02937fa91630bd1987257207b01';
 let SUPABASE_URL = localStorage.getItem('supa_url') || 'https://vshugonvufhubjwjkuhq.supabase.co';
@@ -570,6 +710,8 @@ let currentSearchPage = 1;
 let totalSearchPages = 1;
 
 document.addEventListener('DOMContentLoaded', async () => {
+applyStaticIcons();
+
 const savedTheme = localStorage.getItem('app_theme') || 'theme-purple';
 changeTheme(savedTheme);
 document.getElementById('themeSelect').value = savedTheme;
@@ -736,23 +878,23 @@ btn.className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition fle
 
 if (tab === 'home') {
 document.getElementById('tabHome').classList.remove('hidden');
-document.getElementById('tabHomeBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 bg-indigo-600/80 text-white shadow-md";
+document.getElementById('tabHomeBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 shine-btn bg-indigo-600/80 text-white shadow-md";
 renderHomeRecent();
 } else if (tab === 'collection') {
 document.getElementById('tabCollection').classList.remove('hidden');
-document.getElementById('tabCollectionBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 bg-indigo-600/80 text-white shadow-md";
+document.getElementById('tabCollectionBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 shine-btn bg-indigo-600/80 text-white shadow-md";
 renderCollection();
 } else if (tab === 'wishlist') {
 document.getElementById('tabWishlist').classList.remove('hidden');
-document.getElementById('tabWishlistBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 bg-pink-600/80 text-white shadow-md";
+document.getElementById('tabWishlistBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 shine-btn bg-pink-600/80 text-white shadow-md";
 renderWishlist();
 } else if (tab === 'stats') {
 document.getElementById('tabStats').classList.remove('hidden');
-document.getElementById('tabStatsBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 bg-indigo-600/80 text-white shadow-md";
+document.getElementById('tabStatsBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 shine-btn bg-indigo-600/80 text-white shadow-md";
 renderStats();
 } else if (tab === 'settings') {
 document.getElementById('tabSettings').classList.remove('hidden');
-document.getElementById('tabSettingsBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 bg-indigo-600/80 text-white shadow-md";
+document.getElementById('tabSettingsBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 shine-btn bg-indigo-600/80 text-white shadow-md";
 updateSettingsCounters();
 }
 }
@@ -832,11 +974,11 @@ item.innerHTML = `
 <p class="text-[10px] text-gray-400">${year}</p>
 </div>
 <div class="flex flex-col gap-1">
-<button onclick='addMovieFromTMDB(${JSON.stringify(m).replace(/'/g, "&apos;")}, false)' class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition">
-+ Collection
+<button onclick='addMovieFromTMDB(${JSON.stringify(m).replace(/'/g, "&apos;")}, false)' class="shine-btn bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition flex items-center justify-center gap-1">
+${ic('plus','w-3 h-3')} Collection
 </button>
-<button onclick='addMovieFromTMDB(${JSON.stringify(m).replace(/'/g, "&apos;")}, true)' class="bg-pink-600 hover:bg-pink-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition">
-+ Wishlist
+<button onclick='addMovieFromTMDB(${JSON.stringify(m).replace(/'/g, "&apos;")}, true)' class="shine-btn bg-pink-600 hover:bg-pink-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition flex items-center justify-center gap-1">
+${ic('plus','w-3 h-3')} Wishlist
 </button>
 </div>
 `;
@@ -966,7 +1108,7 @@ updated++;
 console.error("Erreur lors du rafraîchissement de", movie.title, e);
 }
 done++;
-if (btn) btn.querySelector('span').innerText = `🔄 Mise à jour... (${done}/${allMovies.length})`;
+if (btn) document.getElementById('refreshTmdbBtnText').innerText = `Mise à jour... (${done}/${allMovies.length})`;
 }
 
 renderCollection();
@@ -976,7 +1118,7 @@ renderHomeRecent();
 if (btn) {
 btn.disabled = false;
 btn.classList.remove('opacity-60', 'pointer-events-none');
-btn.querySelector('span').innerText = '🔄 Rafraîchir les infos TMDB (durée, réalisateur, acteurs...)';
+document.getElementById('refreshTmdbBtnText').innerText = 'Rafraîchir les infos TMDB (durée, réalisateur, acteurs...)';
 }
 
 showToast(`Mise à jour terminée : ${updated}/${allMovies.length} film(s) actualisé(s) ✅`);
@@ -1084,7 +1226,7 @@ card.innerHTML = `
 <span class="font-bold text-emerald-400">${totals.totalPurchase.toFixed(2)} €</span>
 </div>
 <div class="mci-status flex items-center gap-1 mt-1">
-${m.seen ? '<span class="text-[10px]">🍿 Vu</span>' : '<span class="text-[10px] text-gray-500">👁️ Non vu</span>'}
+${m.seen ? `<span class="text-[10px] text-emerald-400 flex items-center gap-1">${ic('check','w-3 h-3')} Vu</span>` : `<span class="text-[10px] text-gray-500 flex items-center gap-1">${ic('eye','w-3 h-3')} Non vu</span>`}
 </div>
 </div>
 `;
@@ -1141,7 +1283,7 @@ let editionsHtml = movie.editions.map((ed, idx) => `
 <div class="glass-pill p-3 rounded-2xl space-y-2 border border-white/10 relative">
 <div class="flex justify-between items-center">
 <span class="text-xs font-bold text-indigo-300">Édition #${idx + 1}</span>
-${movie.editions.length > 1 ? `<button onclick="removeEdition('${movie.id}', ${idx})" class="text-red-400 hover:text-red-300 text-[10px] font-bold">✕ Supprimer</button>` : ''}
+${movie.editions.length > 1 ? `<button onclick="removeEdition('${movie.id}', ${idx})" class="text-red-400 hover:text-red-300 text-[10px] font-bold flex items-center gap-1">${ic('x','w-3 h-3')} Supprimer</button>` : ''}
 </div>
 <div class="grid grid-cols-2 gap-2 text-xs">
 <div>
@@ -1194,22 +1336,22 @@ const movieInfoHtml = `
 <div class="glass-card p-3 rounded-2xl border border-white/10 space-y-1.5 text-[11px] mt-3">
 ${infoYear || infoRuntime ? `
 <div class="flex items-center gap-2 text-gray-300">
-<span class="text-gray-500">📅</span>
+<span class="text-gray-500">${ic('calendar','w-3.5 h-3.5')}</span>
 <span>${[infoYear, infoRuntime].filter(Boolean).join(' • ')}</span>
 </div>` : ''}
 ${infoGenres ? `
 <div class="flex items-start gap-2 text-gray-300">
-<span class="text-gray-500">🎭</span>
+<span class="text-gray-500 mt-0.5">${ic('tag','w-3.5 h-3.5')}</span>
 <span>${infoGenres}</span>
 </div>` : ''}
 ${infoDirector ? `
 <div class="flex items-start gap-2 text-gray-300">
-<span class="text-gray-500">🎬</span>
+<span class="text-gray-500 mt-0.5">${ic('clapper','w-3.5 h-3.5')}</span>
 <span><span class="text-gray-500">Réalisateur : </span>${infoDirector}</span>
 </div>` : ''}
 ${infoCast ? `
 <div class="flex items-start gap-2 text-gray-300">
-<span class="text-gray-500">🎟️</span>
+<span class="text-gray-500 mt-0.5">${ic('users','w-3.5 h-3.5')}</span>
 <span><span class="text-gray-500">Avec : </span>${infoCast}</span>
 </div>` : ''}
 </div>
@@ -1223,8 +1365,8 @@ content.innerHTML = `
 <h3 class="text-base font-extrabold text-white leading-snug">${movie.title}</h3>
 
 <div class="mt-3 flex items-center gap-2">
-<button onclick="toggleMovieSeen('${movie.id}')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition ${movie.seen ? 'bg-emerald-600 text-white' : 'glass-pill text-gray-300'}">
-${movie.seen ? '🍿 Vu' : '👁️ Marquer comme vu'}
+<button onclick="toggleMovieSeen('${movie.id}')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${movie.seen ? 'bg-emerald-600 text-white' : 'glass-pill text-gray-300'}">
+${movie.seen ? `${ic('check','w-3.5 h-3.5')} Vu` : `${ic('eye','w-3.5 h-3.5')} Marquer comme vu`}
 </button>
 </div>
 </div>
@@ -1235,8 +1377,8 @@ ${movieInfoHtml}
 <div class="glass-card p-3 rounded-2xl space-y-3 border border-white/10">
 <div class="flex items-center justify-between border-b border-white/10 pb-2">
 <h4 class="text-xs font-bold text-gray-300 uppercase tracking-wider">Éditions Possédées (${movie.editions.length})</h4>
-<button onclick="addEditionToMovie('${movie.id}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1 rounded-xl text-[10px] font-bold shadow transition">
-+ Ajouter une édition
+<button onclick="addEditionToMovie('${movie.id}')" class="shine-btn bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1 rounded-xl text-[10px] font-bold shadow transition flex items-center gap-1">
+${ic('plus','w-3 h-3')} Ajouter une édition
 </button>
 </div>
 
@@ -1252,12 +1394,12 @@ ${editionsHtml}
 
 <div class="flex gap-2 pt-2">
 ${movie.isWishlist ? `
-<button onclick="moveWishlistToCollection('${movie.id}')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg transition">
-📥 Transférer en Collection
+<button onclick="moveWishlistToCollection('${movie.id}')" class="shine-btn flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg transition flex items-center justify-center gap-1.5">
+${ic('download','w-3.5 h-3.5')} Transférer en Collection
 </button>
 ` : ''}
-<button onclick="deleteMovie('${movie.id}')" class="bg-red-600/80 hover:bg-red-600 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition">
-🗑️ Supprimer
+<button onclick="deleteMovie('${movie.id}')" class="bg-red-600/80 hover:bg-red-600 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-1.5">
+${ic('trash','w-3.5 h-3.5')} Supprimer
 </button>
 </div>
 </div>
