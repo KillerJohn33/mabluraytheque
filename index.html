@@ -703,6 +703,21 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <p class="text-[10px] text-gray-500">Récupère la durée, le réalisateur et les acteurs principaux pour tous les films déjà dans votre collection et votre wishlist.</p>
 </div>
 
+<div class="p-4 md:p-5 space-y-3">
+<div class="flex items-center gap-2">
+<span class="icon-chip" data-icon="star"></span>
+<div>
+<h3 class="text-sm font-bold text-white">Notes IMDb</h3>
+<p class="text-[11px] text-gray-400">Importer vos notes personnelles depuis votre compte IMDb.</p>
+</div>
+</div>
+<label class="shine-btn w-full bg-amber-500 hover:bg-amber-400 text-gray-900 font-bold py-2.5 rounded-2xl text-xs shadow-lg transition transform active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+<span class="icon-inline w-3.5 h-3.5" data-icon="upload"></span><span>Importer le fichier ratings.csv</span>
+<input type="file" id="imdbCsvInput" accept=".csv" class="hidden" onchange="importImdbRatings(event)">
+</label>
+<p class="text-[10px] text-gray-500">Sur IMDb : votre profil → "Your Ratings" → icône Export (⋮ en haut à droite). Le fichier ratings.csv téléchargé se glisse directement ici. La correspondance se fait via l'identifiant IMDb du film, pas par le titre.</p>
+</div>
+
 <div class="p-4 md:p-5 space-y-2 text-xs text-gray-300">
 <div class="flex items-center gap-2 mb-1"><span class="icon-chip chip-sm" data-icon="info"></span><h3 class="text-sm font-bold text-white">Informations</h3></div>
 <div class="flex justify-between border-b border-white/10 py-1.5">
@@ -768,6 +783,8 @@ plus: '<path d="M12 5v14M5 12h14"/>',
 x: '<path d="M18 6L6 18"/><path d="M6 6l12 12"/>',
 cloud: '<path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/>',
 search: '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/>',
+star: '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z"/>',
+upload: '<path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/>',
 trend: '<path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/>'
 };
 
@@ -781,6 +798,11 @@ return `<span class="icon-chip ${size}">${svgMarkup(name)}</span>`;
 
 function ic(name, cls = 'w-3.5 h-3.5') {
 return `<span class="icon-inline ${cls}">${svgMarkup(name)}</span>`;
+}
+
+function imdbBadge(m, cls = 'w-3 h-3') {
+if (m.imdbUserRating === undefined || m.imdbUserRating === null) return '';
+return `<span class="inline-flex items-center gap-1 text-amber-400 font-bold" title="Votre note IMDb">${ic('star', cls)}${m.imdbUserRating}/10</span>`;
 }
 
 function applyStaticIcons() {
@@ -1102,6 +1124,7 @@ let genres = [];
 let runtime = null;
 let director = '';
 let cast = [];
+let imdbId = null;
 
 try {
 // On combine détails + crédits en un seul appel via append_to_response
@@ -1110,6 +1133,7 @@ const detail = await detailRes.json();
 
 genres = detail.genres ? detail.genres.map(g => g.name) : [];
 runtime = detail.runtime || null;
+imdbId = detail.imdb_id || null;
 
 if (detail.credits) {
 const crew = detail.credits.crew || [];
@@ -1124,6 +1148,7 @@ cast = castList.slice(0, 5).map(p => p.name);
 const movie = {
 id: 'tmdb_' + tmdbData.id + '_' + Date.now(),
 tmdb_id: tmdbData.id,
+imdb_id: imdbId,
 title: tmdbData.title,
 poster: tmdbData.poster_path ? `https://image.tmdb.org/t/p/w500${tmdbData.poster_path}` : 'https://via.placeholder.com/300x450?text=Pas+d+image',
 releaseDate: tmdbData.release_date || '',
@@ -1167,6 +1192,7 @@ let genres = [];
 let runtime = null;
 let director = '';
 let cast = [];
+let imdbId = null;
 
 try {
 const detailRes = await fetch(`https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${API_KEY}&language=fr-FR&append_to_response=credits`);
@@ -1174,6 +1200,7 @@ const detail = await detailRes.json();
 
 genres = detail.genres ? detail.genres.map(g => g.name) : [];
 runtime = detail.runtime || null;
+imdbId = detail.imdb_id || null;
 
 if (detail.credits) {
 const crew = detail.credits.crew || [];
@@ -1185,7 +1212,7 @@ cast = castList.slice(0, 5).map(p => p.name);
 }
 } catch (e) {}
 
-return { genres, runtime, director, cast };
+return { genres, runtime, director, cast, imdbId };
 }
 
 async function refreshAllTMDBInfo() {
@@ -1212,6 +1239,7 @@ movie.genres = info.genres.length ? info.genres : (movie.genres || []);
 movie.runtime = info.runtime !== null ? info.runtime : (movie.runtime || null);
 movie.director = info.director || movie.director || '';
 movie.cast = info.cast.length ? info.cast : (movie.cast || []);
+movie.imdb_id = info.imdbId || movie.imdb_id || null;
 
 await updateMovieInCloud(movie);
 updated++;
@@ -1336,8 +1364,9 @@ card.innerHTML = `
 <span class="text-indigo-300 font-semibold">${totals.count} éd.</span>
 <span class="font-bold text-emerald-400">${totals.totalPurchase.toFixed(2)} €</span>
 </div>
-<div class="mci-status flex items-center gap-1 mt-1">
-${m.seen ? `<span class="text-[10px] text-emerald-400 flex items-center gap-1">${ic('check','w-3 h-3')} Vu</span>` : `<span class="text-[10px] text-gray-500 flex items-center gap-1">${ic('eye','w-3 h-3')} Non vu</span>`}
+<div class="mci-status flex items-center gap-2 mt-1 text-[10px]">
+${m.seen ? `<span class="text-emerald-400 flex items-center gap-1">${ic('check','w-3 h-3')} Vu</span>` : `<span class="text-gray-500 flex items-center gap-1">${ic('eye','w-3 h-3')} Non vu</span>`}
+${imdbBadge(m)}
 </div>
 </div>
 `;
@@ -1412,6 +1441,7 @@ card.innerHTML = `
 <span>Wishlist</span>
 <span>${totals.totalPurchase > 0 ? totals.totalPurchase.toFixed(2) + ' €' : ''}</span>
 </div>
+${imdbBadge(m) ? `<div class="mt-1 text-[10px]">${imdbBadge(m)}</div>` : ''}
 </div>
 `;
 grid.appendChild(card);
@@ -1501,6 +1531,11 @@ ${infoCast ? `
 <div class="flex items-start gap-2 text-gray-300">
 <span class="text-gray-500 mt-0.5">${ic('users','w-3.5 h-3.5')}</span>
 <span><span class="text-gray-500">Avec : </span>${infoCast}</span>
+</div>` : ''}
+${(movie.imdbUserRating !== undefined && movie.imdbUserRating !== null) ? `
+<div class="flex items-center gap-2 text-gray-300">
+<span class="text-amber-400">${ic('star','w-3.5 h-3.5')}</span>
+<span><span class="text-gray-500">Votre note IMDb : </span><span class="text-amber-400 font-bold">${movie.imdbUserRating}/10</span></span>
 </div>` : ''}
 </div>
 `;
@@ -2020,6 +2055,94 @@ document.body.appendChild(downloadAnchor);
 downloadAnchor.click();
 downloadAnchor.remove();
 showToast("Exportation JSON terminée ! 💾");
+}
+
+// --- IMPORT DES NOTES IMDB (fichier ratings.csv exporté depuis votre compte) ---
+function parseCSV(text) {
+const rows = [];
+let row = [];
+let field = '';
+let inQuotes = false;
+
+for (let i = 0; i < text.length; i++) {
+const c = text[i];
+if (inQuotes) {
+if (c === '"') {
+if (text[i + 1] === '"') { field += '"'; i++; }
+else inQuotes = false;
+} else field += c;
+} else {
+if (c === '"') inQuotes = true;
+else if (c === ',') { row.push(field); field = ''; }
+else if (c === '\n' || c === '\r') {
+if (c === '\r' && text[i + 1] === '\n') i++;
+row.push(field);
+field = '';
+if (row.length > 1 || row[0] !== '') rows.push(row);
+row = [];
+} else field += c;
+}
+}
+if (field !== '' || row.length) { row.push(field); rows.push(row); }
+if (rows.length === 0) return [];
+
+const headers = rows[0];
+return rows.slice(1).map(r => {
+const obj = {};
+headers.forEach((h, idx) => obj[h] = r[idx] !== undefined ? r[idx] : '');
+return obj;
+});
+}
+
+async function importImdbRatings(event) {
+const file = event.target.files[0];
+if (!file) return;
+showToast("Lecture du fichier IMDb...");
+const reader = new FileReader();
+
+reader.onload = async (e) => {
+try {
+const rows = parseCSV(e.target.result);
+if (rows.length === 0) { showToast("Fichier vide ou invalide."); return; }
+
+const ratingsMap = {};
+rows.forEach(r => {
+const constId = (r['Const'] || r['const'] || '').trim();
+const rating = parseFloat(r['Your Rating'] || r['your rating']);
+if (constId && !isNaN(rating)) ratingsMap[constId] = rating;
+});
+
+if (Object.keys(ratingsMap).length === 0) {
+showToast("Aucune note trouvée. Vérifiez qu'il s'agit bien de l'export IMDb \"Your Ratings\".");
+return;
+}
+
+let matched = 0;
+const allMovies = [...collection, ...wishlist];
+for (const m of allMovies) {
+if (m.imdb_id && ratingsMap.hasOwnProperty(m.imdb_id)) {
+m.imdbUserRating = ratingsMap[m.imdb_id];
+await updateMovieInCloud(m);
+matched++;
+}
+}
+
+renderCollection();
+renderWishlist();
+
+if (matched === 0) {
+showToast("Aucune correspondance trouvée. Essayez d'abord \"Rafraîchir les infos TMDB\" pour récupérer les identifiants IMDb de vos films.");
+} else {
+showToast(`${matched} note${matched > 1 ? 's' : ''} IMDb importée${matched > 1 ? 's' : ''} !`);
+}
+} catch (err) {
+console.error(err);
+showToast("Erreur lors de la lecture du fichier CSV.");
+}
+event.target.value = '';
+};
+
+reader.readAsText(file);
 }
 
 async function importExcel(event) {
