@@ -249,6 +249,55 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
   }
   #statsTopGrid { grid-template-columns: repeat(7, minmax(0, 1fr)) !important; }
 }
+
+/* ===== Barre de navigation fixe en bas d'écran (mobile uniquement) ===== */
+@media (max-width: 767px) {
+  body { padding-bottom: 5.75rem !important; }
+}
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.6rem 0.75rem calc(0.6rem + env(safe-area-inset-bottom, 0px));
+  border-radius: 1.5rem 1.5rem 0 0;
+  border-bottom: none;
+}
+.mobile-bottom-nav .bottom-nav-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem 0;
+  border-radius: 0.9rem;
+  color: #9ca3af;
+  transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+  position: relative;
+}
+.mobile-bottom-nav .bottom-nav-btn:active { transform: scale(0.92); }
+.mobile-bottom-nav .bottom-nav-btn.active {
+  color: #fff;
+  background: linear-gradient(155deg, rgba(129,140,248,0.45), rgba(124,58,237,0.35));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.2);
+}
+.mobile-bottom-nav .bottom-nav-badge {
+  position: absolute;
+  top: 4px;
+  right: 22%;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #ec4899;
+  box-shadow: 0 0 0 2px rgba(15,23,42,0.9);
+}
+@media (min-width: 768px) {
+  .mobile-bottom-nav { display: none !important; }
+}
 </style>
 </head>
 <body class="theme-purple text-gray-100 min-h-screen pb-10 selection:bg-indigo-500 selection:text-white">
@@ -740,6 +789,26 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </main>
 
+<!-- BARRE DE NAVIGATION FIXE (mobile uniquement) -->
+<nav id="bottomNav" class="mobile-bottom-nav glass-card">
+<button id="bottomTabHomeBtn" onclick="switchTab('home')" class="bottom-nav-btn active">
+<span class="icon-inline w-5 h-5" data-icon="home"></span>
+</button>
+<button id="bottomTabCollectionBtn" onclick="switchTab('collection')" class="bottom-nav-btn">
+<span class="icon-inline w-5 h-5" data-icon="book"></span>
+</button>
+<button id="bottomTabWishlistBtn" onclick="switchTab('wishlist')" class="bottom-nav-btn">
+<span class="icon-inline w-5 h-5" data-icon="sparkles"></span>
+<span id="wishlistBadgeBottom" class="hidden bottom-nav-badge"></span>
+</button>
+<button id="bottomTabStatsBtn" onclick="switchTab('stats')" class="bottom-nav-btn">
+<span class="icon-inline w-5 h-5" data-icon="barchart"></span>
+</button>
+<button id="bottomTabSettingsBtn" onclick="switchTab('settings')" class="bottom-nav-btn">
+<span class="icon-inline w-5 h-5" data-icon="settings"></span>
+</button>
+</nav>
+
 <!-- MODAL DETAILS -->
 <div id="detailModal" class="fixed inset-0 bg-black/60 backdrop-blur-xl hidden flex items-center justify-center p-4 z-50">
 <div class="glass-card rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto p-5 border border-white/20 relative shadow-2xl">
@@ -1000,25 +1069,35 @@ btn.className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition fle
 }
 });
 
+['bottomTabHomeBtn', 'bottomTabCollectionBtn', 'bottomTabWishlistBtn', 'bottomTabStatsBtn', 'bottomTabSettingsBtn'].forEach(id => {
+const btn = document.getElementById(id);
+if (btn) btn.classList.remove('active');
+});
+
 if (tab === 'home') {
 document.getElementById('tabHome').classList.remove('hidden');
 document.getElementById('tabHomeBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 shine-btn bg-indigo-600/80 text-white shadow-md";
+document.getElementById('bottomTabHomeBtn').classList.add('active');
 renderHomeRecent();
 } else if (tab === 'collection') {
 document.getElementById('tabCollection').classList.remove('hidden');
 document.getElementById('tabCollectionBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 shine-btn bg-indigo-600/80 text-white shadow-md";
+document.getElementById('bottomTabCollectionBtn').classList.add('active');
 renderCollection();
 } else if (tab === 'wishlist') {
 document.getElementById('tabWishlist').classList.remove('hidden');
 document.getElementById('tabWishlistBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 shine-btn bg-pink-600/80 text-white shadow-md";
+document.getElementById('bottomTabWishlistBtn').classList.add('active');
 renderWishlist();
 } else if (tab === 'stats') {
 document.getElementById('tabStats').classList.remove('hidden');
 document.getElementById('tabStatsBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 shine-btn bg-indigo-600/80 text-white shadow-md";
+document.getElementById('bottomTabStatsBtn').classList.add('active');
 renderStats();
 } else if (tab === 'settings') {
 document.getElementById('tabSettings').classList.remove('hidden');
 document.getElementById('tabSettingsBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 shine-btn bg-indigo-600/80 text-white shadow-md";
+document.getElementById('bottomTabSettingsBtn').classList.add('active');
 updateSettingsCounters();
 }
 }
@@ -1395,6 +1474,7 @@ renderWishlist();
 function renderWishlist() {
 const grid = document.getElementById('wishlistGrid');
 const badge = document.getElementById('wishlistBadge');
+const badgeBottom = document.getElementById('wishlistBadgeBottom');
 const countLabel = document.getElementById('wishlistTotalCount');
 
 grid.innerHTML = '';
@@ -1402,6 +1482,10 @@ if (badge) {
 badge.innerText = wishlist.length;
 if (wishlist.length > 0) badge.classList.remove('hidden');
 else badge.classList.add('hidden');
+}
+if (badgeBottom) {
+if (wishlist.length > 0) badgeBottom.classList.remove('hidden');
+else badgeBottom.classList.add('hidden');
 }
 if (countLabel) countLabel.innerText = `${wishlist.length} film${wishlist.length > 1 ? 's' : ''}`;
 
