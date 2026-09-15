@@ -252,7 +252,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 /* ===== Barre de navigation fixe en bas d'écran (mobile uniquement) ===== */
 @media (max-width: 767px) {
-  body { padding-bottom: 8rem !important; }
+  body { padding-bottom: 11rem !important; }
 }
 .mobile-bottom-nav {
   position: fixed;
@@ -262,10 +262,10 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
   z-index: 50;
   display: flex;
   justify-content: space-around;
-  align-items: flex-start;
+  align-items: center;
   gap: 0;
-  padding: 1.2rem 0.25rem 0.65rem;
-  padding-bottom: calc(0.65rem + env(safe-area-inset-bottom, 0px));
+  padding: 2.3rem 0.25rem 1rem;
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
   border-radius: 0;
   border-top: 1px solid rgba(255, 255, 255, 0.22);
 }
