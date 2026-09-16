@@ -860,6 +860,20 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 <div class="p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
+<span class="icon-chip" data-icon="trash"></span>
+<div>
+<h3 class="text-sm font-bold text-white">Zone dangereuse</h3>
+<p class="text-[11px] text-gray-400">Supprimer définitivement toutes les données stockées dans Supabase.</p>
+</div>
+</div>
+<button id="deleteCollectionBtn" onclick="deleteEntireCollection()" class="shine-btn w-full bg-red-600 hover:bg-red-500 text-white font-bold py-2.5 rounded-2xl text-xs shadow-lg transition transform active:scale-95 flex items-center justify-center gap-1.5">
+<span class="icon-inline w-3.5 h-3.5" data-icon="trash"></span><span>Supprimer ma collection</span>
+</button>
+<p class="text-[10px] text-red-300/70">Cette action supprimera tous les films de la collection <strong>et de la wishlist</strong> dans Supabase. Cette action est irréversible.</p>
+</div>
+
+<div class="p-4 md:p-5 space-y-3">
+<div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="star"></span>
 <div>
 <h3 class="text-sm font-bold text-white">Notes IMDb</h3>
@@ -1188,6 +1202,56 @@ if (error) console.error("Update error:", error);
 async function deleteMovieFromCloud(cloud_id) {
 const { error } = await db.from('bluray').delete().eq('id', cloud_id);
 if (error) console.error("Delete error:", error);
+}
+
+async function deleteEntireCollection() {
+const totalItems = collection.length + wishlist.length;
+
+const confirmed = window.confirm(
+`ATTENTION : vous êtes sur le point de supprimer définitivement ${totalItems} élément${totalItems > 1 ? 's' : ''} de votre collection, y compris la wishlist.\n\nToutes les données seront supprimées de Supabase. Cette action est irréversible.\n\nVoulez-vous vraiment continuer ?`
+);
+
+if (!confirmed) return;
+
+const button = document.getElementById('deleteCollectionBtn');
+const originalHtml = button?.innerHTML;
+if (button) {
+button.disabled = true;
+button.classList.add('opacity-60', 'cursor-not-allowed');
+button.innerHTML = '<span class="icon-inline w-3.5 h-3.5" data-icon="refresh"></span><span>Suppression en cours...</span>';
+applyStaticIcons();
+}
+
+try {
+const { error } = await db
+.from('bluray')
+.delete()
+.not('id', 'is', null);
+
+if (error) {
+console.error('Delete collection error:', error);
+showToast('⚠️ Impossible de supprimer la collection. Vérifiez les droits Supabase.');
+return;
+}
+
+collection = [];
+wishlist = [];
+renderCollection();
+renderWishlist();
+updateSettingsCounters();
+
+showToast('🗑️ Collection supprimée définitivement.');
+} catch (err) {
+console.error('Delete collection exception:', err);
+showToast('⚠️ Erreur lors de la suppression de la collection.');
+} finally {
+if (button) {
+button.disabled = false;
+button.classList.remove('opacity-60', 'cursor-not-allowed');
+button.innerHTML = originalHtml;
+applyStaticIcons();
+}
+}
 }
 
 // --- NAVIGATION ET TABS ---
