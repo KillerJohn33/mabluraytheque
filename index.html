@@ -1290,6 +1290,12 @@ return p.total > 0 && p.watched >= p.total;
 }
 
 function normalizeMovieData(movie) {
+// Sécurise les champs qui doivent toujours être des tableaux, même si une
+// entrée importée/ancienne a une structure légèrement différente.
+if (!Array.isArray(movie.genres)) movie.genres = [];
+if (!Array.isArray(movie.cast)) movie.cast = [];
+if (movie.mediaType === 'tv' && !Array.isArray(movie.seasons)) movie.seasons = [];
+
 if (movie.isViewing) {
 if (!movie.editions || !Array.isArray(movie.editions)) movie.editions = [];
 return movie;
@@ -1358,16 +1364,31 @@ console.error("Fetch error:", error);
 collection = [];
 wishlist = [];
 viewingLog = [];
+let skippedCount = 0;
 data.forEach(item => {
+try {
 let m = { ...item.data, cloud_id: item.id };
 m = normalizeMovieData(m);
 if (m.isViewing) viewingLog.push(m);
 else if (m.isWishlist) wishlist.push(m);
 else collection.push(m);
+} catch (itemErr) {
+skippedCount++;
+console.error("Ligne ignorée (structure invalide) :", item.id, itemErr);
+}
 });
+if (skippedCount > 0) {
+showToast(`⚠️ ${skippedCount} entrée(s) n'ont pas pu être chargées (voir la console).`);
+}
+try {
 renderCollection();
+} catch (e) { console.error("Erreur renderCollection:", e); showToast("⚠️ Erreur d'affichage de la Collection (voir la console)."); }
+try {
 renderWishlist();
+} catch (e) { console.error("Erreur renderWishlist:", e); showToast("⚠️ Erreur d'affichage de la Wishlist (voir la console)."); }
+try {
 renderViewingLog();
+} catch (e) { console.error("Erreur renderViewingLog:", e); showToast("⚠️ Erreur d'affichage de Visionnage (voir la console)."); }
 }
 } catch (err) {
 showToast("Erreur de connexion cloud.");
@@ -3604,9 +3625,18 @@ let added = 0;
 let notFound = 0;
 let done = 0;
 
+function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
 for (const entry of toImport) {
 try {
-const res = await fetch(`https://api.themoviedb.org/3/find/${entry.constId}?api_key=${API_KEY}&external_source=imdb_id`);
+let res = await fetch(`https://api.themoviedb.org/3/find/${entry.constId}?api_key=${API_KEY}&external_source=imdb_id`);
+
+// Si TMDB nous limite (trop de requêtes trop vite), on patiente puis on retente une fois
+if (res.status === 429) {
+await sleep(2000);
+res = await fetch(`https://api.themoviedb.org/3/find/${entry.constId}?api_key=${API_KEY}&external_source=imdb_id`);
+}
+
 const data = await res.json();
 
 let newItem = null;
@@ -3629,12 +3659,16 @@ notFound++;
 }
 done++;
 if (btnText) btnText.innerText = `Import en cours... (${done}/${toImport.length})`;
+await sleep(300);
 }
 
 renderViewingLog();
 if (btnText) btnText.innerText = 'Importer le fichier ratings.csv';
 
-showToast(`${added} ajouté${added > 1 ? 's' : ''} à Visionnage${notFound > 0 ? ` • ${notFound} non trouvé(s) sur TMDB` : ''} ✅`);
+showToast(`${added} ajouté${added > 1 ? 's' : ''} à Visionnage${notFound > 0 ? ` • ${notFound} échoué(s)/non trouvé(s)` : ''} ✅`);
+if (notFound > 5) {
+showToast(`Astuce : relance l'import avec le même fichier pour retenter les ${notFound} film(s)/série(s) en échec (les autres seront ignorés automatiquement).`);
+}
 } catch (err) {
 console.error(err);
 showToast("Erreur lors de la lecture du fichier CSV.");
