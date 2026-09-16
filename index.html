@@ -1495,7 +1495,10 @@ showToast('Cette édition est déjà dans votre collection.');
 window.lastScannedBarcode = ''; window.lastScannedProductTitle = '';
 openMovieDetail(existingWork.id); return;
 }
-existingWork.editions.push({ id: 'ed_' + Date.now(), title: 'Nouvelle édition', format: 'Blu-ray 1080p', editionType: 'Amaray', barcode, purchasePrice: '', estimatedPrice: '', purchaseLocation: '' });
+const scannedProductTitle = window.lastScannedProductTitle || '';
+const detectedFormat = /4k|uhd/i.test(scannedProductTitle) ? '4K UHD' : (/dvd/i.test(scannedProductTitle) && !/blu-ray/i.test(scannedProductTitle) ? 'DVD' : 'Blu-ray 1080p');
+const detectedEditionType = /steelbook/i.test(scannedProductTitle) ? 'Steelbook' : (/coffret|boxset|box set/i.test(scannedProductTitle) ? 'Coffret' : 'Amaray');
+existingWork.editions.push({ id: 'ed_' + Date.now(), title: scannedProductTitle || 'Nouvelle édition', format: detectedFormat, editionType: detectedEditionType, barcode, purchasePrice: '', estimatedPrice: '', purchaseLocation: '' });
 const mergeResult = await updateMovieInCloud(existingWork);
 if (mergeResult.success) {
 window.lastScannedBarcode = ''; window.lastScannedProductTitle = '';
@@ -1577,6 +1580,11 @@ editions: [{ id: 'ed_' + Date.now(), title: 'Édition Standard', format: 'Blu-ra
 
 if (window.lastScannedBarcode) {
 movie.editions[0].barcode = window.lastScannedBarcode;
+if (window.lastScannedProductTitle) {
+  movie.editions[0].title = window.lastScannedProductTitle;
+  movie.editions[0].format = /4k|uhd/i.test(window.lastScannedProductTitle) ? '4K UHD' : (/dvd/i.test(window.lastScannedProductTitle) && !/blu-ray/i.test(window.lastScannedProductTitle) ? 'DVD' : 'Blu-ray 1080p');
+  movie.editions[0].editionType = /steelbook/i.test(window.lastScannedProductTitle) ? 'Steelbook' : (/coffret|boxset|box set/i.test(window.lastScannedProductTitle) ? 'Coffret' : 'Amaray');
+}
 window.lastScannedBarcode = '';
 window.lastScannedProductTitle = '';
 }
@@ -2184,10 +2192,6 @@ ${movie.editions.length > 1 ? `<button onclick="removeEdition('${movie.id}', ${i
 <div>
 <label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">Nom</label>
 <input type="text" value="${ed.title || ''}" onchange="updateEditionField('${movie.id}', ${idx}, 'title', this.value)" placeholder="Steelbook 4K" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
-</div>
-<div>
-<label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">EAN / Code-barres</label>
-<input type="text" inputmode="numeric" value="${ed.barcode || ''}" onchange="updateEditionField('${movie.id}', ${idx}, 'barcode', this.value.replace(/\D/g, ''))" placeholder="3760…" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
 </div>
 <div>
 <label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">Format</label>
