@@ -404,13 +404,15 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 
+<div id="scannerSection">
 <button onclick="toggleScanner()" class="shine-btn w-full glass-card hover:bg-white/10 text-white font-semibold py-2.5 rounded-2xl flex items-center justify-center gap-2 shadow transition transform active:scale-95 text-xs">
 <span class="icon-chip chip-sm" data-icon="camera"></span> <span>Scanner un code-barres</span>
 </button>
 
-<div id="scanner-container" class="hidden glass-card p-4 rounded-3xl border border-white/20 overflow-hidden">
+<div id="scanner-container" class="hidden glass-card p-4 rounded-3xl border border-white/20 overflow-hidden mt-2">
 <div id="reader" class="w-full rounded-2xl overflow-hidden"></div>
 <button onclick="stopScanner()" class="mt-3 w-full bg-red-500/80 hover:bg-red-500 text-white py-2 rounded-xl text-xs font-semibold backdrop-blur-md transition">Fermer la caméra</button>
+</div>
 </div>
 </div>
 
@@ -657,6 +659,21 @@ Tout
 <button id="viewTypeTvBtn" onclick="setViewingTypeFilter('tv')" class="flex-1 py-2 rounded-lg font-bold text-xs transition text-gray-400 hover:text-white flex items-center justify-center gap-1.5">
 <span class="icon-inline w-3.5 h-3.5" data-icon="tv"></span> Séries
 </button>
+</div>
+
+<div class="glass-card p-3 rounded-2xl space-y-2 border border-white/10">
+<div class="flex items-center gap-2">
+<span class="icon-chip chip-sm" data-icon="star"></span>
+<div>
+<h3 class="text-xs font-bold text-white">Importer depuis IMDb</h3>
+<p class="text-[10px] text-gray-400">Crée automatiquement les fiches manquantes à partir de votre fichier de notes IMDb.</p>
+</div>
+</div>
+<label class="shine-btn w-full bg-amber-500 hover:bg-amber-400 text-gray-900 font-bold py-2.5 rounded-2xl text-xs shadow-lg transition transform active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+<span class="icon-inline w-3.5 h-3.5" data-icon="upload"></span><span id="importImdbViewingBtnText">Importer le fichier ratings.csv</span>
+<input type="file" id="imdbCsvViewingInput" accept=".csv" class="hidden" onchange="importImdbToViewing(event)">
+</label>
+<p class="text-[10px] text-gray-500">Chaque film/série noté sur IMDb et absent de votre appli sera ajouté ici avec sa note. Les films déjà présents (Collection, Wishlist ou Visionnage) sont ignorés pour éviter les doublons.</p>
 </div>
 
 <div class="glass-card p-3 rounded-2xl space-y-2 border border-white/10">
@@ -1364,6 +1381,12 @@ if (tab === 'home' || tab === 'collection' || tab === 'viewing') searchSection.c
 else searchSection.classList.add('hidden');
 }
 
+const scannerSection = document.getElementById('scannerSection');
+if (scannerSection) {
+if (tab === 'viewing') scannerSection.classList.add('hidden');
+else scannerSection.classList.remove('hidden');
+}
+
 const inactiveClass = "flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent";
 const activeClass = "flex-1 py-2 font-bold text-[10px] transition flex items-center justify-center gap-1 text-cyan-400 border-b-[3px] border-cyan-400";
 
@@ -1529,15 +1552,16 @@ return null;
 }
 }
 
-async function addMovieFromTMDB(tmdbData, isWishlist = false, isViewing = false) {
+async function addMovieFromTMDB(tmdbData, isWishlist = false, isViewing = false, skipDuplicateConfirm = false) {
 // Détection de doublon (déjà présent en Collection, Wishlist ou Visionnage)
 const existsIn = collection.some(m => m.tmdb_id === tmdbData.id) ? 'votre collection'
 : wishlist.some(m => m.tmdb_id === tmdbData.id) ? 'votre wishlist'
 : viewingLog.some(m => m.tmdb_id === tmdbData.id) ? 'votre visionnage' : null;
 
 if (existsIn) {
+if (skipDuplicateConfirm) return null;
 const confirmAdd = confirm(`"${tmdbData.title}" est déjà présent dans ${existsIn}. Voulez-vous quand même l'ajouter en double ?`);
-if (!confirmAdd) return;
+if (!confirmAdd) return null;
 }
 
 let genres = [];
@@ -1610,7 +1634,7 @@ movie.cloud_id = cloudId;
 if (isViewing) {
 viewingLog.push(movie);
 renderViewingLog();
-showToast("Ajouté à Visionnage ! ✅");
+if (!skipDuplicateConfirm) showToast("Ajouté à Visionnage ! ✅");
 } else if (isWishlist) {
 wishlist.push(movie);
 renderWishlist();
@@ -1620,18 +1644,21 @@ collection.push(movie);
 renderCollection();
 showToast("Ajouté à la Collection ! 💿");
 }
+return movie;
 }
+return null;
 }
 
-async function addShowFromTMDB(tmdbData, isWishlist = false, isViewing = false) {
+async function addShowFromTMDB(tmdbData, isWishlist = false, isViewing = false, skipDuplicateConfirm = false) {
 // Détection de doublon
 const existsIn = collection.some(m => m.tmdb_id === tmdbData.id && m.mediaType === 'tv') ? 'votre collection'
 : wishlist.some(m => m.tmdb_id === tmdbData.id && m.mediaType === 'tv') ? 'votre wishlist'
 : viewingLog.some(m => m.tmdb_id === tmdbData.id && m.mediaType === 'tv') ? 'votre visionnage' : null;
 
 if (existsIn) {
+if (skipDuplicateConfirm) return null;
 const confirmAdd = confirm(`"${tmdbData.name}" est déjà présent dans ${existsIn}. Voulez-vous quand même l'ajouter en double ?`);
-if (!confirmAdd) return;
+if (!confirmAdd) return null;
 }
 
 let genres = [];
@@ -1720,7 +1747,7 @@ show.cloud_id = cloudId;
 if (isViewing) {
 viewingLog.push(show);
 renderViewingLog();
-showToast("Série ajoutée à Visionnage ! ✅");
+if (!skipDuplicateConfirm) showToast("Série ajoutée à Visionnage ! ✅");
 } else if (isWishlist) {
 wishlist.push(show);
 renderWishlist();
@@ -1730,7 +1757,9 @@ collection.push(show);
 renderCollection();
 showToast("Série ajoutée à la Collection ! 📺");
 }
+return show;
 }
+return null;
 }
 
 // --- RAFRAÎCHISSEMENT RÉTROACTIF DES INFOS TMDB ---
@@ -3365,6 +3394,92 @@ return obj;
 });
 }
 
+// --- IMPORT MASSIF DEPUIS IMDB VERS VISIONNAGE (crée les fiches manquantes) ---
+async function importImdbToViewing(event) {
+const file = event.target.files[0];
+if (!file) return;
+const btnText = document.getElementById('importImdbViewingBtnText');
+showToast("Lecture du fichier IMDb...");
+const reader = new FileReader();
+
+reader.onload = async (e) => {
+try {
+const rows = parseCSV(e.target.result);
+if (rows.length === 0) { showToast("Fichier vide ou invalide."); return; }
+
+// On ne traite que les films et séries (on ignore les notes d'épisodes individuels)
+const entries = rows.map(r => ({
+constId: (r['Const'] || r['const'] || '').trim(),
+rating: parseFloat(r['Your Rating'] || r['your rating']),
+titleType: (r['Title Type'] || r['title type'] || '').trim().toLowerCase()
+})).filter(r => r.constId && !isNaN(r.rating) && (r.titleType === 'movie' || r.titleType === 'tvseries'));
+
+if (entries.length === 0) {
+showToast("Aucun film/série valide trouvé dans ce fichier.");
+event.target.value = '';
+return;
+}
+
+// On exclut ce qui est déjà présent dans une des 3 listes (par identifiant IMDb)
+const existingImdbIds = new Set(
+[...collection, ...wishlist, ...viewingLog].map(m => m.imdb_id).filter(Boolean)
+);
+const toImport = entries.filter(en => !existingImdbIds.has(en.constId));
+
+if (toImport.length === 0) {
+showToast("Tous les films/séries de ce fichier sont déjà présents dans votre application.");
+event.target.value = '';
+return;
+}
+
+const confirmImport = confirm(`${toImport.length} film(s)/série(s) à importer depuis IMDb vers Visionnage (${entries.length - toImport.length} déjà présents seront ignorés).\n\nCette opération peut prendre plusieurs minutes selon la taille du fichier. Continuer ?`);
+if (!confirmImport) { event.target.value = ''; return; }
+
+let added = 0;
+let notFound = 0;
+let done = 0;
+
+for (const entry of toImport) {
+try {
+const res = await fetch(`https://api.themoviedb.org/3/find/${entry.constId}?api_key=${API_KEY}&external_source=imdb_id`);
+const data = await res.json();
+
+let newItem = null;
+if (data.movie_results && data.movie_results.length > 0) {
+newItem = await addMovieFromTMDB(data.movie_results[0], false, true, true);
+} else if (data.tv_results && data.tv_results.length > 0) {
+newItem = await addShowFromTMDB(data.tv_results[0], false, true, true);
+}
+
+if (newItem) {
+newItem.imdbUserRating = entry.rating;
+await updateMovieInCloud(newItem);
+added++;
+} else {
+notFound++;
+}
+} catch (err) {
+console.error("Erreur import IMDb", entry.constId, err);
+notFound++;
+}
+done++;
+if (btnText) btnText.innerText = `Import en cours... (${done}/${toImport.length})`;
+}
+
+renderViewingLog();
+if (btnText) btnText.innerText = 'Importer le fichier ratings.csv';
+
+showToast(`${added} ajouté${added > 1 ? 's' : ''} à Visionnage${notFound > 0 ? ` • ${notFound} non trouvé(s) sur TMDB` : ''} ✅`);
+} catch (err) {
+console.error(err);
+showToast("Erreur lors de la lecture du fichier CSV.");
+}
+event.target.value = '';
+};
+
+reader.readAsText(file);
+}
+
 async function importImdbRatings(event) {
 const file = event.target.files[0];
 if (!file) return;
@@ -3389,7 +3504,7 @@ return;
 }
 
 let matched = 0;
-const allMovies = [...collection, ...wishlist];
+const allMovies = [...collection, ...wishlist, ...viewingLog];
 for (const m of allMovies) {
 if (m.imdb_id && ratingsMap.hasOwnProperty(m.imdb_id)) {
 m.imdbUserRating = ratingsMap[m.imdb_id];
