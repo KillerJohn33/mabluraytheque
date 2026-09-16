@@ -468,6 +468,14 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 <!-- ONGLET COLLECTION AVEC FILTRES AVANCÉS -->
 <div id="tabCollection" class="hidden space-y-4">
+<!-- FILTRE RAPIDE FILMS / SÉRIES -->
+<div class="glass-card w-full p-1 rounded-2xl border border-white/10 flex items-center gap-1">
+<button id="mediaTypeAllBtn" onclick="setMediaTypeFilter('all')" class="media-type-filter-btn flex-1 py-1.5 rounded-xl text-[11px] font-semibold transition">Tous</button>
+<button id="mediaTypeMovieBtn" onclick="setMediaTypeFilter('movie')" class="media-type-filter-btn flex-1 py-1.5 rounded-xl text-[11px] font-semibold transition">Films</button>
+<button id="mediaTypeSeriesBtn" onclick="setMediaTypeFilter('series')" class="media-type-filter-btn flex-1 py-1.5 rounded-xl text-[11px] font-semibold transition">Séries</button>
+</div>
+<input id="filterMediaType" type="hidden" value="all">
+
 <!-- BARRE DE FILTRES ET DE TRI AVANCÉS -->
 <div class="glass-card p-3 rounded-2xl space-y-2 border border-white/10">
 <div class="flex items-center justify-between border-b border-white/10 pb-2">
@@ -478,15 +486,6 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 
 <div class="grid grid-cols-2 gap-2">
-<div>
-<label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Type</label>
-<select id="filterMediaType" onchange="renderCollection()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
-<option class="bg-gray-900" value="all">Films + Séries</option>
-<option class="bg-gray-900" value="movie">Films uniquement</option>
-<option class="bg-gray-900" value="series">Séries uniquement</option>
-</select>
-</div>
-
 <div>
 <label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Format</label>
 <select id="filterFormat" onchange="renderCollection()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
@@ -1067,6 +1066,7 @@ if (e.key === 'Enter') triggerNewSearch();
 });
 
 await fetchCollectionFromCloud();
+setMediaTypeFilter(document.getElementById('filterMediaType')?.value || 'all');
 
 // Rafraîchissement automatique et silencieux des infos TMDB, une fois par jour maximum
 const todayStr = new Date().toISOString().slice(0, 10);
@@ -1659,6 +1659,27 @@ return movie?.isSeries === true
 || movie?.type === 'series'
 || movie?.type === 'tv'
 || !!movie?.first_air_date;
+}
+
+function setMediaTypeFilter(type) {
+const filter = document.getElementById('filterMediaType');
+if (filter) filter.value = type;
+
+const buttons = {
+all: document.getElementById('mediaTypeAllBtn'),
+movie: document.getElementById('mediaTypeMovieBtn'),
+series: document.getElementById('mediaTypeSeriesBtn')
+};
+
+Object.entries(buttons).forEach(([key, btn]) => {
+if (!btn) return;
+btn.classList.toggle('bg-cyan-600', key === type);
+btn.classList.toggle('text-white', key === type);
+btn.classList.toggle('text-gray-400', key !== type);
+btn.classList.toggle('hover:text-white', key !== type);
+});
+
+renderCollection();
 }
 
 function renderCollection() {
