@@ -1021,6 +1021,14 @@ if (e.key === 'Enter') triggerNewSearch();
 });
 
 await fetchCollectionFromCloud();
+
+// Rafraîchissement automatique et silencieux des infos TMDB, une fois par jour maximum
+const todayStr = new Date().toISOString().slice(0, 10);
+if (localStorage.getItem('lastAutoRefreshTMDB') !== todayStr) {
+refreshAllTMDBInfo(true).then(() => {
+localStorage.setItem('lastAutoRefreshTMDB', todayStr);
+});
+}
 });
 
 function showToast(msg) {
@@ -1443,12 +1451,12 @@ const blurayDateFR = await fetchBlurayReleaseDateFR(tmdbId);
 return { genres, runtime, director, cast, imdbId, voteAverage, voteCount, blurayDateFR };
 }
 
-async function refreshAllTMDBInfo() {
+async function refreshAllTMDBInfo(silent = false) {
 const btn = document.getElementById('refreshTmdbBtn');
 const allMovies = [...collection, ...wishlist].filter(m => m.tmdb_id);
 
 if (allMovies.length === 0) {
-showToast("Aucun film avec un identifiant TMDB à mettre à jour.");
+if (!silent) showToast("Aucun film avec un identifiant TMDB à mettre à jour.");
 return;
 }
 
@@ -1493,7 +1501,11 @@ btn.classList.remove('opacity-60', 'pointer-events-none');
 document.getElementById('refreshTmdbBtnText').innerText = 'Rafraîchir les infos TMDB (durée, réalisateur, acteurs...)';
 }
 
+if (!silent) {
 showToast(`Mise à jour terminée : ${updated}/${allMovies.length} film(s) actualisé(s) ✅`);
+} else if (updated > 0) {
+showToast(`Infos à jour (${updated} film${updated > 1 ? 's' : ''}) ✅`);
+}
 }
 
 // --- ACCUEIL ---
