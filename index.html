@@ -1746,42 +1746,34 @@ ${imdbBadge(m)}
 </div>`;
 
 if (isListView) {
-card.className = "relative rounded-2xl overflow-hidden cursor-pointer bg-white/[0.035] border border-white/10 hover:border-cyan-400/40 hover:bg-white/[0.055] transition-all duration-200";
+card.className = "relative rounded-2xl overflow-hidden cursor-pointer bg-black h-28 border border-white/10 hover:border-cyan-500/50 transition";
 card.innerHTML = `
-<div class="flex items-center gap-3 p-2">
-<img src="${m.poster}" class="w-12 h-[4.5rem] object-cover rounded-xl flex-shrink-0 border border-white/10 shadow-lg">
-<div class="min-w-0 flex-1">
-<div class="flex items-center gap-1.5 mb-1">
-<span class="text-[8px] uppercase tracking-wider font-bold ${isSeries(m) ? 'text-violet-300 bg-violet-400/10 border-violet-400/20' : 'text-cyan-300 bg-cyan-400/10 border-cyan-400/20'} border px-1.5 py-0.5 rounded-full">${isSeries(m) ? 'Série' : 'Film'}</span>
-${m.seen ? `<span class="text-emerald-300 bg-emerald-400/10 border border-emerald-400/20 p-1 rounded-full">${ic('check','w-2.5 h-2.5')}</span>` : ''}
+<img src="${m.poster}" class="absolute left-0 top-0 h-full w-auto">
+<div class="absolute inset-0 bg-gradient-to-r from-transparent via-black/75 to-black"></div>
+<div class="absolute inset-y-0 right-0 w-[68%] flex flex-col justify-center items-end p-3 text-right">
+<h4 class="text-xs font-bold text-white truncate w-full">${m.title}</h4>
+<div class="flex items-center justify-end gap-3 text-[10px] mt-1">
+<span class="text-cyan-300 font-semibold">${totals.count} éd.</span>
+<span class="font-bold text-emerald-400">${totals.totalPurchase.toFixed(2)} €</span>
 </div>
-<h4 class="text-xs font-bold text-white truncate">${m.title}</h4>
-<div class="flex items-center gap-3 text-[9px] mt-1.5 text-gray-400">
-<span>${totals.count} édition${totals.count > 1 ? 's' : ''}</span>
-<span class="text-emerald-300 font-semibold">${totals.totalPurchase.toFixed(2)} €</span>
+<div class="flex items-center justify-end gap-2 mt-1 text-[10px]">
+${m.seen ? `<span class="text-emerald-400 flex items-center gap-1">Vu ${ic('check','w-3 h-3')}</span>` : `<span class="text-gray-400 flex items-center gap-1">Non vu ${ic('eye','w-3 h-3')}</span>`}
 ${imdbBadge(m)}
-</div>
 </div>
 </div>
 `;
 } else {
-card.className = "group relative rounded-2xl overflow-hidden cursor-pointer bg-black border border-white/10 hover:border-cyan-400/50 transition-all duration-200 shadow-lg hover:shadow-cyan-500/10 hover:-translate-y-0.5";
+card.className = "relative rounded-2xl overflow-hidden cursor-pointer bg-black border border-white/10 hover:border-cyan-500/50 transition";
 card.innerHTML = `
-<div class="relative aspect-[2/3] overflow-hidden">
-<img src="${m.poster}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.035]">
-<div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/10 to-transparent"></div>
-<div class="absolute top-2 left-2 right-2 flex items-start justify-between">
-<span class="text-[8px] uppercase tracking-wider font-bold ${isSeries(m) ? 'text-violet-200 bg-violet-500/20 border-violet-300/20' : 'text-cyan-200 bg-cyan-500/20 border-cyan-300/20'} backdrop-blur-md border px-1.5 py-1 rounded-full">${isSeries(m) ? 'Série' : 'Film'}</span>
-${m.seen ? `<span class="text-emerald-200 bg-black/40 backdrop-blur-md border border-emerald-300/20 p-1.5 rounded-full">${ic('check','w-3 h-3')}</span>` : ''}
-</div>
+<img src="${m.poster}" class="w-full aspect-[2/3] object-cover">
+<div class="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none"></div>
 <div class="absolute inset-x-0 bottom-0 p-2.5">
-<h4 class="text-[11px] font-bold text-white leading-tight truncate">${m.title}</h4>
-<div class="flex items-center justify-between gap-2 mt-1.5">
-<span class="text-[9px] text-gray-300">${totals.count} éd.</span>
-<span class="text-[10px] font-bold text-emerald-300">${totals.totalPurchase.toFixed(2)} €</span>
+<h4 class="text-xs font-bold text-white truncate">${m.title}</h4>
+<div class="flex items-center justify-between text-[10px] mt-1">
+<span class="text-cyan-300 font-semibold">${totals.count} éd.</span>
+<span class="font-bold text-emerald-400">${totals.totalPurchase.toFixed(2)} €</span>
 </div>
-<div class="mt-1">${imdbBadge(m) || ''}</div>
-</div>
+${statusRow}
 </div>
 `;
 }
@@ -2070,28 +2062,43 @@ movie = normalizeMovieData(movie);
 const modal = document.getElementById('detailModal');
 const content = document.getElementById('modalContent');
 
-let editionsHtml = movie.editions.map((ed, idx) => `
-<div class="glass-pill p-3 rounded-2xl space-y-2 border border-white/10 relative">
-<div class="flex justify-between items-center">
-<span class="text-xs font-bold text-cyan-300">Édition #${idx + 1}</span>
-${movie.editions.length > 1 ? `<button onclick="removeEdition('${movie.id}', ${idx})" class="text-red-400 hover:text-red-300 text-[10px] font-bold flex items-center gap-1">${ic('x','w-3 h-3')} Supprimer</button>` : ''}
+const totals = calculateMovieTotals(movie);
+const infoYear = movie.releaseDate ? movie.releaseDate.split('-')[0] : '';
+const infoRuntime = formatRuntime(movie.runtime);
+const infoGenres = movie.genres && movie.genres.length ? movie.genres : [];
+const infoDirector = movie.director || '';
+const infoCast = movie.cast && movie.cast.length ? movie.cast : [];
+const isSeriesMovie = isSeries(movie);
+const imdbRating = (movie.imdbUserRating !== undefined && movie.imdbUserRating !== null) ? movie.imdbUserRating : null;
+
+const metaParts = [infoYear, infoRuntime].filter(Boolean);
+const genreChips = infoGenres.slice(0, 4).map(g => `<span class="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] text-gray-300">${g}</span>`).join('');
+
+const editionsHtml = movie.editions.map((ed, idx) => `
+<div class="rounded-2xl bg-white/[0.035] border border-white/10 p-3 space-y-2.5">
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-2 min-w-0">
+<span class="w-6 h-6 rounded-lg bg-cyan-400/10 text-cyan-300 flex items-center justify-center text-[9px] font-bold">${idx + 1}</span>
+<span class="text-[11px] font-semibold text-white truncate">${ed.title || 'Édition sans nom'}</span>
 </div>
-<div class="grid grid-cols-2 gap-2 text-xs">
+${movie.editions.length > 1 ? `<button onclick="removeEdition('${movie.id}', ${idx})" class="text-gray-500 hover:text-red-400 transition p-1 rounded-lg hover:bg-red-400/10" title="Supprimer">${ic('x','w-3.5 h-3.5')}</button>` : ''}
+</div>
+<div class="grid grid-cols-2 gap-2">
 <div>
-<label class="block text-[9px] text-gray-400 uppercase">Nom de l'édition</label>
-<input type="text" value="${ed.title || ''}" onchange="updateEditionField('${movie.id}', ${idx}, 'title', this.value)" placeholder="ex: Steelbook 4K" class="w-full glass-input text-white p-1.5 rounded-xl">
+<label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">Nom</label>
+<input type="text" value="${ed.title || ''}" onchange="updateEditionField('${movie.id}', ${idx}, 'title', this.value)" placeholder="Steelbook 4K" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
 </div>
 <div>
-<label class="block text-[9px] text-gray-400 uppercase">Format</label>
-<select onchange="updateEditionField('${movie.id}', ${idx}, 'format', this.value)" class="w-full glass-input text-white p-1.5 rounded-xl">
+<label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">Format</label>
+<select onchange="updateEditionField('${movie.id}', ${idx}, 'format', this.value)" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
 <option class="bg-gray-900" value="4K UHD" ${ed.format === '4K UHD' ? 'selected' : ''}>4K UHD</option>
 <option class="bg-gray-900" value="Blu-ray 1080p" ${ed.format === 'Blu-ray 1080p' ? 'selected' : ''}>Blu-ray 1080p</option>
 <option class="bg-gray-900" value="DVD" ${ed.format === 'DVD' ? 'selected' : ''}>DVD</option>
 </select>
 </div>
 <div>
-<label class="block text-[9px] text-gray-400 uppercase">Boîtier</label>
-<select onchange="updateEditionField('${movie.id}', ${idx}, 'editionType', this.value)" class="w-full glass-input text-white p-1.5 rounded-xl">
+<label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">Boîtier</label>
+<select onchange="updateEditionField('${movie.id}', ${idx}, 'editionType', this.value)" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
 <option class="bg-gray-900" value="Amaray" ${ed.editionType === 'Amaray' ? 'selected' : ''}>Amaray</option>
 <option class="bg-gray-900" value="Steelbook" ${ed.editionType === 'Steelbook' ? 'selected' : ''}>Steelbook</option>
 <option class="bg-gray-900" value="Digibook" ${ed.editionType === 'Digibook' ? 'selected' : ''}>Digibook</option>
@@ -2099,115 +2106,78 @@ ${movie.editions.length > 1 ? `<button onclick="removeEdition('${movie.id}', ${i
 </select>
 </div>
 <div>
-<label class="block text-[9px] text-gray-400 uppercase">Lieu d'achat</label>
-<input type="text" value="${ed.purchaseLocation || ''}" onchange="updateEditionField('${movie.id}', ${idx}, 'purchaseLocation', this.value)" placeholder="ex: Fnac" class="w-full glass-input text-white p-1.5 rounded-xl">
+<label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">Lieu</label>
+<input type="text" value="${ed.purchaseLocation || ''}" onchange="updateEditionField('${movie.id}', ${idx}, 'purchaseLocation', this.value)" placeholder="Fnac" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
 </div>
 <div>
-<label class="block text-[9px] text-gray-400 uppercase">Prix d'Achat (€)</label>
-<input type="number" step="0.01" value="${ed.purchasePrice !== undefined ? ed.purchasePrice : ''}" onchange="updateEditionField('${movie.id}', ${idx}, 'purchasePrice', this.value)" placeholder="0.00" class="w-full glass-input text-white p-1.5 rounded-xl">
+<label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">Achat</label>
+<input type="number" step="0.01" value="${ed.purchasePrice !== undefined ? ed.purchasePrice : ''}" onchange="updateEditionField('${movie.id}', ${idx}, 'purchasePrice', this.value)" placeholder="0.00" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
 </div>
 <div>
-<label class="block text-[9px] text-gray-400 uppercase">Prix Estimé (€)</label>
-<input type="number" step="0.01" value="${ed.estimatedPrice !== undefined ? ed.estimatedPrice : ''}" onchange="updateEditionField('${movie.id}', ${idx}, 'estimatedPrice', this.value)" placeholder="0.00" class="w-full glass-input text-white p-1.5 rounded-xl">
+<label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">Estimé</label>
+<input type="number" step="0.01" value="${ed.estimatedPrice !== undefined ? ed.estimatedPrice : ''}" onchange="updateEditionField('${movie.id}', ${idx}, 'estimatedPrice', this.value)" placeholder="0.00" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
 </div>
 </div>
-</div>
-`).join('');
+</div>`).join('');
 
-const totals = calculateMovieTotals(movie);
-
-// --- INFOS FILM (durée / année / genre / réalisateur / acteurs) ---
-const infoYear = movie.releaseDate ? movie.releaseDate.split('-')[0] : '';
-const infoRuntime = formatRuntime(movie.runtime);
-const infoGenres = movie.genres && movie.genres.length ? movie.genres.join(', ') : '';
-const infoDirector = movie.director || '';
-const infoCast = movie.cast && movie.cast.length ? movie.cast.join(', ') : '';
-
-const movieInfoHtml = `
-<div class="glass-card p-3 rounded-2xl border border-white/10 space-y-1.5 text-[11px] mt-3">
-${infoYear || infoRuntime ? `
-<div class="flex items-center gap-2 text-gray-300">
-<span class="text-gray-500">${ic('calendar','w-3.5 h-3.5')}</span>
-<span>${[infoYear, infoRuntime].filter(Boolean).join(' • ')}</span>
-</div>` : ''}
-${infoGenres ? `
-<div class="flex items-start gap-2 text-gray-300">
-<span class="text-gray-500 mt-0.5">${ic('tag','w-3.5 h-3.5')}</span>
-<span>${infoGenres}</span>
-</div>` : ''}
-${infoDirector ? `
-<div class="flex items-start gap-2 text-gray-300">
-<span class="text-gray-500 mt-0.5">${ic('clapper','w-3.5 h-3.5')}</span>
-<span><span class="text-gray-500">Réalisateur : </span>${infoDirector}</span>
-</div>` : ''}
-${infoCast ? `
-<div class="flex items-start gap-2 text-gray-300">
-<span class="text-gray-500 mt-0.5">${ic('users','w-3.5 h-3.5')}</span>
-<span><span class="text-gray-500">Avec : </span>${infoCast}</span>
-</div>` : ''}
-${(typeof movie.voteAverage === 'number' && movie.voteAverage > 0) ? `
-<div class="flex items-center gap-2 text-gray-300">
-<span class="text-sky-400">${ic('trend','w-3.5 h-3.5')}</span>
-<span><span class="text-gray-500">Note moyenne des utilisateurs : </span><span class="text-sky-400 font-bold">${movie.voteAverage.toFixed(1)}/10</span>${movie.voteCount ? `<span class="text-gray-500"> (${movie.voteCount.toLocaleString('fr-FR')} votes)</span>` : ''}</span>
-</div>` : ''}
-<div class="flex items-center gap-2 text-gray-300 pt-1 border-t border-white/5">
-<span class="text-cyan-400 flex-shrink-0">${ic('disc','w-3.5 h-3.5')}</span>
-<span class="text-gray-500 whitespace-nowrap">Sortie Blu-ray (FR) :</span>
-<input type="date" value="${movie.blurayReleaseDateFR || ''}" onchange="updateBlurayDate('${movie.id}', this.value)" class="glass-input text-white text-[11px] px-2 py-1 rounded-lg focus:outline-none ml-auto">
-</div>
-</div>
-`;
+const ratingHtml = imdbRating !== null ? `<div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-300 text-[10px] font-bold">${ic('star','w-3.5 h-3.5')} IMDb ${imdbRating}/10</div>` : '';
+const seenHtml = `<button onclick="toggleMovieSeen('${movie.id}')" class="px-2.5 py-1.5 rounded-xl text-[10px] font-semibold transition flex items-center gap-1.5 ${movie.seen ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20' : 'bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10'}">${movie.seen ? ic('check','w-3.5 h-3.5') + ' Vu' : ic('eye','w-3.5 h-3.5') + ' Non vu'}</button>`;
 
 content.innerHTML = `
 <div class="space-y-4">
-<div class="flex gap-4 items-start">
-<img src="${movie.poster}" class="w-24 h-36 object-cover rounded-2xl shadow-lg border border-white/10">
-<div class="flex-1 min-w-0">
-<h3 class="text-base font-extrabold text-white leading-snug">${movie.title}</h3>
-
-<div class="mt-3 flex items-center gap-2 flex-wrap">
-<button onclick="toggleMovieSeen('${movie.id}')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${movie.seen ? 'bg-emerald-600 text-white' : 'glass-pill text-gray-300'}">
-${movie.seen ? `${ic('check','w-3.5 h-3.5')} Vu` : `${ic('eye','w-3.5 h-3.5')} Marquer comme vu`}
-</button>
-${(movie.imdbUserRating !== undefined && movie.imdbUserRating !== null) ? `<span class="glass-pill px-3 py-1.5 rounded-xl text-xs font-bold text-amber-400 flex items-center gap-1.5">${ic('star','w-3.5 h-3.5')} ${movie.imdbUserRating}/10</span>` : ''}
+<!-- HERO -->
+<div class="relative overflow-hidden rounded-3xl border border-white/10 bg-black/30">
+<div class="absolute inset-0 opacity-30 pointer-events-none" style="background-image:linear-gradient(90deg,rgba(0,0,0,.9),rgba(0,0,0,.35)),url('${movie.poster}');background-size:cover;background-position:center;filter:blur(18px);transform:scale(1.08)"></div>
+<div class="relative flex gap-3.5 p-3.5 sm:p-4">
+<img src="${movie.poster}" class="w-24 h-36 sm:w-28 sm:h-42 object-cover rounded-2xl shadow-xl border border-white/15 flex-shrink-0">
+<div class="flex-1 min-w-0 flex flex-col justify-end py-0.5">
+<div class="flex items-center gap-1.5 flex-wrap mb-2">
+<span class="px-2 py-1 rounded-full bg-cyan-400/10 border border-cyan-400/20 text-cyan-300 text-[8px] font-bold uppercase tracking-wider">${isSeriesMovie ? 'Série' : 'Film'}</span>
+${movie.isWishlist ? '<span class="px-2 py-1 rounded-full bg-pink-400/10 border border-pink-400/20 text-pink-300 text-[8px] font-bold uppercase tracking-wider">Wishlist</span>' : '<span class="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 text-[8px] font-bold uppercase tracking-wider">Collection</span>'}
 </div>
-
-<div class="hidden md:block">${movieInfoHtml}</div>
+<h3 class="text-lg sm:text-xl font-extrabold text-white leading-tight">${movie.title}</h3>
+${metaParts.length ? `<p class="text-[10px] text-gray-400 mt-1.5">${metaParts.join(' • ')}</p>` : ''}
+<div class="flex items-center gap-1.5 flex-wrap mt-3">${seenHtml}${ratingHtml}</div>
 </div>
-</div>
-
-<div class="md:hidden">${movieInfoHtml}</div>
-
-<div class="glass-card p-3 rounded-2xl space-y-3 border border-white/10">
-<div class="flex items-center justify-between border-b border-white/10 pb-2">
-<h4 class="text-xs font-bold text-gray-300 uppercase tracking-wider">Éditions Possédées (${movie.editions.length})</h4>
-<button onclick="addEditionToMovie('${movie.id}')" class="shine-btn bg-cyan-600 hover:bg-cyan-500 text-white px-2.5 py-1 rounded-xl text-[10px] font-bold shadow transition flex items-center gap-1">
-${ic('plus','w-3 h-3')} Ajouter une édition
-</button>
-</div>
-
-<div class="space-y-2 max-h-60 overflow-y-auto pr-1">
-${editionsHtml}
-</div>
-
-<div class="flex justify-between items-center text-xs pt-2 border-t border-white/10 font-bold">
-<span class="text-gray-400">Total cumulé :</span>
-<span class="text-emerald-400">${totals.totalPurchase.toFixed(2)} € (Achat) / ${totals.totalEstimated.toFixed(2)} € (Est.)</span>
 </div>
 </div>
 
-<div class="flex gap-2 pt-2">
-${movie.isWishlist ? `
-<button onclick="moveWishlistToCollection('${movie.id}')" class="shine-btn flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg transition flex items-center justify-center gap-1.5">
-${ic('download','w-3.5 h-3.5')} Transférer en Collection
-</button>
-` : ''}
-<button onclick="deleteMovie('${movie.id}')" class="bg-red-600/80 hover:bg-red-600 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-1.5">
-${ic('trash','w-3.5 h-3.5')} Supprimer
-</button>
+<!-- INFOS ESSENTIELLES -->
+<div class="rounded-2xl border border-white/10 bg-white/[0.025] p-3">
+<div class="flex items-center justify-between gap-3 mb-2.5">
+<h4 class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.16em]">Informations</h4>
+${movie.voteAverage > 0 ? `<span class="text-[9px] text-sky-300 font-semibold">TMDB ${movie.voteAverage.toFixed(1)}${movie.voteCount ? ` · ${movie.voteCount.toLocaleString('fr-FR')} votes` : ''}</span>` : ''}
+</div>
+${genreChips ? `<div class="flex flex-wrap gap-1.5 mb-2.5">${genreChips}</div>` : ''}
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-[10px]">
+${infoDirector ? `<div class="text-gray-300"><span class="text-gray-500">Réalisateur</span><br><span class="text-white font-medium">${infoDirector}</span></div>` : ''}
+${infoCast.length ? `<div class="text-gray-300"><span class="text-gray-500">Avec</span><br><span class="text-white font-medium">${infoCast.slice(0, 5).join(', ')}</span></div>` : ''}
+<div class="flex items-center gap-2 sm:col-span-2 pt-2 border-t border-white/5">
+<span class="text-cyan-400">${ic('disc','w-3.5 h-3.5')}</span><span class="text-gray-500">Sortie Blu-ray FR</span>
+<input type="date" value="${movie.blurayReleaseDateFR || ''}" onchange="updateBlurayDate('${movie.id}', this.value)" class="glass-input text-white text-[10px] px-2 py-1.5 rounded-lg focus:outline-none ml-auto">
 </div>
 </div>
-`;
+</div>
+
+<!-- EDITIONS -->
+<div class="rounded-2xl border border-white/10 bg-white/[0.025] p-3 space-y-3">
+<div class="flex items-center justify-between gap-2">
+<div><h4 class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.16em]">Éditions</h4><p class="text-[10px] text-gray-400 mt-0.5">${movie.editions.length} édition${movie.editions.length > 1 ? 's' : ''}</p></div>
+<button onclick="addEditionToMovie('${movie.id}')" class="w-8 h-8 rounded-xl bg-cyan-400/10 border border-cyan-400/20 text-cyan-300 hover:bg-cyan-400/20 transition flex items-center justify-center" title="Ajouter une édition">${ic('plus','w-4 h-4')}</button>
+</div>
+<div class="space-y-2 max-h-64 overflow-y-auto pr-0.5">${editionsHtml}</div>
+<div class="grid grid-cols-2 gap-2 pt-2 border-t border-white/5">
+<div class="rounded-xl bg-white/[0.035] px-3 py-2"><p class="text-[8px] text-gray-500 uppercase">Achat</p><p class="text-sm font-bold text-emerald-300 mt-0.5">${totals.totalPurchase.toFixed(2)} €</p></div>
+<div class="rounded-xl bg-white/[0.035] px-3 py-2"><p class="text-[8px] text-gray-500 uppercase">Valeur estimée</p><p class="text-sm font-bold text-cyan-300 mt-0.5">${totals.totalEstimated.toFixed(2)} €</p></div>
+</div>
+</div>
+
+<!-- ACTIONS -->
+<div class="flex gap-2 pt-1">
+${movie.isWishlist ? `<button onclick="moveWishlistToCollection('${movie.id}')" class="shine-btn flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-[10px] shadow-lg transition flex items-center justify-center gap-1.5">${ic('download','w-3.5 h-3.5')} Ajouter à la collection</button>` : ''}
+<button onclick="deleteMovie('${movie.id}')" class="${movie.isWishlist ? 'px-3' : 'flex-1'} bg-red-500/10 hover:bg-red-500/20 border border-red-400/20 text-red-300 font-semibold py-2.5 rounded-xl text-[10px] transition flex items-center justify-center gap-1.5">${ic('trash','w-3.5 h-3.5')} Supprimer</button>
+</div>
+</div>`;
 
 modal.classList.remove('hidden');
 }
