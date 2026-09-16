@@ -1746,34 +1746,42 @@ ${imdbBadge(m)}
 </div>`;
 
 if (isListView) {
-card.className = "relative rounded-2xl overflow-hidden cursor-pointer bg-black h-28 border border-white/10 hover:border-cyan-500/50 transition";
+card.className = "relative rounded-2xl overflow-hidden cursor-pointer bg-white/[0.035] border border-white/10 hover:border-cyan-400/40 hover:bg-white/[0.055] transition-all duration-200";
 card.innerHTML = `
-<img src="${m.poster}" class="absolute left-0 top-0 h-full w-auto">
-<div class="absolute inset-0 bg-gradient-to-r from-transparent via-black/75 to-black"></div>
-<div class="absolute inset-y-0 right-0 w-[68%] flex flex-col justify-center items-end p-3 text-right">
-<h4 class="text-xs font-bold text-white truncate w-full">${m.title}</h4>
-<div class="flex items-center justify-end gap-3 text-[10px] mt-1">
-<span class="text-cyan-300 font-semibold">${totals.count} éd.</span>
-<span class="font-bold text-emerald-400">${totals.totalPurchase.toFixed(2)} €</span>
+<div class="flex items-center gap-3 p-2">
+<img src="${m.poster}" class="w-12 h-[4.5rem] object-cover rounded-xl flex-shrink-0 border border-white/10 shadow-lg">
+<div class="min-w-0 flex-1">
+<div class="flex items-center gap-1.5 mb-1">
+<span class="text-[8px] uppercase tracking-wider font-bold ${isSeries(m) ? 'text-violet-300 bg-violet-400/10 border-violet-400/20' : 'text-cyan-300 bg-cyan-400/10 border-cyan-400/20'} border px-1.5 py-0.5 rounded-full">${isSeries(m) ? 'Série' : 'Film'}</span>
+${m.seen ? `<span class="text-emerald-300 bg-emerald-400/10 border border-emerald-400/20 p-1 rounded-full">${ic('check','w-2.5 h-2.5')}</span>` : ''}
 </div>
-<div class="flex items-center justify-end gap-2 mt-1 text-[10px]">
-${m.seen ? `<span class="text-emerald-400 flex items-center gap-1">Vu ${ic('check','w-3 h-3')}</span>` : `<span class="text-gray-400 flex items-center gap-1">Non vu ${ic('eye','w-3 h-3')}</span>`}
+<h4 class="text-xs font-bold text-white truncate">${m.title}</h4>
+<div class="flex items-center gap-3 text-[9px] mt-1.5 text-gray-400">
+<span>${totals.count} édition${totals.count > 1 ? 's' : ''}</span>
+<span class="text-emerald-300 font-semibold">${totals.totalPurchase.toFixed(2)} €</span>
 ${imdbBadge(m)}
+</div>
 </div>
 </div>
 `;
 } else {
-card.className = "relative rounded-2xl overflow-hidden cursor-pointer bg-black border border-white/10 hover:border-cyan-500/50 transition";
+card.className = "group relative rounded-2xl overflow-hidden cursor-pointer bg-black border border-white/10 hover:border-cyan-400/50 transition-all duration-200 shadow-lg hover:shadow-cyan-500/10 hover:-translate-y-0.5";
 card.innerHTML = `
-<img src="${m.poster}" class="w-full aspect-[2/3] object-cover">
-<div class="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none"></div>
-<div class="absolute inset-x-0 bottom-0 p-2.5">
-<h4 class="text-xs font-bold text-white truncate">${m.title}</h4>
-<div class="flex items-center justify-between text-[10px] mt-1">
-<span class="text-cyan-300 font-semibold">${totals.count} éd.</span>
-<span class="font-bold text-emerald-400">${totals.totalPurchase.toFixed(2)} €</span>
+<div class="relative aspect-[2/3] overflow-hidden">
+<img src="${m.poster}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.035]">
+<div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/10 to-transparent"></div>
+<div class="absolute top-2 left-2 right-2 flex items-start justify-between">
+<span class="text-[8px] uppercase tracking-wider font-bold ${isSeries(m) ? 'text-violet-200 bg-violet-500/20 border-violet-300/20' : 'text-cyan-200 bg-cyan-500/20 border-cyan-300/20'} backdrop-blur-md border px-1.5 py-1 rounded-full">${isSeries(m) ? 'Série' : 'Film'}</span>
+${m.seen ? `<span class="text-emerald-200 bg-black/40 backdrop-blur-md border border-emerald-300/20 p-1.5 rounded-full">${ic('check','w-3 h-3')}</span>` : ''}
 </div>
-${statusRow}
+<div class="absolute inset-x-0 bottom-0 p-2.5">
+<h4 class="text-[11px] font-bold text-white leading-tight truncate">${m.title}</h4>
+<div class="flex items-center justify-between gap-2 mt-1.5">
+<span class="text-[9px] text-gray-300">${totals.count} éd.</span>
+<span class="text-[10px] font-bold text-emerald-300">${totals.totalPurchase.toFixed(2)} €</span>
+</div>
+<div class="mt-1">${imdbBadge(m) || ''}</div>
+</div>
 </div>
 `;
 }
@@ -1849,29 +1857,36 @@ card.onclick = () => openMovieDetail(m.id);
 const priceLabel = totals.totalPurchase > 0 ? `${totals.totalPurchase.toFixed(2)} €` : 'Wishlist';
 
 if (isWishlistListView) {
-card.className = "relative rounded-2xl overflow-hidden cursor-pointer bg-black h-28 border border-pink-500/20 hover:border-pink-500/50 transition";
+card.className = "relative rounded-2xl overflow-hidden cursor-pointer bg-white/[0.035] border border-pink-500/20 hover:border-pink-400/45 hover:bg-white/[0.055] transition-all duration-200";
 card.innerHTML = `
-<img src="${m.poster}" class="absolute left-0 top-0 h-full w-auto">
-<div class="absolute inset-0 bg-gradient-to-r from-transparent via-black/75 to-black"></div>
-<div class="absolute inset-y-0 right-0 w-[68%] flex flex-col justify-center items-end p-3 text-right">
-<h4 class="text-xs font-bold text-white truncate w-full">${m.title}</h4>
-<div class="flex items-center justify-end gap-3 text-[10px] mt-1">
+<div class="flex items-center gap-3 p-2">
+<img src="${m.poster}" class="w-12 h-[4.5rem] object-cover rounded-xl flex-shrink-0 border border-white/10 shadow-lg">
+<div class="min-w-0 flex-1">
+<span class="inline-block text-[8px] uppercase tracking-wider font-bold text-pink-200 bg-pink-500/10 border border-pink-300/20 px-1.5 py-0.5 rounded-full mb-1">Wishlist</span>
+<h4 class="text-xs font-bold text-white truncate">${m.title}</h4>
+<div class="flex items-center gap-3 text-[9px] mt-1.5">
 <span class="text-pink-300 font-semibold">${priceLabel}</span>
+${imdbBadge(m)}
 </div>
-${imdbBadge(m) ? `<div class="mt-1 text-[10px]">${imdbBadge(m)}</div>` : ''}
+</div>
 </div>
 `;
 } else {
-card.className = "relative rounded-2xl overflow-hidden cursor-pointer bg-black border border-pink-500/20 hover:border-pink-500/50 transition";
+card.className = "group relative rounded-2xl overflow-hidden cursor-pointer bg-black border border-pink-500/20 hover:border-pink-400/50 transition-all duration-200 shadow-lg hover:shadow-pink-500/10 hover:-translate-y-0.5";
 card.innerHTML = `
-<img src="${m.poster}" class="w-full aspect-[2/3] object-cover">
-<div class="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none"></div>
-<div class="absolute inset-x-0 bottom-0 p-2.5">
-<h4 class="text-xs font-bold text-white truncate">${m.title}</h4>
-<div class="flex items-center justify-between text-[10px] mt-1">
-<span class="text-pink-300 font-semibold">${priceLabel}</span>
+<div class="relative aspect-[2/3] overflow-hidden">
+<img src="${m.poster}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.035]">
+<div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/10 to-transparent"></div>
+<div class="absolute top-2 left-2">
+<span class="text-[8px] uppercase tracking-wider font-bold text-pink-100 bg-pink-500/20 backdrop-blur-md border border-pink-300/20 px-1.5 py-1 rounded-full">Wishlist</span>
 </div>
-${imdbBadge(m) ? `<div class="mt-1 text-[10px]">${imdbBadge(m)}</div>` : ''}
+<div class="absolute inset-x-0 bottom-0 p-2.5">
+<h4 class="text-[11px] font-bold text-white leading-tight truncate">${m.title}</h4>
+<div class="flex items-center justify-between gap-2 mt-1.5">
+<span class="text-[10px] font-bold text-pink-300">${priceLabel}</span>
+${imdbBadge(m) || ''}
+</div>
+</div>
 </div>
 `;
 }
