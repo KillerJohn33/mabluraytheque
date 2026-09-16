@@ -390,7 +390,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <div class="flex gap-2">
 <div class="relative flex-1">
 <span class="icon-inline w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" data-icon="search"></span>
-<input id="searchInput" type="text" placeholder="Chercher un film (TMDB)..." class="w-full pl-10 pr-4 py-3 rounded-2xl glass-input text-white text-sm placeholder-gray-400 focus:outline-none transition">
+<input id="searchInput" type="text" placeholder="Rechercher un film ou une série (TMDB)..." class="w-full pl-10 pr-4 py-3 rounded-2xl glass-input text-white text-sm placeholder-gray-400 focus:outline-none transition">
 </div>
 <button onclick="triggerNewSearch()" class="shine-btn bg-cyan-600 hover:bg-cyan-500 px-5 py-3 rounded-2xl font-semibold text-sm shadow-lg shadow-cyan-600/30 transition transform active:scale-95">Chercher</button>
 </div>
@@ -516,6 +516,8 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <option class="bg-gray-900" value="title_desc">Titre (Z ➔ A)</option>
 <option class="bg-gray-900" value="price_desc">Prix d'achat (Élevé)</option>
 <option class="bg-gray-900" value="estimated_desc">Estimation (Élevée)</option>
+<option class="bg-gray-900" value="year_desc">Année (Récentes)</option>
+<option class="bg-gray-900" value="rating_desc">Note TMDB (Élevée)</option>
 </select>
 </div>
 <div>
@@ -1191,26 +1193,55 @@ showToast("Erreur de connexion cloud.");
 
 async function saveMovieToCloud(movie) {
 normalizeMovieData(movie);
+try {
 const { data, error } = await db.from('bluray').insert([{ data: movie }]).select();
 if (error) {
-showToast("⚠️ Erreur de sauvegarde !");
 console.error("Insert error:", error);
-return null;
+showToast("⚠️ Erreur de sauvegarde !");
+return { success: false, error };
 }
-return data[0]?.id || null;
+return { success: true, cloudId: data?.[0]?.id || null };
+} catch (error) {
+console.error("Insert exception:", error);
+showToast("⚠️ Impossible de joindre Supabase.");
+return { success: false, error };
+}
 }
 
 async function updateMovieInCloud(movie) {
-if (!movie.cloud_id) return;
+if (!movie?.cloud_id) return { success: true, skipped: true };
 normalizeMovieData(movie);
 const { cloud_id, ...cleanMovie } = movie;
+try {
 const { error } = await db.from('bluray').update({ data: cleanMovie }).eq('id', cloud_id);
-if (error) console.error("Update error:", error);
+if (error) {
+console.error("Update error:", error);
+showToast("⚠️ Modification non synchronisée.");
+return { success: false, error };
+}
+return { success: true };
+} catch (error) {
+console.error("Update exception:", error);
+showToast("⚠️ Erreur de connexion cloud.");
+return { success: false, error };
+}
 }
 
 async function deleteMovieFromCloud(cloud_id) {
+if (!cloud_id) return { success: true, skipped: true };
+try {
 const { error } = await db.from('bluray').delete().eq('id', cloud_id);
-if (error) console.error("Delete error:", error);
+if (error) {
+console.error("Delete error:", error);
+showToast("⚠️ Suppression cloud impossible.");
+return { success: false, error };
+}
+return { success: true };
+} catch (error) {
+console.error("Delete exception:", error);
+showToast("⚠️ Erreur de connexion cloud.");
+return { success: false, error };
+}
 }
 
 async function deleteEntireCollection() {
@@ -1350,12 +1381,15 @@ async function searchTMDB() {
 if (!currentSearchQuery) return;
 showToast("Recherche en cours...");
 try {
-const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(currentSearchQuery)}&language=fr-FR&page=${currentSearchPage}`);
+const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(currentSearchQuery)}&language=fr-FR&page=${currentSearchPage}`);
 const data = await res.json();
+if (!res.ok) throw new Error(data?.status_message || 'TMDB error');
 
+const results = (data.results || []).filter(m => m.media_type === 'movie' || m.media_type === 'tv');
 totalSearchPages = data.total_pages || 1;
-displaySearchResults(data.results || []);
+displaySearchResults(results);
 } catch (e) {
+console.error('TMDB search error:', e);
 showToast("Erreur lors de la recherche TMDB");
 }
 }
@@ -1370,38 +1404,38 @@ container.innerHTML = '';
 box.classList.remove('hidden');
 
 if (results.length === 0) {
-container.innerHTML = `<p class="text-xs text-gray-400 p-3 text-center">Aucun film trouvé.</p>`;
+container.innerHTML = `<p class="text-xs text-gray-400 p-3 text-center">Aucun film ou série trouvé.</p>`;
 pagination.classList.add('hidden');
 return;
 }
 
 pageInfo.innerText = `Page ${currentSearchPage} / ${totalSearchPages}`;
 pagination.classList.remove('hidden');
-
 document.getElementById('prevPageBtn').disabled = (currentSearchPage <= 1);
 document.getElementById('nextPageBtn').disabled = (currentSearchPage >= totalSearchPages);
 
 results.forEach(m => {
 const poster = m.poster_path ? `https://image.tmdb.org/t/p/w200${m.poster_path}` : 'https://via.placeholder.com/200x300?text=Pas+d+image';
-const year = m.release_date ? m.release_date.split('-')[0] : 'N/A';
+const isTv = m.media_type === 'tv';
+const title = m.title || m.name || 'Sans titre';
+const date = m.release_date || m.first_air_date || '';
+const year = date ? date.split('-')[0] : 'N/A';
+const typeLabel = isTv ? 'Série' : 'Film';
+const safeData = JSON.stringify(m).replace(/'/g, "&apos;");
 
 const item = document.createElement('div');
 item.className = 'glass-card p-2 rounded-2xl flex items-center gap-3 border border-white/10';
 item.innerHTML = `
 <img src="${poster}" class="w-12 h-16 object-cover rounded-xl shadow">
 <div class="flex-1 min-width-0">
-<h4 class="text-xs font-bold text-white truncate">${m.title}</h4>
+<div class="flex items-center gap-1.5 mb-0.5"><span class="text-[8px] uppercase tracking-wider font-bold ${isTv ? 'text-pink-300' : 'text-cyan-300'}">${typeLabel}</span></div>
+<h4 class="text-xs font-bold text-white truncate">${title}</h4>
 <p class="text-[10px] text-gray-400">${year}</p>
 </div>
 <div class="flex flex-col gap-1">
-<button onclick='addMovieFromTMDB(${JSON.stringify(m).replace(/'/g, "&apos;")}, false)' class="shine-btn bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition flex items-center justify-center gap-1">
-${ic('plus','w-3 h-3')} Collection
-</button>
-<button onclick='addMovieFromTMDB(${JSON.stringify(m).replace(/'/g, "&apos;")}, true)' class="shine-btn bg-pink-600 hover:bg-pink-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition flex items-center justify-center gap-1">
-${ic('plus','w-3 h-3')} Wishlist
-</button>
-</div>
-`;
+<button onclick='addMovieFromTMDB(${safeData}, false)' class="shine-btn bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition flex items-center justify-center gap-1">${ic('plus','w-3 h-3')} Collection</button>
+<button onclick='addMovieFromTMDB(${safeData}, true)' class="shine-btn bg-pink-600 hover:bg-pink-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition flex items-center justify-center gap-1">${ic('plus','w-3 h-3')} Wishlist</button>
+</div>`;
 container.appendChild(item);
 });
 }
@@ -1426,89 +1460,81 @@ return null;
 }
 
 async function addMovieFromTMDB(tmdbData, isWishlist = false) {
-// Détection de doublon (déjà présent en Collection ou en Wishlist)
-const existsIn = collection.some(m => m.tmdb_id === tmdbData.id) ? 'votre collection'
-: wishlist.some(m => m.tmdb_id === tmdbData.id) ? 'votre wishlist' : null;
+const isTv = tmdbData.media_type === 'tv' || !!tmdbData.first_air_date;
+const title = tmdbData.title || tmdbData.name || 'Sans titre';
+const existsIn = collection.some(m => m.tmdb_id === tmdbData.id && isSeries(m) === isTv) ? 'votre collection'
+: wishlist.some(m => m.tmdb_id === tmdbData.id && isSeries(m) === isTv) ? 'votre wishlist' : null;
 
 if (existsIn) {
-const confirmAdd = confirm(`"${tmdbData.title}" est déjà présent dans ${existsIn}. Voulez-vous quand même l'ajouter en double ?`);
+const confirmAdd = confirm(`"${title}" est déjà présent dans ${existsIn}. Voulez-vous quand même l'ajouter en double ?`);
 if (!confirmAdd) return;
 }
 
-let genres = [];
-let runtime = null;
-let director = '';
-let cast = [];
-let imdbId = null;
-let voteAverage = null;
-let voteCount = null;
+let genres = [], runtime = null, director = '', cast = [], imdbId = null, voteAverage = null, voteCount = null;
+let numberOfSeasons = null, numberOfEpisodes = null, creators = [];
 let blurayDateFR = null;
 
 try {
-// On combine détails + crédits en un seul appel via append_to_response
-const detailRes = await fetch(`https://api.themoviedb.org/3/movie/${tmdbData.id}?api_key=${API_KEY}&language=fr-FR&append_to_response=credits`);
+const endpoint = isTv ? `tv/${tmdbData.id}` : `movie/${tmdbData.id}`;
+const detailRes = await fetch(`https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&language=fr-FR&append_to_response=credits`);
 const detail = await detailRes.json();
+if (!detailRes.ok) throw new Error(detail?.status_message || 'TMDB error');
 
 genres = detail.genres ? detail.genres.map(g => g.name) : [];
-runtime = detail.runtime || null;
+runtime = isTv ? (detail.episode_run_time?.[0] || null) : (detail.runtime || null);
 imdbId = detail.imdb_id || null;
 voteAverage = typeof detail.vote_average === 'number' ? detail.vote_average : null;
 voteCount = typeof detail.vote_count === 'number' ? detail.vote_count : null;
 
-if (detail.credits) {
+if (isTv) {
+creators = (detail.created_by || []).map(p => p.name);
+director = creators.join(', ');
+numberOfSeasons = detail.number_of_seasons ?? null;
+numberOfEpisodes = detail.number_of_episodes ?? null;
+} else if (detail.credits) {
 const crew = detail.credits.crew || [];
-const directors = crew.filter(p => p.job === 'Director').map(p => p.name);
-director = directors.join(', ');
-
-const castList = detail.credits.cast || [];
-cast = castList.slice(0, 5).map(p => p.name);
+director = crew.filter(p => p.job === 'Director').map(p => p.name).join(', ');
 }
-} catch(e) {}
 
-blurayDateFR = await fetchBlurayReleaseDateFR(tmdbData.id);
+if (detail.credits) cast = (detail.credits.cast || []).slice(0, 5).map(p => p.name);
+} catch (e) {
+console.error('TMDB detail error:', e);
+}
+
+if (!isTv) blurayDateFR = await fetchBlurayReleaseDateFR(tmdbData.id);
 
 const movie = {
 id: 'tmdb_' + tmdbData.id + '_' + Date.now(),
 tmdb_id: tmdbData.id,
+media_type: isTv ? 'tv' : 'movie',
+isSeries: isTv,
 imdb_id: imdbId,
-title: tmdbData.title,
+title,
 poster: tmdbData.poster_path ? `https://image.tmdb.org/t/p/w500${tmdbData.poster_path}` : 'https://via.placeholder.com/300x450?text=Pas+d+image',
-releaseDate: tmdbData.release_date || '',
+releaseDate: tmdbData.release_date || tmdbData.first_air_date || '',
 blurayReleaseDateFR: blurayDateFR,
 blurayReleaseDateManual: false,
 overview: tmdbData.overview || '',
-genres: genres,
-runtime: runtime,
-director: director,
-cast: cast,
-voteAverage: voteAverage,
-voteCount: voteCount,
+genres,
+runtime,
+director,
+cast,
+creators,
+numberOfSeasons,
+numberOfEpisodes,
+voteAverage,
+voteCount,
 seen: false,
 isWishlist: isWishlist,
 addedAt: new Date().toISOString(),
-editions: [{
-id: 'ed_' + Date.now(),
-title: 'Édition Standard',
-format: 'Blu-ray 1080p',
-editionType: 'Amaray',
-purchasePrice: '',
-estimatedPrice: '',
-purchaseLocation: ''
-}]
+editions: [{ id: 'ed_' + Date.now(), title: 'Édition Standard', format: 'Blu-ray 1080p', editionType: 'Amaray', purchasePrice: '', estimatedPrice: '', purchaseLocation: '' }]
 };
 
-const cloudId = await saveMovieToCloud(movie);
-if (cloudId) {
-movie.cloud_id = cloudId;
-if (isWishlist) {
-wishlist.push(movie);
-renderWishlist();
-showToast("Ajouté à la Wishlist ! ✨");
-} else {
-collection.push(movie);
-renderCollection();
-showToast("Ajouté à la Collection ! 💿");
-}
+const saveResult = await saveMovieToCloud(movie);
+if (saveResult?.success && saveResult.cloudId) {
+movie.cloud_id = saveResult.cloudId;
+if (isWishlist) { wishlist.push(movie); renderWishlist(); showToast("Ajouté à la Wishlist ! ✨"); }
+else { collection.push(movie); renderCollection(); showToast("Ajouté à la Collection ! 💿"); }
 }
 }
 
@@ -1713,7 +1739,13 @@ if (seenFilter === 'seen') filtered = filtered.filter(m => m.seen);
 if (seenFilter === 'unseen') filtered = filtered.filter(m => !m.seen);
 
 if (textFilter) {
-filtered = filtered.filter(m => m.title.toLowerCase().includes(textFilter));
+const normalizeSearch = value => String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+const query = normalizeSearch(textFilter);
+filtered = filtered.filter(m => {
+const editionText = (m.editions || []).flatMap(e => [e.title, e.format, e.editionType, e.purchaseLocation]).join(' ');
+const haystack = [m.title, m.director, m.creators?.join(' '), m.cast?.join(' '), m.genres?.join(' '), editionText, isSeries(m) ? 'serie series' : 'film'].join(' ');
+return normalizeSearch(haystack).includes(query);
+});
 }
 
 // Tri
@@ -1726,6 +1758,8 @@ if (sortVal === 'title_asc') return a.title.localeCompare(b.title);
 if (sortVal === 'title_desc') return b.title.localeCompare(a.title);
 if (sortVal === 'price_desc') return totB.totalPurchase - totA.totalPurchase;
 if (sortVal === 'estimated_desc') return totB.totalEstimated - totA.totalEstimated;
+if (sortVal === 'year_desc') return new Date(b.releaseDate || 0) - new Date(a.releaseDate || 0);
+if (sortVal === 'rating_desc') return (b.voteAverage || 0) - (a.voteAverage || 0);
 return 0;
 });
 
@@ -1822,7 +1856,13 @@ if (formatFilter !== 'all') {
 filtered = filtered.filter(m => m.editions && m.editions.some(e => e.format === formatFilter));
 }
 if (textFilter) {
-filtered = filtered.filter(m => m.title.toLowerCase().includes(textFilter));
+const normalizeSearch = value => String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+const query = normalizeSearch(textFilter);
+filtered = filtered.filter(m => {
+const editionText = (m.editions || []).flatMap(e => [e.title, e.format, e.editionType, e.purchaseLocation]).join(' ');
+const haystack = [m.title, m.director, m.creators?.join(' '), m.cast?.join(' '), m.genres?.join(' '), editionText, isSeries(m) ? 'serie series' : 'film'].join(' ');
+return normalizeSearch(haystack).includes(query);
+});
 }
 
 filtered.sort((a, b) => {
@@ -1833,6 +1873,8 @@ if (sortVal === 'added_asc') return new Date(a.addedAt || 0) - new Date(b.addedA
 if (sortVal === 'title_asc') return a.title.localeCompare(b.title);
 if (sortVal === 'title_desc') return b.title.localeCompare(a.title);
 if (sortVal === 'estimated_desc') return totB.totalEstimated - totA.totalEstimated;
+if (sortVal === 'year_desc') return new Date(b.releaseDate || 0) - new Date(a.releaseDate || 0);
+if (sortVal === 'rating_desc') return (b.voteAverage || 0) - (a.voteAverage || 0);
 return 0;
 });
 
@@ -2065,13 +2107,17 @@ const content = document.getElementById('modalContent');
 const totals = calculateMovieTotals(movie);
 const infoYear = movie.releaseDate ? movie.releaseDate.split('-')[0] : '';
 const infoRuntime = formatRuntime(movie.runtime);
+const seriesSeasons = Number(movie.numberOfSeasons) || 0;
+const seriesEpisodes = Number(movie.numberOfEpisodes) || 0;
 const infoGenres = movie.genres && movie.genres.length ? movie.genres : [];
 const infoDirector = movie.director || '';
 const infoCast = movie.cast && movie.cast.length ? movie.cast : [];
 const isSeriesMovie = isSeries(movie);
 const imdbRating = (movie.imdbUserRating !== undefined && movie.imdbUserRating !== null) ? movie.imdbUserRating : null;
 
-const metaParts = [infoYear, infoRuntime].filter(Boolean);
+const metaParts = isSeriesMovie
+? [infoYear, seriesSeasons ? `${seriesSeasons} saison${seriesSeasons > 1 ? 's' : ''}` : '', seriesEpisodes ? `${seriesEpisodes} épisode${seriesEpisodes > 1 ? 's' : ''}` : ''].filter(Boolean)
+: [infoYear, infoRuntime].filter(Boolean);
 const genreChips = infoGenres.slice(0, 4).map(g => `<span class="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] text-gray-300">${g}</span>`).join('');
 
 const editionsHtml = movie.editions.map((ed, idx) => `
@@ -2150,10 +2196,11 @@ ${movie.voteAverage > 0 ? `<span class="text-[9px] text-sky-300 font-semibold">T
 </div>
 ${genreChips ? `<div class="flex flex-wrap gap-1.5 mb-2.5">${genreChips}</div>` : ''}
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-[10px]">
-${infoDirector ? `<div class="text-gray-300"><span class="text-gray-500">Réalisateur</span><br><span class="text-white font-medium">${infoDirector}</span></div>` : ''}
+${infoDirector ? `<div class="text-gray-300"><span class="text-gray-500">${isSeriesMovie ? 'Créateur' : 'Réalisateur'}</span><br><span class="text-white font-medium">${infoDirector}</span></div>` : ''}
+${isSeriesMovie && infoRuntime ? `<div class="text-gray-300"><span class="text-gray-500">Durée moyenne</span><br><span class="text-white font-medium">${infoRuntime}</span></div>` : ''}
 ${infoCast.length ? `<div class="text-gray-300"><span class="text-gray-500">Avec</span><br><span class="text-white font-medium">${infoCast.slice(0, 5).join(', ')}</span></div>` : ''}
 <div class="flex items-center gap-2 sm:col-span-2 pt-2 border-t border-white/5">
-<span class="text-cyan-400">${ic('disc','w-3.5 h-3.5')}</span><span class="text-gray-500">Sortie Blu-ray FR</span>
+<span class="text-cyan-400">${ic('disc','w-3.5 h-3.5')}</span><span class="text-gray-500">${isSeriesMovie ? 'Sortie Blu-ray FR (optionnel)' : 'Sortie Blu-ray FR'}</span>
 <input type="date" value="${movie.blurayReleaseDateFR || ''}" onchange="updateBlurayDate('${movie.id}', this.value)" class="glass-input text-white text-[10px] px-2 py-1.5 rounded-lg focus:outline-none ml-auto">
 </div>
 </div>
@@ -2189,101 +2236,89 @@ document.getElementById('detailModal').classList.add('hidden');
 async function toggleMovieSeen(movieId) {
 let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
 if (!movie) return;
-movie.seen = !movie.seen;
-await updateMovieInCloud(movie);
+const previous = !!movie.seen;
+movie.seen = !previous;
+const result = await updateMovieInCloud(movie);
+if (!result.success) { movie.seen = previous; return; }
 openMovieDetail(movieId);
 renderCollection();
+renderWishlist();
 }
 
 async function updateBlurayDate(movieId, value) {
 let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
 if (!movie) return;
+const previousDate = movie.blurayReleaseDateFR;
+const previousManual = movie.blurayReleaseDateManual;
 movie.blurayReleaseDateFR = value || null;
 movie.blurayReleaseDateManual = !!value;
-await updateMovieInCloud(movie);
+const result = await updateMovieInCloud(movie);
+if (!result.success) { movie.blurayReleaseDateFR = previousDate; movie.blurayReleaseDateManual = previousManual; return; }
 renderWishlistCalendar();
 renderWishlistCalendarGrid();
+openMovieDetail(movieId);
 showToast(value ? "Date de sortie Blu-ray enregistrée." : "Date de sortie Blu-ray effacée.");
 }
 
 async function addEditionToMovie(movieId) {
 let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
 if (!movie) return;
-
-movie.editions.push({
-id: 'ed_' + Date.now(),
-title: 'Nouvelle Édition',
-format: 'Blu-ray 1080p',
-editionType: 'Amaray',
-purchasePrice: '',
-estimatedPrice: '',
-purchaseLocation: ''
-});
-
-await updateMovieInCloud(movie);
-openMovieDetail(movieId);
-renderCollection();
-renderWishlist();
+const edition = { id: 'ed_' + Date.now(), title: 'Nouvelle Édition', format: 'Blu-ray 1080p', editionType: 'Amaray', purchasePrice: '', estimatedPrice: '', purchaseLocation: '' };
+movie.editions.push(edition);
+const result = await updateMovieInCloud(movie);
+if (!result.success) movie.editions.pop();
+else { openMovieDetail(movieId); renderCollection(); renderWishlist(); }
 }
 
 async function removeEdition(movieId, editionIdx) {
 let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
 if (!movie || movie.editions.length <= 1) return;
-
-movie.editions.splice(editionIdx, 1);
-await updateMovieInCloud(movie);
-openMovieDetail(movieId);
-renderCollection();
-renderWishlist();
+const removed = movie.editions.splice(editionIdx, 1)[0];
+const result = await updateMovieInCloud(movie);
+if (!result.success) movie.editions.splice(editionIdx, 0, removed);
+else { openMovieDetail(movieId); renderCollection(); renderWishlist(); }
 }
 
 async function updateEditionField(movieId, editionIdx, field, val) {
 let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
 if (!movie || !movie.editions[editionIdx]) return;
-
+const previous = movie.editions[editionIdx][field];
 movie.editions[editionIdx][field] = val;
-await updateMovieInCloud(movie);
-renderCollection();
-renderWishlist();
+const result = await updateMovieInCloud(movie);
+if (!result.success) movie.editions[editionIdx][field] = previous;
+else { renderCollection(); renderWishlist(); }
 }
 
 async function moveWishlistToCollection(movieId) {
 const idx = wishlist.findIndex(m => m.id === movieId);
 if (idx === -1) return;
-
-const movie = wishlist.splice(idx, 1)[0];
+const movie = wishlist[idx];
+const previous = movie.isWishlist;
 movie.isWishlist = false;
+const result = await updateMovieInCloud(movie);
+if (!result.success) { movie.isWishlist = previous; return; }
+wishlist.splice(idx, 1);
 collection.push(movie);
-
-await updateMovieInCloud(movie);
 closeModal();
 renderWishlist();
 renderCollection();
-showToast("Film transféré dans votre collection ! 💿");
+showToast("Titre transféré dans votre collection ! 💿");
 }
 
 async function deleteMovie(movieId) {
-if (!confirm("Voulez-vous vraiment supprimer ce film ?")) return;
-
+if (!confirm("Voulez-vous vraiment supprimer ce titre ?")) return;
 let idx = collection.findIndex(m => m.id === movieId);
 let isWish = false;
-if (idx === -1) {
-idx = wishlist.findIndex(m => m.id === movieId);
-isWish = true;
-}
-
-if (idx !== -1) {
+if (idx === -1) { idx = wishlist.findIndex(m => m.id === movieId); isWish = true; }
+if (idx === -1) return;
 const movie = isWish ? wishlist[idx] : collection[idx];
-if (movie.cloud_id) await deleteMovieFromCloud(movie.cloud_id);
-
-if (isWish) wishlist.splice(idx, 1);
-else collection.splice(idx, 1);
-
+const result = movie.cloud_id ? await deleteMovieFromCloud(movie.cloud_id) : { success: true };
+if (!result.success) return;
+if (isWish) wishlist.splice(idx, 1); else collection.splice(idx, 1);
 closeModal();
 renderCollection();
 renderWishlist();
-showToast("Film supprimé.");
-}
+showToast("Titre supprimé.");
 }
 
 // --- STATISTIQUES UNIFIÉES ET INTELLIGENTES ---
