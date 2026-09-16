@@ -25,6 +25,7 @@ body.theme-purple { background: radial-gradient(circle at 50% -20%, #2e1065, #0f
 body.theme-midnight { background: radial-gradient(circle at 50% -20%, #0f172a, #0284c7, #020617); }
 body.theme-amber { background: radial-gradient(circle at 50% -20%, #78350f, #1c1917, #0c0a09); }
 body.theme-emerald { background: radial-gradient(circle at 50% -20%, #064e3b, #022c22, #020617); }
+body.theme-noir { background: radial-gradient(circle at 50% -20%, #1e293b, #0a0e14, #000000); }
 
 .glass-card {
 background: rgba(255, 255, 255, 0.05);
@@ -86,7 +87,7 @@ flex-shrink: 0;
 width: 2.1rem;
 height: 2.1rem;
 border-radius: 0.8rem;
-background: linear-gradient(155deg, #818cf8 0%, #6366f1 55%, #7c3aed 100%);
+background: linear-gradient(155deg, #22d3ee 0%, #06b6d4 55%, #0e7490 100%);
 box-shadow: inset 0 1px 0 rgba(255,255,255,.55), inset 0 -6px 10px rgba(0,0,0,.28), 0 3px 10px rgba(0,0,0,.35);
 color: #fff;
 position: relative;
@@ -289,7 +290,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
   line-height: 1;
 }
 .mobile-bottom-nav .bottom-nav-btn.active {
-  color: #a5b4fc;
+  color: #22d3ee;
 }
 .mobile-bottom-nav .bottom-nav-badge {
   position: absolute;
@@ -306,7 +307,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 }
 </style>
 </head>
-<body class="theme-purple text-gray-100 min-h-screen pb-10 selection:bg-indigo-500 selection:text-white">
+<body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
 
 <header class="sticky top-0 z-40 p-4 glass-card border-b-0 border-b-[0.5px] border-white/10 text-center font-extrabold text-xl tracking-wide flex items-center justify-center gap-2.5">
 <span class="icon-chip chip-lg" data-icon="disc"></span>
@@ -316,7 +317,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <main class="p-4 max-w-md mx-auto space-y-5">
 <!-- NAVIGATION BAR -->
 <nav class="glass-pill p-1.5 rounded-2xl flex justify-between items-center shadow-lg gap-1">
-<button id="tabHomeBtn" onclick="switchTab('home')" class="flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 shine-btn bg-indigo-600/80 text-white shadow-md">
+<button id="tabHomeBtn" onclick="switchTab('home')" class="flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 shine-btn bg-cyan-600/80 text-white shadow-md">
 <span class="icon-inline w-3.5 h-3.5" data-icon="home"></span> <span>Accueil</span>
 </button>
 <button id="tabCollectionBtn" onclick="switchTab('collection')" class="flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white">
@@ -342,7 +343,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <span class="icon-inline w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" data-icon="search"></span>
 <input id="searchInput" type="text" placeholder="Chercher un film (TMDB)..." class="w-full pl-10 pr-4 py-3 rounded-2xl glass-input text-white text-sm placeholder-gray-400 focus:outline-none transition">
 </div>
-<button onclick="triggerNewSearch()" class="shine-btn bg-indigo-600 hover:bg-indigo-500 px-5 py-3 rounded-2xl font-semibold text-sm shadow-lg shadow-indigo-600/30 transition transform active:scale-95">Chercher</button>
+<button onclick="triggerNewSearch()" class="shine-btn bg-cyan-600 hover:bg-cyan-500 px-5 py-3 rounded-2xl font-semibold text-sm shadow-lg shadow-cyan-600/30 transition transform active:scale-95">Chercher</button>
 </div>
 <div class="flex justify-start px-2">
 <button id="clearSearchBtn" onclick="clearSearch()" class="hidden text-[11px] text-gray-400 hover:text-red-400 transition flex items-center gap-1">
@@ -364,7 +365,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <!-- RÉSULTATS DE RECHERCHE AMÉLIORÉS DE TMDB -->
 <div id="searchResultsContainer" class="hidden space-y-3">
 <div class="flex items-center justify-between px-1">
-<span class="text-xs font-bold uppercase tracking-wider text-indigo-300">Résultats TMDB</span>
+<span class="text-xs font-bold uppercase tracking-wider text-cyan-300">Résultats TMDB</span>
 <span id="searchPageInfo" class="text-[10px] text-gray-400">Page 1</span>
 </div>
 <div id="searchResults" class="grid grid-cols-1 gap-3"></div>
@@ -372,7 +373,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <!-- PAGINATION TMDB -->
 <div id="searchPagination" class="hidden flex justify-between items-center pt-1">
 <button id="prevPageBtn" onclick="changeSearchPage(-1)" class="glass-pill px-3 py-1.5 rounded-xl text-xs text-gray-300 hover:text-white disabled:opacity-30 disabled:pointer-events-none">← Précédent</button>
-<button id="nextPageBtn" onclick="changeSearchPage(1)" class="glass-pill px-3 py-1.5 rounded-xl text-xs text-indigo-300 hover:text-white disabled:opacity-30 disabled:pointer-events-none">Suivant →</button>
+<button id="nextPageBtn" onclick="changeSearchPage(1)" class="glass-pill px-3 py-1.5 rounded-xl text-xs text-cyan-300 hover:text-white disabled:opacity-30 disabled:pointer-events-none">Suivant →</button>
 </div>
 </div>
 
@@ -381,7 +382,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <div>
 <div class="flex items-center justify-between mb-3 px-1">
 <h2 class="text-xs font-bold uppercase tracking-wider text-gray-400">Derniers ajouts</h2>
-<button onclick="switchTab('collection')" class="text-indigo-400 hover:text-indigo-300 text-xs font-semibold">Tout voir →</button>
+<button onclick="switchTab('collection')" class="text-cyan-400 hover:text-cyan-300 text-xs font-semibold">Tout voir →</button>
 </div>
 <div id="recentGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
 </div>
@@ -397,7 +398,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <option class="bg-gray-900" value="unseen">Seulement les films NON VUS</option>
 <option class="bg-gray-900" value="4k">Seulement les films en 4K UHD</option>
 </select>
-<button onclick="pickRandomMovie()" class="shine-btn bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:opacity-90 text-white font-extrabold px-4 py-2 rounded-xl text-xs shadow-lg transition transform active:scale-95 flex items-center gap-1">
+<button onclick="pickRandomMovie()" class="shine-btn bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:opacity-90 text-white font-extrabold px-4 py-2 rounded-xl text-xs shadow-lg transition transform active:scale-95 flex items-center gap-1">
 <span>Lancer</span>
 </button>
 </div>
@@ -409,8 +410,8 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <!-- BARRE DE FILTRES ET DE TRI AVANCÉS -->
 <div class="glass-card p-3 rounded-2xl space-y-2 border border-white/10">
 <div class="flex items-center justify-between border-b border-white/10 pb-2">
-<span class="text-[11px] font-bold text-gray-300 flex items-center gap-1.5"><span class="icon-inline w-3.5 h-3.5 text-indigo-300" data-icon="filter"></span> Filtres & Tri</span>
-<button onclick="toggleViewMode()" id="toggleViewBtn" class="glass-pill px-2.5 py-1 rounded-xl text-[11px] text-indigo-300 hover:text-white flex items-center gap-1 transition">
+<span class="text-[11px] font-bold text-gray-300 flex items-center gap-1.5"><span class="icon-inline w-3.5 h-3.5 text-cyan-300" data-icon="filter"></span> Filtres & Tri</span>
+<button onclick="toggleViewMode()" id="toggleViewBtn" class="glass-pill px-2.5 py-1 rounded-xl text-[11px] text-cyan-300 hover:text-white flex items-center gap-1 transition">
 <span class="icon-inline w-3.5 h-3.5" data-icon="list"></span> <span id="viewModeLabel">Vue Liste</span>
 </button>
 </div>
@@ -520,7 +521,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 <div class="glass-pill p-1.5 rounded-2xl flex justify-between items-center shadow-md">
-<button id="chartStyleBarsBtn" onclick="setChartStyle('bars')" class="flex-1 py-2 rounded-xl font-bold text-xs transition bg-indigo-600 text-white shadow flex items-center justify-center gap-1.5">
+<button id="chartStyleBarsBtn" onclick="setChartStyle('bars')" class="flex-1 py-2 rounded-xl font-bold text-xs transition bg-cyan-600 text-white shadow flex items-center justify-center gap-1.5">
 <span class="icon-inline w-3.5 h-3.5" data-icon="barchart"></span> Mode Barres
 </button>
 <button id="chartStylePieBtn" onclick="setChartStyle('pie')" class="flex-1 py-2 rounded-xl font-bold text-xs transition text-gray-400 hover:text-white flex items-center justify-center gap-1.5">
@@ -540,11 +541,11 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <div id="statsTopGrid" class="grid grid-cols-2 gap-3">
 <div class="stat-tile text-center">
 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Films Uniques</p>
-<p id="statTotalMovies" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400 mt-1">0</p>
+<p id="statTotalMovies" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 mt-1">0</p>
 </div>
 <div class="stat-tile text-center">
 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Éditions/Boîtiers</p>
-<p id="statTotalEditions" class="text-3xl font-black text-indigo-300 mt-1">0</p>
+<p id="statTotalEditions" class="text-3xl font-black text-cyan-300 mt-1">0</p>
 </div>
 <div class="stat-tile text-center">
 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Valeur D'achat</p>
@@ -556,7 +557,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 <div class="stat-tile text-center">
 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Prix Moyen / Film</p>
-<p id="statAvgPriceMovie" class="text-lg font-black text-indigo-400 mt-0.5">0 €</p>
+<p id="statAvgPriceMovie" class="text-lg font-black text-cyan-400 mt-0.5">0 €</p>
 </div>
 <div class="stat-tile text-center">
 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Prix Moyen / Édition</p>
@@ -708,7 +709,8 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <div class="space-y-2">
 <label class="block text-xs font-semibold text-gray-300">Thème de l'interface :</label>
 <select id="themeSelect" onchange="changeTheme(this.value)" class="w-full glass-input text-white text-xs p-2 rounded-xl focus:outline-none">
-<option class="bg-gray-900" value="theme-purple">🌌 Nébuleuse Violette (Défaut)</option>
+<option class="bg-gray-900" value="theme-noir">⚫ Noir Glossy Cyan (Défaut)</option>
+<option class="bg-gray-900" value="theme-purple">🌌 Nébuleuse Violette</option>
 <option class="bg-gray-900" value="theme-midnight">🌌 Midnight Blue</option>
 <option class="bg-gray-900" value="theme-amber">🔥 Cyberpunk Amber</option>
 <option class="bg-gray-900" value="theme-emerald">🌲 Dark Emerald</option>
@@ -738,7 +740,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <label class="block text-[10px] text-gray-400 font-semibold mb-1">Clé Anon Supabase :</label>
 <input type="password" id="settingSupaKey" class="w-full glass-input text-white text-xs p-2 rounded-xl focus:outline-none">
 </div>
-<button onclick="saveApiKeysFromSettings()" class="shine-btn w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-xl text-xs transition active:scale-95 flex items-center justify-center gap-1.5">
+<button onclick="saveApiKeysFromSettings()" class="shine-btn w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 rounded-xl text-xs transition active:scale-95 flex items-center justify-center gap-1.5">
 <span class="icon-inline w-3.5 h-3.5" data-icon="check"></span><span>Enregistrer la configuration</span>
 </button>
 </div>
@@ -752,7 +754,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <p class="text-[11px] text-gray-400">Mettre à jour les fiches films déjà ajoutées.</p>
 </div>
 </div>
-<button id="refreshTmdbBtn" onclick="refreshAllTMDBInfo()" class="shine-btn w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-2xl text-xs shadow-lg transition transform active:scale-95 flex items-center justify-center gap-1.5">
+<button id="refreshTmdbBtn" onclick="refreshAllTMDBInfo()" class="shine-btn w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 rounded-2xl text-xs shadow-lg transition transform active:scale-95 flex items-center justify-center gap-1.5">
 <span class="icon-inline w-3.5 h-3.5" data-icon="refresh"></span><span id="refreshTmdbBtnText">Rafraîchir les infos TMDB (durée, réalisateur, acteurs...)</span>
 </button>
 <p class="text-[10px] text-gray-500">Récupère la durée, le réalisateur et les acteurs principaux pour tous les films déjà dans votre collection et votre wishlist.</p>
@@ -777,11 +779,11 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <div class="flex items-center gap-2 mb-1"><span class="icon-chip chip-sm" data-icon="info"></span><h3 class="text-sm font-bold text-white">Informations</h3></div>
 <div class="flex justify-between border-b border-white/10 py-1.5">
 <span class="text-gray-400">Total Films :</span>
-<span id="settingsTotalCount" class="font-bold text-indigo-300">0</span>
+<span id="settingsTotalCount" class="font-bold text-cyan-300">0</span>
 </div>
 <div class="flex justify-between border-b border-white/10 py-1.5">
 <span class="text-gray-400">Total Éditions :</span>
-<span id="settingsTotalEditionsCount" class="font-bold text-indigo-300">0</span>
+<span id="settingsTotalEditionsCount" class="font-bold text-cyan-300">0</span>
 </div>
 <div class="flex justify-between border-b border-white/10 py-1.5">
 <span class="text-gray-400">Films en Wishlist :</span>
@@ -916,7 +918,7 @@ let totalSearchPages = 1;
 document.addEventListener('DOMContentLoaded', async () => {
 applyStaticIcons();
 
-const savedTheme = localStorage.getItem('app_theme') || 'theme-purple';
+const savedTheme = localStorage.getItem('app_theme') || 'theme-noir';
 changeTheme(savedTheme);
 document.getElementById('themeSelect').value = savedTheme;
 
@@ -954,7 +956,7 @@ setTimeout(() => toast.remove(), 3000);
 }
 
 function changeTheme(themeClass) {
-document.body.className = `${themeClass} text-gray-100 min-h-screen pb-10 selection:bg-indigo-500 selection:text-white`;
+document.body.className = `${themeClass} text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white`;
 localStorage.setItem('app_theme', themeClass);
 }
 
@@ -1087,12 +1089,12 @@ if (btn) btn.classList.remove('active');
 
 if (tab === 'home') {
 document.getElementById('tabHome').classList.remove('hidden');
-document.getElementById('tabHomeBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 shine-btn bg-indigo-600/80 text-white shadow-md";
+document.getElementById('tabHomeBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 shine-btn bg-cyan-600/80 text-white shadow-md";
 document.getElementById('bottomTabHomeBtn').classList.add('active');
 renderHomeRecent();
 } else if (tab === 'collection') {
 document.getElementById('tabCollection').classList.remove('hidden');
-document.getElementById('tabCollectionBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 shine-btn bg-indigo-600/80 text-white shadow-md";
+document.getElementById('tabCollectionBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 shine-btn bg-cyan-600/80 text-white shadow-md";
 document.getElementById('bottomTabCollectionBtn').classList.add('active');
 renderCollection();
 } else if (tab === 'wishlist') {
@@ -1102,12 +1104,12 @@ document.getElementById('bottomTabWishlistBtn').classList.add('active');
 renderWishlist();
 } else if (tab === 'stats') {
 document.getElementById('tabStats').classList.remove('hidden');
-document.getElementById('tabStatsBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 shine-btn bg-indigo-600/80 text-white shadow-md";
+document.getElementById('tabStatsBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 shine-btn bg-cyan-600/80 text-white shadow-md";
 document.getElementById('bottomTabStatsBtn').classList.add('active');
 renderStats();
 } else if (tab === 'settings') {
 document.getElementById('tabSettings').classList.remove('hidden');
-document.getElementById('tabSettingsBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 shine-btn bg-indigo-600/80 text-white shadow-md";
+document.getElementById('tabSettingsBtn').className = "flex-1 py-2 rounded-xl font-semibold text-[10px] transition flex items-center justify-center gap-1 shine-btn bg-cyan-600/80 text-white shadow-md";
 document.getElementById('bottomTabSettingsBtn').classList.add('active');
 updateSettingsCounters();
 }
@@ -1188,7 +1190,7 @@ item.innerHTML = `
 <p class="text-[10px] text-gray-400">${year}</p>
 </div>
 <div class="flex flex-col gap-1">
-<button onclick='addMovieFromTMDB(${JSON.stringify(m).replace(/'/g, "&apos;")}, false)' class="shine-btn bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition flex items-center justify-center gap-1">
+<button onclick='addMovieFromTMDB(${JSON.stringify(m).replace(/'/g, "&apos;")}, false)' class="shine-btn bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition flex items-center justify-center gap-1">
 ${ic('plus','w-3 h-3')} Collection
 </button>
 <button onclick='addMovieFromTMDB(${JSON.stringify(m).replace(/'/g, "&apos;")}, true)' class="shine-btn bg-pink-600 hover:bg-pink-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition flex items-center justify-center gap-1">
@@ -1379,12 +1381,12 @@ return;
 recent.forEach(m => {
 const totals = calculateMovieTotals(m);
 const card = document.createElement('div');
-card.className = 'glass-card p-2 rounded-2xl text-center space-y-1.5 border border-white/10 hover:border-indigo-500/50 transition cursor-pointer';
+card.className = 'glass-card p-2 rounded-2xl text-center space-y-1.5 border border-white/10 hover:border-cyan-500/50 transition cursor-pointer';
 card.onclick = () => openMovieDetail(m.id);
 card.innerHTML = `
 <img src="${m.poster}" class="w-full h-36 object-cover rounded-xl shadow">
 <h4 class="text-[11px] font-bold text-white truncate">${m.title}</h4>
-<p class="text-[9px] text-indigo-300 font-semibold">${totals.count} éd. • ${totals.totalPurchase.toFixed(2)} €</p>
+<p class="text-[9px] text-cyan-300 font-semibold">${totals.count} éd. • ${totals.totalPurchase.toFixed(2)} €</p>
 `;
 grid.appendChild(card);
 });
@@ -1455,7 +1457,7 @@ return;
 filtered.forEach(m => {
 const totals = calculateMovieTotals(m);
 const card = document.createElement('div');
-card.className = `glass-card p-2.5 rounded-2xl border border-white/10 hover:border-indigo-500/50 transition cursor-pointer movie-card-item relative ${isListView ? '' : 'flex flex-col items-center text-center'}`;
+card.className = `glass-card p-2.5 rounded-2xl border border-white/10 hover:border-cyan-500/50 transition cursor-pointer movie-card-item relative ${isListView ? '' : 'flex flex-col items-center text-center'}`;
 card.onclick = () => openMovieDetail(m.id);
 
 card.innerHTML = `
@@ -1463,7 +1465,7 @@ card.innerHTML = `
 <div class="movie-card-info w-full">
 <h4 class="mci-title text-xs font-bold text-white truncate">${m.title}</h4>
 <div class="mci-meta flex items-center justify-between text-[10px] text-gray-400 mt-1">
-<span class="text-indigo-300 font-semibold">${totals.count} éd.</span>
+<span class="text-cyan-300 font-semibold">${totals.count} éd.</span>
 <span class="font-bold text-emerald-400">${totals.totalPurchase.toFixed(2)} €</span>
 </div>
 <div class="mci-status flex items-center gap-2 mt-1 text-[10px]">
@@ -1567,7 +1569,7 @@ const content = document.getElementById('modalContent');
 let editionsHtml = movie.editions.map((ed, idx) => `
 <div class="glass-pill p-3 rounded-2xl space-y-2 border border-white/10 relative">
 <div class="flex justify-between items-center">
-<span class="text-xs font-bold text-indigo-300">Édition #${idx + 1}</span>
+<span class="text-xs font-bold text-cyan-300">Édition #${idx + 1}</span>
 ${movie.editions.length > 1 ? `<button onclick="removeEdition('${movie.id}', ${idx})" class="text-red-400 hover:text-red-300 text-[10px] font-bold flex items-center gap-1">${ic('x','w-3 h-3')} Supprimer</button>` : ''}
 </div>
 <div class="grid grid-cols-2 gap-2 text-xs">
@@ -1670,7 +1672,7 @@ ${(movie.imdbUserRating !== undefined && movie.imdbUserRating !== null) ? `<span
 <div class="glass-card p-3 rounded-2xl space-y-3 border border-white/10">
 <div class="flex items-center justify-between border-b border-white/10 pb-2">
 <h4 class="text-xs font-bold text-gray-300 uppercase tracking-wider">Éditions Possédées (${movie.editions.length})</h4>
-<button onclick="addEditionToMovie('${movie.id}')" class="shine-btn bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1 rounded-xl text-[10px] font-bold shadow transition flex items-center gap-1">
+<button onclick="addEditionToMovie('${movie.id}')" class="shine-btn bg-cyan-600 hover:bg-cyan-500 text-white px-2.5 py-1 rounded-xl text-[10px] font-bold shadow transition flex items-center gap-1">
 ${ic('plus','w-3 h-3')} Ajouter une édition
 </button>
 </div>
@@ -1797,8 +1799,8 @@ showToast("Film supprimé.");
 // --- STATISTIQUES UNIFIÉES ET INTELLIGENTES ---
 function setChartStyle(style) {
 chartStyle = style;
-document.getElementById('chartStyleBarsBtn').className = style === 'bars' ? 'flex-1 py-2 rounded-xl font-bold text-xs transition bg-indigo-600 text-white shadow' : 'flex-1 py-2 rounded-xl font-bold text-xs transition text-gray-400 hover:text-white';
-document.getElementById('chartStylePieBtn').className = style === 'pie' ? 'flex-1 py-2 rounded-xl font-bold text-xs transition bg-indigo-600 text-white shadow' : 'flex-1 py-2 rounded-xl font-bold text-xs transition text-gray-400 hover:text-white';
+document.getElementById('chartStyleBarsBtn').className = style === 'bars' ? 'flex-1 py-2 rounded-xl font-bold text-xs transition bg-cyan-600 text-white shadow' : 'flex-1 py-2 rounded-xl font-bold text-xs transition text-gray-400 hover:text-white';
+document.getElementById('chartStylePieBtn').className = style === 'pie' ? 'flex-1 py-2 rounded-xl font-bold text-xs transition bg-cyan-600 text-white shadow' : 'flex-1 py-2 rounded-xl font-bold text-xs transition text-gray-400 hover:text-white';
 renderStats();
 }
 
@@ -1911,7 +1913,7 @@ if (limit) entries = entries.slice(0, limit);
 entries.forEach(([key, val]) => {
 const item = document.createElement('div');
 item.className = "flex justify-between items-center py-1 border-b border-white/5";
-item.innerHTML = `<span class="text-gray-300">${key}</span><span class="font-bold text-indigo-400">${val}</span>`;
+item.innerHTML = `<span class="text-gray-300">${key}</span><span class="font-bold text-cyan-400">${val}</span>`;
 listElem.appendChild(item);
 });
 
@@ -1954,7 +1956,7 @@ data: {
 labels: labels,
 datasets: [{
 data: data,
-backgroundColor: '#818cf8',
+backgroundColor: '#22d3ee',
 borderRadius: 6,
 maxBarThickness: 28
 }]
@@ -1983,7 +1985,7 @@ labels: labels,
 datasets: [{
 data: data,
 backgroundColor: [
-'#6366f1', '#ec4899', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#14b8a6'
+'#22d3ee', '#ec4899', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#14b8a6'
 ],
 borderWidth: 0
 }]
