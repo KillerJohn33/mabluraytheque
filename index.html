@@ -476,6 +476,19 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 <!-- ONGLET COLLECTION AVEC FILTRES AVANCÉS -->
 <div id="tabCollection" class="hidden space-y-4">
+<!-- BASCULE FILMS / SÉRIES -->
+<div class="glass-pill p-1 rounded-xl flex justify-between items-center">
+<button id="collTypeAllBtn" onclick="setCollectionTypeFilter('all')" class="flex-1 py-2 rounded-lg font-bold text-xs transition bg-cyan-600 text-white flex items-center justify-center gap-1.5">
+Tout
+</button>
+<button id="collTypeMovieBtn" onclick="setCollectionTypeFilter('movie')" class="flex-1 py-2 rounded-lg font-bold text-xs transition text-gray-400 hover:text-white flex items-center justify-center gap-1.5">
+<span class="icon-inline w-3.5 h-3.5" data-icon="disc"></span> Films
+</button>
+<button id="collTypeTvBtn" onclick="setCollectionTypeFilter('tv')" class="flex-1 py-2 rounded-lg font-bold text-xs transition text-gray-400 hover:text-white flex items-center justify-center gap-1.5">
+<span class="icon-inline w-3.5 h-3.5" data-icon="tv"></span> Séries
+</button>
+</div>
+
 <!-- BARRE DE FILTRES ET DE TRI AVANCÉS -->
 <div class="glass-card p-3 rounded-2xl space-y-2 border border-white/10">
 <div class="flex items-center justify-between border-b border-white/10 pb-2">
@@ -486,14 +499,6 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 
 <div class="grid grid-cols-2 gap-2">
-<div>
-<label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Type</label>
-<select id="filterType" onchange="renderCollection()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
-<option class="bg-gray-900" value="all">Films & Séries</option>
-<option class="bg-gray-900" value="movie">🎬 Films uniquement</option>
-<option class="bg-gray-900" value="tv">📺 Séries uniquement</option>
-</select>
-</div>
 <div>
 <label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Format</label>
 <select id="filterFormat" onchange="renderCollection()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
@@ -549,6 +554,19 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <span id="wishlistTotalCount" class="bg-pink-500/20 text-pink-300 font-black text-xs px-2.5 py-1 rounded-xl border border-pink-500/30">0 film</span>
 </div>
 
+<!-- BASCULE FILMS / SÉRIES -->
+<div class="glass-pill p-1 rounded-xl flex justify-between items-center">
+<button id="wishTypeAllBtn" onclick="setWishlistTypeFilter('all')" class="flex-1 py-2 rounded-lg font-bold text-xs transition bg-pink-600 text-white flex items-center justify-center gap-1.5">
+Tout
+</button>
+<button id="wishTypeMovieBtn" onclick="setWishlistTypeFilter('movie')" class="flex-1 py-2 rounded-lg font-bold text-xs transition text-gray-400 hover:text-white flex items-center justify-center gap-1.5">
+<span class="icon-inline w-3.5 h-3.5" data-icon="disc"></span> Films
+</button>
+<button id="wishTypeTvBtn" onclick="setWishlistTypeFilter('tv')" class="flex-1 py-2 rounded-lg font-bold text-xs transition text-gray-400 hover:text-white flex items-center justify-center gap-1.5">
+<span class="icon-inline w-3.5 h-3.5" data-icon="tv"></span> Séries
+</button>
+</div>
+
 <div id="wishlistLayout" class="space-y-4 md:space-y-0 md:grid md:grid-cols-2 md:gap-5 md:items-start">
 
 <div class="glass-card p-2.5 md:p-6 rounded-2xl space-y-1.5 md:space-y-4 border border-white/10 w-full">
@@ -588,14 +606,6 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 
 <div class="grid grid-cols-2 gap-2">
-<div>
-<label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Type</label>
-<select id="filterTypeWishlist" onchange="renderWishlist()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
-<option class="bg-gray-900" value="all">Films & Séries</option>
-<option class="bg-gray-900" value="movie">🎬 Films uniquement</option>
-<option class="bg-gray-900" value="tv">📺 Séries uniquement</option>
-</select>
-</div>
 <div>
 <label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Format</label>
 <select id="filterFormatWishlist" onchange="renderWishlist()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
@@ -686,8 +696,21 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <p id="statSeenMovies" class="text-2xl font-black text-emerald-400 mt-1">0</p>
 </div>
 <div class="stat-tile text-center col-span-2">
-<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Temps Total de Visionnage</p>
-<p id="statWatchTime" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-sky-400 mt-1">0h</p>
+<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Temps de Visionnage</p>
+<div class="grid grid-cols-3 gap-2 mt-1.5">
+<div>
+<p class="text-[9px] text-gray-500 uppercase">Films</p>
+<p id="statWatchTimeMovies" class="text-sm font-black text-cyan-300">0h</p>
+</div>
+<div>
+<p class="text-[9px] text-gray-500 uppercase">Séries</p>
+<p id="statWatchTimeTV" class="text-sm font-black text-cyan-300">0h</p>
+</div>
+<div>
+<p class="text-[9px] text-gray-500 uppercase">Cumulé</p>
+<p id="statWatchTime" class="text-sm font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-sky-400">0h</p>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -1034,6 +1057,28 @@ let collection = [];
 let wishlist = [];
 let isListView = false;
 let isWishlistListView = false;
+let collectionTypeFilter = 'all';
+let wishlistTypeFilter = 'all';
+
+function setCollectionTypeFilter(type) {
+collectionTypeFilter = type;
+const activeClass = 'flex-1 py-2 rounded-lg font-bold text-xs transition bg-cyan-600 text-white flex items-center justify-center gap-1.5';
+const inactiveClass = 'flex-1 py-2 rounded-lg font-bold text-xs transition text-gray-400 hover:text-white flex items-center justify-center gap-1.5';
+document.getElementById('collTypeAllBtn').className = type === 'all' ? activeClass : inactiveClass;
+document.getElementById('collTypeMovieBtn').className = type === 'movie' ? activeClass : inactiveClass;
+document.getElementById('collTypeTvBtn').className = type === 'tv' ? activeClass : inactiveClass;
+renderCollection();
+}
+
+function setWishlistTypeFilter(type) {
+wishlistTypeFilter = type;
+const activeClass = 'flex-1 py-2 rounded-lg font-bold text-xs transition bg-pink-600 text-white flex items-center justify-center gap-1.5';
+const inactiveClass = 'flex-1 py-2 rounded-lg font-bold text-xs transition text-gray-400 hover:text-white flex items-center justify-center gap-1.5';
+document.getElementById('wishTypeAllBtn').className = type === 'all' ? activeClass : inactiveClass;
+document.getElementById('wishTypeMovieBtn').className = type === 'movie' ? activeClass : inactiveClass;
+document.getElementById('wishTypeTvBtn').className = type === 'tv' ? activeClass : inactiveClass;
+renderWishlist();
+}
 let html5QrcodeScanner = null;
 let chartInstances = {};
 let statsShowCharts = true;
@@ -1813,7 +1858,7 @@ grid.className = "grid grid-cols-2 gap-4";
 }
 
 let filtered = [...collection];
-const typeFilter = document.getElementById('filterType').value;
+const typeFilter = collectionTypeFilter;
 const formatFilter = document.getElementById('filterFormat').value;
 const seenFilter = document.getElementById('filterSeen').value;
 const sortVal = document.getElementById('sortSelect').value;
@@ -1941,7 +1986,7 @@ grid.className = "grid grid-cols-2 gap-4";
 }
 
 let filtered = [...wishlist];
-const typeFilter = document.getElementById('filterTypeWishlist').value;
+const typeFilter = wishlistTypeFilter;
 const formatFilter = document.getElementById('filterFormatWishlist').value;
 const sortVal = document.getElementById('sortSelectWishlist').value;
 const textFilter = document.getElementById('filterTextWishlist').value.toLowerCase().trim();
@@ -2599,12 +2644,21 @@ renderStats();
 }
 
 function renderStats() {
-const totalMovies = collection.length;
+// Pour les stats, on ignore les séries qui n'ont pas encore d'édition physique achetée
+// (prix d'achat renseigné sur au moins une édition) — elles restent visibles en Collection
+// pour le suivi de visionnage, mais ne comptent pas dans les statistiques de collection.
+const statsItems = collection.filter(m => {
+if (!isTV(m)) return true;
+return m.editions && m.editions.some(ed => parseFloat(ed.purchasePrice) > 0);
+});
+
+const totalMovies = statsItems.length;
 let totalEditions = 0;
 let totalPurchaseVal = 0;
 let totalEstimatedVal = 0;
 let seenCount = 0;
-let totalWatchMinutes = 0;
+let totalWatchMinutesMovies = 0;
+let totalWatchMinutesTV = 0;
 
 const formatsMap = {};
 const editionsMap = {};
@@ -2614,17 +2668,17 @@ const directorsMap = {};
 const actorsMap = {};
 const monthsMap = {};
 
-collection.forEach(m => {
+statsItems.forEach(m => {
 if (isTV(m)) {
 const progress = getShowProgress(m);
 if (progress.watched > 0 && typeof m.runtime === 'number' && m.runtime > 0) {
-totalWatchMinutes += progress.watched * m.runtime;
+totalWatchMinutesTV += progress.watched * m.runtime;
 }
 if (isShowFullyWatched(m)) seenCount++;
 } else if (m.seen) {
 seenCount++;
 if (typeof m.runtime === 'number' && m.runtime > 0) {
-totalWatchMinutes += m.runtime;
+totalWatchMinutesMovies += m.runtime;
 }
 }
 
@@ -2683,7 +2737,9 @@ locationsMap[loc] = (locationsMap[loc] || 0) + 1;
 document.getElementById('statTotalMovies').innerText = totalMovies;
 document.getElementById('statTotalEditions').innerText = totalEditions;
 document.getElementById('statSeenMovies').innerText = `${seenCount} / ${totalMovies}`;
-document.getElementById('statWatchTime').innerText = formatWatchTime(totalWatchMinutes);
+document.getElementById('statWatchTimeMovies').innerText = formatWatchTime(totalWatchMinutesMovies);
+document.getElementById('statWatchTimeTV').innerText = formatWatchTime(totalWatchMinutesTV);
+document.getElementById('statWatchTime').innerText = formatWatchTime(totalWatchMinutesMovies + totalWatchMinutesTV);
 document.getElementById('statTotalValue').innerText = `${totalPurchaseVal.toFixed(2)} €`;
 document.getElementById('statTotalEstimatedValue').innerText = `${totalEstimatedVal.toFixed(2)} €`;
 
