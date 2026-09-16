@@ -1302,6 +1302,25 @@ container.appendChild(item);
 });
 }
 
+// --- RÉCUPÉRATION DE LA DATE DE SORTIE BLU-RAY/DVD EN FRANCE ---
+async function fetchBlurayReleaseDateFR(tmdbId) {
+try {
+const res = await fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/release_dates?api_key=${API_KEY}`);
+const data = await res.json();
+const frEntry = (data.results || []).find(r => r.iso_3166_1 === 'FR');
+if (!frEntry) return null;
+
+// type 5 = sortie physique (Blu-ray/DVD) selon la documentation TMDB
+const physicalReleases = frEntry.release_dates.filter(rd => rd.type === 5);
+if (physicalReleases.length === 0) return null;
+
+physicalReleases.sort((a, b) => new Date(a.release_date) - new Date(b.release_date));
+return physicalReleases[0].release_date.split('T')[0];
+} catch (e) {
+return null;
+}
+}
+
 async function addMovieFromTMDB(tmdbData, isWishlist = false) {
 // Détection de doublon (déjà présent en Collection ou en Wishlist)
 const existsIn = collection.some(m => m.tmdb_id === tmdbData.id) ? 'votre collection'
@@ -1319,6 +1338,7 @@ let cast = [];
 let imdbId = null;
 let voteAverage = null;
 let voteCount = null;
+let blurayDateFR = null;
 
 try {
 // On combine détails + crédits en un seul appel via append_to_response
@@ -1341,6 +1361,8 @@ cast = castList.slice(0, 5).map(p => p.name);
 }
 } catch(e) {}
 
+blurayDateFR = await fetchBlurayReleaseDateFR(tmdbData.id);
+
 const movie = {
 id: 'tmdb_' + tmdbData.id + '_' + Date.now(),
 tmdb_id: tmdbData.id,
@@ -1348,6 +1370,8 @@ imdb_id: imdbId,
 title: tmdbData.title,
 poster: tmdbData.poster_path ? `https://image.tmdb.org/t/p/w500${tmdbData.poster_path}` : 'https://via.placeholder.com/300x450?text=Pas+d+image',
 releaseDate: tmdbData.release_date || '',
+blurayReleaseDateFR: blurayDateFR,
+blurayReleaseDateManual: false,
 overview: tmdbData.overview || '',
 genres: genres,
 runtime: runtime,
@@ -1414,7 +1438,9 @@ cast = castList.slice(0, 5).map(p => p.name);
 }
 } catch (e) {}
 
-return { genres, runtime, director, cast, imdbId, voteAverage, voteCount };
+const blurayDateFR = await fetchBlurayReleaseDateFR(tmdbId);
+
+return { genres, runtime, director, cast, imdbId, voteAverage, voteCount, blurayDateFR };
 }
 
 async function refreshAllTMDBInfo() {
@@ -1444,6 +1470,9 @@ movie.cast = info.cast.length ? info.cast : (movie.cast || []);
 movie.imdb_id = info.imdbId || movie.imdb_id || null;
 movie.voteAverage = info.voteAverage !== null ? info.voteAverage : (movie.voteAverage ?? null);
 movie.voteCount = info.voteCount !== null ? info.voteCount : (movie.voteCount ?? null);
+if (!movie.blurayReleaseDateManual) {
+movie.blurayReleaseDateFR = info.blurayDateFR || movie.blurayReleaseDateFR || null;
+}
 
 await updateMovieInCloud(movie);
 updated++;
@@ -1661,13 +1690,17 @@ grid.appendChild(card);
 });
 }
 
+function effectiveReleaseDate(m) {
+return m.blurayReleaseDateFR || m.releaseDate || null;
+}
+
 function renderWishlistCalendar() {
 const container = document.getElementById('wishlistCalendar');
 if (!container) return;
 
 const withDates = wishlist
-.filter(m => m.releaseDate)
-.sort((a, b) => new Date(a.releaseDate) - new Date(b.releaseDate));
+.filter(m => effectiveReleaseDate(m))
+.sort((a, b) => new Date(effectiveReleaseDate(a)) - new Date(effectiveReleaseDate(b)));
 
 if (withDates.length === 0) {
 container.innerHTML = `<p class="text-[10px] text-gray-500 py-2">Aucune date de sortie disponible pour le moment.</p>`;
@@ -1679,7 +1712,8 @@ const today = new Date();
 today.setHours(0,0,0,0);
 
 container.innerHTML = withDates.map(m => {
-const d = new Date(m.releaseDate);
+const isBluray = !!m.blurayReleaseDateFR;
+const d = new Date(effectiveReleaseDate(m));
 const dateLabel = `${d.getDate()} ${monthNames[d.getMonth()]} ${d.getFullYear()}`;
 const isFuture = d >= today;
 
@@ -1696,7 +1730,7 @@ return `
 <img src="${m.poster}" class="w-9 h-14 object-cover rounded-lg shadow flex-shrink-0">
 <div class="flex-1 min-w-0">
 <p class="text-xs font-bold text-white truncate">${m.title}</p>
-<p class="text-[10px] text-gray-400">${dateLabel}</p>
+<p class="text-[10px] text-gray-400">${dateLabel}${isBluray ? ' <span class="text-cyan-400">• Blu-ray FR</span>' : ' <span class="text-gray-500">• Sortie cinéma</span>'}</p>
 </div>
 ${badge}
 </div>
@@ -1729,8 +1763,9 @@ label.innerText = `${monthNames[month]} ${year}`;
 // Films de la wishlist qui sortent ce mois-ci, regroupés par jour
 const releasesByDay = {};
 wishlist.forEach(m => {
-if (!m.releaseDate) return;
-const d = new Date(m.releaseDate);
+const rd = effectiveReleaseDate(m);
+if (!rd) return;
+const d = new Date(rd);
 if (isNaN(d) || d.getFullYear() !== year || d.getMonth() !== month) return;
 const key = `${year}-${pad2(month + 1)}-${pad2(d.getDate())}`;
 if (!releasesByDay[key]) releasesByDay[key] = [];
@@ -1787,8 +1822,9 @@ return;
 }
 
 const moviesThatDay = wishlist.filter(m => {
-if (!m.releaseDate) return false;
-const d = new Date(m.releaseDate);
+const rd = effectiveReleaseDate(m);
+if (!rd) return false;
+const d = new Date(rd);
 if (isNaN(d)) return false;
 const key = `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 return key === wishlistCalSelected;
@@ -1811,7 +1847,10 @@ detail.innerHTML = `
 ${moviesThatDay.map(m => `
 <div class="flex items-center gap-3 cursor-pointer hover:bg-white/5 rounded-xl p-1 transition" onclick="openMovieDetail('${m.id}')">
 <img src="${m.poster}" class="w-9 h-14 object-cover rounded-lg shadow flex-shrink-0">
+<div class="min-w-0">
 <p class="text-xs font-bold text-white truncate">${m.title}</p>
+<p class="text-[10px] ${m.blurayReleaseDateFR ? 'text-cyan-400' : 'text-gray-500'}">${m.blurayReleaseDateFR ? 'Sortie Blu-ray FR' : 'Sortie cinéma'}</p>
+</div>
 </div>
 `).join('')}
 </div>
@@ -1907,6 +1946,11 @@ ${(typeof movie.voteAverage === 'number' && movie.voteAverage > 0) ? `
 <span class="text-sky-400">${ic('trend','w-3.5 h-3.5')}</span>
 <span><span class="text-gray-500">Note moyenne des utilisateurs : </span><span class="text-sky-400 font-bold">${movie.voteAverage.toFixed(1)}/10</span>${movie.voteCount ? `<span class="text-gray-500"> (${movie.voteCount.toLocaleString('fr-FR')} votes)</span>` : ''}</span>
 </div>` : ''}
+<div class="flex items-center gap-2 text-gray-300 pt-1 border-t border-white/5">
+<span class="text-cyan-400 flex-shrink-0">${ic('disc','w-3.5 h-3.5')}</span>
+<span class="text-gray-500 whitespace-nowrap">Sortie Blu-ray (FR) :</span>
+<input type="date" value="${movie.blurayReleaseDateFR || ''}" onchange="updateBlurayDate('${movie.id}', this.value)" class="glass-input text-white text-[11px] px-2 py-1 rounded-lg focus:outline-none ml-auto">
+</div>
 </div>
 `;
 
@@ -1975,6 +2019,17 @@ movie.seen = !movie.seen;
 await updateMovieInCloud(movie);
 openMovieDetail(movieId);
 renderCollection();
+}
+
+async function updateBlurayDate(movieId, value) {
+let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+if (!movie) return;
+movie.blurayReleaseDateFR = value || null;
+movie.blurayReleaseDateManual = !!value;
+await updateMovieInCloud(movie);
+renderWishlistCalendar();
+renderWishlistCalendarGrid();
+showToast(value ? "Date de sortie Blu-ray enregistrée." : "Date de sortie Blu-ray effacée.");
 }
 
 async function addEditionToMovie(movieId) {
