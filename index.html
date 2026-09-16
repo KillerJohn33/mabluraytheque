@@ -3359,6 +3359,10 @@ showToast("Exportation JSON terminée ! 💾");
 
 // --- IMPORT DES NOTES IMDB (fichier ratings.csv exporté depuis votre compte) ---
 function parseCSV(text) {
+// On retire un éventuel BOM (souvent ajouté par Excel/Windows), qui sinon
+// corrompt le nom de la toute première colonne ("Const" devient illisible).
+if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+
 const rows = [];
 let row = [];
 let field = '';
@@ -3386,7 +3390,7 @@ row = [];
 if (field !== '' || row.length) { row.push(field); rows.push(row); }
 if (rows.length === 0) return [];
 
-const headers = rows[0];
+const headers = rows[0].map(h => h.trim());
 return rows.slice(1).map(r => {
 const obj = {};
 headers.forEach((h, idx) => obj[h] = r[idx] !== undefined ? r[idx] : '');
@@ -3407,15 +3411,18 @@ try {
 const rows = parseCSV(e.target.result);
 if (rows.length === 0) { showToast("Fichier vide ou invalide."); return; }
 
-// On ne traite que les films et séries (on ignore les notes d'épisodes individuels)
+// On ne traite que les films et séries (on ignore uniquement les notes d'épisodes individuels).
+// Le format de la colonne "Title Type" varie selon les versions de l'export IMDb
+// (ex: "movie"/"tvSeries" ou "Feature Film"/"TV Series"), donc on reste tolérant :
+// seul un type contenant explicitement "episode" est exclu. TMDB confirmera le type réel.
 const entries = rows.map(r => ({
 constId: (r['Const'] || r['const'] || '').trim(),
 rating: parseFloat(r['Your Rating'] || r['your rating']),
 titleType: (r['Title Type'] || r['title type'] || '').trim().toLowerCase()
-})).filter(r => r.constId && !isNaN(r.rating) && (r.titleType === 'movie' || r.titleType === 'tvseries'));
+})).filter(r => r.constId && !isNaN(r.rating) && !r.titleType.includes('episode'));
 
 if (entries.length === 0) {
-showToast("Aucun film/série valide trouvé dans ce fichier.");
+showToast("Aucun film/série valide trouvé dans ce fichier. Vérifiez qu'il contient bien les colonnes \"Const\" et \"Your Rating\".");
 event.target.value = '';
 return;
 }
