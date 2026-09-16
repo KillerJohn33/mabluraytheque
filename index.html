@@ -375,6 +375,9 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <span class="icon-inline w-3.5 h-3.5" data-icon="sparkles"></span> <span>Wishlist</span>
 <span id="wishlistBadge" class="hidden bg-pink-500 text-white text-[9px] font-black px-1.5 py-0.2 rounded-full ml-0.5">0</span>
 </button>
+<button id="tabViewingBtn" onclick="switchTab('viewing')" class="flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent">
+<span class="icon-inline w-3.5 h-3.5" data-icon="playcircle"></span> <span>Visionnage</span>
+</button>
 <button id="tabStatsBtn" onclick="switchTab('stats')" class="flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent">
 <span class="icon-inline w-3.5 h-3.5" data-icon="barchart"></span> <span>Stats</span>
 </button>
@@ -630,6 +633,45 @@ Tout
 </div>
 </div>
 
+<!-- ONGLET VISIONNAGE -->
+<div id="tabViewing" class="hidden space-y-4">
+<div class="glass-card p-3 rounded-2xl border border-emerald-500/30 flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="icon-chip chip-sm" data-icon="playcircle"></span>
+<div>
+<h2 class="text-xs font-bold text-emerald-300">Visionnage</h2>
+<p class="text-[10px] text-gray-400">Films et séries que vous avez regardés, avec vos notes.</p>
+</div>
+</div>
+<span id="viewingTotalCount" class="bg-emerald-500/20 text-emerald-300 font-black text-xs px-2.5 py-1 rounded-xl border border-emerald-500/30">0</span>
+</div>
+
+<!-- BASCULE FILMS / SÉRIES -->
+<div class="glass-pill p-1 rounded-xl flex justify-between items-center">
+<button id="viewTypeAllBtn" onclick="setViewingTypeFilter('all')" class="flex-1 py-2 rounded-lg font-bold text-xs transition bg-emerald-600 text-white flex items-center justify-center gap-1.5">
+Tout
+</button>
+<button id="viewTypeMovieBtn" onclick="setViewingTypeFilter('movie')" class="flex-1 py-2 rounded-lg font-bold text-xs transition text-gray-400 hover:text-white flex items-center justify-center gap-1.5">
+<span class="icon-inline w-3.5 h-3.5" data-icon="disc"></span> Films
+</button>
+<button id="viewTypeTvBtn" onclick="setViewingTypeFilter('tv')" class="flex-1 py-2 rounded-lg font-bold text-xs transition text-gray-400 hover:text-white flex items-center justify-center gap-1.5">
+<span class="icon-inline w-3.5 h-3.5" data-icon="tv"></span> Séries
+</button>
+</div>
+
+<div class="glass-card p-3 rounded-2xl space-y-2 border border-white/10">
+<div class="flex items-center justify-between border-b border-white/10 pb-2">
+<label class="text-[9px] text-gray-400 font-bold uppercase">Filtrer par nom</label>
+<button onclick="toggleViewingListView()" id="toggleViewBtnViewing" class="glass-pill px-2.5 py-1 rounded-xl text-[11px] text-emerald-300 hover:text-white flex items-center gap-1 transition">
+<span class="icon-inline w-3.5 h-3.5" data-icon="list"></span> <span id="viewModeLabelViewing">Vue Liste</span>
+</button>
+</div>
+<input id="filterTextViewing" type="text" placeholder="Mot clé..." oninput="renderViewingLog()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
+</div>
+
+<div id="viewingGrid" class="grid grid-cols-2 gap-4"></div>
+</div>
+
 <!-- ONGLET STATS -->
 <div id="tabStats" class="hidden glass-card rounded-3xl border border-white/10 divide-y divide-white/10 overflow-hidden">
 <div class="p-4 md:p-5 space-y-3">
@@ -684,7 +726,7 @@ Tout
 <p id="statAvgPriceEdition" class="text-lg font-black text-teal-400 mt-0.5">0 €</p>
 </div>
 <div class="stat-tile text-center">
-<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Vus (Films + Séries)</p>
+<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Vus (Visionnage)</p>
 <p id="statSeenMovies" class="text-2xl font-black text-emerald-400 mt-1">0</p>
 </div>
 <div class="stat-tile text-center col-span-2">
@@ -937,24 +979,28 @@ Tout
 <!-- BARRE DE NAVIGATION FIXE (mobile uniquement) -->
 <nav id="bottomNav" class="mobile-bottom-nav glass-card">
 <button id="bottomTabHomeBtn" onclick="switchTab('home')" class="bottom-nav-btn active">
-<span class="icon-inline w-8 h-8" data-icon="home"></span>
+<span class="icon-inline w-7 h-7" data-icon="home"></span>
 <span class="bottom-nav-label">Accueil</span>
 </button>
 <button id="bottomTabCollectionBtn" onclick="switchTab('collection')" class="bottom-nav-btn">
-<span class="icon-inline w-8 h-8" data-icon="book"></span>
+<span class="icon-inline w-7 h-7" data-icon="book"></span>
 <span class="bottom-nav-label">Collection</span>
 </button>
 <button id="bottomTabWishlistBtn" onclick="switchTab('wishlist')" class="bottom-nav-btn">
-<span class="icon-inline w-8 h-8" data-icon="sparkles"></span>
+<span class="icon-inline w-7 h-7" data-icon="sparkles"></span>
 <span class="bottom-nav-label">Wishlist</span>
 <span id="wishlistBadgeBottom" class="hidden bottom-nav-badge"></span>
 </button>
+<button id="bottomTabViewingBtn" onclick="switchTab('viewing')" class="bottom-nav-btn">
+<span class="icon-inline w-7 h-7" data-icon="playcircle"></span>
+<span class="bottom-nav-label">Vu</span>
+</button>
 <button id="bottomTabStatsBtn" onclick="switchTab('stats')" class="bottom-nav-btn">
-<span class="icon-inline w-8 h-8" data-icon="barchart"></span>
+<span class="icon-inline w-7 h-7" data-icon="barchart"></span>
 <span class="bottom-nav-label">Stats</span>
 </button>
 <button id="bottomTabSettingsBtn" onclick="switchTab('settings')" class="bottom-nav-btn">
-<span class="icon-inline w-8 h-8" data-icon="settings"></span>
+<span class="icon-inline w-7 h-7" data-icon="settings"></span>
 <span class="bottom-nav-label">Options</span>
 </button>
 </nav>
@@ -1047,10 +1093,33 @@ let db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let collection = [];
 let wishlist = [];
+let viewingLog = [];
+
+function findAnyItem(id) {
+return collection.find(m => m.id === id) || wishlist.find(m => m.id === id) || viewingLog.find(m => m.id === id);
+}
 let isListView = false;
 let isWishlistListView = false;
 let collectionTypeFilter = 'all';
 let wishlistTypeFilter = 'all';
+let viewingTypeFilter = 'all';
+let isViewingListView = false;
+
+function toggleViewingListView() {
+isViewingListView = !isViewingListView;
+document.getElementById('viewModeLabelViewing').innerText = isViewingListView ? "Vue Grille" : "Vue Liste";
+renderViewingLog();
+}
+
+function setViewingTypeFilter(type) {
+viewingTypeFilter = type;
+const activeClass = 'flex-1 py-2 rounded-lg font-bold text-xs transition bg-emerald-600 text-white flex items-center justify-center gap-1.5';
+const inactiveClass = 'flex-1 py-2 rounded-lg font-bold text-xs transition text-gray-400 hover:text-white flex items-center justify-center gap-1.5';
+document.getElementById('viewTypeAllBtn').className = type === 'all' ? activeClass : inactiveClass;
+document.getElementById('viewTypeMovieBtn').className = type === 'movie' ? activeClass : inactiveClass;
+document.getElementById('viewTypeTvBtn').className = type === 'tv' ? activeClass : inactiveClass;
+renderViewingLog();
+}
 
 function setCollectionTypeFilter(type) {
 collectionTypeFilter = type;
@@ -1174,6 +1243,10 @@ return p.total > 0 && p.watched >= p.total;
 }
 
 function normalizeMovieData(movie) {
+if (movie.isViewing) {
+if (!movie.editions || !Array.isArray(movie.editions)) movie.editions = [];
+return movie;
+}
 if (!movie.editions || !Array.isArray(movie.editions) || movie.editions.length === 0) {
 movie.editions = [{
 id: 'ed_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
@@ -1237,14 +1310,17 @@ console.error("Fetch error:", error);
 } else {
 collection = [];
 wishlist = [];
+viewingLog = [];
 data.forEach(item => {
 let m = { ...item.data, cloud_id: item.id };
 m = normalizeMovieData(m);
-if (m.isWishlist) wishlist.push(m);
+if (m.isViewing) viewingLog.push(m);
+else if (m.isWishlist) wishlist.push(m);
 else collection.push(m);
 });
 renderCollection();
 renderWishlist();
+renderViewingLog();
 }
 } catch (err) {
 showToast("Erreur de connexion cloud.");
@@ -1277,28 +1353,28 @@ if (error) console.error("Delete error:", error);
 
 // --- NAVIGATION ET TABS ---
 function switchTab(tab) {
-['tabHome', 'tabCollection', 'tabWishlist', 'tabStats', 'tabSettings'].forEach(id => {
+['tabHome', 'tabCollection', 'tabWishlist', 'tabViewing', 'tabStats', 'tabSettings'].forEach(id => {
 const el = document.getElementById(id);
 if (el) el.classList.add('hidden');
 });
 
 const searchSection = document.getElementById('searchSection');
 if (searchSection) {
-if (tab === 'home' || tab === 'collection') searchSection.classList.remove('hidden');
+if (tab === 'home' || tab === 'collection' || tab === 'viewing') searchSection.classList.remove('hidden');
 else searchSection.classList.add('hidden');
 }
 
 const inactiveClass = "flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent";
 const activeClass = "flex-1 py-2 font-bold text-[10px] transition flex items-center justify-center gap-1 text-cyan-400 border-b-[3px] border-cyan-400";
 
-['tabHomeBtn', 'tabCollectionBtn', 'tabWishlistBtn', 'tabStatsBtn', 'tabSettingsBtn'].forEach(id => {
+['tabHomeBtn', 'tabCollectionBtn', 'tabWishlistBtn', 'tabViewingBtn', 'tabStatsBtn', 'tabSettingsBtn'].forEach(id => {
 const btn = document.getElementById(id);
 if (btn) {
 btn.className = inactiveClass;
 }
 });
 
-['bottomTabHomeBtn', 'bottomTabCollectionBtn', 'bottomTabWishlistBtn', 'bottomTabStatsBtn', 'bottomTabSettingsBtn'].forEach(id => {
+['bottomTabHomeBtn', 'bottomTabCollectionBtn', 'bottomTabWishlistBtn', 'bottomTabViewingBtn', 'bottomTabStatsBtn', 'bottomTabSettingsBtn'].forEach(id => {
 const btn = document.getElementById(id);
 if (btn) btn.classList.remove('active');
 });
@@ -1318,6 +1394,11 @@ document.getElementById('tabWishlist').classList.remove('hidden');
 document.getElementById('tabWishlistBtn').className = activeClass;
 document.getElementById('bottomTabWishlistBtn').classList.add('active');
 renderWishlist();
+} else if (tab === 'viewing') {
+document.getElementById('tabViewing').classList.remove('hidden');
+document.getElementById('tabViewingBtn').className = activeClass;
+document.getElementById('bottomTabViewingBtn').classList.add('active');
+renderViewingLog();
 } else if (tab === 'stats') {
 document.getElementById('tabStats').classList.remove('hidden');
 document.getElementById('tabStatsBtn').className = activeClass;
@@ -1420,6 +1501,9 @@ ${ic('plus','w-3 h-3')} Collection
 <button onclick='${addFn}(${JSON.stringify(m).replace(/'/g, "&apos;")}, true)' class="shine-btn bg-pink-600 hover:bg-pink-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition flex items-center justify-center gap-1">
 ${ic('plus','w-3 h-3')} Wishlist
 </button>
+<button onclick='${addFn}(${JSON.stringify(m).replace(/'/g, "&apos;")}, false, true)' class="shine-btn bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition flex items-center justify-center gap-1">
+${ic('check','w-3 h-3')} Vu
+</button>
 </div>
 `;
 container.appendChild(item);
@@ -1445,10 +1529,11 @@ return null;
 }
 }
 
-async function addMovieFromTMDB(tmdbData, isWishlist = false) {
-// Détection de doublon (déjà présent en Collection ou en Wishlist)
+async function addMovieFromTMDB(tmdbData, isWishlist = false, isViewing = false) {
+// Détection de doublon (déjà présent en Collection, Wishlist ou Visionnage)
 const existsIn = collection.some(m => m.tmdb_id === tmdbData.id) ? 'votre collection'
-: wishlist.some(m => m.tmdb_id === tmdbData.id) ? 'votre wishlist' : null;
+: wishlist.some(m => m.tmdb_id === tmdbData.id) ? 'votre wishlist'
+: viewingLog.some(m => m.tmdb_id === tmdbData.id) ? 'votre visionnage' : null;
 
 if (existsIn) {
 const confirmAdd = confirm(`"${tmdbData.title}" est déjà présent dans ${existsIn}. Voulez-vous quand même l'ajouter en double ?`);
@@ -1485,7 +1570,7 @@ cast = castList.slice(0, 5).map(p => p.name);
 }
 } catch(e) {}
 
-blurayDateFR = await fetchBlurayReleaseDateFR(tmdbData.id);
+if (!isViewing) blurayDateFR = await fetchBlurayReleaseDateFR(tmdbData.id);
 
 const movie = {
 id: 'tmdb_' + tmdbData.id + '_' + Date.now(),
@@ -1504,10 +1589,11 @@ director: director,
 cast: cast,
 voteAverage: voteAverage,
 voteCount: voteCount,
-seen: false,
+seen: isViewing ? true : false,
 isWishlist: isWishlist,
+isViewing: isViewing,
 addedAt: new Date().toISOString(),
-editions: [{
+editions: isViewing ? [] : [{
 id: 'ed_' + Date.now(),
 title: 'Édition Standard',
 format: 'Blu-ray 1080p',
@@ -1521,7 +1607,11 @@ purchaseLocation: ''
 const cloudId = await saveMovieToCloud(movie);
 if (cloudId) {
 movie.cloud_id = cloudId;
-if (isWishlist) {
+if (isViewing) {
+viewingLog.push(movie);
+renderViewingLog();
+showToast("Ajouté à Visionnage ! ✅");
+} else if (isWishlist) {
 wishlist.push(movie);
 renderWishlist();
 showToast("Ajouté à la Wishlist ! ✨");
@@ -1533,10 +1623,11 @@ showToast("Ajouté à la Collection ! 💿");
 }
 }
 
-async function addShowFromTMDB(tmdbData, isWishlist = false) {
+async function addShowFromTMDB(tmdbData, isWishlist = false, isViewing = false) {
 // Détection de doublon
 const existsIn = collection.some(m => m.tmdb_id === tmdbData.id && m.mediaType === 'tv') ? 'votre collection'
-: wishlist.some(m => m.tmdb_id === tmdbData.id && m.mediaType === 'tv') ? 'votre wishlist' : null;
+: wishlist.some(m => m.tmdb_id === tmdbData.id && m.mediaType === 'tv') ? 'votre wishlist'
+: viewingLog.some(m => m.tmdb_id === tmdbData.id && m.mediaType === 'tv') ? 'votre visionnage' : null;
 
 if (existsIn) {
 const confirmAdd = confirm(`"${tmdbData.name}" est déjà présent dans ${existsIn}. Voulez-vous quand même l'ajouter en double ?`);
@@ -1610,8 +1701,9 @@ voteCount: voteCount,
 seasons: seasons,
 seen: false,
 isWishlist: isWishlist,
+isViewing: isViewing,
 addedAt: new Date().toISOString(),
-editions: [{
+editions: isViewing ? [] : [{
 id: 'ed_' + Date.now(),
 title: 'Édition Standard',
 format: 'Blu-ray 1080p',
@@ -1625,7 +1717,11 @@ purchaseLocation: ''
 const cloudId = await saveMovieToCloud(show);
 if (cloudId) {
 show.cloud_id = cloudId;
-if (isWishlist) {
+if (isViewing) {
+viewingLog.push(show);
+renderViewingLog();
+showToast("Série ajoutée à Visionnage ! ✅");
+} else if (isWishlist) {
 wishlist.push(show);
 renderWishlist();
 showToast("Série ajoutée à la Wishlist ! ✨");
@@ -1792,6 +1888,7 @@ if (btn) document.getElementById('refreshTmdbBtnText').innerText = `Mise à jour
 
 renderCollection();
 renderWishlist();
+renderViewingLog();
 renderHomeRecent();
 
 if (btn) {
@@ -2062,6 +2159,76 @@ grid.appendChild(card);
 });
 }
 
+// --- VISIONNAGE (films/séries vus, indépendant de la Collection) ---
+function renderViewingLog() {
+const grid = document.getElementById('viewingGrid');
+const countLabel = document.getElementById('viewingTotalCount');
+if (!grid) return;
+
+grid.innerHTML = '';
+if (countLabel) countLabel.innerText = viewingLog.length;
+
+if (isViewingListView) {
+grid.className = "flex flex-col gap-3 coll-list-view";
+} else {
+grid.className = "grid grid-cols-2 gap-4";
+}
+
+let filtered = [...viewingLog];
+if (viewingTypeFilter === 'movie') filtered = filtered.filter(m => !isTV(m));
+if (viewingTypeFilter === 'tv') filtered = filtered.filter(m => isTV(m));
+
+const textFilter = document.getElementById('filterTextViewing').value.toLowerCase().trim();
+if (textFilter) filtered = filtered.filter(m => m.title.toLowerCase().includes(textFilter));
+
+filtered.sort((a, b) => new Date(b.addedAt || 0) - new Date(a.addedAt || 0));
+
+if (filtered.length === 0) {
+grid.innerHTML = `<p class="text-xs text-gray-400 col-span-2 text-center p-6">${viewingLog.length === 0 ? 'Aucun film ou série marqué comme vu pour le moment.' : 'Aucun résultat ne correspond.'}</p>`;
+return;
+}
+
+filtered.forEach(m => {
+const tv = isTV(m);
+const progress = tv ? getShowProgress(m) : null;
+const card = document.createElement('div');
+card.onclick = () => openMovieDetail(m.id);
+
+const ratingLabel = (typeof m.voteAverage === 'number' && m.voteAverage > 0)
+? `<span class="text-sky-400 font-semibold flex items-center gap-1">${ic('trend','w-3 h-3')} ${m.voteAverage.toFixed(1)}</span>`
+: '';
+const progressLabel = tv
+? `<span class="text-emerald-300 font-semibold">${progress.watched}/${progress.total || '?'} ép.</span>`
+: '';
+
+if (isViewingListView) {
+card.className = "relative rounded-2xl overflow-hidden cursor-pointer bg-black h-28 border border-emerald-500/20 hover:border-emerald-500/50 transition";
+card.innerHTML = `
+<img src="${m.poster}" class="absolute left-0 top-0 h-full w-auto">
+<div class="absolute inset-0 bg-gradient-to-r from-transparent via-black/75 to-black"></div>
+<div class="absolute inset-y-0 right-0 w-[68%] flex flex-col justify-center items-end p-3 text-right">
+<h4 class="text-xs font-bold text-white truncate w-full flex items-center justify-end gap-1.5">${tv ? ic('tv','w-3 h-3 text-emerald-400') : ''}${m.title}</h4>
+<div class="flex items-center justify-end gap-3 text-[10px] mt-1">${progressLabel}${ratingLabel}</div>
+${imdbBadge(m) ? `<div class="mt-1 text-[10px]">${imdbBadge(m)}</div>` : ''}
+</div>
+`;
+} else {
+card.className = "relative rounded-2xl overflow-hidden cursor-pointer bg-black border border-emerald-500/20 hover:border-emerald-500/50 transition";
+card.innerHTML = `
+<img src="${m.poster}" class="w-full aspect-[2/3] object-cover">
+<div class="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none"></div>
+${tv ? `<div class="absolute top-2 left-2 bg-black/70 backdrop-blur-sm rounded-lg px-1.5 py-0.5">${ic('tv','w-3 h-3 text-emerald-400')}</div>` : ''}
+<div class="absolute inset-x-0 bottom-0 p-2.5">
+<h4 class="text-xs font-bold text-white truncate">${m.title}</h4>
+<div class="flex items-center justify-between text-[10px] mt-1">${progressLabel}${ratingLabel}</div>
+${imdbBadge(m) ? `<div class="mt-1 text-[10px]">${imdbBadge(m)}</div>` : ''}
+</div>
+`;
+}
+grid.appendChild(card);
+});
+}
+
 function effectiveReleaseDate(m) {
 return m.blurayReleaseDateFR || m.releaseDate || null;
 }
@@ -2258,7 +2425,7 @@ ${sub}
 
 // --- MODAL & ÉDITION AVANCÉE DES ÉDITIONS ---
 function openMovieDetail(movieId) {
-let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+let movie = findAnyItem(movieId);
 if (!movie) return;
 
 movie = normalizeMovieData(movie);
@@ -2380,6 +2547,7 @@ ${(movie.imdbUserRating !== undefined && movie.imdbUserRating !== null) ? `<span
 
 ${isTV(movie) ? renderSeasonsHtml(movie) : ''}
 
+${!movie.isViewing ? `
 <div class="glass-card p-3 rounded-2xl space-y-3 border border-white/10">
 <div class="flex items-center justify-between border-b border-white/10 pb-2">
 <h4 class="text-xs font-bold text-gray-300 uppercase tracking-wider">Éditions Possédées (${movie.editions.length})</h4>
@@ -2397,11 +2565,17 @@ ${editionsHtml}
 <span class="text-emerald-400">${totals.totalPurchase.toFixed(2)} € (Achat) / ${totals.totalEstimated.toFixed(2)} € (Est.)</span>
 </div>
 </div>
+` : ''}
 
 <div class="flex gap-2 pt-2">
 ${movie.isWishlist ? `
 <button onclick="moveWishlistToCollection('${movie.id}')" class="shine-btn flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg transition flex items-center justify-center gap-1.5">
 ${ic('download','w-3.5 h-3.5')} Transférer en Collection
+</button>
+` : ''}
+${movie.isViewing ? `
+<button onclick="moveViewingToCollection('${movie.id}')" class="shine-btn flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg transition flex items-center justify-center gap-1.5">
+${ic('download','w-3.5 h-3.5')} J'ai aussi le Blu-ray (ajouter à la Collection)
 </button>
 ` : ''}
 <button onclick="deleteMovie('${movie.id}')" class="bg-red-600/80 hover:bg-red-600 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-1.5">
@@ -2508,7 +2682,7 @@ const wasExpanded = !!expandedSeasons[key];
 expandedSeasons[key] = !wasExpanded;
 
 if (!wasExpanded) {
-let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+let movie = findAnyItem(movieId);
 if (movie) {
 const season = movie.seasons.find(s => s.seasonNumber === seasonNumber);
 if (season && season.episodes === null) {
@@ -2523,7 +2697,7 @@ openMovieDetail(movieId);
 }
 
 async function toggleEpisodeWatched(movieId, seasonNumber, episodeNumber) {
-let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+let movie = findAnyItem(movieId);
 if (!movie || !movie.seasons) return;
 const season = movie.seasons.find(s => s.seasonNumber === seasonNumber);
 if (!season) return;
@@ -2535,11 +2709,12 @@ await updateMovieInCloud(movie);
 openMovieDetail(movieId);
 renderCollection();
 renderWishlist();
+renderViewingLog();
 renderHomeRecent();
 }
 
 async function toggleSeasonWatched(movieId, seasonNumber) {
-let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+let movie = findAnyItem(movieId);
 if (!movie || !movie.seasons) return;
 const season = movie.seasons.find(s => s.seasonNumber === seasonNumber);
 if (!season) return;
@@ -2561,20 +2736,22 @@ await updateMovieInCloud(movie);
 openMovieDetail(movieId);
 renderCollection();
 renderWishlist();
+renderViewingLog();
 renderHomeRecent();
 }
 
 async function toggleMovieSeen(movieId) {
-let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+let movie = findAnyItem(movieId);
 if (!movie) return;
 movie.seen = !movie.seen;
 await updateMovieInCloud(movie);
 openMovieDetail(movieId);
 renderCollection();
+renderViewingLog();
 }
 
 async function updateBlurayDate(movieId, value) {
-let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+let movie = findAnyItem(movieId);
 if (!movie) return;
 movie.blurayReleaseDateFR = value || null;
 movie.blurayReleaseDateManual = !!value;
@@ -2585,7 +2762,7 @@ showToast(value ? "Date de sortie Blu-ray enregistrée." : "Date de sortie Blu-r
 }
 
 async function addEditionToMovie(movieId) {
-let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+let movie = findAnyItem(movieId);
 if (!movie) return;
 
 movie.editions.push({
@@ -2602,10 +2779,11 @@ await updateMovieInCloud(movie);
 openMovieDetail(movieId);
 renderCollection();
 renderWishlist();
+renderViewingLog();
 }
 
 async function removeEdition(movieId, editionIdx) {
-let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+let movie = findAnyItem(movieId);
 if (!movie || movie.editions.length <= 1) return;
 
 movie.editions.splice(editionIdx, 1);
@@ -2613,16 +2791,18 @@ await updateMovieInCloud(movie);
 openMovieDetail(movieId);
 renderCollection();
 renderWishlist();
+renderViewingLog();
 }
 
 async function updateEditionField(movieId, editionIdx, field, val) {
-let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+let movie = findAnyItem(movieId);
 if (!movie || !movie.editions[editionIdx]) return;
 
 movie.editions[editionIdx][field] = val;
 await updateMovieInCloud(movie);
 renderCollection();
 renderWishlist();
+renderViewingLog();
 }
 
 async function moveWishlistToCollection(movieId) {
@@ -2640,26 +2820,64 @@ renderCollection();
 showToast("Film transféré dans votre collection ! 💿");
 }
 
+async function moveViewingToCollection(movieId) {
+const item = viewingLog.find(m => m.id === movieId);
+if (!item) return;
+
+// On crée une entrée Collection distincte (avec ses propres éditions physiques)
+// tout en gardant l'entrée Visionnage intacte (progression, notes...).
+const copy = JSON.parse(JSON.stringify(item));
+copy.id = 'coll_' + (copy.tmdb_id || Date.now()) + '_' + Date.now();
+copy.cloud_id = undefined;
+copy.isWishlist = false;
+copy.isViewing = false;
+copy.editions = [{
+id: 'ed_' + Date.now(),
+title: 'Édition Standard',
+format: 'Blu-ray 1080p',
+editionType: 'Amaray',
+purchasePrice: '',
+estimatedPrice: '',
+purchaseLocation: ''
+}];
+
+const cloudId = await saveMovieToCloud(copy);
+if (cloudId) {
+copy.cloud_id = cloudId;
+collection.push(copy);
+closeModal();
+renderCollection();
+showToast("Ajouté à votre Collection ! 💿 (toujours présent dans Visionnage)");
+}
+}
+
 async function deleteMovie(movieId) {
 if (!confirm("Voulez-vous vraiment supprimer ce film ?")) return;
 
+let list = null;
 let idx = collection.findIndex(m => m.id === movieId);
-let isWish = false;
-if (idx === -1) {
+if (idx !== -1) {
+list = collection;
+} else {
 idx = wishlist.findIndex(m => m.id === movieId);
-isWish = true;
+if (idx !== -1) {
+list = wishlist;
+} else {
+idx = viewingLog.findIndex(m => m.id === movieId);
+if (idx !== -1) list = viewingLog;
+}
 }
 
-if (idx !== -1) {
-const movie = isWish ? wishlist[idx] : collection[idx];
+if (idx !== -1 && list) {
+const movie = list[idx];
 if (movie.cloud_id) await deleteMovieFromCloud(movie.cloud_id);
 
-if (isWish) wishlist.splice(idx, 1);
-else collection.splice(idx, 1);
+list.splice(idx, 1);
 
 closeModal();
 renderCollection();
 renderWishlist();
+renderViewingLog();
 showToast("Film supprimé.");
 }
 }
@@ -2678,9 +2896,9 @@ renderStats();
 }
 
 function renderStats() {
-// Pour les stats, on ignore les séries qui n'ont pas encore d'édition physique achetée
+// Pour les stats de collection, on ignore les séries qui n'ont pas encore d'édition physique achetée
 // (prix d'achat renseigné sur au moins une édition) — elles restent visibles en Collection
-// pour le suivi de visionnage, mais ne comptent pas dans les statistiques de collection.
+// pour référence, mais ne comptent pas dans les statistiques de possession.
 const statsItems = collection.filter(m => {
 if (!isTV(m)) return true;
 return m.editions && m.editions.some(ed => parseFloat(ed.purchasePrice) > 0);
@@ -2690,9 +2908,26 @@ const totalMovies = statsItems.length;
 let totalEditions = 0;
 let totalPurchaseVal = 0;
 let totalEstimatedVal = 0;
+
+// Le temps de visionnage et le nombre de films/séries "vus" sont désormais calculés
+// à partir de l'onglet Visionnage (indépendant de ce qui est physiquement possédé).
 let seenCount = 0;
 let totalWatchMinutesMovies = 0;
 let totalWatchMinutesTV = 0;
+viewingLog.forEach(m => {
+if (isTV(m)) {
+const progress = getShowProgress(m);
+if (progress.watched > 0 && typeof m.runtime === 'number' && m.runtime > 0) {
+totalWatchMinutesTV += progress.watched * m.runtime;
+}
+if (isShowFullyWatched(m) || getShowProgress(m).watched > 0) seenCount++;
+} else if (m.seen) {
+seenCount++;
+if (typeof m.runtime === 'number' && m.runtime > 0) {
+totalWatchMinutesMovies += m.runtime;
+}
+}
+});
 
 const formatsMap = {};
 const editionsMap = {};
@@ -2703,18 +2938,6 @@ const actorsMap = {};
 const monthsMap = {};
 
 statsItems.forEach(m => {
-if (isTV(m)) {
-const progress = getShowProgress(m);
-if (progress.watched > 0 && typeof m.runtime === 'number' && m.runtime > 0) {
-totalWatchMinutesTV += progress.watched * m.runtime;
-}
-if (isShowFullyWatched(m)) seenCount++;
-} else if (m.seen) {
-seenCount++;
-if (typeof m.runtime === 'number' && m.runtime > 0) {
-totalWatchMinutesMovies += m.runtime;
-}
-}
 
 // Genres calculés au niveau du film
 if (m.genres && Array.isArray(m.genres)) {
@@ -2770,7 +2993,7 @@ locationsMap[loc] = (locationsMap[loc] || 0) + 1;
 
 document.getElementById('statTotalMovies').innerText = totalMovies;
 document.getElementById('statTotalEditions').innerText = totalEditions;
-document.getElementById('statSeenMovies').innerText = `${seenCount} / ${totalMovies}`;
+document.getElementById('statSeenMovies').innerText = `${seenCount} / ${viewingLog.length}`;
 document.getElementById('statWatchTimeMovies').innerText = formatWatchTime(totalWatchMinutesMovies);
 document.getElementById('statWatchTimeTV').innerText = formatWatchTime(totalWatchMinutesTV);
 document.getElementById('statWatchTime').innerText = formatWatchTime(totalWatchMinutesMovies + totalWatchMinutesTV);
@@ -3177,6 +3400,7 @@ matched++;
 
 renderCollection();
 renderWishlist();
+renderViewingLog();
 
 if (matched === 0) {
 showToast("Aucune correspondance trouvée. Essayez d'abord \"Rafraîchir les infos TMDB\" pour récupérer les identifiants IMDb de vos films.");
