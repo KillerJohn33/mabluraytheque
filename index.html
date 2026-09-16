@@ -387,6 +387,14 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <div id="searchSection" class="space-y-4">
 <div class="space-y-4">
 <div class="space-y-2">
+<div class="glass-pill p-1 rounded-xl flex justify-between items-center">
+<button id="searchTypeMovieBtn" onclick="setSearchType('movie')" class="flex-1 py-1.5 rounded-lg font-bold text-[11px] transition bg-cyan-600 text-white flex items-center justify-center gap-1">
+<span class="icon-inline w-3 h-3" data-icon="disc"></span> Films
+</button>
+<button id="searchTypeTvBtn" onclick="setSearchType('tv')" class="flex-1 py-1.5 rounded-lg font-bold text-[11px] transition text-gray-400 hover:text-white flex items-center justify-center gap-1">
+<span class="icon-inline w-3 h-3" data-icon="tv"></span> Séries
+</button>
+</div>
 <div class="flex gap-2">
 <div class="relative flex-1">
 <span class="icon-inline w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" data-icon="search"></span>
@@ -478,6 +486,14 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 
 <div class="grid grid-cols-2 gap-2">
+<div>
+<label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Type</label>
+<select id="filterType" onchange="renderCollection()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
+<option class="bg-gray-900" value="all">Films & Séries</option>
+<option class="bg-gray-900" value="movie">🎬 Films uniquement</option>
+<option class="bg-gray-900" value="tv">📺 Séries uniquement</option>
+</select>
+</div>
 <div>
 <label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Format</label>
 <select id="filterFormat" onchange="renderCollection()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
@@ -573,6 +589,14 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 <div class="grid grid-cols-2 gap-2">
 <div>
+<label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Type</label>
+<select id="filterTypeWishlist" onchange="renderWishlist()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
+<option class="bg-gray-900" value="all">Films & Séries</option>
+<option class="bg-gray-900" value="movie">🎬 Films uniquement</option>
+<option class="bg-gray-900" value="tv">📺 Séries uniquement</option>
+</select>
+</div>
+<div>
 <label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Format</label>
 <select id="filterFormatWishlist" onchange="renderWishlist()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
 <option class="bg-gray-900" value="all">Tous les formats</option>
@@ -634,7 +658,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 <div id="statsTopGrid" class="grid grid-cols-2 gap-3">
 <div class="stat-tile text-center">
-<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Films Uniques</p>
+<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Titres Uniques</p>
 <p id="statTotalMovies" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 mt-1">0</p>
 </div>
 <div class="stat-tile text-center">
@@ -658,7 +682,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <p id="statAvgPriceEdition" class="text-lg font-black text-teal-400 mt-0.5">0 €</p>
 </div>
 <div class="stat-tile text-center">
-<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Films Vus</p>
+<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Vus (Films + Séries)</p>
 <p id="statSeenMovies" class="text-2xl font-black text-emerald-400 mt-1">0</p>
 </div>
 <div class="stat-tile text-center col-span-2">
@@ -967,7 +991,11 @@ star: '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.1
 upload: '<path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/>',
 trend: '<path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/>',
 chevronleft: '<path d="M15 18l-6-6 6-6"/>',
-chevronright: '<path d="M9 18l6-6-6-6"/>'
+chevronright: '<path d="M9 18l6-6-6-6"/>',
+tv: '<rect x="2" y="7" width="20" height="15" rx="2"/><path d="M17 2l-5 5-5-5"/>',
+playcircle: '<circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>',
+layers: '<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+chevrondown: '<path d="M6 9l6 6 6-6"/>'
 };
 
 function svgMarkup(name) {
@@ -1014,6 +1042,19 @@ let statsShowCharts = true;
 let currentSearchQuery = '';
 let currentSearchPage = 1;
 let totalSearchPages = 1;
+let currentSearchType = 'movie';
+
+function setSearchType(type) {
+currentSearchType = type;
+document.getElementById('searchTypeMovieBtn').className = type === 'movie'
+? 'flex-1 py-1.5 rounded-lg font-bold text-[11px] transition bg-cyan-600 text-white flex items-center justify-center gap-1'
+: 'flex-1 py-1.5 rounded-lg font-bold text-[11px] transition text-gray-400 hover:text-white flex items-center justify-center gap-1';
+document.getElementById('searchTypeTvBtn').className = type === 'tv'
+? 'flex-1 py-1.5 rounded-lg font-bold text-[11px] transition bg-cyan-600 text-white flex items-center justify-center gap-1'
+: 'flex-1 py-1.5 rounded-lg font-bold text-[11px] transition text-gray-400 hover:text-white flex items-center justify-center gap-1';
+document.getElementById('searchInput').placeholder = type === 'movie' ? 'Chercher un film (TMDB)...' : 'Chercher une série (TMDB)...';
+if (currentSearchQuery) { currentSearchPage = 1; searchTMDB(); }
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
 applyStaticIcons();
@@ -1088,6 +1129,26 @@ fetchCollectionFromCloud();
 }
 
 // --- NORMALISATION DES DONNÉES (POUR LES ÉDITIONS MULTIPLES) ---
+function isTV(m) {
+return m && m.mediaType === 'tv';
+}
+
+function getShowProgress(m) {
+if (!isTV(m) || !m.seasons) return { watched: 0, total: 0 };
+let watched = 0;
+let total = 0;
+m.seasons.forEach(s => {
+total += s.episodeCount || 0;
+watched += (s.watchedEpisodes || []).length;
+});
+return { watched, total };
+}
+
+function isShowFullyWatched(m) {
+const p = getShowProgress(m);
+return p.total > 0 && p.watched >= p.total;
+}
+
 function normalizeMovieData(movie) {
 if (!movie.editions || !Array.isArray(movie.editions) || movie.editions.length === 0) {
 movie.editions = [{
@@ -1277,7 +1338,8 @@ async function searchTMDB() {
 if (!currentSearchQuery) return;
 showToast("Recherche en cours...");
 try {
-const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(currentSearchQuery)}&language=fr-FR&page=${currentSearchPage}`);
+const endpoint = currentSearchType === 'tv' ? 'tv' : 'movie';
+const res = await fetch(`https://api.themoviedb.org/3/search/${endpoint}?api_key=${API_KEY}&query=${encodeURIComponent(currentSearchQuery)}&language=fr-FR&page=${currentSearchPage}`);
 const data = await res.json();
 
 totalSearchPages = data.total_pages || 1;
@@ -1297,7 +1359,7 @@ container.innerHTML = '';
 box.classList.remove('hidden');
 
 if (results.length === 0) {
-container.innerHTML = `<p class="text-xs text-gray-400 p-3 text-center">Aucun film trouvé.</p>`;
+container.innerHTML = `<p class="text-xs text-gray-400 p-3 text-center">Aucun ${currentSearchType === 'tv' ? 'série trouvée' : 'film trouvé'}.</p>`;
 pagination.classList.add('hidden');
 return;
 }
@@ -1310,21 +1372,24 @@ document.getElementById('nextPageBtn').disabled = (currentSearchPage >= totalSea
 
 results.forEach(m => {
 const poster = m.poster_path ? `https://image.tmdb.org/t/p/w200${m.poster_path}` : 'https://via.placeholder.com/200x300?text=Pas+d+image';
-const year = m.release_date ? m.release_date.split('-')[0] : 'N/A';
+const displayTitle = currentSearchType === 'tv' ? m.name : m.title;
+const displayDate = currentSearchType === 'tv' ? m.first_air_date : m.release_date;
+const year = displayDate ? displayDate.split('-')[0] : 'N/A';
+const addFn = currentSearchType === 'tv' ? 'addShowFromTMDB' : 'addMovieFromTMDB';
 
 const item = document.createElement('div');
 item.className = 'glass-card p-2 rounded-2xl flex items-center gap-3 border border-white/10';
 item.innerHTML = `
 <img src="${poster}" class="w-12 h-16 object-cover rounded-xl shadow">
 <div class="flex-1 min-width-0">
-<h4 class="text-xs font-bold text-white truncate">${m.title}</h4>
+<h4 class="text-xs font-bold text-white truncate">${displayTitle}</h4>
 <p class="text-[10px] text-gray-400">${year}</p>
 </div>
 <div class="flex flex-col gap-1">
-<button onclick='addMovieFromTMDB(${JSON.stringify(m).replace(/'/g, "&apos;")}, false)' class="shine-btn bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition flex items-center justify-center gap-1">
+<button onclick='${addFn}(${JSON.stringify(m).replace(/'/g, "&apos;")}, false)' class="shine-btn bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition flex items-center justify-center gap-1">
 ${ic('plus','w-3 h-3')} Collection
 </button>
-<button onclick='addMovieFromTMDB(${JSON.stringify(m).replace(/'/g, "&apos;")}, true)' class="shine-btn bg-pink-600 hover:bg-pink-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition flex items-center justify-center gap-1">
+<button onclick='${addFn}(${JSON.stringify(m).replace(/'/g, "&apos;")}, true)' class="shine-btn bg-pink-600 hover:bg-pink-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition flex items-center justify-center gap-1">
 ${ic('plus','w-3 h-3')} Wishlist
 </button>
 </div>
@@ -1397,6 +1462,7 @@ blurayDateFR = await fetchBlurayReleaseDateFR(tmdbData.id);
 const movie = {
 id: 'tmdb_' + tmdbData.id + '_' + Date.now(),
 tmdb_id: tmdbData.id,
+mediaType: 'movie',
 imdb_id: imdbId,
 title: tmdbData.title,
 poster: tmdbData.poster_path ? `https://image.tmdb.org/t/p/w500${tmdbData.poster_path}` : 'https://via.placeholder.com/300x450?text=Pas+d+image',
@@ -1439,6 +1505,98 @@ showToast("Ajouté à la Collection ! 💿");
 }
 }
 
+async function addShowFromTMDB(tmdbData, isWishlist = false) {
+// Détection de doublon
+const existsIn = collection.some(m => m.tmdb_id === tmdbData.id && m.mediaType === 'tv') ? 'votre collection'
+: wishlist.some(m => m.tmdb_id === tmdbData.id && m.mediaType === 'tv') ? 'votre wishlist' : null;
+
+if (existsIn) {
+const confirmAdd = confirm(`"${tmdbData.name}" est déjà présent dans ${existsIn}. Voulez-vous quand même l'ajouter en double ?`);
+if (!confirmAdd) return;
+}
+
+let genres = [];
+let creators = '';
+let cast = [];
+let imdbId = null;
+let voteAverage = null;
+let voteCount = null;
+let episodeRuntime = null;
+let seasons = [];
+
+try {
+const detailRes = await fetch(`https://api.themoviedb.org/3/tv/${tmdbData.id}?api_key=${API_KEY}&language=fr-FR&append_to_response=aggregate_credits,external_ids`);
+const detail = await detailRes.json();
+
+genres = detail.genres ? detail.genres.map(g => g.name) : [];
+imdbId = (detail.external_ids && detail.external_ids.imdb_id) || null;
+voteAverage = typeof detail.vote_average === 'number' ? detail.vote_average : null;
+voteCount = typeof detail.vote_count === 'number' ? detail.vote_count : null;
+episodeRuntime = (detail.episode_run_time && detail.episode_run_time.length) ? detail.episode_run_time[0] : null;
+creators = detail.created_by ? detail.created_by.map(c => c.name).join(', ') : '';
+
+if (detail.aggregate_credits && detail.aggregate_credits.cast) {
+cast = detail.aggregate_credits.cast.slice(0, 5).map(p => p.name);
+}
+
+seasons = (detail.seasons || [])
+.filter(s => s.season_number > 0) // on exclut les "Spécials" (saison 0)
+.map(s => ({
+seasonNumber: s.season_number,
+name: s.name || `Saison ${s.season_number}`,
+episodeCount: s.episode_count || 0,
+airDate: s.air_date || '',
+poster: s.poster_path ? `https://image.tmdb.org/t/p/w300${s.poster_path}` : null,
+episodes: null, // chargé à la demande (lazy load)
+watchedEpisodes: [] // liste des numéros d'épisodes marqués vus
+}));
+} catch (e) {}
+
+const show = {
+id: 'tv_' + tmdbData.id + '_' + Date.now(),
+tmdb_id: tmdbData.id,
+mediaType: 'tv',
+imdb_id: imdbId,
+title: tmdbData.name,
+poster: tmdbData.poster_path ? `https://image.tmdb.org/t/p/w500${tmdbData.poster_path}` : 'https://via.placeholder.com/300x450?text=Pas+d+image',
+releaseDate: tmdbData.first_air_date || '',
+overview: tmdbData.overview || '',
+genres: genres,
+runtime: episodeRuntime,
+director: creators,
+cast: cast,
+voteAverage: voteAverage,
+voteCount: voteCount,
+seasons: seasons,
+seen: false,
+isWishlist: isWishlist,
+addedAt: new Date().toISOString(),
+editions: [{
+id: 'ed_' + Date.now(),
+title: 'Édition Standard',
+format: 'Blu-ray 1080p',
+editionType: 'Amaray',
+purchasePrice: '',
+estimatedPrice: '',
+purchaseLocation: ''
+}]
+};
+
+const cloudId = await saveMovieToCloud(show);
+if (cloudId) {
+show.cloud_id = cloudId;
+if (isWishlist) {
+wishlist.push(show);
+renderWishlist();
+showToast("Série ajoutée à la Wishlist ! ✨");
+} else {
+collection.push(show);
+renderCollection();
+showToast("Série ajoutée à la Collection ! 📺");
+}
+}
+}
+
 // --- RAFRAÎCHISSEMENT RÉTROACTIF DES INFOS TMDB ---
 async function fetchTMDBExtraInfo(tmdbId) {
 let genres = [];
@@ -1474,6 +1632,45 @@ const blurayDateFR = await fetchBlurayReleaseDateFR(tmdbId);
 return { genres, runtime, director, cast, imdbId, voteAverage, voteCount, blurayDateFR };
 }
 
+async function fetchTVExtraInfo(tmdbId) {
+let genres = [];
+let creators = '';
+let cast = [];
+let imdbId = null;
+let voteAverage = null;
+let voteCount = null;
+let episodeRuntime = null;
+let seasonsMeta = [];
+
+try {
+const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${API_KEY}&language=fr-FR&append_to_response=aggregate_credits,external_ids`);
+const detail = await res.json();
+
+genres = detail.genres ? detail.genres.map(g => g.name) : [];
+imdbId = (detail.external_ids && detail.external_ids.imdb_id) || null;
+voteAverage = typeof detail.vote_average === 'number' ? detail.vote_average : null;
+voteCount = typeof detail.vote_count === 'number' ? detail.vote_count : null;
+episodeRuntime = (detail.episode_run_time && detail.episode_run_time.length) ? detail.episode_run_time[0] : null;
+creators = detail.created_by ? detail.created_by.map(c => c.name).join(', ') : '';
+
+if (detail.aggregate_credits && detail.aggregate_credits.cast) {
+cast = detail.aggregate_credits.cast.slice(0, 5).map(p => p.name);
+}
+
+seasonsMeta = (detail.seasons || [])
+.filter(s => s.season_number > 0)
+.map(s => ({
+seasonNumber: s.season_number,
+name: s.name || `Saison ${s.season_number}`,
+episodeCount: s.episode_count || 0,
+airDate: s.air_date || '',
+poster: s.poster_path ? `https://image.tmdb.org/t/p/w300${s.poster_path}` : null
+}));
+} catch (e) {}
+
+return { genres, creators, cast, imdbId, voteAverage, voteCount, episodeRuntime, seasonsMeta };
+}
+
 async function refreshAllTMDBInfo(silent = false) {
 const btn = document.getElementById('refreshTmdbBtn');
 const allMovies = [...collection, ...wishlist].filter(m => m.tmdb_id);
@@ -1493,6 +1690,32 @@ let updated = 0;
 
 for (const movie of allMovies) {
 try {
+if (isTV(movie)) {
+const info = await fetchTVExtraInfo(movie.tmdb_id);
+movie.genres = info.genres.length ? info.genres : (movie.genres || []);
+movie.runtime = info.episodeRuntime !== null ? info.episodeRuntime : (movie.runtime || null);
+movie.director = info.creators || movie.director || '';
+movie.cast = info.cast.length ? info.cast : (movie.cast || []);
+movie.imdb_id = info.imdbId || movie.imdb_id || null;
+movie.voteAverage = info.voteAverage !== null ? info.voteAverage : (movie.voteAverage ?? null);
+movie.voteCount = info.voteCount !== null ? info.voteCount : (movie.voteCount ?? null);
+
+// On met à jour les métadonnées de saisons (nom, nb d'épisodes) sans jamais toucher
+// aux épisodes déjà chargés ni à la progression déjà cochée par l'utilisateur.
+if (info.seasonsMeta.length && movie.seasons) {
+info.seasonsMeta.forEach(freshSeason => {
+const existing = movie.seasons.find(s => s.seasonNumber === freshSeason.seasonNumber);
+if (existing) {
+existing.name = freshSeason.name;
+existing.episodeCount = freshSeason.episodeCount || existing.episodeCount;
+existing.airDate = freshSeason.airDate || existing.airDate;
+existing.poster = freshSeason.poster || existing.poster;
+} else {
+movie.seasons.push({ ...freshSeason, episodes: null, watchedEpisodes: [] });
+}
+});
+}
+} else {
 const info = await fetchTMDBExtraInfo(movie.tmdb_id);
 movie.genres = info.genres.length ? info.genres : (movie.genres || []);
 movie.runtime = info.runtime !== null ? info.runtime : (movie.runtime || null);
@@ -1503,6 +1726,7 @@ movie.voteAverage = info.voteAverage !== null ? info.voteAverage : (movie.voteAv
 movie.voteCount = info.voteCount !== null ? info.voteCount : (movie.voteCount ?? null);
 if (!movie.blurayReleaseDateManual) {
 movie.blurayReleaseDateFR = info.blurayDateFR || movie.blurayReleaseDateFR || null;
+}
 }
 
 await updateMovieInCloud(movie);
@@ -1589,17 +1813,21 @@ grid.className = "grid grid-cols-2 gap-4";
 }
 
 let filtered = [...collection];
+const typeFilter = document.getElementById('filterType').value;
 const formatFilter = document.getElementById('filterFormat').value;
 const seenFilter = document.getElementById('filterSeen').value;
 const sortVal = document.getElementById('sortSelect').value;
 const textFilter = document.getElementById('filterText').value.toLowerCase().trim();
 
+if (typeFilter === 'movie') filtered = filtered.filter(m => !isTV(m));
+if (typeFilter === 'tv') filtered = filtered.filter(m => isTV(m));
+
 if (formatFilter !== 'all') {
 filtered = filtered.filter(m => m.editions && m.editions.some(e => e.format === formatFilter));
 }
 
-if (seenFilter === 'seen') filtered = filtered.filter(m => m.seen);
-if (seenFilter === 'unseen') filtered = filtered.filter(m => !m.seen);
+if (seenFilter === 'seen') filtered = filtered.filter(m => isTV(m) ? isShowFullyWatched(m) : m.seen);
+if (seenFilter === 'unseen') filtered = filtered.filter(m => isTV(m) ? !isShowFullyWatched(m) : !m.seen);
 
 if (textFilter) {
 filtered = filtered.filter(m => m.title.toLowerCase().includes(textFilter));
@@ -1625,12 +1853,21 @@ return;
 
 filtered.forEach(m => {
 const totals = calculateMovieTotals(m);
+const tv = isTV(m);
+const progress = tv ? getShowProgress(m) : null;
 const card = document.createElement('div');
 card.onclick = () => openMovieDetail(m.id);
 
+const tvBadge = tv ? `<span class="inline-flex items-center gap-1 text-cyan-400">${ic('tv','w-3 h-3')}</span>` : '';
+const statusText = tv
+? (progress.total > 0
+? `<span class="${progress.watched >= progress.total ? 'text-emerald-400' : 'text-gray-400'} flex items-center gap-1">${ic(progress.watched >= progress.total ? 'check' : 'playcircle','w-3 h-3')} ${progress.watched}/${progress.total} ép.</span>`
+: `<span class="text-gray-500 flex items-center gap-1">${ic('layers','w-3 h-3')} Saisons à charger</span>`)
+: (m.seen ? `<span class="text-emerald-400 flex items-center gap-1">${ic('check','w-3 h-3')} Vu</span>` : `<span class="text-gray-400 flex items-center gap-1">${ic('eye','w-3 h-3')} Non vu</span>`);
+
 const statusRow = `
 <div class="flex items-center gap-2 mt-1 text-[10px]">
-${m.seen ? `<span class="text-emerald-400 flex items-center gap-1">${ic('check','w-3 h-3')} Vu</span>` : `<span class="text-gray-400 flex items-center gap-1">${ic('eye','w-3 h-3')} Non vu</span>`}
+${statusText}
 ${imdbBadge(m)}
 </div>`;
 
@@ -1640,13 +1877,13 @@ card.innerHTML = `
 <img src="${m.poster}" class="absolute left-0 top-0 h-full w-auto">
 <div class="absolute inset-0 bg-gradient-to-r from-transparent via-black/75 to-black"></div>
 <div class="absolute inset-y-0 right-0 w-[68%] flex flex-col justify-center items-end p-3 text-right">
-<h4 class="text-xs font-bold text-white truncate w-full">${m.title}</h4>
+<h4 class="text-xs font-bold text-white truncate w-full flex items-center justify-end gap-1.5">${tvBadge}${m.title}</h4>
 <div class="flex items-center justify-end gap-3 text-[10px] mt-1">
 <span class="text-cyan-300 font-semibold">${totals.count} éd.</span>
 <span class="font-bold text-emerald-400">${totals.totalPurchase.toFixed(2)} €</span>
 </div>
 <div class="flex items-center justify-end gap-2 mt-1 text-[10px]">
-${m.seen ? `<span class="text-emerald-400 flex items-center gap-1">Vu ${ic('check','w-3 h-3')}</span>` : `<span class="text-gray-400 flex items-center gap-1">Non vu ${ic('eye','w-3 h-3')}</span>`}
+${statusText}
 ${imdbBadge(m)}
 </div>
 </div>
@@ -1656,6 +1893,7 @@ card.className = "relative rounded-2xl overflow-hidden cursor-pointer bg-black b
 card.innerHTML = `
 <img src="${m.poster}" class="w-full aspect-[2/3] object-cover">
 <div class="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none"></div>
+${tv ? `<div class="absolute top-2 left-2 bg-black/70 backdrop-blur-sm rounded-lg px-1.5 py-0.5">${ic('tv','w-3 h-3 text-cyan-400')}</div>` : ''}
 <div class="absolute inset-x-0 bottom-0 p-2.5">
 <h4 class="text-xs font-bold text-white truncate">${m.title}</h4>
 <div class="flex items-center justify-between text-[10px] mt-1">
@@ -1703,9 +1941,13 @@ grid.className = "grid grid-cols-2 gap-4";
 }
 
 let filtered = [...wishlist];
+const typeFilter = document.getElementById('filterTypeWishlist').value;
 const formatFilter = document.getElementById('filterFormatWishlist').value;
 const sortVal = document.getElementById('sortSelectWishlist').value;
 const textFilter = document.getElementById('filterTextWishlist').value.toLowerCase().trim();
+
+if (typeFilter === 'movie') filtered = filtered.filter(m => !isTV(m));
+if (typeFilter === 'tv') filtered = filtered.filter(m => isTV(m));
 
 if (formatFilter !== 'all') {
 filtered = filtered.filter(m => m.editions && m.editions.some(e => e.format === formatFilter));
@@ -2002,7 +2244,7 @@ const movieInfoHtml = `
 ${infoYear || infoRuntime ? `
 <div class="flex items-center gap-2 text-gray-300">
 <span class="text-gray-500">${ic('calendar','w-3.5 h-3.5')}</span>
-<span>${[infoYear, infoRuntime].filter(Boolean).join(' • ')}</span>
+<span>${[infoYear, infoRuntime ? (infoRuntime + (isTV(movie) ? '/ép.' : '')) : ''].filter(Boolean).join(' • ')}</span>
 </div>` : ''}
 ${infoGenres ? `
 <div class="flex items-start gap-2 text-gray-300">
@@ -2012,7 +2254,7 @@ ${infoGenres ? `
 ${infoDirector ? `
 <div class="flex items-start gap-2 text-gray-300">
 <span class="text-gray-500 mt-0.5">${ic('clapper','w-3.5 h-3.5')}</span>
-<span><span class="text-gray-500">Réalisateur : </span>${infoDirector}</span>
+<span><span class="text-gray-500">${isTV(movie) ? 'Créateur' : 'Réalisateur'} : </span>${infoDirector}</span>
 </div>` : ''}
 ${infoCast ? `
 <div class="flex items-start gap-2 text-gray-300">
@@ -2040,9 +2282,14 @@ content.innerHTML = `
 <h3 class="text-base font-extrabold text-white leading-snug">${movie.title}</h3>
 
 <div class="mt-3 flex items-center gap-2 flex-wrap">
+${isTV(movie) ? (() => {
+const p = getShowProgress(movie);
+const full = p.total > 0 && p.watched >= p.total;
+return `<span class="px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 ${full ? 'bg-emerald-600 text-white' : 'glass-pill text-gray-300'}">${ic(full ? 'check' : 'playcircle','w-3.5 h-3.5')} ${p.watched}/${p.total || '?'} épisodes vus</span>`;
+})() : `
 <button onclick="toggleMovieSeen('${movie.id}')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${movie.seen ? 'bg-emerald-600 text-white' : 'glass-pill text-gray-300'}">
 ${movie.seen ? `${ic('check','w-3.5 h-3.5')} Vu` : `${ic('eye','w-3.5 h-3.5')} Marquer comme vu`}
-</button>
+</button>`}
 ${(movie.imdbUserRating !== undefined && movie.imdbUserRating !== null) ? `<span class="glass-pill px-3 py-1.5 rounded-xl text-xs font-bold text-amber-400 flex items-center gap-1.5">${ic('star','w-3.5 h-3.5')} ${movie.imdbUserRating}/10</span>` : ''}
 </div>
 
@@ -2051,6 +2298,8 @@ ${(movie.imdbUserRating !== undefined && movie.imdbUserRating !== null) ? `<span
 </div>
 
 <div class="md:hidden">${movieInfoHtml}</div>
+
+${isTV(movie) ? renderSeasonsHtml(movie) : ''}
 
 <div class="glass-card p-3 rounded-2xl space-y-3 border border-white/10">
 <div class="flex items-center justify-between border-b border-white/10 pb-2">
@@ -2088,6 +2337,152 @@ modal.classList.remove('hidden');
 
 function closeModal() {
 document.getElementById('detailModal').classList.add('hidden');
+}
+
+// --- SAISONS & ÉPISODES (SÉRIES) ---
+let expandedSeasons = {};
+
+function renderSeasonsHtml(movie) {
+if (!movie.seasons || movie.seasons.length === 0) {
+return `<div class="glass-card p-3 rounded-2xl border border-white/10 text-xs text-gray-400">Aucune information de saison disponible.</div>`;
+}
+
+const seasonsHtml = movie.seasons.map(s => {
+const watchedCount = (s.watchedEpisodes || []).length;
+const total = s.episodeCount || 0;
+const full = total > 0 && watchedCount >= total;
+const expandKey = `${movie.id}_${s.seasonNumber}`;
+const isExpanded = !!expandedSeasons[expandKey];
+
+let episodesHtml = '';
+if (isExpanded) {
+if (s.episodes === null) {
+episodesHtml = `<div class="text-center py-3 text-[10px] text-gray-500">Chargement des épisodes...</div>`;
+} else if (s.episodes.length === 0) {
+episodesHtml = `<div class="text-center py-3 text-[10px] text-gray-500">Aucun épisode trouvé.</div>`;
+} else {
+episodesHtml = `<div class="space-y-1 mt-2 max-h-64 overflow-y-auto pr-1">` + s.episodes.map(ep => {
+const watched = (s.watchedEpisodes || []).includes(ep.episodeNumber);
+return `
+<label class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-white/5 cursor-pointer">
+<input type="checkbox" ${watched ? 'checked' : ''} onchange="toggleEpisodeWatched('${movie.id}', ${s.seasonNumber}, ${ep.episodeNumber})" class="w-4 h-4 accent-cyan-500 flex-shrink-0">
+<span class="text-[10px] text-gray-500 flex-shrink-0 w-6">${ep.episodeNumber}.</span>
+<span class="text-xs ${watched ? 'text-gray-500 line-through' : 'text-white'} truncate flex-1">${ep.name}</span>
+${ep.airDate ? `<span class="text-[9px] text-gray-500 flex-shrink-0">${ep.airDate.split('-')[0]}</span>` : ''}
+</label>
+`;
+}).join('') + `</div>`;
+}
+}
+
+return `
+<div class="glass-pill rounded-2xl border border-white/10 overflow-hidden">
+<div class="flex items-center gap-2 p-2.5 cursor-pointer" onclick="toggleSeasonExpand('${movie.id}', ${s.seasonNumber})">
+${s.poster ? `<img src="${s.poster}" class="w-8 h-12 object-cover rounded-lg flex-shrink-0">` : `<div class="w-8 h-12 rounded-lg bg-white/10 flex-shrink-0 flex items-center justify-center">${ic('layers','w-3.5 h-3.5 text-gray-500')}</div>`}
+<div class="flex-1 min-w-0">
+<p class="text-xs font-bold text-white truncate">${s.name}</p>
+<p class="text-[10px] ${full ? 'text-emerald-400' : 'text-gray-400'}">${watchedCount}/${total || '?'} épisodes vus</p>
+</div>
+<button onclick="event.stopPropagation(); toggleSeasonWatched('${movie.id}', ${s.seasonNumber})" class="shine-btn ${full ? 'bg-gray-600 hover:bg-gray-500' : 'bg-cyan-600 hover:bg-cyan-500'} text-white text-[10px] font-bold px-2 py-1.5 rounded-lg flex-shrink-0 flex items-center gap-1 whitespace-nowrap">
+${ic(full ? 'x' : 'check','w-3 h-3')} ${full ? 'Tout décocher' : 'Tout vu'}
+</button>
+<span class="text-gray-400 flex-shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''}">${ic('chevrondown','w-3.5 h-3.5')}</span>
+</div>
+${isExpanded ? `<div class="px-2.5 pb-2.5">${episodesHtml}</div>` : ''}
+</div>
+`;
+}).join('');
+
+return `
+<div class="glass-card p-3 rounded-2xl space-y-2 border border-white/10">
+<div class="flex items-center justify-between border-b border-white/10 pb-2">
+<h4 class="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">${ic('layers','w-3.5 h-3.5')} Saisons & Épisodes</h4>
+</div>
+<div class="space-y-2 max-h-96 overflow-y-auto pr-1">${seasonsHtml}</div>
+</div>
+`;
+}
+
+async function loadSeasonEpisodes(movie, seasonNumber) {
+try {
+const res = await fetch(`https://api.themoviedb.org/3/tv/${movie.tmdb_id}/season/${seasonNumber}?api_key=${API_KEY}&language=fr-FR`);
+const data = await res.json();
+const season = movie.seasons.find(s => s.seasonNumber === seasonNumber);
+if (season) {
+season.episodes = (data.episodes || []).map(ep => ({
+episodeNumber: ep.episode_number,
+name: ep.name || `Épisode ${ep.episode_number}`,
+airDate: ep.air_date || '',
+runtime: ep.runtime || null
+}));
+if (season.episodes.length > 0) season.episodeCount = season.episodes.length;
+await updateMovieInCloud(movie);
+}
+} catch (e) {
+showToast("Erreur lors du chargement des épisodes.");
+}
+}
+
+async function toggleSeasonExpand(movieId, seasonNumber) {
+const key = `${movieId}_${seasonNumber}`;
+const wasExpanded = !!expandedSeasons[key];
+expandedSeasons[key] = !wasExpanded;
+
+if (!wasExpanded) {
+let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+if (movie) {
+const season = movie.seasons.find(s => s.seasonNumber === seasonNumber);
+if (season && season.episodes === null) {
+openMovieDetail(movieId);
+await loadSeasonEpisodes(movie, seasonNumber);
+openMovieDetail(movieId);
+return;
+}
+}
+}
+openMovieDetail(movieId);
+}
+
+async function toggleEpisodeWatched(movieId, seasonNumber, episodeNumber) {
+let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+if (!movie || !movie.seasons) return;
+const season = movie.seasons.find(s => s.seasonNumber === seasonNumber);
+if (!season) return;
+if (!season.watchedEpisodes) season.watchedEpisodes = [];
+const idx = season.watchedEpisodes.indexOf(episodeNumber);
+if (idx === -1) season.watchedEpisodes.push(episodeNumber);
+else season.watchedEpisodes.splice(idx, 1);
+await updateMovieInCloud(movie);
+openMovieDetail(movieId);
+renderCollection();
+renderWishlist();
+renderHomeRecent();
+}
+
+async function toggleSeasonWatched(movieId, seasonNumber) {
+let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+if (!movie || !movie.seasons) return;
+const season = movie.seasons.find(s => s.seasonNumber === seasonNumber);
+if (!season) return;
+const total = season.episodeCount || 0;
+const currentlyFull = total > 0 && (season.watchedEpisodes || []).length >= total;
+
+if (currentlyFull) {
+season.watchedEpisodes = [];
+} else {
+if (season.episodes === null) {
+await loadSeasonEpisodes(movie, seasonNumber);
+}
+const nums = season.episodes && season.episodes.length
+? season.episodes.map(e => e.episodeNumber)
+: Array.from({ length: total }, (_, i) => i + 1);
+season.watchedEpisodes = nums;
+}
+await updateMovieInCloud(movie);
+openMovieDetail(movieId);
+renderCollection();
+renderWishlist();
+renderHomeRecent();
 }
 
 async function toggleMovieSeen(movieId) {
@@ -2220,7 +2615,13 @@ const actorsMap = {};
 const monthsMap = {};
 
 collection.forEach(m => {
-if (m.seen) {
+if (isTV(m)) {
+const progress = getShowProgress(m);
+if (progress.watched > 0 && typeof m.runtime === 'number' && m.runtime > 0) {
+totalWatchMinutes += progress.watched * m.runtime;
+}
+if (isShowFullyWatched(m)) seenCount++;
+} else if (m.seen) {
 seenCount++;
 if (typeof m.runtime === 'number' && m.runtime > 0) {
 totalWatchMinutes += m.runtime;
