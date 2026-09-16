@@ -73,6 +73,22 @@ inset: 0;
 background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 45%);
 pointer-events: none;
 }
+#topNav {
+background: rgba(255, 255, 255, 0.06);
+backdrop-filter: blur(24px) saturate(160%);
+-webkit-backdrop-filter: blur(24px) saturate(160%);
+box-shadow: inset 0 1px 0 rgba(255,255,255,.25), inset 0 -3px 8px rgba(0,0,0,.2), 0 6px 18px rgba(0,0,0,.3);
+}
+#topNav::after {
+content: "";
+position: absolute;
+top: 1px;
+left: 14%;
+right: 14%;
+height: 1px;
+background: linear-gradient(90deg, rgba(0,229,255,0) 0%, rgba(0,229,255,0.5) 50%, rgba(0,229,255,0) 100%);
+pointer-events: none;
+}
 .glass-input {
 background: rgba(0, 0, 0, 0.3);
 border: 1px solid rgba(255, 255, 255, 0.15);
@@ -94,7 +110,7 @@ background: linear-gradient(120deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,
 pointer-events: none;
 }
 
-/* ===== Système d'icônes unifié (pastilles glossy, un seul ton) ===== */
+/* ===== Système d'icônes unifié (forme seule, sans pavé de fond) ===== */
 .icon-chip {
 display: inline-flex;
 align-items: center;
@@ -102,34 +118,18 @@ justify-content: center;
 flex-shrink: 0;
 width: 2.1rem;
 height: 2.1rem;
-border-radius: 0.8rem;
-background: linear-gradient(155deg, #67e8f9 0%, #00e5ff 45%, #00acc1 100%);
-box-shadow: inset 0 1px 0 rgba(255,255,255,.55), inset 0 -6px 10px rgba(0,0,0,.28), 0 3px 10px rgba(0,0,0,.35);
-color: #fff;
-position: relative;
-overflow: hidden;
-}
-.icon-chip::after {
-content: "";
-position: absolute;
-inset: 0;
-background: linear-gradient(120deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 45%);
+color: #00e5ff;
+filter: drop-shadow(0 0 5px rgba(0, 229, 255, 0.5)) drop-shadow(0 0 1px rgba(0, 229, 255, 0.6));
 }
 .icon-chip svg {
-width: 1.1rem;
-height: 1.1rem;
-position: relative;
-z-index: 1;
-filter: drop-shadow(0 1px 1px rgba(0,0,0,.3));
+width: 1.5rem;
+height: 1.5rem;
+stroke-width: 1.75;
 }
-.icon-chip.chip-sm { width: 1.65rem; height: 1.65rem; border-radius: 0.6rem; }
-.icon-chip.chip-sm svg { width: 0.9rem; height: 0.9rem; }
-.icon-chip.chip-lg { width: 2.6rem; height: 2.6rem; border-radius: 1rem; }
-.icon-chip.chip-lg svg { width: 1.35rem; height: 1.35rem; }
-.icon-chip.chip-flat {
-background: rgba(255,255,255,0.1);
-box-shadow: inset 0 1px 0 rgba(255,255,255,.25), inset 0 -3px 6px rgba(0,0,0,.15);
-}
+.icon-chip.chip-sm { width: 1.65rem; height: 1.65rem; }
+.icon-chip.chip-sm svg { width: 1.2rem; height: 1.2rem; }
+.icon-chip.chip-lg { width: 2.6rem; height: 2.6rem; }
+.icon-chip.chip-lg svg { width: 1.9rem; height: 1.9rem; }
 .icon-inline {
 display: inline-flex;
 align-items: center;
@@ -284,7 +284,28 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
   padding: 0.3rem 0.25rem 1.2rem;
   padding-bottom: calc(1.2rem + env(safe-area-inset-bottom, 0px));
   border-radius: 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  border-top: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.045) !important;
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 -8px 30px rgba(0,0,0,.45);
+}
+.mobile-bottom-nav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0) 55%);
+  pointer-events: none;
+}
+.mobile-bottom-nav::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(0,229,255,0) 0%, rgba(0,229,255,0.55) 50%, rgba(0,229,255,0) 100%);
+  pointer-events: none;
 }
 .mobile-bottom-nav .bottom-nav-btn {
   flex: 1;
@@ -332,7 +353,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 <main class="p-4 max-w-md mx-auto space-y-5">
 <!-- NAVIGATION BAR -->
-<nav class="glass-pill p-1.5 rounded-2xl flex justify-between items-center shadow-lg gap-1">
+<nav id="topNav" class="glass-pill p-1.5 rounded-2xl flex justify-between items-center shadow-lg gap-1">
 <button id="tabHomeBtn" onclick="switchTab('home')" class="flex-1 py-2 font-bold text-[10px] transition flex items-center justify-center gap-1 text-cyan-400 border-b-[3px] border-cyan-400">
 <span class="icon-inline w-3.5 h-3.5" data-icon="home"></span> <span>Accueil</span>
 </button>
