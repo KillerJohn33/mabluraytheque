@@ -160,6 +160,14 @@ pointer-events: none;
 border-color: rgba(255, 255, 255, 0.22);
 transform: translateY(-1px);
 }
+.chart-box {
+height: 230px;
+position: relative;
+}
+.chart-box canvas {
+width: 100% !important;
+height: 100% !important;
+}
 
 .list-view-container {
 display: flex !important; flex-direction: column !important; gap: 0.75rem !important;
@@ -551,24 +559,6 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <div id="tabStats" class="hidden glass-card rounded-3xl border border-white/10 divide-y divide-white/10 overflow-hidden">
 <div class="p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
-<span class="icon-chip" data-icon="pie"></span>
-<div>
-<h3 class="text-sm font-bold text-white">Affichage des graphiques</h3>
-<p class="text-[11px] text-gray-400">Choisir comment les répartitions sont visualisées.</p>
-</div>
-</div>
-<div class="glass-pill p-1.5 rounded-2xl flex justify-between items-center shadow-md">
-<button id="chartStyleBarsBtn" onclick="setChartStyle('bars')" class="flex-1 py-2 rounded-xl font-bold text-xs transition bg-cyan-600 text-white shadow flex items-center justify-center gap-1.5">
-<span class="icon-inline w-3.5 h-3.5" data-icon="barchart"></span> Mode Barres
-</button>
-<button id="chartStylePieBtn" onclick="setChartStyle('pie')" class="flex-1 py-2 rounded-xl font-bold text-xs transition text-gray-400 hover:text-white flex items-center justify-center gap-1.5">
-<span class="icon-inline w-3.5 h-3.5" data-icon="pie"></span> Diagramme Circulaire
-</button>
-</div>
-</div>
-
-<div class="p-4 md:p-5 space-y-3">
-<div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="grid"></span>
 <div>
 <h3 class="text-sm font-bold text-white">Vue d'ensemble</h3>
@@ -604,6 +594,10 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Films Vus</p>
 <p id="statSeenMovies" class="text-2xl font-black text-emerald-400 mt-1">0</p>
 </div>
+<div class="stat-tile text-center col-span-2">
+<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Temps Total de Visionnage</p>
+<p id="statWatchTime" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-sky-400 mt-1">0h</p>
+</div>
 </div>
 </div>
 
@@ -616,7 +610,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 <div id="statFormatsList" class="space-y-2 text-xs text-gray-300"></div>
-<div id="chartContainerFormat" class="hidden max-w-[220px] mx-auto py-2">
+<div id="chartContainerFormat" class="hidden w-full py-2 chart-box">
 <canvas id="chartFormat"></canvas>
 </div>
 </div>
@@ -630,7 +624,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 <div id="statEditionsList" class="space-y-2 text-xs text-gray-300"></div>
-<div id="chartContainerEdition" class="hidden max-w-[220px] mx-auto py-2">
+<div id="chartContainerEdition" class="hidden w-full py-2 chart-box">
 <canvas id="chartEdition"></canvas>
 </div>
 </div>
@@ -644,7 +638,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 <div id="statLocationsList" class="space-y-2 text-xs text-gray-300"></div>
-<div id="chartContainerLocation" class="hidden max-w-[220px] mx-auto py-2">
+<div id="chartContainerLocation" class="hidden w-full py-2 chart-box">
 <canvas id="chartLocation"></canvas>
 </div>
 </div>
@@ -658,7 +652,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 <div id="statGenresList" class="space-y-2 text-xs text-gray-300"></div>
-<div id="chartContainerGenre" class="hidden max-w-[220px] mx-auto py-2">
+<div id="chartContainerGenre" class="hidden w-full py-2 chart-box">
 <canvas id="chartGenre"></canvas>
 </div>
 </div>
@@ -672,7 +666,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 <div id="statDirectorsList" class="space-y-2 text-xs text-gray-300"></div>
-<div id="chartContainerDirectors" class="hidden max-w-[220px] mx-auto py-2">
+<div id="chartContainerDirectors" class="hidden w-full py-2 chart-box">
 <canvas id="chartDirectors"></canvas>
 </div>
 </div>
@@ -686,7 +680,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 <div id="statActorsList" class="space-y-2 text-xs text-gray-300"></div>
-<div id="chartContainerActors" class="hidden max-w-[220px] mx-auto py-2">
+<div id="chartContainerActors" class="hidden w-full py-2 chart-box">
 <canvas id="chartActors"></canvas>
 </div>
 </div>
@@ -700,7 +694,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 <p id="statTimelineEmpty" class="text-[10px] text-gray-500">Aucune donnée disponible.</p>
-<div id="chartContainerTimeline" class="hidden py-2">
+<div id="chartContainerTimeline" class="hidden py-2 chart-box">
 <canvas id="chartTimeline"></canvas>
 </div>
 </div>
@@ -943,7 +937,6 @@ let wishlist = [];
 let isListView = false;
 let isWishlistListView = false;
 let html5QrcodeScanner = null;
-let chartStyle = 'bars';
 let chartInstances = {};
 
 // Recherche TMDB
@@ -1053,6 +1046,20 @@ const h = Math.floor(minutes / 60);
 const m = minutes % 60;
 if (h > 0) return `${h}h${m.toString().padStart(2, '0')}`;
 return `${m} min`;
+}
+
+// --- FORMATAGE DU TEMPS TOTAL DE VISIONNAGE (STATS) ---
+function formatWatchTime(totalMinutes) {
+if (!totalMinutes || totalMinutes <= 0) return '0h';
+const h = Math.floor(totalMinutes / 60);
+const m = totalMinutes % 60;
+let label = h > 0 ? `${h}h${m > 0 ? m.toString().padStart(2, '0') : ''}` : `${m} min`;
+if (h >= 24) {
+const days = Math.floor(h / 24);
+const remHours = h % 24;
+label += ` (≈ ${days}j ${remHours}h)`;
+}
+return label;
 }
 
 // --- SUPABASE SYNCHRO ---
@@ -1836,12 +1843,6 @@ showToast("Film supprimé.");
 }
 
 // --- STATISTIQUES UNIFIÉES ET INTELLIGENTES ---
-function setChartStyle(style) {
-chartStyle = style;
-document.getElementById('chartStyleBarsBtn').className = style === 'bars' ? 'flex-1 py-2 rounded-xl font-bold text-xs transition bg-cyan-600 text-white shadow' : 'flex-1 py-2 rounded-xl font-bold text-xs transition text-gray-400 hover:text-white';
-document.getElementById('chartStylePieBtn').className = style === 'pie' ? 'flex-1 py-2 rounded-xl font-bold text-xs transition bg-cyan-600 text-white shadow' : 'flex-1 py-2 rounded-xl font-bold text-xs transition text-gray-400 hover:text-white';
-renderStats();
-}
 
 function renderStats() {
 const totalMovies = collection.length;
@@ -1849,6 +1850,7 @@ let totalEditions = 0;
 let totalPurchaseVal = 0;
 let totalEstimatedVal = 0;
 let seenCount = 0;
+let totalWatchMinutes = 0;
 
 const formatsMap = {};
 const editionsMap = {};
@@ -1859,7 +1861,12 @@ const actorsMap = {};
 const monthsMap = {};
 
 collection.forEach(m => {
-if (m.seen) seenCount++;
+if (m.seen) {
+seenCount++;
+if (typeof m.runtime === 'number' && m.runtime > 0) {
+totalWatchMinutes += m.runtime;
+}
+}
 
 // Genres calculés au niveau du film
 if (m.genres && Array.isArray(m.genres)) {
@@ -1916,6 +1923,7 @@ locationsMap[loc] = (locationsMap[loc] || 0) + 1;
 document.getElementById('statTotalMovies').innerText = totalMovies;
 document.getElementById('statTotalEditions').innerText = totalEditions;
 document.getElementById('statSeenMovies').innerText = `${seenCount} / ${totalMovies}`;
+document.getElementById('statWatchTime').innerText = formatWatchTime(totalWatchMinutes);
 document.getElementById('statTotalValue').innerText = `${totalPurchaseVal.toFixed(2)} €`;
 document.getElementById('statTotalEstimatedValue').innerText = `${totalEstimatedVal.toFixed(2)} €`;
 
@@ -1956,11 +1964,9 @@ item.innerHTML = `<span class="text-gray-300">${key}</span><span class="font-bol
 listElem.appendChild(item);
 });
 
-if (chartStyle === 'pie') {
+if (chartContainer) {
 chartContainer.classList.remove('hidden');
-renderPieChart(canvasId, entries.map(e => e[0]), entries.map(e => e[1]));
-} else {
-chartContainer.classList.add('hidden');
+renderBarChart(canvasId, entries.map(e => e[0]), entries.map(e => e[1]));
 }
 }
 
@@ -2002,6 +2008,7 @@ maxBarThickness: 28
 },
 options: {
 responsive: true,
+maintainAspectRatio: false,
 plugins: { legend: { display: false } },
 scales: {
 x: { ticks: { color: '#9ca3af', font: { size: 9 } }, grid: { display: false } },
@@ -2011,28 +2018,33 @@ y: { ticks: { color: '#9ca3af', stepSize: 1, precision: 0 }, grid: { color: 'rgb
 });
 }
 
-function renderPieChart(canvasId, labels, data) {
+function renderBarChart(canvasId, labels, data) {
 if (chartInstances[canvasId]) {
 chartInstances[canvasId].destroy();
 }
 
 const ctx = document.getElementById(canvasId).getContext('2d');
 chartInstances[canvasId] = new Chart(ctx, {
-type: 'doughnut',
+type: 'bar',
 data: {
 labels: labels,
 datasets: [{
 data: data,
-backgroundColor: [
-'#00e5ff', '#ec4899', '#10b981', '#f59e0b', '#3b82f6', '#64748b', '#14b8a6'
-],
-borderWidth: 0
+backgroundColor: '#00e5ff',
+borderRadius: 6,
+maxBarThickness: 22
 }]
 },
 options: {
+indexAxis: 'y',
 responsive: true,
+maintainAspectRatio: false,
 plugins: {
 legend: { display: false }
+},
+scales: {
+x: { ticks: { color: '#9ca3af', stepSize: 1, precision: 0 }, grid: { color: 'rgba(255,255,255,0.06)' }, beginAtZero: true },
+y: { ticks: { color: '#9ca3af', font: { size: 10 } }, grid: { display: false } }
 }
 }
 });
