@@ -479,6 +479,15 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 <div class="grid grid-cols-2 gap-2">
 <div>
+<label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Type</label>
+<select id="filterMediaType" onchange="renderCollection()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
+<option class="bg-gray-900" value="all">Films + Séries</option>
+<option class="bg-gray-900" value="movie">Films uniquement</option>
+<option class="bg-gray-900" value="series">Séries uniquement</option>
+</select>
+</div>
+
+<div>
 <label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Format</label>
 <select id="filterFormat" onchange="renderCollection()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
 <option class="bg-gray-900" value="all">Tous les formats</option>
@@ -1642,6 +1651,16 @@ openMovieDetail(random.id);
 }
 
 // --- RENDU COLLECTION ET WISHLIST ---
+function isSeries(movie) {
+// Compatibilité avec plusieurs formats de données possibles (TMDB/imports/anciennes données).
+return movie?.isSeries === true
+|| movie?.media_type === 'tv'
+|| movie?.mediaType === 'tv'
+|| movie?.type === 'series'
+|| movie?.type === 'tv'
+|| !!movie?.first_air_date;
+}
+
 function renderCollection() {
 const grid = document.getElementById('collectionGrid');
 grid.innerHTML = '';
@@ -1653,8 +1672,15 @@ grid.className = "grid grid-cols-2 gap-4";
 }
 
 let filtered = [...collection];
+const mediaTypeFilter = document.getElementById('filterMediaType')?.value || 'all';
 const formatFilter = document.getElementById('filterFormat').value;
 const seenFilter = document.getElementById('filterSeen').value;
+
+if (mediaTypeFilter === 'series') {
+filtered = filtered.filter(m => isSeries(m));
+} else if (mediaTypeFilter === 'movie') {
+filtered = filtered.filter(m => !isSeries(m));
+}
 const sortVal = document.getElementById('sortSelect').value;
 const textFilter = document.getElementById('filterText').value.toLowerCase().trim();
 
