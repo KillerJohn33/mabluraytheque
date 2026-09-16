@@ -375,6 +375,9 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <span class="icon-inline w-3.5 h-3.5" data-icon="sparkles"></span> <span>Wishlist</span>
 <span id="wishlistBadge" class="hidden bg-pink-500 text-white text-[9px] font-black px-1.5 py-0.2 rounded-full ml-0.5">0</span>
 </button>
+<button id="tabSeriesBtn" onclick="switchTab('series')" class="flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent">
+<span class="icon-inline w-3.5 h-3.5" data-icon="tv"></span> <span>Séries</span>
+</button>
 <button id="tabStatsBtn" onclick="switchTab('stats')" class="flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent">
 <span class="icon-inline w-3.5 h-3.5" data-icon="barchart"></span> <span>Stats</span>
 </button>
@@ -614,6 +617,44 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 
 </div>
+</div>
+
+<!-- ONGLET MES SÉRIES -->
+<div id="tabSeries" class="hidden space-y-4">
+<div class="glass-card p-3 rounded-2xl border border-purple-400/20 flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="icon-chip chip-sm" data-icon="tv"></span>
+<div><h2 class="text-xs font-bold text-purple-200">Mes séries</h2><p class="text-[10px] text-gray-400">Suivez vos séries et leurs prochains épisodes.</p></div>
+</div>
+<div class="flex items-center gap-1.5">
+<span id="trackedSeriesCount" class="bg-purple-500/15 text-purple-200 font-black text-xs px-2.5 py-1 rounded-xl border border-purple-400/20">0 série</span>
+<button onclick="refreshTrackedSeries()" class="glass-pill w-8 h-8 rounded-xl flex items-center justify-center text-purple-200 hover:text-white" title="Actualiser les épisodes"><span class="icon-inline w-3.5 h-3.5" data-icon="refresh"></span></button>
+</div>
+</div>
+
+<div class="glass-card p-3 rounded-2xl border border-white/10 space-y-3">
+<div class="flex items-center justify-between gap-2"><div><h3 class="text-xs font-bold text-white">Ajouter une série à suivre</h3><p class="text-[9px] text-gray-500">Recherchez-la dans le champ TMDB en haut de l'application.</p></div><button onclick="addTrackedSeriesFromCollection()" class="shine-btn bg-purple-600 hover:bg-purple-500 text-white px-3 py-2 rounded-xl text-[10px] font-bold">Depuis ma collection</button></div>
+</div>
+
+<div class="glass-card p-3 rounded-2xl border border-white/10 space-y-3">
+<div class="flex items-center justify-between"><div><h3 class="text-xs font-bold text-white">Prochains épisodes</h3><p class="text-[9px] text-gray-500">Les sorties à venir de vos séries suivies.</p></div><span id="trackedUpcomingCount" class="text-[9px] text-purple-300 font-bold"></span></div>
+<div id="trackedUpcomingList" class="space-y-1.5"></div>
+</div>
+
+<div class="glass-card p-3 rounded-2xl border border-white/10 space-y-3">
+<div class="flex items-center justify-between"><div><h3 class="text-xs font-bold text-white">Calendrier des épisodes</h3><p class="text-[9px] text-gray-500">Les dates de diffusion récupérées depuis TMDB.</p></div></div>
+<div class="flex items-center justify-between"><button onclick="changeSeriesCalendarMonth(-1)" class="glass-pill w-7 h-7 rounded-lg flex items-center justify-center text-gray-300 hover:text-white"><span class="icon-inline w-3.5 h-3.5" data-icon="chevronleft"></span></button><span id="seriesCalMonthLabel" class="text-xs font-bold text-white"></span><button onclick="changeSeriesCalendarMonth(1)" class="glass-pill w-7 h-7 rounded-lg flex items-center justify-center text-gray-300 hover:text-white"><span class="icon-inline w-3.5 h-3.5" data-icon="chevronright"></span></button></div>
+<div class="grid grid-cols-7 gap-1 text-center text-[8px] text-gray-500 font-bold uppercase"><div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div><div>D</div></div>
+<div id="seriesCalendarGrid" class="grid grid-cols-7 gap-1"></div><div id="seriesCalendarDayDetail" class="hidden"></div>
+</div>
+
+<div class="flex items-center gap-1 p-1 glass-pill rounded-xl">
+<button onclick="setTrackedSeriesFilter('all')" id="seriesFilterAll" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold">Toutes</button>
+<button onclick="setTrackedSeriesFilter('watching')" id="seriesFilterWatching" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold text-gray-400">En cours</button>
+<button onclick="setTrackedSeriesFilter('upcoming')" id="seriesFilterUpcoming" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold text-gray-400">À venir</button>
+<button onclick="setTrackedSeriesFilter('completed')" id="seriesFilterCompleted" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold text-gray-400">Terminées</button>
+</div>
+<div id="trackedSeriesGrid" class="space-y-3"></div>
 </div>
 
 <!-- ONGLET STATS -->
@@ -965,6 +1006,10 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <span class="bottom-nav-label">Wishlist</span>
 <span id="wishlistBadgeBottom" class="hidden bottom-nav-badge"></span>
 </button>
+<button id="bottomTabSeriesBtn" onclick="switchTab('series')" class="bottom-nav-btn">
+<span class="icon-inline w-8 h-8" data-icon="tv"></span>
+<span class="bottom-nav-label">Séries</span>
+</button>
 <button id="bottomTabStatsBtn" onclick="switchTab('stats')" class="bottom-nav-btn">
 <span class="icon-inline w-8 h-8" data-icon="barchart"></span>
 <span class="bottom-nav-label">Stats</span>
@@ -1099,7 +1144,9 @@ if (e.key === 'Enter') triggerNewSearch();
 });
 
 await fetchCollectionFromCloud();
+await loadTrackedSeriesFromCloud();
 setMediaTypeFilter(document.getElementById('filterMediaType')?.value || 'all');
+setTrackedSeriesFilter('all');
 
 // Rafraîchissement automatique et silencieux des infos TMDB, une fois par jour maximum
 const todayStr = new Date().toISOString().slice(0, 10);
@@ -1141,6 +1188,7 @@ localStorage.setItem('supa_key', SUPABASE_KEY);
 db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 showToast("Identifiants enregistrés !");
 fetchCollectionFromCloud();
+loadTrackedSeriesFromCloud().then(() => renderTrackedSeries());
 }
 
 // --- NORMALISATION DES DONNÉES (POUR LES ÉDITIONS MULTIPLES) ---
@@ -1328,7 +1376,7 @@ applyStaticIcons();
 
 // --- NAVIGATION ET TABS ---
 function switchTab(tab) {
-['tabHome', 'tabCollection', 'tabWishlist', 'tabStats', 'tabSettings'].forEach(id => {
+['tabHome', 'tabCollection', 'tabWishlist', 'tabSeries', 'tabStats', 'tabSettings'].forEach(id => {
 const el = document.getElementById(id);
 if (el) el.classList.add('hidden');
 });
@@ -1342,14 +1390,14 @@ else searchSection.classList.add('hidden');
 const inactiveClass = "flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent";
 const activeClass = "flex-1 py-2 font-bold text-[10px] transition flex items-center justify-center gap-1 text-cyan-400 border-b-[3px] border-cyan-400";
 
-['tabHomeBtn', 'tabCollectionBtn', 'tabWishlistBtn', 'tabStatsBtn', 'tabSettingsBtn'].forEach(id => {
+['tabHomeBtn', 'tabCollectionBtn', 'tabWishlistBtn', 'tabSeriesBtn', 'tabStatsBtn', 'tabSettingsBtn'].forEach(id => {
 const btn = document.getElementById(id);
 if (btn) {
 btn.className = inactiveClass;
 }
 });
 
-['bottomTabHomeBtn', 'bottomTabCollectionBtn', 'bottomTabWishlistBtn', 'bottomTabStatsBtn', 'bottomTabSettingsBtn'].forEach(id => {
+['bottomTabHomeBtn', 'bottomTabCollectionBtn', 'bottomTabWishlistBtn', 'bottomTabSeriesBtn', 'bottomTabStatsBtn', 'bottomTabSettingsBtn'].forEach(id => {
 const btn = document.getElementById(id);
 if (btn) btn.classList.remove('active');
 });
@@ -1369,6 +1417,11 @@ document.getElementById('tabWishlist').classList.remove('hidden');
 document.getElementById('tabWishlistBtn').className = activeClass;
 document.getElementById('bottomTabWishlistBtn').classList.add('active');
 renderWishlist();
+} else if (tab === 'series') {
+document.getElementById('tabSeries').classList.remove('hidden');
+document.getElementById('tabSeriesBtn').className = activeClass;
+document.getElementById('bottomTabSeriesBtn').classList.add('active');
+renderTrackedSeries();
 } else if (tab === 'stats') {
 document.getElementById('tabStats').classList.remove('hidden');
 document.getElementById('tabStatsBtn').className = activeClass;
@@ -1467,6 +1520,7 @@ item.innerHTML = `
 <div class="flex flex-col gap-1">
 <button onclick='addMovieFromTMDB(${safeData}, false)' class="shine-btn bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition flex items-center justify-center gap-1">${ic('plus','w-3 h-3')} Collection</button>
 <button onclick='addMovieFromTMDB(${safeData}, true)' class="shine-btn bg-pink-600 hover:bg-pink-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition flex items-center justify-center gap-1">${ic('plus','w-3 h-3')} Wishlist</button>
+${isTv ? `<button onclick='trackSeriesFromTMDB(${safeData})' class="shine-btn bg-purple-600 hover:bg-purple-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition flex items-center justify-center gap-1">${ic('tv','w-3 h-3')} Suivre</button>` : ''}
 </div>`;
 container.appendChild(item);
 });
@@ -2183,6 +2237,210 @@ ${moviesThatDay.map(m => `
 `;
 }
 
+// --- SUIVI DES SÉRIES ---
+let trackedSeries = JSON.parse(localStorage.getItem('tracked_series_v1') || '[]');
+let trackedSeriesFilter = 'all';
+let trackedSeriesCloudReady = false;
+let trackedSeriesCloudBusy = false;
+let seriesCalDate = new Date();
+let seriesCalSelected = null;
+
+function saveTrackedSeriesLocal() {
+localStorage.setItem('tracked_series_v1', JSON.stringify(trackedSeries));
+}
+
+async function saveTrackedSeriesCloud(series) {
+if (!db || !series || !series.tmdb_id) return false;
+try {
+const payload = {
+ tmdb_id: Number(series.tmdb_id),
+ data: series,
+ updated_at: new Date().toISOString()
+};
+const { error } = await db.from('tracked_series').upsert(payload, { onConflict: 'tmdb_id' });
+if (error) throw error;
+trackedSeriesCloudReady = true;
+return true;
+} catch (e) {
+console.warn('Supabase suivi séries indisponible:', e);
+trackedSeriesCloudReady = false;
+return false;
+}
+}
+
+async function deleteTrackedSeriesCloud(tmdbId) {
+if (!db || !tmdbId) return false;
+try {
+const { error } = await db.from('tracked_series').delete().eq('tmdb_id', Number(tmdbId));
+if (error) throw error;
+return true;
+} catch (e) {
+console.warn('Suppression Supabase suivi séries indisponible:', e);
+return false;
+}
+}
+
+async function loadTrackedSeriesFromCloud() {
+try {
+const { data, error } = await db.from('tracked_series').select('tmdb_id,data,updated_at').order('updated_at', { ascending: false });
+if (error) throw error;
+trackedSeriesCloudReady = true;
+const cloudSeries = (data || []).map(row => row.data).filter(s => s && s.tmdb_id);
+if (cloudSeries.length) {
+trackedSeries = cloudSeries;
+saveTrackedSeriesLocal();
+return true;
+}
+
+// Première activation : on migre automatiquement le suivi déjà présent dans le navigateur.
+const localSeries = JSON.parse(localStorage.getItem('tracked_series_v1') || '[]');
+if (localSeries.length) {
+for (const series of localSeries) await saveTrackedSeriesCloud(series);
+trackedSeries = localSeries;
+saveTrackedSeriesLocal();
+}
+return true;
+} catch (e) {
+trackedSeriesCloudReady = false;
+console.warn('Table Supabase tracked_series absente ou inaccessible. Utilisation du stockage local.', e);
+return false;
+}
+}
+
+async function persistTrackedSeries(series) {
+trackedSeries = Array.isArray(trackedSeries) ? trackedSeries : [];
+saveTrackedSeriesLocal();
+if (trackedSeriesCloudBusy) return;
+trackedSeriesCloudBusy = true;
+try {
+if (trackedSeriesCloudReady) await saveTrackedSeriesCloud(series);
+} finally {
+trackedSeriesCloudBusy = false;
+}
+}
+function isTrackedSeries(tmdbId) { return trackedSeries.some(s => String(s.tmdb_id) === String(tmdbId)); }
+function getTrackedSeries(tmdbId) { return trackedSeries.find(s => String(s.tmdb_id) === String(tmdbId)); }
+function episodeKey(season, episode) { return `S${Number(season)}E${Number(episode)}`; }
+function seriesEpisodes(series) { return (series.episodes || []).slice().sort((a,b) => new Date(a.air_date || '2999-12-31') - new Date(b.air_date || '2999-12-31') || a.season_number-b.season_number || a.episode_number-b.episode_number); }
+function seriesProgress(series) {
+const eps = seriesEpisodes(series).filter(e => Number(e.season_number) > 0 && Number(e.episode_number) > 0);
+const watched = eps.filter(e => e.watched).length;
+return { total: eps.length, watched, pct: eps.length ? Math.round(watched / eps.length * 100) : 0 };
+}
+function seriesStatus(series) {
+const p = seriesProgress(series);
+if (p.total && p.watched >= p.total) return 'completed';
+const today = new Date(); today.setHours(0,0,0,0);
+const hasPast = seriesEpisodes(series).some(e => e.air_date && new Date(e.air_date) <= today);
+return hasPast ? 'watching' : 'upcoming';
+}
+function seriesStatusLabel(status) { return status === 'completed' ? 'Terminée' : status === 'upcoming' ? 'À venir' : 'En cours'; }
+
+async function fetchTrackedSeriesEpisodes(series) {
+const seasons = Number(series.number_of_seasons || series.numberOfSeasons || 0);
+const episodes = [];
+for (let season = 1; season <= seasons; season++) {
+try {
+const res = await fetch(`https://api.themoviedb.org/3/tv/${series.tmdb_id}/season/${season}?api_key=${API_KEY}&language=fr-FR`);
+const data = await res.json();
+if (!res.ok) continue;
+(data.episodes || []).forEach(ep => episodes.push({
+ id: ep.id, season_number: ep.season_number, episode_number: ep.episode_number, name: ep.name || '', air_date: ep.air_date || '', runtime: ep.runtime || null, overview: ep.overview || '', still_path: ep.still_path || '', watched: false
+}));
+} catch (e) { console.warn('Erreur saison', season, e); }
+}
+const oldMap = Object.fromEntries((series.episodes || []).map(e => [episodeKey(e.season_number, e.episode_number), e]));
+episodes.forEach(ep => { const old = oldMap[episodeKey(ep.season_number, ep.episode_number)]; if (old) ep.watched = !!old.watched; });
+series.episodes = episodes;
+series.updatedAt = new Date().toISOString();
+}
+
+async function trackSeriesFromTMDB(tmdbData) {
+if (!tmdbData || tmdbData.media_type !== 'tv') return;
+if (isTrackedSeries(tmdbData.id)) { switchTab('series'); return; }
+showToast('Ajout de la série et récupération des épisodes…');
+let detail = null;
+try {
+const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbData.id}?api_key=${API_KEY}&language=fr-FR`);
+detail = await res.json();
+if (!res.ok) throw new Error(detail?.status_message || 'TMDB error');
+} catch (e) { console.error(e); showToast('Impossible de récupérer la série.'); return; }
+const series = {
+tmdb_id: tmdbData.id, title: detail.name || tmdbData.name || 'Sans titre', poster: detail.poster_path ? `https://image.tmdb.org/t/p/w500${detail.poster_path}` : 'https://via.placeholder.com/300x450?text=Pas+d+image',
+first_air_date: detail.first_air_date || tmdbData.first_air_date || '', number_of_seasons: detail.number_of_seasons || 0, number_of_episodes: detail.number_of_episodes || 0,
+status: detail.status || '', episodes: [], addedAt: new Date().toISOString()
+};
+await fetchTrackedSeriesEpisodes(series);
+trackedSeries.push(series); await persistTrackedSeries(series);
+switchTab('series'); showToast(`« ${series.title} » est maintenant suivie.`);
+}
+
+function trackSeriesFromMovie(movieId) {
+const movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+if (!movie || !isSeries(movie)) return;
+if (isTrackedSeries(movie.tmdb_id)) { switchTab('series'); return; }
+trackSeriesFromTMDB({ id: movie.tmdb_id, media_type: 'tv', name: movie.title, first_air_date: movie.releaseDate, poster_path: String(movie.poster || '').includes('/w500') ? String(movie.poster).split('/w500')[1] : null });
+}
+
+async function addTrackedSeriesFromCollection() {
+const candidates = collection.filter(isSeries);
+if (!candidates.length) { showToast('Aucune série dans votre collection.'); return; }
+const available = candidates.filter(m => !isTrackedSeries(m.tmdb_id));
+if (!available.length) { showToast('Toutes vos séries sont déjà suivies.'); return; }
+const names = available.map((m,i) => `${i+1}. ${m.title}`).join('\n');
+const choice = prompt(`Choisissez une série à suivre :\n\n${names}\n\nEntrez son numéro.`);
+const idx = Number(choice) - 1;
+if (!Number.isInteger(idx) || !available[idx]) return;
+await trackSeriesFromTMDB({ id: available[idx].tmdb_id, media_type: 'tv', name: available[idx].title, first_air_date: available[idx].releaseDate });
+}
+
+async function refreshTrackedSeries() {
+if (!trackedSeries.length) { renderTrackedSeries(); return; }
+showToast('Actualisation des épisodes…');
+for (const series of trackedSeries) await fetchTrackedSeriesEpisodes(series);
+saveTrackedSeriesLocal(); renderTrackedSeries(); showToast('Calendrier des séries actualisé.');
+for (const series of trackedSeries) await saveTrackedSeriesCloud(series);
+}
+
+function setTrackedSeriesFilter(filter) {
+trackedSeriesFilter = filter;
+['all','watching','upcoming','completed'].forEach(k => {
+const b = document.getElementById('seriesFilter' + k.charAt(0).toUpperCase() + k.slice(1));
+if (!b) return;
+b.classList.toggle('bg-purple-600', k === filter); b.classList.toggle('text-white', k === filter); b.classList.toggle('text-gray-400', k !== filter);
+});
+renderTrackedSeries();
+}
+
+function renderTrackedSeries() {
+const grid = document.getElementById('trackedSeriesGrid'); if (!grid) return;
+const count = document.getElementById('trackedSeriesCount'); if (count) count.textContent = `${trackedSeries.length} série${trackedSeries.length > 1 ? 's' : ''}`;
+setTrackedSeriesFilterVisual();
+const upcoming = [];
+trackedSeries.forEach(s => seriesEpisodes(s).forEach(e => { if (e.air_date && new Date(e.air_date) >= new Date(new Date().setHours(0,0,0,0)) && !e.watched) upcoming.push({...e, seriesTitle:s.title, poster:s.poster, tmdb_id:s.tmdb_id}); }));
+upcoming.sort((a,b) => new Date(a.air_date)-new Date(b.air_date));
+const upList = document.getElementById('trackedUpcomingList');
+if (upList) { document.getElementById('trackedUpcomingCount').textContent = `${upcoming.length} à venir`; upList.innerHTML = upcoming.slice(0,6).map(e => `<div class="flex items-center gap-2 p-2 rounded-xl bg-white/[0.025] border border-white/5"><img src="${e.poster}" class="w-7 h-10 rounded-lg object-cover"><div class="min-w-0 flex-1"><p class="text-[10px] font-bold text-white truncate">${e.seriesTitle}</p><p class="text-[9px] text-gray-400">S${String(e.season_number).padStart(2,'0')}E${String(e.episode_number).padStart(2,'0')} · ${e.name || 'Épisode'}</p></div><span class="text-[9px] font-bold text-purple-300 whitespace-nowrap">${formatSeriesDate(e.air_date)}</span></div>`).join('') || '<p class="text-[10px] text-gray-500 py-2">Aucun épisode à venir.</p>'; }
+const filtered = trackedSeries.filter(s => trackedSeriesFilter === 'all' || seriesStatus(s) === trackedSeriesFilter);
+if (!filtered.length) { grid.innerHTML = '<p class="text-[10px] text-gray-500 text-center py-6">Aucune série dans cette catégorie.</p>'; renderSeriesCalendar(); return; }
+grid.innerHTML = filtered.map(s => {
+const p = seriesProgress(s), status = seriesStatus(s), eps = seriesEpisodes(s); const next = eps.find(e => !e.watched && e.air_date && new Date(e.air_date) >= new Date(new Date().setHours(0,0,0,0)));
+return `<div class="glass-card rounded-2xl border border-white/10 p-2.5 flex gap-3"><img src="${s.poster}" class="w-16 h-24 object-cover rounded-xl border border-white/10 shadow"><div class="min-w-0 flex-1"><div class="flex items-center justify-between gap-2"><h4 class="text-xs font-bold text-white truncate">${s.title}</h4><button onclick="removeTrackedSeries(${s.tmdb_id})" class="text-gray-500 hover:text-red-400">${ic('x','w-3.5 h-3.5')}</button></div><div class="flex items-center gap-1.5 mt-1"><span class="text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-400/20">${seriesStatusLabel(status)}</span><span class="text-[9px] text-gray-500">${p.watched}/${p.total} épisodes</span></div><div class="h-1.5 bg-white/10 rounded-full mt-2 overflow-hidden"><div class="h-full bg-purple-500 rounded-full" style="width:${p.pct}%"></div></div>${next ? `<p class="text-[9px] text-gray-400 mt-2">Prochain : <span class="text-white">S${String(next.season_number).padStart(2,'0')}E${String(next.episode_number).padStart(2,'0')}</span> · ${formatSeriesDate(next.air_date)}</p>` : '<p class="text-[9px] text-emerald-300 mt-2">Tous les épisodes disponibles sont vus.</p>'}<div class="mt-2 flex flex-wrap gap-1.5">${eps.slice(0,20).map(e => `<button onclick="toggleTrackedEpisode(${s.tmdb_id},${e.season_number},${e.episode_number})" title="${(e.name||'').replace(/"/g,'&quot;')}" class="w-7 h-7 rounded-lg text-[8px] font-bold border ${e.watched ? 'bg-emerald-500/15 text-emerald-300 border-emerald-400/20' : 'bg-white/5 text-gray-400 border-white/10'}">${e.season_number}x${e.episode_number}</button>`).join('')}</div></div></div>`;
+}).join('');
+renderSeriesCalendar();
+}
+function setTrackedSeriesFilterVisual() {
+['all','watching','upcoming','completed'].forEach(k => { const b=document.getElementById('seriesFilter'+k.charAt(0).toUpperCase()+k.slice(1)); if(b){b.classList.toggle('bg-purple-600',k===trackedSeriesFilter);b.classList.toggle('text-white',k===trackedSeriesFilter);b.classList.toggle('text-gray-400',k!==trackedSeriesFilter);} });
+}
+function formatSeriesDate(date) { if (!date) return 'Date inconnue'; return new Date(date+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}); }
+async function toggleTrackedEpisode(tmdbId, season, episode) { const s=getTrackedSeries(tmdbId); if(!s)return; const e=(s.episodes||[]).find(x=>Number(x.season_number)===Number(season)&&Number(x.episode_number)===Number(episode)); if(!e)return; e.watched=!e.watched; e.watchedAt=e.watched?new Date().toISOString():null; saveTrackedSeriesLocal(); renderTrackedSeries(); await saveTrackedSeriesCloud(s); }
+async function removeTrackedSeries(tmdbId) { const s=getTrackedSeries(tmdbId); if(!s)return; if(!confirm(`Arrêter de suivre « ${s.title} » ?`))return; trackedSeries=trackedSeries.filter(x=>String(x.tmdb_id)!==String(tmdbId)); saveTrackedSeriesLocal(); await deleteTrackedSeriesCloud(tmdbId); renderTrackedSeries(); showToast('Série retirée du suivi.'); }
+function changeSeriesCalendarMonth(delta) { seriesCalDate=new Date(seriesCalDate.getFullYear(),seriesCalDate.getMonth()+delta,1);seriesCalSelected=null;renderSeriesCalendar(); }
+function renderSeriesCalendar() {
+const grid=document.getElementById('seriesCalendarGrid'), label=document.getElementById('seriesCalMonthLabel'); if(!grid||!label)return; const y=seriesCalDate.getFullYear(),m=seriesCalDate.getMonth(); const months=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];label.textContent=`${months[m]} ${y}`; const byDay={}; trackedSeries.forEach(s=>seriesEpisodes(s).forEach(e=>{if(!e.air_date)return;const d=new Date(e.air_date+'T12:00:00');if(d.getFullYear()!==y||d.getMonth()!==m)return;const k=`${y}-${pad2(m+1)}-${pad2(d.getDate())}`;(byDay[k]??=[]).push({...e,seriesTitle:s.title,poster:s.poster,tmdb_id:s.tmdb_id});})); const first=new Date(y,m,1);let offset=first.getDay()-1;if(offset<0)offset=6;const days=new Date(y,m+1,0).getDate();const now=new Date();const today=`${now.getFullYear()}-${pad2(now.getMonth()+1)}-${pad2(now.getDate())}`;let html='';for(let i=0;i<offset;i++)html+='<div></div>';for(let d=1;d<=days;d++){const k=`${y}-${pad2(m+1)}-${pad2(d)}`,has=!!byDay[k],sel=k===seriesCalSelected,isToday=k===today;html+=`<button onclick="selectSeriesCalendarDay('${k}')" class="aspect-square rounded-lg flex flex-col items-center justify-center text-[9px] ${sel?'bg-purple-500 text-white':isToday?'text-purple-300 border border-purple-400/50':'text-gray-300 hover:bg-white/10'}"><span>${d}</span>${has?`<span class="w-1 h-1 rounded-full mt-0.5 ${sel?'bg-white':'bg-purple-400'}"></span>`:''}</button>`;}grid.innerHTML=html;renderSeriesCalendarDayDetail(byDay); }
+function selectSeriesCalendarDay(k){seriesCalSelected=seriesCalSelected===k?null:k;renderSeriesCalendar();}
+function renderSeriesCalendarDayDetail(byDayOverride){const detail=document.getElementById('seriesCalendarDayDetail');if(!detail)return;if(!seriesCalSelected){detail.classList.add('hidden');detail.innerHTML='';return;}const y=seriesCalSelected.split('-')[0];const m=Number(seriesCalSelected.split('-')[1])-1;const byDay=byDayOverride||{};const eps=byDay[seriesCalSelected]||[];if(!eps.length){detail.classList.add('hidden');return;}detail.classList.remove('hidden');detail.innerHTML=`<div class="pt-2 mt-2 border-t border-white/10 space-y-1.5">${eps.map(e=>`<div class="flex items-center gap-2 p-1.5 rounded-xl bg-white/[0.025]"><img src="${e.poster}" class="w-7 h-10 object-cover rounded-lg"><div class="min-w-0 flex-1"><p class="text-[10px] font-bold text-white truncate">${e.seriesTitle}</p><p class="text-[9px] text-gray-500">S${String(e.season_number).padStart(2,'0')}E${String(e.episode_number).padStart(2,'0')} · ${e.name||'Épisode'}</p></div><button onclick="toggleTrackedEpisode(${e.tmdb_id},${e.season_number},${e.episode_number})" class="text-[9px] font-bold ${e.watched?'text-emerald-300':'text-gray-400'}">${e.watched?'✓ Vu':'À voir'}</button></div>`).join('')}</div>`; }
+
 // --- MODAL & ÉDITION AVANCÉE DES ÉDITIONS ---
 function openMovieDetail(movieId) {
 let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
@@ -2309,6 +2567,7 @@ ${infoCast.length ? `<div class="text-gray-300"><span class="text-gray-500">Avec
 
 <!-- ACTIONS -->
 <div class="flex gap-2 pt-1">
+${isSeriesMovie ? `<button onclick="trackSeriesFromMovie('${movie.id}')" class="shine-btn flex-1 bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 rounded-xl text-[10px] shadow-lg transition flex items-center justify-center gap-1.5">${ic('tv','w-3.5 h-3.5')} ${isTrackedSeries(movie.tmdb_id) ? 'Gérer le suivi' : 'Suivre la série'}</button>` : ''}
 ${movie.isWishlist ? `<button onclick="moveWishlistToCollection('${movie.id}')" class="shine-btn flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-[10px] shadow-lg transition flex items-center justify-center gap-1.5">${ic('download','w-3.5 h-3.5')} Ajouter à la collection</button>` : ''}
 <button onclick="deleteMovie('${movie.id}')" class="${movie.isWishlist ? 'px-3' : 'flex-1'} bg-red-500/10 hover:bg-red-500/20 border border-red-400/20 text-red-300 font-semibold py-2.5 rounded-xl text-[10px] transition flex items-center justify-center gap-1.5">${ic('trash','w-3.5 h-3.5')} Supprimer</button>
 </div>
