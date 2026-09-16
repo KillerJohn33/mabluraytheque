@@ -1462,9 +1462,51 @@ return null;
 }
 }
 
+function normalizeTitleForMatch(value) {
+return String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
+function findExistingWork(tmdbData, isTv, title, releaseDate) {
+const mediaType = isTv ? 'tv' : 'movie';
+const tmdbId = String(tmdbData?.id || '');
+const normalizedTitle = normalizeTitleForMatch(title);
+const year = String(releaseDate || '').slice(0, 4);
+return collection.concat(wishlist).find(m => {
+const sameTmdb = tmdbId && String(m.tmdb_id || '') === tmdbId && (m.media_type || (isSeries(m) ? 'tv' : 'movie')) === mediaType;
+if (sameTmdb) return true;
+const sameType = (m.media_type || (isSeries(m) ? 'tv' : 'movie')) === mediaType;
+const sameTitle = normalizeTitleForMatch(m.title) === normalizedTitle;
+const movieYear = String(m.releaseDate || '').slice(0, 4);
+return sameType && sameTitle && normalizedTitle && (!year || !movieYear || year === movieYear);
+});
+}
+
 async function addMovieFromTMDB(tmdbData, isWishlist = false) {
 const isTv = tmdbData.media_type === 'tv' || !!tmdbData.first_air_date;
 const title = tmdbData.title || tmdbData.name || 'Sans titre';
+const releaseDateForMatch = tmdbData.release_date || tmdbData.first_air_date || '';
+const existingWork = findExistingWork(tmdbData, isTv, title, releaseDateForMatch);
+if (existingWork && !isWishlist && !existingWork.isWishlist) {
+normalizeMovieData(existingWork);
+if (window.lastScannedBarcode) {
+const barcode = String(window.lastScannedBarcode).replace(/\D/g, '');
+if (existingWork.editions.some(ed => barcode && String(ed.barcode || '') === barcode)) {
+showToast('Cette édition est déjà dans votre collection.');
+window.lastScannedBarcode = ''; window.lastScannedProductTitle = '';
+openMovieDetail(existingWork.id); return;
+}
+existingWork.editions.push({ id: 'ed_' + Date.now(), title: 'Nouvelle édition', format: 'Blu-ray 1080p', editionType: 'Amaray', barcode, purchasePrice: '', estimatedPrice: '', purchaseLocation: '' });
+const mergeResult = await updateMovieInCloud(existingWork);
+if (mergeResult.success) {
+window.lastScannedBarcode = ''; window.lastScannedProductTitle = '';
+renderCollection(); openMovieDetail(existingWork.id); showToast('Édition ajoutée au titre existant.');
+} else { existingWork.editions.pop(); }
+return;
+}
+showToast('Ce titre est déjà dans votre collection. Ouverture de sa fiche.');
+openMovieDetail(existingWork.id);
+return;
+}
 const existsIn = collection.some(m => m.tmdb_id === tmdbData.id && isSeries(m) === isTv) ? 'votre collection'
 : wishlist.some(m => m.tmdb_id === tmdbData.id && isSeries(m) === isTv) ? 'votre wishlist' : null;
 
@@ -1751,7 +1793,7 @@ if (textFilter) {
 const normalizeSearch = value => String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 const query = normalizeSearch(textFilter);
 filtered = filtered.filter(m => {
-const editionText = (m.editions || []).flatMap(e => [e.title, e.format, e.editionType, e.purchaseLocation]).join(' ');
+const editionText = (m.editions || []).flatMap(e => [e.title, e.format, e.editionType, e.purchaseLocation, e.barcode]).join(' ');
 const haystack = [m.title, m.director, m.creators?.join(' '), m.cast?.join(' '), m.genres?.join(' '), editionText, isSeries(m) ? 'serie series' : 'film'].join(' ');
 return normalizeSearch(haystack).includes(query);
 });
@@ -1868,7 +1910,7 @@ if (textFilter) {
 const normalizeSearch = value => String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 const query = normalizeSearch(textFilter);
 filtered = filtered.filter(m => {
-const editionText = (m.editions || []).flatMap(e => [e.title, e.format, e.editionType, e.purchaseLocation]).join(' ');
+const editionText = (m.editions || []).flatMap(e => [e.title, e.format, e.editionType, e.purchaseLocation, e.barcode]).join(' ');
 const haystack = [m.title, m.director, m.creators?.join(' '), m.cast?.join(' '), m.genres?.join(' '), editionText, isSeries(m) ? 'serie series' : 'film'].join(' ');
 return normalizeSearch(haystack).includes(query);
 });
@@ -2297,6 +2339,12 @@ let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id ==
 if (!movie || !movie.editions[editionIdx]) return;
 const previous = movie.editions[editionIdx][field];
 movie.editions[editionIdx][field] = val;
+if (field === 'barcode' && val && movie.editions.some((ed, idx) => idx !== editionIdx && String(ed.barcode || '') === String(val))) {
+movie.editions[editionIdx][field] = previous;
+showToast('⚠️ Ce code-barres est déjà utilisé pour ce titre.');
+openMovieDetail(movieId);
+return;
+}
 const result = await updateMovieInCloud(movie);
 if (!result.success) movie.editions[editionIdx][field] = previous;
 else { renderCollection(); renderWishlist(); }
@@ -2756,9 +2804,13 @@ excelData.push({
 'Prix d\'achat (€)': ed.purchasePrice ? parseFloat(ed.purchasePrice) : '',
 'Valeur Estimée (€)': ed.estimatedPrice ? parseFloat(ed.estimatedPrice) : '',
 'Lieu d\'achat': ed.purchaseLocation || '',
+'EAN / Code-barres': ed.barcode || '',
 'Genres': genresStr,
+'Type': isSeries(m) ? 'Série' : 'Film',
 'Durée': formatRuntime(m.runtime),
-'Réalisateur': m.director || '',
+'Réalisateur / Créateur': m.director || '',
+'Saisons': isSeries(m) ? (m.numberOfSeasons || '') : '',
+'Épisodes': isSeries(m) ? (m.numberOfEpisodes || '') : '',
 'Acteurs principaux': m.cast ? m.cast.join(', ') : '',
 'Vu': m.seen ? 'Oui' : 'Non',
 'Date d\'ajout': m.addedAt ? new Date(m.addedAt).toLocaleDateString('fr-FR') : ''
@@ -2898,6 +2950,7 @@ const editionType = row['Boitier'] || row['boitier'] || row['Boîtier'] || 'Amar
 const price = row['Prix'] || row['prix'] || row['Prix d\'achat'] || row['Prix d\'achat (€)'] || '';
 const estimatedPrice = row['Estimation'] || row['estimation'] || row['Valeur Estimée (€)'] || '';
 const location = row['Lieu'] || row['Magasin'] || row['Lieu d\'achat'] || '';
+const barcode = String(row['EAN'] || row['EAN / Code-barres'] || row['Code-barres'] || row['Code barre'] || '').replace(/\D/g, '');
 const genre = row['Genre'] || row['genre'] || row['Genres'] || '';
 const seenRaw = String(row['Vu'] || row['vu'] || '').toLowerCase();
 const seen = (seenRaw === 'oui' || seenRaw === 'true' || seenRaw === '1');
@@ -2915,7 +2968,8 @@ format: String(format),
 editionType: String(editionType),
 purchasePrice: price,
 estimatedPrice: estimatedPrice,
-purchaseLocation: String(location)
+purchaseLocation: String(location),
+barcode
 });
 await updateMovieInCloud(existingMovie);
 } else {
@@ -2935,7 +2989,8 @@ format: String(format),
 editionType: String(editionType),
 purchasePrice: price,
 estimatedPrice: estimatedPrice,
-purchaseLocation: String(location)
+purchaseLocation: String(location),
+barcode
 }]
 };
 const cloudId = await saveMovieToCloud(newMovie);
