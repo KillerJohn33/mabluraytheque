@@ -213,10 +213,13 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
   #recentGrid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 1rem !important; }
   #searchResults { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 
-  #collectionGrid:not(.list-view-container),
+  #collectionGrid:not(.coll-list-view),
   #wishlistGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     gap: 1.1rem !important;
+  }
+  .coll-list-view > div {
+    height: 8rem !important;
   }
   .list-view-container .movie-card-item {
     max-width: none;
@@ -268,7 +271,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
   }
   #recentGrid { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; }
   #searchResults { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
-  #collectionGrid:not(.list-view-container),
+  #collectionGrid:not(.coll-list-view),
   #wishlistGrid {
     grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
   }
@@ -1557,7 +1560,7 @@ const grid = document.getElementById('collectionGrid');
 grid.innerHTML = '';
 
 if (isListView) {
-grid.className = "list-view-container";
+grid.className = "flex flex-col gap-3 coll-list-view";
 } else {
 grid.className = "grid grid-cols-2 gap-4";
 }
@@ -1600,23 +1603,46 @@ return;
 filtered.forEach(m => {
 const totals = calculateMovieTotals(m);
 const card = document.createElement('div');
-card.className = `glass-card p-2.5 rounded-2xl border border-white/10 hover:border-cyan-500/50 transition cursor-pointer movie-card-item relative ${isListView ? '' : 'flex flex-col items-center text-center'}`;
 card.onclick = () => openMovieDetail(m.id);
 
+const statusRow = `
+<div class="flex items-center gap-2 mt-1 text-[10px]">
+${m.seen ? `<span class="text-emerald-400 flex items-center gap-1">${ic('check','w-3 h-3')} Vu</span>` : `<span class="text-gray-400 flex items-center gap-1">${ic('eye','w-3 h-3')} Non vu</span>`}
+${imdbBadge(m)}
+</div>`;
+
+if (isListView) {
+card.className = "relative rounded-2xl overflow-hidden cursor-pointer bg-black h-28 border border-white/10 hover:border-cyan-500/50 transition";
 card.innerHTML = `
-<img src="${m.poster}" class="${isListView ? 'w-16 h-24' : 'w-full h-44'} object-cover rounded-xl shadow mb-2">
-<div class="movie-card-info w-full">
-<h4 class="mci-title text-xs font-bold text-white truncate">${m.title}</h4>
-<div class="mci-meta flex items-center justify-between text-[10px] text-gray-400 mt-1">
+<img src="${m.poster}" class="absolute left-0 top-0 h-full w-auto">
+<div class="absolute inset-0 bg-gradient-to-r from-transparent via-black/75 to-black"></div>
+<div class="absolute inset-y-0 right-0 w-[68%] flex flex-col justify-center items-end p-3 text-right">
+<h4 class="text-xs font-bold text-white truncate w-full">${m.title}</h4>
+<div class="flex items-center justify-end gap-3 text-[10px] mt-1">
 <span class="text-cyan-300 font-semibold">${totals.count} éd.</span>
 <span class="font-bold text-emerald-400">${totals.totalPurchase.toFixed(2)} €</span>
 </div>
-<div class="mci-status flex items-center gap-2 mt-1 text-[10px]">
-${m.seen ? `<span class="text-emerald-400 flex items-center gap-1">${ic('check','w-3 h-3')} Vu</span>` : `<span class="text-gray-500 flex items-center gap-1">${ic('eye','w-3 h-3')} Non vu</span>`}
+<div class="flex items-center justify-end gap-2 mt-1 text-[10px]">
+${m.seen ? `<span class="text-emerald-400 flex items-center gap-1">Vu ${ic('check','w-3 h-3')}</span>` : `<span class="text-gray-400 flex items-center gap-1">Non vu ${ic('eye','w-3 h-3')}</span>`}
 ${imdbBadge(m)}
 </div>
 </div>
 `;
+} else {
+card.className = "relative rounded-2xl overflow-hidden cursor-pointer bg-black border border-white/10 hover:border-cyan-500/50 transition";
+card.innerHTML = `
+<img src="${m.poster}" class="w-full aspect-[2/3] object-cover">
+<div class="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none"></div>
+<div class="absolute inset-x-0 bottom-0 p-2.5">
+<h4 class="text-xs font-bold text-white truncate">${m.title}</h4>
+<div class="flex items-center justify-between text-[10px] mt-1">
+<span class="text-cyan-300 font-semibold">${totals.count} éd.</span>
+<span class="font-bold text-emerald-400">${totals.totalPurchase.toFixed(2)} €</span>
+</div>
+${statusRow}
+</div>
+`;
+}
 grid.appendChild(card);
 });
 }
