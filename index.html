@@ -387,18 +387,10 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <div id="searchSection" class="space-y-4">
 <div class="space-y-4">
 <div class="space-y-2">
-<div class="glass-pill p-1 rounded-xl flex justify-between items-center">
-<button id="searchTypeMovieBtn" onclick="setSearchType('movie')" class="flex-1 py-1.5 rounded-lg font-bold text-[11px] transition bg-cyan-600 text-white flex items-center justify-center gap-1">
-<span class="icon-inline w-3 h-3" data-icon="disc"></span> Films
-</button>
-<button id="searchTypeTvBtn" onclick="setSearchType('tv')" class="flex-1 py-1.5 rounded-lg font-bold text-[11px] transition text-gray-400 hover:text-white flex items-center justify-center gap-1">
-<span class="icon-inline w-3 h-3" data-icon="tv"></span> Séries
-</button>
-</div>
 <div class="flex gap-2">
 <div class="relative flex-1">
 <span class="icon-inline w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" data-icon="search"></span>
-<input id="searchInput" type="text" placeholder="Chercher un film (TMDB)..." class="w-full pl-10 pr-4 py-3 rounded-2xl glass-input text-white text-sm placeholder-gray-400 focus:outline-none transition">
+<input id="searchInput" type="text" placeholder="Chercher un film ou une série (TMDB)..." class="w-full pl-10 pr-4 py-3 rounded-2xl glass-input text-white text-sm placeholder-gray-400 focus:outline-none transition">
 </div>
 <button onclick="triggerNewSearch()" class="shine-btn bg-cyan-600 hover:bg-cyan-500 px-5 py-3 rounded-2xl font-semibold text-sm shadow-lg shadow-cyan-600/30 transition transform active:scale-95">Chercher</button>
 </div>
@@ -1087,19 +1079,6 @@ let statsShowCharts = true;
 let currentSearchQuery = '';
 let currentSearchPage = 1;
 let totalSearchPages = 1;
-let currentSearchType = 'movie';
-
-function setSearchType(type) {
-currentSearchType = type;
-document.getElementById('searchTypeMovieBtn').className = type === 'movie'
-? 'flex-1 py-1.5 rounded-lg font-bold text-[11px] transition bg-cyan-600 text-white flex items-center justify-center gap-1'
-: 'flex-1 py-1.5 rounded-lg font-bold text-[11px] transition text-gray-400 hover:text-white flex items-center justify-center gap-1';
-document.getElementById('searchTypeTvBtn').className = type === 'tv'
-? 'flex-1 py-1.5 rounded-lg font-bold text-[11px] transition bg-cyan-600 text-white flex items-center justify-center gap-1'
-: 'flex-1 py-1.5 rounded-lg font-bold text-[11px] transition text-gray-400 hover:text-white flex items-center justify-center gap-1';
-document.getElementById('searchInput').placeholder = type === 'movie' ? 'Chercher un film (TMDB)...' : 'Chercher une série (TMDB)...';
-if (currentSearchQuery) { currentSearchPage = 1; searchTMDB(); }
-}
 
 document.addEventListener('DOMContentLoaded', async () => {
 applyStaticIcons();
@@ -1383,12 +1362,14 @@ async function searchTMDB() {
 if (!currentSearchQuery) return;
 showToast("Recherche en cours...");
 try {
-const endpoint = currentSearchType === 'tv' ? 'tv' : 'movie';
-const res = await fetch(`https://api.themoviedb.org/3/search/${endpoint}?api_key=${API_KEY}&query=${encodeURIComponent(currentSearchQuery)}&language=fr-FR&page=${currentSearchPage}`);
+const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(currentSearchQuery)}&language=fr-FR&page=${currentSearchPage}`);
 const data = await res.json();
 
+// On ignore les résultats "personne" (acteurs/réalisateurs) du multi-search
+const filtered = (data.results || []).filter(r => r.media_type === 'movie' || r.media_type === 'tv');
+
 totalSearchPages = data.total_pages || 1;
-displaySearchResults(data.results || []);
+displaySearchResults(filtered);
 } catch (e) {
 showToast("Erreur lors de la recherche TMDB");
 }
@@ -1404,7 +1385,7 @@ container.innerHTML = '';
 box.classList.remove('hidden');
 
 if (results.length === 0) {
-container.innerHTML = `<p class="text-xs text-gray-400 p-3 text-center">Aucun ${currentSearchType === 'tv' ? 'série trouvée' : 'film trouvé'}.</p>`;
+container.innerHTML = `<p class="text-xs text-gray-400 p-3 text-center">Aucun résultat trouvé.</p>`;
 pagination.classList.add('hidden');
 return;
 }
@@ -1416,11 +1397,13 @@ document.getElementById('prevPageBtn').disabled = (currentSearchPage <= 1);
 document.getElementById('nextPageBtn').disabled = (currentSearchPage >= totalSearchPages);
 
 results.forEach(m => {
+const isShow = m.media_type === 'tv';
 const poster = m.poster_path ? `https://image.tmdb.org/t/p/w200${m.poster_path}` : 'https://via.placeholder.com/200x300?text=Pas+d+image';
-const displayTitle = currentSearchType === 'tv' ? m.name : m.title;
-const displayDate = currentSearchType === 'tv' ? m.first_air_date : m.release_date;
+const displayTitle = isShow ? m.name : m.title;
+const displayDate = isShow ? m.first_air_date : m.release_date;
 const year = displayDate ? displayDate.split('-')[0] : 'N/A';
-const addFn = currentSearchType === 'tv' ? 'addShowFromTMDB' : 'addMovieFromTMDB';
+const addFn = isShow ? 'addShowFromTMDB' : 'addMovieFromTMDB';
+const typeBadge = isShow ? `<span class="text-[9px] text-cyan-400 font-bold">📺 Série</span>` : `<span class="text-[9px] text-gray-500 font-bold">🎬 Film</span>`;
 
 const item = document.createElement('div');
 item.className = 'glass-card p-2 rounded-2xl flex items-center gap-3 border border-white/10';
@@ -1428,7 +1411,7 @@ item.innerHTML = `
 <img src="${poster}" class="w-12 h-16 object-cover rounded-xl shadow">
 <div class="flex-1 min-width-0">
 <h4 class="text-xs font-bold text-white truncate">${displayTitle}</h4>
-<p class="text-[10px] text-gray-400">${year}</p>
+<p class="text-[10px] text-gray-400">${year} ${typeBadge}</p>
 </div>
 <div class="flex flex-col gap-1">
 <button onclick='${addFn}(${JSON.stringify(m).replace(/'/g, "&apos;")}, false)' class="shine-btn bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition flex items-center justify-center gap-1">
@@ -1568,6 +1551,7 @@ let voteAverage = null;
 let voteCount = null;
 let episodeRuntime = null;
 let seasons = [];
+let nextEpisodeToAir = null;
 
 try {
 const detailRes = await fetch(`https://api.themoviedb.org/3/tv/${tmdbData.id}?api_key=${API_KEY}&language=fr-FR&append_to_response=aggregate_credits,external_ids`);
@@ -1579,6 +1563,16 @@ voteAverage = typeof detail.vote_average === 'number' ? detail.vote_average : nu
 voteCount = typeof detail.vote_count === 'number' ? detail.vote_count : null;
 episodeRuntime = (detail.episode_run_time && detail.episode_run_time.length) ? detail.episode_run_time[0] : null;
 creators = detail.created_by ? detail.created_by.map(c => c.name).join(', ') : '';
+
+if (detail.next_episode_to_air) {
+const n = detail.next_episode_to_air;
+nextEpisodeToAir = {
+seasonNumber: n.season_number,
+episodeNumber: n.episode_number,
+name: n.name || `Épisode ${n.episode_number}`,
+airDate: n.air_date || null
+};
+}
 
 if (detail.aggregate_credits && detail.aggregate_credits.cast) {
 cast = detail.aggregate_credits.cast.slice(0, 5).map(p => p.name);
@@ -1605,6 +1599,7 @@ imdb_id: imdbId,
 title: tmdbData.name,
 poster: tmdbData.poster_path ? `https://image.tmdb.org/t/p/w500${tmdbData.poster_path}` : 'https://via.placeholder.com/300x450?text=Pas+d+image',
 releaseDate: tmdbData.first_air_date || '',
+nextEpisodeToAir: nextEpisodeToAir,
 overview: tmdbData.overview || '',
 genres: genres,
 runtime: episodeRuntime,
@@ -1686,6 +1681,7 @@ let voteAverage = null;
 let voteCount = null;
 let episodeRuntime = null;
 let seasonsMeta = [];
+let nextEpisodeToAir = null;
 
 try {
 const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${API_KEY}&language=fr-FR&append_to_response=aggregate_credits,external_ids`);
@@ -1697,6 +1693,16 @@ voteAverage = typeof detail.vote_average === 'number' ? detail.vote_average : nu
 voteCount = typeof detail.vote_count === 'number' ? detail.vote_count : null;
 episodeRuntime = (detail.episode_run_time && detail.episode_run_time.length) ? detail.episode_run_time[0] : null;
 creators = detail.created_by ? detail.created_by.map(c => c.name).join(', ') : '';
+
+if (detail.next_episode_to_air) {
+const n = detail.next_episode_to_air;
+nextEpisodeToAir = {
+seasonNumber: n.season_number,
+episodeNumber: n.episode_number,
+name: n.name || `Épisode ${n.episode_number}`,
+airDate: n.air_date || null
+};
+}
 
 if (detail.aggregate_credits && detail.aggregate_credits.cast) {
 cast = detail.aggregate_credits.cast.slice(0, 5).map(p => p.name);
@@ -1713,7 +1719,7 @@ poster: s.poster_path ? `https://image.tmdb.org/t/p/w300${s.poster_path}` : null
 }));
 } catch (e) {}
 
-return { genres, creators, cast, imdbId, voteAverage, voteCount, episodeRuntime, seasonsMeta };
+return { genres, creators, cast, imdbId, voteAverage, voteCount, episodeRuntime, seasonsMeta, nextEpisodeToAir };
 }
 
 async function refreshAllTMDBInfo(silent = false) {
@@ -1744,6 +1750,7 @@ movie.cast = info.cast.length ? info.cast : (movie.cast || []);
 movie.imdb_id = info.imdbId || movie.imdb_id || null;
 movie.voteAverage = info.voteAverage !== null ? info.voteAverage : (movie.voteAverage ?? null);
 movie.voteCount = info.voteCount !== null ? info.voteCount : (movie.voteCount ?? null);
+movie.nextEpisodeToAir = info.nextEpisodeToAir || null;
 
 // On met à jour les métadonnées de saisons (nom, nb d'épisodes) sans jamais toucher
 // aux épisodes déjà chargés ni à la progression déjà cochée par l'utilisateur.
@@ -2059,13 +2066,32 @@ function effectiveReleaseDate(m) {
 return m.blurayReleaseDateFR || m.releaseDate || null;
 }
 
+// Combine les sorties de la wishlist (films/séries) et les prochains épisodes
+// à diffuser pour les séries en cours de visionnage dans la Collection.
+function getCalendarEntries() {
+const entries = [];
+
+wishlist.forEach(m => {
+const rd = effectiveReleaseDate(m);
+if (rd) {
+entries.push({ movie: m, date: rd, type: m.blurayReleaseDateFR ? 'bluray' : 'release' });
+}
+});
+
+collection.forEach(m => {
+if (isTV(m) && m.nextEpisodeToAir && m.nextEpisodeToAir.airDate) {
+entries.push({ movie: m, date: m.nextEpisodeToAir.airDate, type: 'episode', episodeInfo: m.nextEpisodeToAir });
+}
+});
+
+return entries;
+}
+
 function renderWishlistCalendar() {
 const container = document.getElementById('wishlistCalendar');
 if (!container) return;
 
-const withDates = wishlist
-.filter(m => effectiveReleaseDate(m))
-.sort((a, b) => new Date(effectiveReleaseDate(a)) - new Date(effectiveReleaseDate(b)));
+const withDates = getCalendarEntries().sort((a, b) => new Date(a.date) - new Date(b.date));
 
 if (withDates.length === 0) {
 container.innerHTML = `<p class="text-[10px] text-gray-500 py-2">Aucune date de sortie disponible pour le moment.</p>`;
@@ -2076,11 +2102,16 @@ const monthNames = ['janvier','février','mars','avril','mai','juin','juillet','
 const today = new Date();
 today.setHours(0,0,0,0);
 
-container.innerHTML = withDates.map(m => {
-const isBluray = !!m.blurayReleaseDateFR;
-const d = new Date(effectiveReleaseDate(m));
+container.innerHTML = withDates.map(entry => {
+const m = entry.movie;
+const d = new Date(entry.date);
 const dateLabel = `${d.getDate()} ${monthNames[d.getMonth()]} ${d.getFullYear()}`;
 const isFuture = d >= today;
+
+let typeLabel;
+if (entry.type === 'bluray') typeLabel = '<span class="text-cyan-400">• Blu-ray FR</span>';
+else if (entry.type === 'episode') typeLabel = `<span class="text-emerald-400">• Ép. ${entry.episodeInfo.seasonNumber}x${String(entry.episodeInfo.episodeNumber).padStart(2,'0')} (France)</span>`;
+else typeLabel = '<span class="text-gray-500">• Sortie cinéma</span>';
 
 let badge;
 if (isFuture) {
@@ -2095,7 +2126,7 @@ return `
 <img src="${m.poster}" class="w-9 h-14 object-cover rounded-lg shadow flex-shrink-0">
 <div class="flex-1 min-w-0">
 <p class="text-xs font-bold text-white truncate">${m.title}</p>
-<p class="text-[10px] text-gray-400">${dateLabel}${isBluray ? ' <span class="text-cyan-400">• Blu-ray FR</span>' : ' <span class="text-gray-500">• Sortie cinéma</span>'}</p>
+<p class="text-[10px] text-gray-400">${dateLabel} ${typeLabel}</p>
 </div>
 ${badge}
 </div>
@@ -2125,16 +2156,14 @@ const year = wishlistCalDate.getFullYear();
 const month = wishlistCalDate.getMonth();
 label.innerText = `${monthNames[month]} ${year}`;
 
-// Films de la wishlist qui sortent ce mois-ci, regroupés par jour
+// Sorties (wishlist) + prochains épisodes ce mois-ci, regroupés par jour
 const releasesByDay = {};
-wishlist.forEach(m => {
-const rd = effectiveReleaseDate(m);
-if (!rd) return;
-const d = new Date(rd);
+getCalendarEntries().forEach(entry => {
+const d = new Date(entry.date);
 if (isNaN(d) || d.getFullYear() !== year || d.getMonth() !== month) return;
 const key = `${year}-${pad2(month + 1)}-${pad2(d.getDate())}`;
 if (!releasesByDay[key]) releasesByDay[key] = [];
-releasesByDay[key].push(m);
+releasesByDay[key].push(entry);
 });
 
 const firstDay = new Date(year, month, 1);
@@ -2186,16 +2215,14 @@ detail.innerHTML = '';
 return;
 }
 
-const moviesThatDay = wishlist.filter(m => {
-const rd = effectiveReleaseDate(m);
-if (!rd) return false;
-const d = new Date(rd);
+const entriesThatDay = getCalendarEntries().filter(entry => {
+const d = new Date(entry.date);
 if (isNaN(d)) return false;
 const key = `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 return key === wishlistCalSelected;
 });
 
-if (moviesThatDay.length === 0) {
+if (entriesThatDay.length === 0) {
 detail.classList.add('hidden');
 detail.innerHTML = '';
 return;
@@ -2209,15 +2236,22 @@ detail.classList.remove('hidden');
 detail.innerHTML = `
 <div class="pt-3 mt-2 border-t border-white/10 space-y-2">
 <p class="text-[10px] text-gray-400 font-bold uppercase">Sorties du ${dateLabel}</p>
-${moviesThatDay.map(m => `
+${entriesThatDay.map(entry => {
+const m = entry.movie;
+let sub;
+if (entry.type === 'bluray') sub = `<p class="text-[10px] text-cyan-400">Sortie Blu-ray FR</p>`;
+else if (entry.type === 'episode') sub = `<p class="text-[10px] text-emerald-400">Ép. ${entry.episodeInfo.seasonNumber}x${String(entry.episodeInfo.episodeNumber).padStart(2,'0')} — ${entry.episodeInfo.name}</p>`;
+else sub = `<p class="text-[10px] text-gray-500">Sortie cinéma</p>`;
+return `
 <div class="flex items-center gap-3 cursor-pointer hover:bg-white/5 rounded-xl p-1 transition" onclick="openMovieDetail('${m.id}')">
 <img src="${m.poster}" class="w-9 h-14 object-cover rounded-lg shadow flex-shrink-0">
 <div class="min-w-0">
 <p class="text-xs font-bold text-white truncate">${m.title}</p>
-<p class="text-[10px] ${m.blurayReleaseDateFR ? 'text-cyan-400' : 'text-gray-500'}">${m.blurayReleaseDateFR ? 'Sortie Blu-ray FR' : 'Sortie cinéma'}</p>
+${sub}
 </div>
 </div>
-`).join('')}
+`;
+}).join('')}
 </div>
 `;
 }
