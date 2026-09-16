@@ -161,7 +161,7 @@ border-color: rgba(255, 255, 255, 0.22);
 transform: translateY(-1px);
 }
 .chart-box {
-height: 230px;
+height: 190px;
 position: relative;
 }
 .chart-box canvas {
@@ -608,6 +608,24 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <div id="tabStats" class="hidden glass-card rounded-3xl border border-white/10 divide-y divide-white/10 overflow-hidden">
 <div class="p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
+<span class="icon-chip" data-icon="barchart"></span>
+<div>
+<h3 class="text-sm font-bold text-white">Affichage des répartitions</h3>
+<p class="text-[11px] text-gray-400">Choisir comment les données sont présentées.</p>
+</div>
+</div>
+<div class="glass-pill p-1.5 rounded-2xl flex justify-between items-center shadow-md">
+<button id="statsViewListBtn" onclick="setStatsView(false)" class="flex-1 py-2 rounded-xl font-bold text-xs transition text-gray-400 hover:text-white flex items-center justify-center gap-1.5">
+<span class="icon-inline w-3.5 h-3.5" data-icon="list"></span> Liste simple
+</button>
+<button id="statsViewChartBtn" onclick="setStatsView(true)" class="flex-1 py-2 rounded-xl font-bold text-xs transition bg-cyan-600 text-white shadow flex items-center justify-center gap-1.5">
+<span class="icon-inline w-3.5 h-3.5" data-icon="barchart"></span> Avec diagramme
+</button>
+</div>
+</div>
+
+<div class="p-4 md:p-5 space-y-3">
+<div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="grid"></span>
 <div>
 <h3 class="text-sm font-bold text-white">Vue d'ensemble</h3>
@@ -743,6 +761,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 <p id="statTimelineEmpty" class="text-[10px] text-gray-500">Aucune donnée disponible.</p>
+<div id="statTimelineList" class="hidden space-y-2 text-xs text-gray-300"></div>
 <div id="chartContainerTimeline" class="hidden py-2 chart-box">
 <canvas id="chartTimeline"></canvas>
 </div>
@@ -989,6 +1008,7 @@ let isListView = false;
 let isWishlistListView = false;
 let html5QrcodeScanner = null;
 let chartInstances = {};
+let statsShowCharts = true;
 
 // Recherche TMDB
 let currentSearchQuery = '';
@@ -2172,6 +2192,17 @@ showToast("Film supprimé.");
 
 // --- STATISTIQUES UNIFIÉES ET INTELLIGENTES ---
 
+function setStatsView(showCharts) {
+statsShowCharts = showCharts;
+const listBtn = document.getElementById('statsViewListBtn');
+const chartBtn = document.getElementById('statsViewChartBtn');
+const activeClass = 'flex-1 py-2 rounded-xl font-bold text-xs transition bg-cyan-600 text-white shadow flex items-center justify-center gap-1.5';
+const inactiveClass = 'flex-1 py-2 rounded-xl font-bold text-xs transition text-gray-400 hover:text-white flex items-center justify-center gap-1.5';
+listBtn.className = showCharts ? inactiveClass : activeClass;
+chartBtn.className = showCharts ? activeClass : inactiveClass;
+renderStats();
+}
+
 function renderStats() {
 const totalMovies = collection.length;
 let totalEditions = 0;
@@ -2293,8 +2324,16 @@ listElem.appendChild(item);
 });
 
 if (chartContainer) {
+if (statsShowCharts) {
 chartContainer.classList.remove('hidden');
 renderBarChart(canvasId, entries.map(e => e[0]), entries.map(e => e[1]));
+} else {
+chartContainer.classList.add('hidden');
+if (chartInstances[canvasId]) {
+chartInstances[canvasId].destroy();
+delete chartInstances[canvasId];
+}
+}
 }
 }
 
@@ -2302,21 +2341,41 @@ function renderTimelineChart(monthsMap) {
 const keys = Object.keys(monthsMap).sort();
 const emptyMsg = document.getElementById('statTimelineEmpty');
 const container = document.getElementById('chartContainerTimeline');
+const listElem = document.getElementById('statTimelineList');
 
 if (keys.length === 0) {
 emptyMsg.classList.remove('hidden');
 container.classList.add('hidden');
+listElem.classList.add('hidden');
 return;
 }
 emptyMsg.classList.add('hidden');
-container.classList.remove('hidden');
 
 const monthNames = ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'];
+const monthNamesFull = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 const labels = keys.map(k => {
 const [y, mo] = k.split('-');
 return `${monthNames[parseInt(mo, 10) - 1]} ${y.slice(2)}`;
 });
 const data = keys.map(k => monthsMap[k]);
+
+if (!statsShowCharts) {
+container.classList.add('hidden');
+if (chartInstances['chartTimeline']) {
+chartInstances['chartTimeline'].destroy();
+delete chartInstances['chartTimeline'];
+}
+listElem.classList.remove('hidden');
+listElem.innerHTML = keys.slice().reverse().map(k => {
+const [y, mo] = k.split('-');
+const label = `${monthNamesFull[parseInt(mo, 10) - 1]} ${y}`;
+return `<div class="flex justify-between items-center py-1 border-b border-white/5"><span class="text-gray-300">${label}</span><span class="font-bold text-cyan-400">${monthsMap[k]}</span></div>`;
+}).join('');
+return;
+}
+
+listElem.classList.add('hidden');
+container.classList.remove('hidden');
 
 if (chartInstances['chartTimeline']) {
 chartInstances['chartTimeline'].destroy();
@@ -2351,28 +2410,35 @@ if (chartInstances[canvasId]) {
 chartInstances[canvasId].destroy();
 }
 
+// Labels raccourcis pour ne pas surcharger l'axe horizontal
+const shortLabels = labels.map(l => l.length > 12 ? l.slice(0, 11) + '…' : l);
+
 const ctx = document.getElementById(canvasId).getContext('2d');
 chartInstances[canvasId] = new Chart(ctx, {
 type: 'bar',
 data: {
-labels: labels,
+labels: shortLabels,
 datasets: [{
 data: data,
 backgroundColor: '#00e5ff',
 borderRadius: 6,
-maxBarThickness: 22
+maxBarThickness: 30
 }]
 },
 options: {
-indexAxis: 'y',
 responsive: true,
 maintainAspectRatio: false,
 plugins: {
-legend: { display: false }
+legend: { display: false },
+tooltip: {
+callbacks: {
+title: (items) => labels[items[0].dataIndex]
+}
+}
 },
 scales: {
-x: { ticks: { color: '#9ca3af', stepSize: 1, precision: 0 }, grid: { color: 'rgba(255,255,255,0.06)' }, beginAtZero: true },
-y: { ticks: { color: '#9ca3af', font: { size: 10 } }, grid: { display: false } }
+x: { ticks: { color: '#9ca3af', font: { size: 9 }, maxRotation: 40, minRotation: 0 }, grid: { display: false } },
+y: { ticks: { color: '#9ca3af', stepSize: 1, precision: 0 }, grid: { color: 'rgba(255,255,255,0.06)' }, beginAtZero: true }
 }
 }
 });
