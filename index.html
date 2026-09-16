@@ -599,6 +599,8 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <option class="bg-gray-900" value="title_asc">Titre (A ➔ Z)</option>
 <option class="bg-gray-900" value="title_desc">Titre (Z ➔ A)</option>
 <option class="bg-gray-900" value="estimated_desc">Estimation (Élevée)</option>
+<option class="bg-gray-900" value="year_desc">Année (Récentes)</option>
+<option class="bg-gray-900" value="rating_desc">Note TMDB (Élevée)</option>
 </select>
 </div>
 </div>
@@ -1122,7 +1124,8 @@ format: movie.format || 'Blu-ray 1080p',
 editionType: movie.editionType || 'Amaray',
 purchasePrice: movie.purchasePrice !== undefined ? movie.purchasePrice : '',
 estimatedPrice: movie.estimatedPrice !== undefined ? movie.estimatedPrice : '',
-purchaseLocation: movie.purchaseLocation || ''
+purchaseLocation: movie.purchaseLocation || '',
+barcode: movie.barcode || ''
 }];
 }
 return movie;
@@ -1527,8 +1530,14 @@ voteCount,
 seen: false,
 isWishlist: isWishlist,
 addedAt: new Date().toISOString(),
-editions: [{ id: 'ed_' + Date.now(), title: 'Édition Standard', format: 'Blu-ray 1080p', editionType: 'Amaray', purchasePrice: '', estimatedPrice: '', purchaseLocation: '' }]
+editions: [{ id: 'ed_' + Date.now(), title: 'Édition Standard', format: 'Blu-ray 1080p', editionType: 'Amaray', barcode: '', purchasePrice: '', estimatedPrice: '', purchaseLocation: '' }]
 };
+
+if (window.lastScannedBarcode) {
+movie.editions[0].barcode = window.lastScannedBarcode;
+window.lastScannedBarcode = '';
+window.lastScannedProductTitle = '';
+}
 
 const saveResult = await saveMovieToCloud(movie);
 if (saveResult?.success && saveResult.cloudId) {
@@ -2135,6 +2144,10 @@ ${movie.editions.length > 1 ? `<button onclick="removeEdition('${movie.id}', ${i
 <input type="text" value="${ed.title || ''}" onchange="updateEditionField('${movie.id}', ${idx}, 'title', this.value)" placeholder="Steelbook 4K" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
 </div>
 <div>
+<label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">EAN / Code-barres</label>
+<input type="text" inputmode="numeric" value="${ed.barcode || ''}" onchange="updateEditionField('${movie.id}', ${idx}, 'barcode', this.value.replace(/\D/g, ''))" placeholder="3760…" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
+</div>
+<div>
 <label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">Format</label>
 <select onchange="updateEditionField('${movie.id}', ${idx}, 'format', this.value)" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
 <option class="bg-gray-900" value="4K UHD" ${ed.format === '4K UHD' ? 'selected' : ''}>4K UHD</option>
@@ -2263,7 +2276,7 @@ showToast(value ? "Date de sortie Blu-ray enregistrée." : "Date de sortie Blu-r
 async function addEditionToMovie(movieId) {
 let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
 if (!movie) return;
-const edition = { id: 'ed_' + Date.now(), title: 'Nouvelle Édition', format: 'Blu-ray 1080p', editionType: 'Amaray', purchasePrice: '', estimatedPrice: '', purchaseLocation: '' };
+const edition = { id: 'ed_' + Date.now(), title: 'Nouvelle Édition', format: 'Blu-ray 1080p', editionType: 'Amaray', barcode: '', purchasePrice: '', estimatedPrice: '', purchaseLocation: '' };
 movie.editions.push(edition);
 const result = await updateMovieInCloud(movie);
 if (!result.success) movie.editions.pop();
@@ -2684,20 +2697,47 @@ document.getElementById('scanner-container').classList.add('hidden');
 
 async function onScanSuccess(decodedText) {
 stopScanner();
-showToast(`Code scanné : ${decodedText}`);
+const barcode = String(decodedText || '').trim();
+if (!barcode) return;
+showToast(`Code scanné : ${barcode}`);
+
+// On tente d'abord une identification produit par EAN/UPC. Si elle échoue,
+// on conserve le comportement de secours via la recherche TMDB.
 try {
-const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(decodedText)}&language=fr-FR`);
-const data = await res.json();
-if (data.results && data.results.length > 0) {
-displaySearchResults(data.results);
-} else {
-document.getElementById('searchInput').value = decodedText;
-triggerNewSearch();
+const productRes = await fetch(`https://api.upcitemdb.com/prod/trial/lookup?upc=${encodeURIComponent(barcode)}`);
+if (productRes.ok) {
+const productData = await productRes.json();
+const item = productData?.items?.[0];
+const productTitle = item?.title || item?.description || '';
+if (productTitle) {
+const tmdbRes = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(productTitle)}&language=fr-FR&page=1`);
+const tmdbData = await tmdbRes.json();
+const results = (tmdbData.results || []).filter(m => m.media_type === 'movie' || m.media_type === 'tv');
+if (results.length) {
+// Mémorise le code pour le prochain ajout : l'utilisateur pourra le retrouver
+// dans le résultat sélectionné et le renseigner sur l'édition.
+window.lastScannedBarcode = barcode;
+window.lastScannedProductTitle = productTitle;
+currentSearchQuery = productTitle;
+currentSearchPage = 1;
+const input = document.getElementById('searchInput');
+if (input) input.value = productTitle;
+showToast(`Produit identifié : ${productTitle}`);
+return displaySearchResults(results);
+}
+}
 }
 } catch (e) {
-showToast("Erreur lors de la recherche du code-barres.");
+console.warn('Identification EAN indisponible, recherche TMDB utilisée :', e);
 }
+
+window.lastScannedBarcode = barcode;
+document.getElementById('searchInput').value = barcode;
+currentSearchQuery = barcode;
+currentSearchPage = 1;
+await searchTMDB();
 }
+
 
 // --- EXPORTS / IMPORTS ---
 function exportToExcel() {
