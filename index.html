@@ -1099,6 +1099,25 @@ if (m.imdbUserRating === undefined || m.imdbUserRating === null) return '';
 return `<span class="inline-flex items-center gap-1 text-amber-400 font-bold" title="Votre note IMDb">${ic('star', cls)}${m.imdbUserRating}/10</span>`;
 }
 
+function escapeHtml(value) {
+return String(value ?? '')
+.replace(/&/g, '&amp;')
+.replace(/</g, '&lt;')
+.replace(/>/g, '&gt;')
+.replace(/"/g, '&quot;')
+.replace(/'/g, '&#39;');
+}
+
+function safeImageUrl(value) {
+const url = String(value || '').trim();
+if (/^data:image\/(?:png|jpeg|gif|webp);base64,[a-z0-9+/=]+$/i.test(url)) return url;
+try {
+const parsed = new URL(url);
+if (parsed.protocol === 'https:') return escapeHtml(parsed.href.replace(/[\s'"()\\]/g, char => encodeURIComponent(char)));
+} catch (_) {}
+return 'https://via.placeholder.com/300x450?text=Pas+d+image';
+}
+
 function applyStaticIcons() {
 document.querySelectorAll('[data-icon]').forEach(el => {
 const name = el.dataset.icon;
@@ -1512,7 +1531,7 @@ document.getElementById('prevPageBtn').disabled = (currentSearchPage <= 1);
 document.getElementById('nextPageBtn').disabled = (currentSearchPage >= totalSearchPages);
 
 results.forEach(m => {
-const poster = m.poster_path ? `https://image.tmdb.org/t/p/w200${m.poster_path}` : 'https://via.placeholder.com/200x300?text=Pas+d+image';
+const poster = safeImageUrl(m.poster_path ? `https://image.tmdb.org/t/p/w200${m.poster_path}` : 'https://via.placeholder.com/200x300?text=Pas+d+image');
 const isTv = m.media_type === 'tv';
 const title = m.title || m.name || 'Sans titre';
 const date = m.release_date || m.first_air_date || '';
@@ -1526,7 +1545,7 @@ item.innerHTML = `
 <img src="${poster}" class="w-12 h-16 object-cover rounded-xl shadow">
 <div class="flex-1 min-width-0">
 <div class="flex items-center gap-1.5 mb-0.5"><span class="text-[8px] uppercase tracking-wider font-bold ${isTv ? 'text-pink-300' : 'text-cyan-300'}">${typeLabel}</span></div>
-<h4 class="text-xs font-bold text-white truncate">${title}</h4>
+<h4 class="text-xs font-bold text-white truncate">${escapeHtml(title)}</h4>
 <p class="text-[10px] text-gray-400">${year}</p>
 </div>
 <div class="flex flex-col gap-1">
@@ -1803,10 +1822,10 @@ const card = document.createElement('div');
 card.className = 'relative rounded-2xl overflow-hidden cursor-pointer bg-black border border-white/10 hover:border-cyan-500/50 transition';
 card.onclick = () => openMovieDetail(m.id);
 card.innerHTML = `
-<img src="${m.poster}" class="w-full aspect-[2/3] object-cover">
+<img src="${safeImageUrl(m.poster)}" class="w-full aspect-[2/3] object-cover">
 <div class="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none"></div>
 <div class="absolute inset-x-0 bottom-0 p-2">
-<h4 class="text-[11px] font-bold text-white truncate">${m.title}</h4>
+<h4 class="text-[11px] font-bold text-white truncate">${escapeHtml(m.title)}</h4>
 <p class="text-[9px] text-cyan-300 font-semibold mt-0.5">${totals.count} éd. • ${totals.totalPurchase.toFixed(2)} €</p>
 </div>
 `;
@@ -1936,10 +1955,10 @@ ${imdbBadge(m)}
 if (isListView) {
 card.className = "relative rounded-2xl overflow-hidden cursor-pointer bg-black h-28 border border-white/10 hover:border-cyan-500/50 transition";
 card.innerHTML = `
-<img src="${m.poster}" class="absolute left-0 top-0 h-full w-auto">
+<img src="${safeImageUrl(m.poster)}" class="absolute left-0 top-0 h-full w-auto">
 <div class="absolute inset-0 bg-gradient-to-r from-transparent via-black/75 to-black"></div>
 <div class="absolute inset-y-0 right-0 w-[68%] flex flex-col justify-center items-end p-3 text-right">
-<h4 class="text-xs font-bold text-white truncate w-full">${m.title}</h4>
+<h4 class="text-xs font-bold text-white truncate w-full">${escapeHtml(m.title)}</h4>
 <div class="flex items-center justify-end gap-3 text-[10px] mt-1">
 <span class="text-cyan-300 font-semibold">${totals.count} éd.</span>
 <span class="font-bold text-emerald-400">${totals.totalPurchase.toFixed(2)} €</span>
@@ -1953,10 +1972,10 @@ ${imdbBadge(m)}
 } else {
 card.className = "relative rounded-2xl overflow-hidden cursor-pointer bg-black border border-white/10 hover:border-cyan-500/50 transition";
 card.innerHTML = `
-<img src="${m.poster}" class="w-full aspect-[2/3] object-cover">
+<img src="${safeImageUrl(m.poster)}" class="w-full aspect-[2/3] object-cover">
 <div class="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none"></div>
 <div class="absolute inset-x-0 bottom-0 p-2.5">
-<h4 class="text-xs font-bold text-white truncate">${m.title}</h4>
+<h4 class="text-xs font-bold text-white truncate">${escapeHtml(m.title)}</h4>
 <div class="flex items-center justify-between text-[10px] mt-1">
 <span class="text-cyan-300 font-semibold">${totals.count} éd.</span>
 <span class="font-bold text-emerald-400">${totals.totalPurchase.toFixed(2)} €</span>
@@ -2048,10 +2067,10 @@ if (isWishlistListView) {
 card.className = "relative rounded-2xl overflow-hidden cursor-pointer bg-white/[0.035] border border-pink-500/20 hover:border-pink-400/45 hover:bg-white/[0.055] transition-all duration-200";
 card.innerHTML = `
 <div class="flex items-center gap-3 p-2">
-<img src="${m.poster}" class="w-12 h-[4.5rem] object-cover rounded-xl flex-shrink-0 border border-white/10 shadow-lg">
+<img src="${safeImageUrl(m.poster)}" class="w-12 h-[4.5rem] object-cover rounded-xl flex-shrink-0 border border-white/10 shadow-lg">
 <div class="min-w-0 flex-1">
 <span class="inline-block text-[8px] uppercase tracking-wider font-bold text-pink-200 bg-pink-500/10 border border-pink-300/20 px-1.5 py-0.5 rounded-full mb-1">Wishlist</span>
-<h4 class="text-xs font-bold text-white truncate">${m.title}</h4>
+<h4 class="text-xs font-bold text-white truncate">${escapeHtml(m.title)}</h4>
 <div class="flex items-center gap-3 text-[9px] mt-1.5">
 <span class="text-pink-300 font-semibold">${priceLabel}</span>
 ${imdbBadge(m)}
@@ -2063,13 +2082,13 @@ ${imdbBadge(m)}
 card.className = "group relative rounded-2xl overflow-hidden cursor-pointer bg-black border border-pink-500/20 hover:border-pink-400/50 transition-all duration-200 shadow-lg hover:shadow-pink-500/10 hover:-translate-y-0.5";
 card.innerHTML = `
 <div class="relative aspect-[2/3] overflow-hidden">
-<img src="${m.poster}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.035]">
+<img src="${safeImageUrl(m.poster)}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.035]">
 <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/10 to-transparent"></div>
 <div class="absolute top-2 left-2">
 <span class="text-[8px] uppercase tracking-wider font-bold text-pink-100 bg-pink-500/20 backdrop-blur-md border border-pink-300/20 px-1.5 py-1 rounded-full">Wishlist</span>
 </div>
 <div class="absolute inset-x-0 bottom-0 p-2.5">
-<h4 class="text-[11px] font-bold text-white leading-tight truncate">${m.title}</h4>
+<h4 class="text-[11px] font-bold text-white leading-tight truncate">${escapeHtml(m.title)}</h4>
 <div class="flex items-center justify-between gap-2 mt-1.5">
 <span class="text-[10px] font-bold text-pink-300">${priceLabel}</span>
 ${imdbBadge(m) || ''}
@@ -2140,7 +2159,7 @@ function renderHomeCalendarDetail(allEvents, byDay) {
   else { const today=new Date();today.setHours(0,0,0,0); events=allEvents.filter(e=>new Date(e.date+'T12:00:00')>=today).slice(0,8); if(sub)sub.textContent='Prochaines dates de votre calendrier.'; }
   if(count)count.textContent=`${events.length} événement${events.length>1?'s':''}`;
   if(!events.length){box.innerHTML='<p class="text-[10px] text-gray-500 py-3">Aucune sortie prévue.</p>';return;}
-  box.innerHTML=events.map(e=>{const d=new Date(e.date+'T12:00:00'); const date=d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}); const click=e.type==='wishlist'?`openMovieDetail('${e.movieId}')`:`openTrackedSeriesDetail(${e.tmdbId})`; return `<div onclick="${click}" class="flex items-center gap-2.5 p-2 rounded-xl bg-white/[0.025] border border-white/5 cursor-pointer hover:bg-white/[0.05] transition"><img src="${e.poster}" class="w-8 h-12 object-cover rounded-lg"><div class="min-w-0 flex-1"><div class="flex items-center gap-1.5"><span class="text-[8px] font-bold px-1.5 py-0.5 rounded-full ${e.type==='wishlist'?'bg-pink-500/10 text-pink-300':'bg-purple-500/10 text-purple-300'}">${e.label}</span><span class="text-[9px] text-gray-500">${date}</span></div><p class="text-[10px] font-bold text-white truncate mt-1">${e.title}</p><p class="text-[9px] text-gray-400 truncate">${e.detail}</p></div></div>`;}).join('');
+  box.innerHTML=events.map(e=>{const d=new Date(e.date+'T12:00:00'); const date=d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}); const idArg=escapeHtml(JSON.stringify(String(e.type==='wishlist'?e.movieId:e.tmdbId))); const click=e.type==='wishlist'?`openMovieDetail(${idArg})`:`openTrackedSeriesDetail(${idArg})`; return `<div onclick="${click}" class="flex items-center gap-2.5 p-2 rounded-xl bg-white/[0.025] border border-white/5 cursor-pointer hover:bg-white/[0.05] transition"><img src="${safeImageUrl(e.poster)}" class="w-8 h-12 object-cover rounded-lg"><div class="min-w-0 flex-1"><div class="flex items-center gap-1.5"><span class="text-[8px] font-bold px-1.5 py-0.5 rounded-full ${e.type==='wishlist'?'bg-pink-500/10 text-pink-300':'bg-purple-500/10 text-purple-300'}">${escapeHtml(e.label)}</span><span class="text-[9px] text-gray-500">${date}</span></div><p class="text-[10px] font-bold text-white truncate mt-1">${escapeHtml(e.title)}</p><p class="text-[9px] text-gray-400 truncate">${escapeHtml(e.detail)}</p></div></div>`;}).join('');
 }
 
 function renderWishlistCalendar() {
@@ -2176,9 +2195,9 @@ badge = `<span class="text-[9px] font-bold text-gray-400 bg-white/5 border borde
 
 return `
 <div class="flex items-center gap-3 py-2 border-b border-white/5 last:border-0 cursor-pointer hover:bg-white/5 rounded-xl px-1 transition" onclick="openMovieDetail('${m.id}')">
-<img src="${m.poster}" class="w-9 h-14 object-cover rounded-lg shadow flex-shrink-0">
+<img src="${safeImageUrl(m.poster)}" class="w-9 h-14 object-cover rounded-lg shadow flex-shrink-0">
 <div class="flex-1 min-w-0">
-<p class="text-xs font-bold text-white truncate">${m.title}</p>
+<p class="text-xs font-bold text-white truncate">${escapeHtml(m.title)}</p>
 <p class="text-[10px] text-gray-400">${dateLabel}${isBluray ? ' <span class="text-cyan-400">• Blu-ray FR</span>' : ' <span class="text-gray-500">• Sortie cinéma</span>'}</p>
 </div>
 ${badge}
@@ -2295,9 +2314,9 @@ detail.innerHTML = `
 <p class="text-[10px] text-gray-400 font-bold uppercase">Sorties du ${dateLabel}</p>
 ${moviesThatDay.map(m => `
 <div class="flex items-center gap-3 cursor-pointer hover:bg-white/5 rounded-xl p-1 transition" onclick="openMovieDetail('${m.id}')">
-<img src="${m.poster}" class="w-9 h-14 object-cover rounded-lg shadow flex-shrink-0">
+<img src="${safeImageUrl(m.poster)}" class="w-9 h-14 object-cover rounded-lg shadow flex-shrink-0">
 <div class="min-w-0">
-<p class="text-xs font-bold text-white truncate">${m.title}</p>
+<p class="text-xs font-bold text-white truncate">${escapeHtml(m.title)}</p>
 <p class="text-[10px] ${m.blurayReleaseDateFR ? 'text-cyan-400' : 'text-gray-500'}">${m.blurayReleaseDateFR ? 'Sortie Blu-ray FR' : 'Sortie cinéma'}</p>
 </div>
 </div>
@@ -2408,20 +2427,27 @@ function seriesStatusLabel(status) { return status === 'completed' ? 'Terminée'
 async function fetchTrackedSeriesEpisodes(series) {
 const seasons = Number(series.number_of_seasons || series.numberOfSeasons || 0);
 const episodes = [];
+const failedSeasons = new Set();
 for (let season = 1; season <= seasons; season++) {
 try {
 const res = await fetch(`https://api.themoviedb.org/3/tv/${series.tmdb_id}/season/${season}?api_key=${API_KEY}&language=fr-FR`);
 const data = await res.json();
-if (!res.ok) continue;
+if (!res.ok) { failedSeasons.add(season); continue; }
 (data.episodes || []).forEach(ep => episodes.push({
  id: ep.id, season_number: ep.season_number, episode_number: ep.episode_number, name: ep.name || '', air_date: ep.air_date || '', runtime: ep.runtime || null, overview: ep.overview || '', still_path: ep.still_path || '', watched: false
 }));
-} catch (e) { console.warn('Erreur saison', season, e); }
+} catch (e) { failedSeasons.add(season); console.warn('Erreur saison', season, e); }
 }
 const oldMap = Object.fromEntries((series.episodes || []).map(e => [episodeKey(e.season_number, e.episode_number), e]));
-episodes.forEach(ep => { const old = oldMap[episodeKey(ep.season_number, ep.episode_number)]; if (old) ep.watched = !!old.watched; });
+episodes.forEach(ep => { const old = oldMap[episodeKey(ep.season_number, ep.episode_number)]; if (old) { ep.watched = !!old.watched; ep.watchedAt = old.watchedAt || null; } });
+if (failedSeasons.size) {
+(series.episodes || []).forEach(ep => {
+if (failedSeasons.has(Number(ep.season_number)) && !episodes.some(current => episodeKey(current.season_number, current.episode_number) === episodeKey(ep.season_number, ep.episode_number))) episodes.push(ep);
+});
+}
 series.episodes = episodes;
 series.updatedAt = new Date().toISOString();
+return { success: failedSeasons.size === 0, failedSeasons: [...failedSeasons] };
 }
 
 async function trackSeriesFromTMDB(tmdbData) {
@@ -2489,12 +2515,12 @@ const upcoming = [];
 trackedSeries.forEach(s => seriesEpisodes(s).forEach(e => { if (e.air_date && new Date(e.air_date) >= new Date(new Date().setHours(0,0,0,0)) && !e.watched) upcoming.push({...e, seriesTitle:s.title, poster:s.poster, tmdb_id:s.tmdb_id}); }));
 upcoming.sort((a,b) => new Date(a.air_date)-new Date(b.air_date));
 const upList = document.getElementById('trackedUpcomingList');
-if (upList) { document.getElementById('trackedUpcomingCount').textContent = `${upcoming.length} à venir`; upList.innerHTML = upcoming.slice(0,6).map(e => `<div class="flex items-center gap-2 p-2 rounded-xl bg-white/[0.025] border border-white/5"><img src="${e.poster}" class="w-7 h-10 rounded-lg object-cover"><div class="min-w-0 flex-1"><p class="text-[10px] font-bold text-white truncate">${e.seriesTitle}</p><p class="text-[9px] text-gray-400">S${String(e.season_number).padStart(2,'0')}E${String(e.episode_number).padStart(2,'0')} · ${e.name || 'Épisode'}</p></div><span class="text-[9px] font-bold text-purple-300 whitespace-nowrap">${formatSeriesDate(e.air_date)}</span></div>`).join('') || '<p class="text-[10px] text-gray-500 py-2">Aucun épisode à venir.</p>'; }
+if (upList) { document.getElementById('trackedUpcomingCount').textContent = `${upcoming.length} à venir`; upList.innerHTML = upcoming.slice(0,6).map(e => `<div class="flex items-center gap-2 p-2 rounded-xl bg-white/[0.025] border border-white/5"><img src="${safeImageUrl(e.poster)}" class="w-7 h-10 rounded-lg object-cover"><div class="min-w-0 flex-1"><p class="text-[10px] font-bold text-white truncate">${escapeHtml(e.seriesTitle)}</p><p class="text-[9px] text-gray-400">S${String(e.season_number).padStart(2,'0')}E${String(e.episode_number).padStart(2,'0')} · ${escapeHtml(e.name || 'Épisode')}</p></div><span class="text-[9px] font-bold text-purple-300 whitespace-nowrap">${formatSeriesDate(e.air_date)}</span></div>`).join('') || '<p class="text-[10px] text-gray-500 py-2">Aucun épisode à venir.</p>'; }
 const filtered = trackedSeries.filter(s => trackedSeriesFilter === 'all' || seriesStatus(s) === trackedSeriesFilter);
 if (!filtered.length) { grid.innerHTML = '<p class="text-[10px] text-gray-500 text-center py-6">Aucune série dans cette catégorie.</p>'; renderSeriesCalendar(); return; }
 grid.innerHTML = filtered.map(s => {
 const p = seriesProgress(s), status = seriesStatus(s), eps = seriesEpisodes(s); const next = eps.find(e => !e.watched && e.air_date && new Date(e.air_date) >= new Date(new Date().setHours(0,0,0,0)));
-return `<div onclick="openTrackedSeriesDetail(${s.tmdb_id})" class="glass-card rounded-2xl border border-white/10 p-2.5 flex gap-3 cursor-pointer hover:border-purple-400/30 hover:bg-white/[0.04] transition"><img src="${s.poster}" class="w-16 h-24 object-cover rounded-xl border border-white/10 shadow"><div class="min-w-0 flex-1"><div class="flex items-center justify-between gap-2"><h4 class="text-xs font-bold text-white truncate">${s.title}</h4><button onclick="event.stopPropagation();removeTrackedSeries(${s.tmdb_id})" class="text-gray-500 hover:text-red-400 p-1">${ic('x','w-3.5 h-3.5')}</button></div><div class="flex items-center gap-1.5 mt-1"><span class="text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-400/20">${seriesStatusLabel(status)}</span><span class="text-[9px] text-gray-500">${p.watched}/${p.total} épisodes</span></div><div class="h-1.5 bg-white/10 rounded-full mt-2 overflow-hidden"><div class="h-full bg-purple-500 rounded-full" style="width:${p.pct}%"></div></div>${next ? `<p class="text-[9px] text-gray-400 mt-2">Prochain : <span class="text-white">S${String(next.season_number).padStart(2,'0')}E${String(next.episode_number).padStart(2,'0')}</span> · ${formatSeriesDate(next.air_date)}</p>` : '<p class="text-[9px] text-emerald-300 mt-2">Tous les épisodes disponibles sont vus.</p>'}<p class="text-[8px] text-purple-300 mt-2 font-semibold">Cliquer pour voir saisons et épisodes →</p></div></div>`;
+return `<div onclick="openTrackedSeriesDetail(${Number(s.tmdb_id)})" class="glass-card rounded-2xl border border-white/10 p-2.5 flex gap-3 cursor-pointer hover:border-purple-400/30 hover:bg-white/[0.04] transition"><img src="${safeImageUrl(s.poster)}" class="w-16 h-24 object-cover rounded-xl border border-white/10 shadow"><div class="min-w-0 flex-1"><div class="flex items-center justify-between gap-2"><h4 class="text-xs font-bold text-white truncate">${escapeHtml(s.title)}</h4><button onclick="event.stopPropagation();removeTrackedSeries(${Number(s.tmdb_id)})" class="text-gray-500 hover:text-red-400 p-1">${ic('x','w-3.5 h-3.5')}</button></div><div class="flex items-center gap-1.5 mt-1"><span class="text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-400/20">${seriesStatusLabel(status)}</span><span class="text-[9px] text-gray-500">${p.watched}/${p.total} épisodes</span></div><div class="h-1.5 bg-white/10 rounded-full mt-2 overflow-hidden"><div class="h-full bg-purple-500 rounded-full" style="width:${p.pct}%"></div></div>${next ? `<p class="text-[9px] text-gray-400 mt-2">Prochain : <span class="text-white">S${String(next.season_number).padStart(2,'0')}E${String(next.episode_number).padStart(2,'0')}</span> · ${formatSeriesDate(next.air_date)}</p>` : '<p class="text-[9px] text-emerald-300 mt-2">Tous les épisodes disponibles sont vus.</p>'}<p class="text-[8px] text-purple-300 mt-2 font-semibold">Cliquer pour voir saisons et épisodes →</p></div></div>`;
 }).join('');
 renderSeriesCalendar();
 if (document.getElementById('homeCalendarGrid')) renderHomeSummaryCalendar();
@@ -2509,7 +2535,7 @@ function changeSeriesCalendarMonth(delta) { seriesCalDate=new Date(seriesCalDate
 function renderSeriesCalendar() {
 const grid=document.getElementById('seriesCalendarGrid'), label=document.getElementById('seriesCalMonthLabel'); if(!grid||!label)return; const y=seriesCalDate.getFullYear(),m=seriesCalDate.getMonth(); const months=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];label.textContent=`${months[m]} ${y}`; const byDay={}; trackedSeries.forEach(s=>seriesEpisodes(s).forEach(e=>{if(!e.air_date)return;const d=new Date(e.air_date+'T12:00:00');if(d.getFullYear()!==y||d.getMonth()!==m)return;const k=`${y}-${pad2(m+1)}-${pad2(d.getDate())}`;(byDay[k]??=[]).push({...e,seriesTitle:s.title,poster:s.poster,tmdb_id:s.tmdb_id});})); const first=new Date(y,m,1);let offset=first.getDay()-1;if(offset<0)offset=6;const days=new Date(y,m+1,0).getDate();const now=new Date();const today=`${now.getFullYear()}-${pad2(now.getMonth()+1)}-${pad2(now.getDate())}`;let html='';for(let i=0;i<offset;i++)html+='<div></div>';for(let d=1;d<=days;d++){const k=`${y}-${pad2(m+1)}-${pad2(d)}`,has=!!byDay[k],sel=k===seriesCalSelected,isToday=k===today;html+=`<button onclick="selectSeriesCalendarDay('${k}')" class="aspect-square rounded-lg flex flex-col items-center justify-center text-[10px] md:text-[11px] transition ${sel?'bg-purple-500 text-white':isToday?'text-purple-300 border border-purple-400/50':'text-gray-300 hover:bg-white/10'}"><span>${d}</span>${has?`<span class="w-1 h-1 rounded-full mt-0.5 ${sel?'bg-white':'bg-purple-400'}"></span>`:''}</button>`;}grid.innerHTML=html;renderSeriesCalendarDayDetail(byDay); }
 function selectSeriesCalendarDay(k){seriesCalSelected=seriesCalSelected===k?null:k;renderSeriesCalendar();}
-function renderSeriesCalendarDayDetail(byDayOverride){const detail=document.getElementById('seriesCalendarDayDetail');if(!detail)return;if(!seriesCalSelected){detail.classList.add('hidden');detail.innerHTML='';return;}const y=seriesCalSelected.split('-')[0];const m=Number(seriesCalSelected.split('-')[1])-1;const byDay=byDayOverride||{};const eps=byDay[seriesCalSelected]||[];if(!eps.length){detail.classList.add('hidden');return;}detail.classList.remove('hidden');detail.innerHTML=`<div class="pt-2 mt-2 border-t border-white/10 space-y-1.5">${eps.map(e=>`<div class="flex items-center gap-2 p-1.5 rounded-xl bg-white/[0.025]"><img src="${e.poster}" class="w-7 h-10 object-cover rounded-lg"><div class="min-w-0 flex-1"><p class="text-[10px] font-bold text-white truncate">${e.seriesTitle}</p><p class="text-[9px] text-gray-500">S${String(e.season_number).padStart(2,'0')}E${String(e.episode_number).padStart(2,'0')} · ${e.name||'Épisode'}</p></div><button onclick="toggleTrackedEpisode(${e.tmdb_id},${e.season_number},${e.episode_number})" class="text-[9px] font-bold ${e.watched?'text-emerald-300':'text-gray-400'}">${e.watched?'✓ Vu':'À voir'}</button></div>`).join('')}</div>`; }
+function renderSeriesCalendarDayDetail(byDayOverride){const detail=document.getElementById('seriesCalendarDayDetail');if(!detail)return;if(!seriesCalSelected){detail.classList.add('hidden');detail.innerHTML='';return;}const y=seriesCalSelected.split('-')[0];const m=Number(seriesCalSelected.split('-')[1])-1;const byDay=byDayOverride||{};const eps=byDay[seriesCalSelected]||[];if(!eps.length){detail.classList.add('hidden');return;}detail.classList.remove('hidden');detail.innerHTML=`<div class="pt-2 mt-2 border-t border-white/10 space-y-1.5">${eps.map(e=>`<div class="flex items-center gap-2 p-1.5 rounded-xl bg-white/[0.025]"><img src="${safeImageUrl(e.poster)}" class="w-7 h-10 object-cover rounded-lg"><div class="min-w-0 flex-1"><p class="text-[10px] font-bold text-white truncate">${escapeHtml(e.seriesTitle)}</p><p class="text-[9px] text-gray-500">S${String(e.season_number).padStart(2,'0')}E${String(e.episode_number).padStart(2,'0')} · ${escapeHtml(e.name||'Épisode')}</p></div><button onclick="toggleTrackedEpisode(${Number(e.tmdb_id)},${Number(e.season_number)},${Number(e.episode_number)})" class="text-[9px] font-bold ${e.watched?'text-emerald-300':'text-gray-400'}">${e.watched?'✓ Vu':'À voir'}</button></div>`).join('')}</div>`; }
 
 async function openTrackedSeriesDetail(tmdbId, uiState = null) {
 const series = getTrackedSeries(tmdbId); if (!series) return;
@@ -2587,29 +2613,30 @@ const infoDirector = movie.director || '';
 const infoCast = movie.cast && movie.cast.length ? movie.cast : [];
 const isSeriesMovie = isSeries(movie);
 const imdbRating = (movie.imdbUserRating !== undefined && movie.imdbUserRating !== null) ? movie.imdbUserRating : null;
+const movieIdArg = escapeHtml(JSON.stringify(String(movie.id)));
 
 const metaParts = isSeriesMovie
 ? [infoYear, seriesSeasons ? `${seriesSeasons} saison${seriesSeasons > 1 ? 's' : ''}` : '', seriesEpisodes ? `${seriesEpisodes} épisode${seriesEpisodes > 1 ? 's' : ''}` : ''].filter(Boolean)
 : [infoYear, infoRuntime].filter(Boolean);
-const genreChips = infoGenres.slice(0, 4).map(g => `<span class="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] text-gray-300">${g}</span>`).join('');
+const genreChips = infoGenres.slice(0, 4).map(g => `<span class="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] text-gray-300">${escapeHtml(g)}</span>`).join('');
 
 const editionsHtml = movie.editions.map((ed, idx) => `
 <div class="rounded-2xl bg-white/[0.035] border border-white/10 p-3 space-y-2.5">
 <div class="flex items-center justify-between gap-2">
 <div class="flex items-center gap-2 min-w-0">
 <span class="w-6 h-6 rounded-lg bg-cyan-400/10 text-cyan-300 flex items-center justify-center text-[9px] font-bold">${idx + 1}</span>
-<span class="text-[11px] font-semibold text-white truncate">${ed.title || 'Édition sans nom'}</span>
+<span class="text-[11px] font-semibold text-white truncate">${escapeHtml(ed.title || 'Édition sans nom')}</span>
 </div>
-${movie.editions.length > 1 ? `<button onclick="removeEdition('${movie.id}', ${idx})" class="text-gray-500 hover:text-red-400 transition p-1 rounded-lg hover:bg-red-400/10" title="Supprimer">${ic('x','w-3.5 h-3.5')}</button>` : ''}
+${movie.editions.length > 1 ? `<button onclick="removeEdition(${movieIdArg}, ${idx})" class="text-gray-500 hover:text-red-400 transition p-1 rounded-lg hover:bg-red-400/10" title="Supprimer">${ic('x','w-3.5 h-3.5')}</button>` : ''}
 </div>
 <div class="grid grid-cols-2 gap-2">
 <div>
 <label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">Nom</label>
-<input type="text" value="${ed.title || ''}" onchange="updateEditionField('${movie.id}', ${idx}, 'title', this.value)" placeholder="Steelbook 4K" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
+<input type="text" value="${escapeHtml(ed.title || '')}" onchange="updateEditionField(${movieIdArg}, ${idx}, 'title', this.value)" placeholder="Steelbook 4K" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
 </div>
 <div>
 <label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">Format</label>
-<select onchange="updateEditionField('${movie.id}', ${idx}, 'format', this.value)" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
+<select onchange="updateEditionField(${movieIdArg}, ${idx}, 'format', this.value)" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
 <option class="bg-gray-900" value="4K UHD" ${ed.format === '4K UHD' ? 'selected' : ''}>4K UHD</option>
 <option class="bg-gray-900" value="Blu-ray 1080p" ${ed.format === 'Blu-ray 1080p' ? 'selected' : ''}>Blu-ray 1080p</option>
 <option class="bg-gray-900" value="DVD" ${ed.format === 'DVD' ? 'selected' : ''}>DVD</option>
@@ -2617,7 +2644,7 @@ ${movie.editions.length > 1 ? `<button onclick="removeEdition('${movie.id}', ${i
 </div>
 <div>
 <label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">Boîtier</label>
-<select onchange="updateEditionField('${movie.id}', ${idx}, 'editionType', this.value)" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
+<select onchange="updateEditionField(${movieIdArg}, ${idx}, 'editionType', this.value)" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
 <option class="bg-gray-900" value="Amaray" ${ed.editionType === 'Amaray' ? 'selected' : ''}>Amaray</option>
 <option class="bg-gray-900" value="Steelbook" ${ed.editionType === 'Steelbook' ? 'selected' : ''}>Steelbook</option>
 <option class="bg-gray-900" value="Digibook" ${ed.editionType === 'Digibook' ? 'selected' : ''}>Digibook</option>
@@ -2626,35 +2653,35 @@ ${movie.editions.length > 1 ? `<button onclick="removeEdition('${movie.id}', ${i
 </div>
 <div>
 <label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">Lieu</label>
-<input type="text" value="${ed.purchaseLocation || ''}" onchange="updateEditionField('${movie.id}', ${idx}, 'purchaseLocation', this.value)" placeholder="Fnac" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
+<input type="text" value="${escapeHtml(ed.purchaseLocation || '')}" onchange="updateEditionField(${movieIdArg}, ${idx}, 'purchaseLocation', this.value)" placeholder="Fnac" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
 </div>
 <div>
 <label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">Achat</label>
-<input type="number" step="0.01" value="${ed.purchasePrice !== undefined ? ed.purchasePrice : ''}" onchange="updateEditionField('${movie.id}', ${idx}, 'purchasePrice', this.value)" placeholder="0.00" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
+<input type="number" step="0.01" value="${escapeHtml(ed.purchasePrice !== undefined ? ed.purchasePrice : '')}" onchange="updateEditionField(${movieIdArg}, ${idx}, 'purchasePrice', this.value)" placeholder="0.00" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
 </div>
 <div>
 <label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">Estimé</label>
-<input type="number" step="0.01" value="${ed.estimatedPrice !== undefined ? ed.estimatedPrice : ''}" onchange="updateEditionField('${movie.id}', ${idx}, 'estimatedPrice', this.value)" placeholder="0.00" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
+<input type="number" step="0.01" value="${escapeHtml(ed.estimatedPrice !== undefined ? ed.estimatedPrice : '')}" onchange="updateEditionField(${movieIdArg}, ${idx}, 'estimatedPrice', this.value)" placeholder="0.00" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
 </div>
 </div>
 </div>`).join('');
 
 const ratingHtml = imdbRating !== null ? `<div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-300 text-[10px] font-bold">${ic('star','w-3.5 h-3.5')} IMDb ${imdbRating}/10</div>` : '';
-const seenHtml = `<button onclick="toggleMovieSeen('${movie.id}')" class="px-2.5 py-1.5 rounded-xl text-[10px] font-semibold transition flex items-center gap-1.5 ${movie.seen ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20' : 'bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10'}">${movie.seen ? ic('check','w-3.5 h-3.5') + ' Vu' : ic('eye','w-3.5 h-3.5') + ' Non vu'}</button>`;
+const seenHtml = `<button onclick="toggleMovieSeen(${movieIdArg})" class="px-2.5 py-1.5 rounded-xl text-[10px] font-semibold transition flex items-center gap-1.5 ${movie.seen ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20' : 'bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10'}">${movie.seen ? ic('check','w-3.5 h-3.5') + ' Vu' : ic('eye','w-3.5 h-3.5') + ' Non vu'}</button>`;
 
 content.innerHTML = `
 <div class="space-y-4">
 <!-- HERO -->
 <div class="relative overflow-hidden rounded-3xl border border-white/10 bg-black/30">
-<div class="absolute inset-0 opacity-30 pointer-events-none" style="background-image:linear-gradient(90deg,rgba(0,0,0,.9),rgba(0,0,0,.35)),url('${movie.poster}');background-size:cover;background-position:center;filter:blur(18px);transform:scale(1.08)"></div>
+<div class="absolute inset-0 opacity-30 pointer-events-none" style="background-image:linear-gradient(90deg,rgba(0,0,0,.9),rgba(0,0,0,.35)),url('${safeImageUrl(movie.poster)}');background-size:cover;background-position:center;filter:blur(18px);transform:scale(1.08)"></div>
 <div class="relative flex gap-3.5 p-3.5 sm:p-4">
-<img src="${movie.poster}" class="w-24 h-36 sm:w-28 sm:h-42 object-cover rounded-2xl shadow-xl border border-white/15 flex-shrink-0">
+<img src="${safeImageUrl(movie.poster)}" class="w-24 h-36 sm:w-28 sm:h-42 object-cover rounded-2xl shadow-xl border border-white/15 flex-shrink-0">
 <div class="flex-1 min-w-0 flex flex-col justify-end py-0.5">
 <div class="flex items-center gap-1.5 flex-wrap mb-2">
 <span class="px-2 py-1 rounded-full bg-cyan-400/10 border border-cyan-400/20 text-cyan-300 text-[8px] font-bold uppercase tracking-wider">${isSeriesMovie ? 'Série' : 'Film'}</span>
 ${movie.isWishlist ? '<span class="px-2 py-1 rounded-full bg-pink-400/10 border border-pink-400/20 text-pink-300 text-[8px] font-bold uppercase tracking-wider">Wishlist</span>' : '<span class="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 text-[8px] font-bold uppercase tracking-wider">Collection</span>'}
 </div>
-<h3 class="text-lg sm:text-xl font-extrabold text-white leading-tight">${movie.title}</h3>
+<h3 class="text-lg sm:text-xl font-extrabold text-white leading-tight">${escapeHtml(movie.title)}</h3>
 ${metaParts.length ? `<p class="text-[10px] text-gray-400 mt-1.5">${metaParts.join(' • ')}</p>` : ''}
 <div class="flex items-center gap-1.5 flex-wrap mt-3">${seenHtml}${ratingHtml}</div>
 </div>
@@ -2669,12 +2696,12 @@ ${movie.voteAverage > 0 ? `<span class="text-[9px] text-sky-300 font-semibold">T
 </div>
 ${genreChips ? `<div class="flex flex-wrap gap-1.5 mb-2.5">${genreChips}</div>` : ''}
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-[10px]">
-${infoDirector ? `<div class="text-gray-300"><span class="text-gray-500">${isSeriesMovie ? 'Créateur' : 'Réalisateur'}</span><br><span class="text-white font-medium">${infoDirector}</span></div>` : ''}
+${infoDirector ? `<div class="text-gray-300"><span class="text-gray-500">${isSeriesMovie ? 'Créateur' : 'Réalisateur'}</span><br><span class="text-white font-medium">${escapeHtml(infoDirector)}</span></div>` : ''}
 ${isSeriesMovie && infoRuntime ? `<div class="text-gray-300"><span class="text-gray-500">Durée moyenne</span><br><span class="text-white font-medium">${infoRuntime}</span></div>` : ''}
-${infoCast.length ? `<div class="text-gray-300"><span class="text-gray-500">Avec</span><br><span class="text-white font-medium">${infoCast.slice(0, 5).join(', ')}</span></div>` : ''}
+${infoCast.length ? `<div class="text-gray-300"><span class="text-gray-500">Avec</span><br><span class="text-white font-medium">${escapeHtml(infoCast.slice(0, 5).join(', '))}</span></div>` : ''}
 <div class="flex items-center gap-2 sm:col-span-2 pt-2 border-t border-white/5">
 <span class="text-cyan-400">${ic('disc','w-3.5 h-3.5')}</span><span class="text-gray-500">${isSeriesMovie ? 'Sortie Blu-ray FR (optionnel)' : 'Sortie Blu-ray FR'}</span>
-<input type="date" value="${movie.blurayReleaseDateFR || ''}" onchange="updateBlurayDate('${movie.id}', this.value)" class="glass-input text-white text-[10px] px-2 py-1.5 rounded-lg focus:outline-none ml-auto">
+<input type="date" value="${escapeHtml(movie.blurayReleaseDateFR || '')}" onchange="updateBlurayDate(${movieIdArg}, this.value)" class="glass-input text-white text-[10px] px-2 py-1.5 rounded-lg focus:outline-none ml-auto">
 </div>
 </div>
 </div>
@@ -2683,7 +2710,7 @@ ${infoCast.length ? `<div class="text-gray-300"><span class="text-gray-500">Avec
 <div class="rounded-2xl border border-white/10 bg-white/[0.025] p-3 space-y-3">
 <div class="flex items-center justify-between gap-2">
 <div><h4 class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.16em]">Éditions</h4><p class="text-[10px] text-gray-400 mt-0.5">${movie.editions.length} édition${movie.editions.length > 1 ? 's' : ''}</p></div>
-<button onclick="addEditionToMovie('${movie.id}')" class="w-8 h-8 rounded-xl bg-cyan-400/10 border border-cyan-400/20 text-cyan-300 hover:bg-cyan-400/20 transition flex items-center justify-center" title="Ajouter une édition">${ic('plus','w-4 h-4')}</button>
+<button onclick="addEditionToMovie(${movieIdArg})" class="w-8 h-8 rounded-xl bg-cyan-400/10 border border-cyan-400/20 text-cyan-300 hover:bg-cyan-400/20 transition flex items-center justify-center" title="Ajouter une édition">${ic('plus','w-4 h-4')}</button>
 </div>
 <div class="space-y-2 max-h-64 overflow-y-auto pr-0.5">${editionsHtml}</div>
 <div class="grid grid-cols-2 gap-2 pt-2 border-t border-white/5">
@@ -2694,9 +2721,9 @@ ${infoCast.length ? `<div class="text-gray-300"><span class="text-gray-500">Avec
 
 <!-- ACTIONS -->
 <div class="flex gap-2 pt-1">
-${isSeriesMovie ? `<button onclick="trackSeriesFromMovie('${movie.id}')" class="shine-btn flex-1 bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 rounded-xl text-[10px] shadow-lg transition flex items-center justify-center gap-1.5">${ic('tv','w-3.5 h-3.5')} ${isTrackedSeries(movie.tmdb_id) ? 'Gérer le suivi' : 'Suivre la série'}</button>` : ''}
-${movie.isWishlist ? `<button onclick="moveWishlistToCollection('${movie.id}')" class="shine-btn flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-[10px] shadow-lg transition flex items-center justify-center gap-1.5">${ic('download','w-3.5 h-3.5')} Ajouter à la collection</button>` : ''}
-<button onclick="deleteMovie('${movie.id}')" class="${movie.isWishlist ? 'px-3' : 'flex-1'} bg-red-500/10 hover:bg-red-500/20 border border-red-400/20 text-red-300 font-semibold py-2.5 rounded-xl text-[10px] transition flex items-center justify-center gap-1.5">${ic('trash','w-3.5 h-3.5')} Supprimer</button>
+${isSeriesMovie ? `<button onclick="trackSeriesFromMovie(${movieIdArg})" class="shine-btn flex-1 bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 rounded-xl text-[10px] shadow-lg transition flex items-center justify-center gap-1.5">${ic('tv','w-3.5 h-3.5')} ${isTrackedSeries(movie.tmdb_id) ? 'Gérer le suivi' : 'Suivre la série'}</button>` : ''}
+${movie.isWishlist ? `<button onclick="moveWishlistToCollection(${movieIdArg})" class="shine-btn flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-[10px] shadow-lg transition flex items-center justify-center gap-1.5">${ic('download','w-3.5 h-3.5')} Ajouter à la collection</button>` : ''}
+<button onclick="deleteMovie(${movieIdArg})" class="${movie.isWishlist ? 'px-3' : 'flex-1'} bg-red-500/10 hover:bg-red-500/20 border border-red-400/20 text-red-300 font-semibold py-2.5 rounded-xl text-[10px] transition flex items-center justify-center gap-1.5">${ic('trash','w-3.5 h-3.5')} Supprimer</button>
 </div>
 </div>`;
 
@@ -2951,7 +2978,7 @@ if (limit) entries = entries.slice(0, limit);
 entries.forEach(([key, val]) => {
 const item = document.createElement('div');
 item.className = "flex justify-between items-center py-1 border-b border-white/5";
-item.innerHTML = `<span class="text-gray-300">${key}</span><span class="font-bold text-cyan-400">${val}</span>`;
+item.innerHTML = `<span class="text-gray-300">${escapeHtml(key)}</span><span class="font-bold text-cyan-400">${val}</span>`;
 listElem.appendChild(item);
 });
 
@@ -3433,9 +3460,9 @@ purchaseLocation: String(location),
 barcode
 }]
 };
-const cloudId = await saveMovieToCloud(newMovie);
-if (cloudId) {
-newMovie.cloud_id = cloudId;
+const saveResult = await saveMovieToCloud(newMovie);
+if (saveResult?.success && saveResult.cloudId) {
+newMovie.cloud_id = saveResult.cloudId;
 collection.push(newMovie);
 }
 }
