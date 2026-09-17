@@ -363,6 +363,9 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <header class="sticky top-0 z-40 p-4 glass-card border-b-0 border-b-[0.5px] border-white/10 text-center font-extrabold text-xl tracking-wide flex items-center justify-center gap-2.5">
 <span class="icon-chip chip-lg" data-icon="disc"></span>
 <span class="bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">Blu-raythèque Cloud</span>
+<button id="syncStatus" onclick="syncAllData()" class="absolute right-3 md:right-5 flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] font-semibold text-gray-400" title="Synchroniser maintenant">
+<span id="syncStatusDot" class="w-2 h-2 rounded-full bg-gray-500"></span><span id="syncStatusLabel" class="hidden sm:inline">Connexion…</span>
+</button>
 </header>
 
 <main class="p-4 max-w-md mx-auto space-y-5">
@@ -872,7 +875,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <span class="icon-chip" data-icon="download"></span>
 <div>
 <h3 class="text-sm font-bold text-white">Sauvegarde & Exportation</h3>
-<p class="text-[11px] text-gray-400">Exporter les données au format Excel ou JSON.</p>
+<p class="text-[11px] text-gray-400">Exporter ou restaurer la collection, la wishlist et les séries suivies.</p>
 </div>
 </div>
 <div class="grid grid-cols-2 gap-2">
@@ -882,6 +885,14 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <button onclick="exportToJSON()" class="shine-btn bg-sky-600 hover:bg-sky-500 text-white font-bold py-2.5 px-3 rounded-2xl text-xs shadow-lg transition transform active:scale-95 flex items-center justify-center gap-1.5">
 <span class="icon-inline w-3.5 h-3.5" data-icon="download"></span><span>JSON (.json)</span>
 </button>
+<label class="shine-btn bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 px-3 rounded-2xl text-xs shadow-lg transition transform active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+<span class="icon-inline w-3.5 h-3.5" data-icon="upload"></span><span>Restaurer JSON</span>
+<input type="file" accept=".json,application/json" class="hidden" onchange="importBackupJSON(event)">
+</label>
+<label class="shine-btn bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 px-3 rounded-2xl text-xs shadow-lg transition transform active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+<span class="icon-inline w-3.5 h-3.5" data-icon="upload"></span><span>Importer Excel</span>
+<input type="file" accept=".xlsx,.xls" class="hidden" onchange="importExcel(event)">
+</label>
 </div>
 </div>
 
@@ -1000,7 +1011,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 <div class="flex justify-between py-1.5">
 <span class="text-gray-400">Statut Synchro :</span>
-<span class="font-bold text-emerald-400 flex items-center gap-1.5">Connecté au Cloud <span class="icon-inline w-3.5 h-3.5" data-icon="cloud"></span></span>
+<span id="settingsSyncStatus" class="font-bold text-gray-400 flex items-center gap-1.5">Connexion… <span class="icon-inline w-3.5 h-3.5" data-icon="cloud"></span></span>
 </div>
 </div>
 </div>
@@ -1151,6 +1162,56 @@ let currentSearchQuery = '';
 let currentSearchPage = 1;
 let totalSearchPages = 1;
 
+function setSyncStatus(state, customLabel = '') {
+const states = {
+syncing: { label: 'Synchronisation…', dot: 'bg-amber-400 animate-pulse', text: 'text-amber-300' },
+synced: { label: 'Synchronisé', dot: 'bg-emerald-400', text: 'text-emerald-300' },
+offline: { label: 'Hors ligne', dot: 'bg-gray-500', text: 'text-gray-400' },
+error: { label: 'Erreur de synchro', dot: 'bg-red-400', text: 'text-red-300' }
+};
+const config = states[state] || states.offline;
+const label = customLabel || config.label;
+const status = document.getElementById('syncStatus');
+const dot = document.getElementById('syncStatusDot');
+const headerLabel = document.getElementById('syncStatusLabel');
+const settingsLabel = document.getElementById('settingsSyncStatus');
+if (status) status.className = `absolute right-3 md:right-5 flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] font-semibold ${config.text}`;
+if (dot) dot.className = `w-2 h-2 rounded-full ${config.dot}`;
+if (headerLabel) headerLabel.textContent = label;
+if (settingsLabel) {
+const lastSync = localStorage.getItem('last_cloud_sync');
+settingsLabel.textContent = state === 'synced' && lastSync ? `${label} · ${new Date(lastSync).toLocaleString('fr-FR')}` : label;
+settingsLabel.className = `font-bold flex items-center gap-1.5 ${config.text}`;
+}
+}
+
+async function syncAllData(silent = false) {
+if (!navigator.onLine) { setSyncStatus('offline'); if (!silent) showToast('Mode hors ligne.'); return false; }
+setSyncStatus('syncing');
+const collectionOk = await fetchCollectionFromCloud();
+const seriesOk = await loadTrackedSeriesFromCloud();
+if (collectionOk && seriesOk) {
+localStorage.setItem('last_cloud_sync', new Date().toISOString());
+setSyncStatus('synced');
+renderCollection();
+renderWishlist();
+renderTrackedSeries();
+updateSettingsCounters();
+if (!silent) showToast('Données synchronisées avec le cloud.');
+return true;
+}
+setSyncStatus('error');
+return false;
+}
+
+function beginCloudWrite() { setSyncStatus(navigator.onLine ? 'syncing' : 'offline'); }
+function finishCloudWrite(success) {
+if (success) {
+localStorage.setItem('last_cloud_sync', new Date().toISOString());
+setSyncStatus('synced');
+} else setSyncStatus(navigator.onLine ? 'error' : 'offline');
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
 applyStaticIcons();
 
@@ -1187,10 +1248,12 @@ searchInput.addEventListener('keypress', (e) => {
 if (e.key === 'Enter') triggerNewSearch();
 });
 
-await fetchCollectionFromCloud();
-await loadTrackedSeriesFromCloud();
+await syncAllData(true);
 setMediaTypeFilter(document.getElementById('filterMediaType')?.value || 'all');
 setTrackedSeriesFilter('all');
+
+window.addEventListener('online', () => syncAllData(true));
+window.addEventListener('offline', () => setSyncStatus('offline'));
 
 // Rafraîchissement automatique et silencieux des infos TMDB, une fois par jour maximum
 const todayStr = new Date().toISOString().slice(0, 10);
@@ -1231,8 +1294,7 @@ localStorage.setItem('supa_key', SUPABASE_KEY);
 
 db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 showToast("Identifiants enregistrés !");
-await fetchCollectionFromCloud();
-await loadTrackedSeriesFromCloud();
+await syncAllData(true);
 renderTrackedSeries();
 }
 
@@ -1299,6 +1361,7 @@ const { data, error } = await db.from('bluray').select('*');
 if (error) {
 showToast("Erreur de synchronisation Supabase");
 console.error("Fetch error:", error);
+return false;
 } else {
 collection = [];
 wishlist = [];
@@ -1317,25 +1380,31 @@ else collection.push(m);
 });
 renderCollection();
 renderWishlist();
+return true;
 }
 } catch (err) {
 showToast("Erreur de connexion cloud.");
+return false;
 }
 }
 
 async function saveMovieToCloud(movie) {
 normalizeMovieData(movie);
+beginCloudWrite();
 try {
 const { data, error } = await db.from('bluray').insert([{ data: movie }]).select();
 if (error) {
 console.error("Insert error:", error);
 showToast("⚠️ Erreur de sauvegarde !");
+finishCloudWrite(false);
 return { success: false, error };
 }
+finishCloudWrite(true);
 return { success: true, cloudId: data?.[0]?.id || null };
 } catch (error) {
 console.error("Insert exception:", error);
 showToast("⚠️ Impossible de joindre Supabase.");
+finishCloudWrite(false);
 return { success: false, error };
 }
 }
@@ -1344,34 +1413,42 @@ async function updateMovieInCloud(movie) {
 if (!movie?.cloud_id) return { success: true, skipped: true };
 normalizeMovieData(movie);
 const { cloud_id, ...cleanMovie } = movie;
+beginCloudWrite();
 try {
 const { error } = await db.from('bluray').update({ data: cleanMovie }).eq('id', cloud_id);
 if (error) {
 console.error("Update error:", error);
 showToast("⚠️ Modification non synchronisée.");
+finishCloudWrite(false);
 return { success: false, error };
 }
+finishCloudWrite(true);
 return { success: true };
 } catch (error) {
 console.error("Update exception:", error);
 showToast("⚠️ Erreur de connexion cloud.");
+finishCloudWrite(false);
 return { success: false, error };
 }
 }
 
 async function deleteMovieFromCloud(cloud_id) {
 if (!cloud_id) return { success: true, skipped: true };
+beginCloudWrite();
 try {
 const { error } = await db.from('bluray').delete().eq('id', cloud_id);
 if (error) {
 console.error("Delete error:", error);
 showToast("⚠️ Suppression cloud impossible.");
+finishCloudWrite(false);
 return { success: false, error };
 }
+finishCloudWrite(true);
 return { success: true };
 } catch (error) {
 console.error("Delete exception:", error);
 showToast("⚠️ Erreur de connexion cloud.");
+finishCloudWrite(false);
 return { success: false, error };
 }
 }
@@ -2361,6 +2438,7 @@ localStorage.setItem('tracked_series_v1', JSON.stringify(trackedSeries));
 
 async function saveTrackedSeriesBundleCloud() {
 if (!db) return false;
+beginCloudWrite();
 const payload = {
 recordType: 'tracked_series_bundle',
 series: trackedSeries,
@@ -2379,10 +2457,12 @@ if (!trackedSeriesBundleCloudId) throw new Error('Identifiant du suivi cloud int
 trackedSeriesBundleFromCloud = trackedSeries;
 trackedSeriesCloudMode = 'bundle';
 trackedSeriesCloudReady = true;
+finishCloudWrite(true);
 return true;
 } catch (e) {
 console.warn('Sauvegarde cloud du suivi des séries indisponible:', e);
 trackedSeriesCloudReady = false;
+finishCloudWrite(false);
 return false;
 }
 }
@@ -3279,15 +3359,22 @@ await searchTMDB();
 
 // --- EXPORTS / IMPORTS ---
 function exportToExcel() {
-if (collection.length === 0) return showToast("Votre collection est vide.");
+if (collection.length === 0 && wishlist.length === 0) return showToast("La collection et la wishlist sont vides.");
 const excelData = [];
 
-collection.forEach(m => {
+[...collection, ...wishlist].forEach(m => {
 normalizeMovieData(m);
 const genresStr = m.genres ? m.genres.map(g => typeof g === 'object' ? g.name : g).join(', ') : '';
 m.editions.forEach(ed => {
 excelData.push({
 'Titre': m.title,
+'Statut': m.isWishlist ? 'Wishlist' : 'Collection',
+'TMDB ID': m.tmdb_id || '',
+'IMDb ID': m.imdb_id || '',
+'Type': isSeries(m) ? 'Série' : 'Film',
+'Date de sortie': m.releaseDate || m.first_air_date || '',
+'Sortie Blu-ray FR': m.blurayReleaseDateFR || '',
+'Affiche': m.poster || '',
 'Édition': ed.title || '',
 'Format': ed.format || 'Blu-ray 1080p',
 'Boîtier': ed.editionType || 'Amaray',
@@ -3296,14 +3383,15 @@ excelData.push({
 'Lieu d\'achat': ed.purchaseLocation || '',
 'EAN / Code-barres': ed.barcode || '',
 'Genres': genresStr,
-'Type': isSeries(m) ? 'Série' : 'Film',
-'Durée': formatRuntime(m.runtime),
+'Durée (minutes)': m.runtime || '',
 'Réalisateur / Créateur': m.director || '',
 'Saisons': isSeries(m) ? (m.numberOfSeasons || '') : '',
 'Épisodes': isSeries(m) ? (m.numberOfEpisodes || '') : '',
 'Acteurs principaux': m.cast ? m.cast.join(', ') : '',
+'Note TMDB': m.voteAverage || '',
+'Note IMDb personnelle': m.imdbUserRating ?? '',
 'Vu': m.seen ? 'Oui' : 'Non',
-'Date d\'ajout': m.addedAt ? new Date(m.addedAt).toLocaleDateString('fr-FR') : ''
+'Date d\'ajout': m.addedAt || ''
 });
 });
 });
@@ -3316,15 +3404,87 @@ showToast("Exportation Excel terminée ! 📊");
 }
 
 function exportToJSON() {
-if (collection.length === 0 && wishlist.length === 0) return showToast("Aucune donnée à exporter.");
-const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ collection, wishlist }, null, 2));
+if (collection.length === 0 && wishlist.length === 0 && trackedSeries.length === 0) return showToast("Aucune donnée à exporter.");
+const backup = {
+schemaVersion: 2,
+exportedAt: new Date().toISOString(),
+collection,
+wishlist,
+trackedSeries,
+preferences: {
+theme: localStorage.getItem('app_theme') || 'theme-noir',
+defaultView: localStorage.getItem('default_view') || 'grid'
+}
+};
+const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json;charset=utf-8' });
+const dataUrl = URL.createObjectURL(blob);
 const downloadAnchor = document.createElement('a');
-downloadAnchor.setAttribute("href", dataStr);
+downloadAnchor.setAttribute("href", dataUrl);
 downloadAnchor.setAttribute("download", `Backup_Bluray_${new Date().toISOString().slice(0,10)}.json`);
 document.body.appendChild(downloadAnchor);
 downloadAnchor.click();
 downloadAnchor.remove();
+URL.revokeObjectURL(dataUrl);
 showToast("Exportation JSON terminée ! 💾");
+}
+
+async function restoreMovieBackup(items, wishlistState) {
+let restored = 0;
+for (const source of items) {
+if (!source || !source.title) continue;
+const tmdbId = source.tmdb_id != null ? String(source.tmdb_id) : '';
+let movie = [...collection, ...wishlist].find(m =>
+(tmdbId && String(m.tmdb_id || '') === tmdbId && isSeries(m) === isSeries(source)) || String(m.id) === String(source.id)
+);
+if (movie) {
+const cloudId = movie.cloud_id;
+Object.assign(movie, source, { cloud_id: cloudId, isWishlist: wishlistState });
+normalizeMovieData(movie);
+await updateMovieInCloud(movie);
+collection = collection.filter(m => m !== movie);
+wishlist = wishlist.filter(m => m !== movie);
+(wishlistState ? wishlist : collection).push(movie);
+} else {
+const { cloud_id, ...cleanSource } = source;
+movie = normalizeMovieData({ ...cleanSource, id: cleanSource.id || `restore_${Date.now()}_${Math.random()}`, isWishlist: wishlistState });
+const result = await saveMovieToCloud(movie);
+if (!result.success) continue;
+movie.cloud_id = result.cloudId;
+(wishlistState ? wishlist : collection).push(movie);
+}
+restored++;
+}
+return restored;
+}
+
+async function importBackupJSON(event) {
+const file = event.target.files?.[0];
+if (!file) return;
+try {
+const backup = JSON.parse(await file.text());
+if (!Array.isArray(backup.collection) || !Array.isArray(backup.wishlist)) throw new Error('Format de sauvegarde invalide');
+setSyncStatus('syncing', 'Restauration…');
+const restoredCollection = await restoreMovieBackup(backup.collection, false);
+const restoredWishlist = await restoreMovieBackup(backup.wishlist, true);
+if (Array.isArray(backup.trackedSeries)) {
+const seriesMap = new Map(trackedSeries.map(s => [String(s.tmdb_id), s]));
+backup.trackedSeries.filter(s => s?.tmdb_id).forEach(s => seriesMap.set(String(s.tmdb_id), s));
+trackedSeries = [...seriesMap.values()];
+saveTrackedSeriesLocal();
+await saveTrackedSeriesBundleCloud();
+}
+if (backup.preferences?.theme) changeTheme(backup.preferences.theme);
+if (backup.preferences?.defaultView) saveDefaultViewPref(backup.preferences.defaultView);
+renderCollection(); renderWishlist(); renderTrackedSeries(); updateSettingsCounters();
+finishCloudWrite(true);
+showToast(`${restoredCollection + restoredWishlist} titre(s) restauré(s), ${trackedSeries.length} série(s) suivie(s).`);
+} catch (error) {
+console.error('Import JSON:', error);
+finishCloudWrite(false);
+showToast('⚠️ Sauvegarde JSON invalide ou impossible à restaurer.');
+} finally {
+event.target.value = '';
+}
 }
 
 // --- IMPORT DES NOTES IMDB (fichier ratings.csv exporté depuis votre compte) ---
@@ -3423,16 +3583,36 @@ const reader = new FileReader();
 
 reader.onload = async (e) => {
 try {
+setSyncStatus('syncing', 'Import Excel…');
 const data = new Uint8Array(e.target.result);
 const workbook = XLSX.read(data, { type: 'array' });
 const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-const json = XLSX.utils.sheet_to_json(worksheet);
+const json = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
 
-if (json.length === 0) return showToast("Fichier vide.");
+if (json.length === 0) { finishCloudWrite(true); return showToast("Fichier vide."); }
+
+let importedTitles = 0;
+let importedEditions = 0;
+let skippedRows = 0;
+
+const parseBoolean = value => ['oui', 'true', '1', 'yes', 'vu'].includes(String(value || '').trim().toLowerCase());
+const parseDate = value => {
+if (!value) return '';
+if (value instanceof Date && !isNaN(value)) return value.toISOString().slice(0, 10);
+if (typeof value === 'number') {
+const parsed = XLSX.SSF.parse_date_code(value);
+if (parsed) return `${parsed.y}-${String(parsed.m).padStart(2, '0')}-${String(parsed.d).padStart(2, '0')}`;
+}
+const text = String(value).trim();
+const french = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+if (french) return `${french[3]}-${french[2].padStart(2, '0')}-${french[1].padStart(2, '0')}`;
+const parsed = new Date(text);
+return isNaN(parsed) ? '' : parsed.toISOString().slice(0, 10);
+};
 
 for (const row of json) {
 const title = row['Titre'] || row['titre'] || row['Title'] || row['Nom'];
-if (!title) continue;
+if (!title) { skippedRows++; continue; }
 
 const editionTitle = row['Édition'] || row['Edition'] || 'Édition Standard';
 const format = row['Format'] || row['format'] || 'Blu-ray 1080p';
@@ -3442,60 +3622,107 @@ const estimatedPrice = row['Estimation'] || row['estimation'] || row['Valeur Est
 const location = row['Lieu'] || row['Magasin'] || row['Lieu d\'achat'] || '';
 const barcode = String(row['EAN'] || row['EAN / Code-barres'] || row['Code-barres'] || row['Code barre'] || '').replace(/\D/g, '');
 const genre = row['Genre'] || row['genre'] || row['Genres'] || '';
-const seenRaw = String(row['Vu'] || row['vu'] || '').toLowerCase();
-const seen = (seenRaw === 'oui' || seenRaw === 'true' || seenRaw === '1');
-
+const seen = parseBoolean(row['Vu'] || row['vu']);
+const listValue = row['Statut'] || row['Liste'] || row['Wishlist'];
+const hasListState = String(listValue || '').trim() !== '';
+const wishlistState = /wishlist|souhait/i.test(String(listValue || '')) || parseBoolean(row['Wishlist']);
+const tmdbId = row['TMDB ID'] || row['tmdb_id'] || '';
+const imdbId = row['IMDb ID'] || row['imdb_id'] || '';
+const mediaType = String(row['Type'] || '').toLowerCase();
+const releaseDate = parseDate(row['Date de sortie'] || row['Release Date']);
+const blurayReleaseDateFR = parseDate(row['Sortie Blu-ray FR']);
+const poster = row['Affiche'] || row['Poster'] || '';
+const runtime = parseInt(row['Durée (minutes)'] || row['Durée'] || row['Runtime'], 10) || null;
+const director = row['Réalisateur / Créateur'] || row['Réalisateur'] || row['Director'] || '';
+const cast = String(row['Acteurs principaux'] || row['Acteurs'] || row['Cast'] || '').split(',').map(v => v.trim()).filter(Boolean);
+const numberOfSeasons = parseInt(row['Saisons'], 10) || null;
+const numberOfEpisodes = parseInt(row['Épisodes'], 10) || null;
+const voteAverage = parseFloat(row['Note TMDB']) || null;
+const imdbUserRating = parseFloat(row['Note IMDb personnelle']);
+const addedAtValue = row['Date d\'ajout'] || row['Date ajout'];
+const addedAt = addedAtValue ? (parseDate(addedAtValue) || String(addedAtValue)) : new Date().toISOString();
 const genresArray = genre ? String(genre).split(',').map(g => g.trim()) : [];
 
-// On cherche si le film existe déjà pour regrouper les éditions
-let existingMovie = collection.find(m => m.title.toLowerCase() === String(title).toLowerCase());
+const normalizedTitle = String(title).trim().toLowerCase();
+let existingMovie = [...collection, ...wishlist].find(m =>
+(tmdbId && String(m.tmdb_id || '') === String(tmdbId)) || String(m.title || '').trim().toLowerCase() === normalizedTitle
+);
+
+const edition = {
+id: 'ed_' + Date.now() + '_' + Math.floor(Math.random() * 100000),
+title: String(editionTitle), format: String(format), editionType: String(editionType),
+purchasePrice: price, estimatedPrice, purchaseLocation: String(location), barcode
+};
 
 if (existingMovie) {
-existingMovie.editions.push({
-id: 'ed_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
-title: String(editionTitle),
-format: String(format),
-editionType: String(editionType),
-purchasePrice: price,
-estimatedPrice: estimatedPrice,
-purchaseLocation: String(location),
-barcode
+normalizeMovieData(existingMovie);
+const targetWishlistState = hasListState ? wishlistState : !!existingMovie.isWishlist;
+const duplicateEdition = existingMovie.editions.some(ed =>
+(barcode && String(ed.barcode || '') === barcode) ||
+(!barcode && String(ed.title || '') === String(editionTitle) && String(ed.format || '') === String(format) && String(ed.editionType || '') === String(editionType))
+);
+if (!duplicateEdition) { existingMovie.editions.push(edition); importedEditions++; }
+Object.assign(existingMovie, {
+isWishlist: targetWishlistState,
+seen: existingMovie.seen || seen,
+tmdb_id: existingMovie.tmdb_id || (tmdbId ? Number(tmdbId) : null),
+imdb_id: existingMovie.imdb_id || imdbId || '',
+releaseDate: existingMovie.releaseDate || releaseDate,
+blurayReleaseDateFR: existingMovie.blurayReleaseDateFR || blurayReleaseDateFR,
+poster: poster || existingMovie.poster,
+genres: genresArray.length ? genresArray : existingMovie.genres,
+runtime: runtime || existingMovie.runtime,
+director: director || existingMovie.director,
+cast: cast.length ? cast : existingMovie.cast,
+numberOfSeasons: numberOfSeasons || existingMovie.numberOfSeasons,
+numberOfEpisodes: numberOfEpisodes || existingMovie.numberOfEpisodes,
+voteAverage: voteAverage || existingMovie.voteAverage,
+imdbUserRating: !isNaN(imdbUserRating) ? imdbUserRating : existingMovie.imdbUserRating
 });
+collection = collection.filter(m => m !== existingMovie);
+wishlist = wishlist.filter(m => m !== existingMovie);
+(targetWishlistState ? wishlist : collection).push(existingMovie);
 await updateMovieInCloud(existingMovie);
 } else {
 const newMovie = {
 id: 'custom_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
 title: String(title),
-poster: 'https://via.placeholder.com/150x225?text=' + encodeURIComponent(title),
-releaseDate: '',
+poster: poster || 'https://via.placeholder.com/150x225?text=' + encodeURIComponent(title),
+releaseDate,
+blurayReleaseDateFR,
 genres: genresArray,
-seen: seen,
-isWishlist: false,
-addedAt: new Date().toISOString(),
-editions: [{
-id: 'ed_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
-title: String(editionTitle),
-format: String(format),
-editionType: String(editionType),
-purchasePrice: price,
-estimatedPrice: estimatedPrice,
-purchaseLocation: String(location),
-barcode
-}]
+seen,
+isWishlist: wishlistState,
+isSeries: mediaType.includes('série') || mediaType.includes('serie') || mediaType === 'tv',
+media_type: mediaType.includes('série') || mediaType.includes('serie') || mediaType === 'tv' ? 'tv' : 'movie',
+tmdb_id: tmdbId ? Number(tmdbId) : null,
+imdb_id: imdbId || '',
+runtime, director, cast, numberOfSeasons, numberOfEpisodes, voteAverage,
+imdbUserRating: !isNaN(imdbUserRating) ? imdbUserRating : null,
+addedAt,
+editions: [edition]
 };
 const saveResult = await saveMovieToCloud(newMovie);
 if (saveResult?.success && saveResult.cloudId) {
 newMovie.cloud_id = saveResult.cloudId;
-collection.push(newMovie);
+(wishlistState ? wishlist : collection).push(newMovie);
+importedTitles++;
+importedEditions++;
 }
 }
 }
 
 renderCollection();
-showToast("Importation terminée avec succès ! 🎉");
+renderWishlist();
+updateSettingsCounters();
+finishCloudWrite(true);
+showToast(`Import terminé : ${importedTitles} nouveau(x) titre(s), ${importedEditions} édition(s), ${skippedRows} ligne(s) ignorée(s).`);
 } catch (err) {
 showToast("Erreur lors de l'importation de l'Excel.");
 console.error(err);
+finishCloudWrite(false);
+} finally {
+event.target.value = '';
 }
 };
 
