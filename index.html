@@ -279,7 +279,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 }
 
 /* ===== Barre de navigation fixe en bas d'écran (mobile uniquement) ===== */
-@media (max-width: 767px) {
+@media (max-width: 767px), (hover: none) and (pointer: coarse) and (max-width: 1024px) {
   body { padding-bottom: 7rem !important; }
 }
 .mobile-bottom-nav {
@@ -350,7 +350,10 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
   background: #ec4899;
   box-shadow: 0 0 0 2px rgba(15,23,42,0.9);
 }
-@media (min-width: 768px) {
+@media (max-width: 767px), (hover: none) and (pointer: coarse) and (max-width: 1024px) {
+  #topNav { display: none !important; }
+}
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
   .mobile-bottom-nav { display: none !important; }
 }
 </style>
@@ -1135,6 +1138,8 @@ let db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let collection = [];
 let wishlist = [];
+let trackedSeriesBundleCloudId = null;
+let trackedSeriesBundleFromCloud = null;
 let isListView = false;
 let isWishlistListView = false;
 let html5QrcodeScanner = null;
@@ -1148,6 +1153,14 @@ let totalSearchPages = 1;
 
 document.addEventListener('DOMContentLoaded', async () => {
 applyStaticIcons();
+
+const updateMobileNavigation = () => {
+const isPhone = window.innerWidth < 768 || (window.matchMedia('(hover: none) and (pointer: coarse)').matches && window.innerWidth <= 1024);
+document.getElementById('topNav')?.classList.toggle('hidden', isPhone);
+document.getElementById('bottomNav')?.classList.toggle('hidden', !isPhone);
+};
+updateMobileNavigation();
+window.addEventListener('resize', updateMobileNavigation);
 
 const savedTheme = localStorage.getItem('app_theme') || 'theme-noir';
 changeTheme(savedTheme);
@@ -1207,7 +1220,7 @@ localStorage.setItem('default_view', val);
 showToast("Préférence d'affichage sauvegardée");
 }
 
-function saveApiKeysFromSettings() {
+async function saveApiKeysFromSettings() {
 API_KEY = document.getElementById('settingTmdbKey').value.trim();
 SUPABASE_URL = document.getElementById('settingSupaUrl').value.trim();
 SUPABASE_KEY = document.getElementById('settingSupaKey').value.trim();
@@ -1218,8 +1231,9 @@ localStorage.setItem('supa_key', SUPABASE_KEY);
 
 db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 showToast("Identifiants enregistrés !");
-fetchCollectionFromCloud();
-loadTrackedSeriesFromCloud().then(() => renderTrackedSeries());
+await fetchCollectionFromCloud();
+await loadTrackedSeriesFromCloud();
+renderTrackedSeries();
 }
 
 // --- NORMALISATION DES DONNÉES (POUR LES ÉDITIONS MULTIPLES) ---
@@ -1288,7 +1302,14 @@ console.error("Fetch error:", error);
 } else {
 collection = [];
 wishlist = [];
+trackedSeriesBundleCloudId = null;
+trackedSeriesBundleFromCloud = null;
 data.forEach(item => {
+if (item.data?.recordType === 'tracked_series_bundle') {
+trackedSeriesBundleCloudId = item.id;
+trackedSeriesBundleFromCloud = Array.isArray(item.data.series) ? item.data.series : [];
+return;
+}
 let m = { ...item.data, cloud_id: item.id };
 m = normalizeMovieData(m);
 if (m.isWishlist) wishlist.push(m);
@@ -2330,6 +2351,7 @@ let trackedSeries = JSON.parse(localStorage.getItem('tracked_series_v1') || '[]'
 let trackedSeriesFilter = 'all';
 let trackedSeriesCloudReady = false;
 let trackedSeriesCloudBusy = false;
+let trackedSeriesCloudMode = 'dedicated';
 let seriesCalDate = new Date();
 let seriesCalSelected = null;
 
@@ -2337,8 +2359,37 @@ function saveTrackedSeriesLocal() {
 localStorage.setItem('tracked_series_v1', JSON.stringify(trackedSeries));
 }
 
+async function saveTrackedSeriesBundleCloud() {
+if (!db) return false;
+const payload = {
+recordType: 'tracked_series_bundle',
+series: trackedSeries,
+updatedAt: new Date().toISOString()
+};
+try {
+if (trackedSeriesBundleCloudId) {
+const { error } = await db.from('bluray').update({ data: payload }).eq('id', trackedSeriesBundleCloudId);
+if (error) throw error;
+} else {
+const { data, error } = await db.from('bluray').insert([{ data: payload }]).select('id');
+if (error) throw error;
+trackedSeriesBundleCloudId = data?.[0]?.id || null;
+if (!trackedSeriesBundleCloudId) throw new Error('Identifiant du suivi cloud introuvable');
+}
+trackedSeriesBundleFromCloud = trackedSeries;
+trackedSeriesCloudMode = 'bundle';
+trackedSeriesCloudReady = true;
+return true;
+} catch (e) {
+console.warn('Sauvegarde cloud du suivi des séries indisponible:', e);
+trackedSeriesCloudReady = false;
+return false;
+}
+}
+
 async function saveTrackedSeriesCloud(series) {
 if (!db || !series || !series.tmdb_id) return false;
+if (trackedSeriesCloudMode === 'bundle') return saveTrackedSeriesBundleCloud();
 try {
 const payload = {
  tmdb_id: Number(series.tmdb_id),
@@ -2350,21 +2401,23 @@ if (error) throw error;
 trackedSeriesCloudReady = true;
 return true;
 } catch (e) {
-console.warn('Supabase suivi séries indisponible:', e);
-trackedSeriesCloudReady = false;
-return false;
+console.warn('Table tracked_series indisponible, sauvegarde dans la table bluray:', e);
+trackedSeriesCloudMode = 'bundle';
+return saveTrackedSeriesBundleCloud();
 }
 }
 
 async function deleteTrackedSeriesCloud(tmdbId) {
 if (!db || !tmdbId) return false;
+if (trackedSeriesCloudMode === 'bundle') return saveTrackedSeriesBundleCloud();
 try {
 const { error } = await db.from('tracked_series').delete().eq('tmdb_id', Number(tmdbId));
 if (error) throw error;
 return true;
 } catch (e) {
-console.warn('Suppression Supabase suivi séries indisponible:', e);
-return false;
+console.warn('Suppression tracked_series indisponible, mise à jour du bundle cloud:', e);
+trackedSeriesCloudMode = 'bundle';
+return saveTrackedSeriesBundleCloud();
 }
 }
 
@@ -2380,6 +2433,13 @@ saveTrackedSeriesLocal();
 return true;
 }
 
+if (Array.isArray(trackedSeriesBundleFromCloud) && trackedSeriesBundleFromCloud.length) {
+trackedSeries = trackedSeriesBundleFromCloud;
+saveTrackedSeriesLocal();
+for (const series of trackedSeries) await saveTrackedSeriesCloud(series);
+return true;
+}
+
 // Première activation : on migre automatiquement le suivi déjà présent dans le navigateur.
 const localSeries = JSON.parse(localStorage.getItem('tracked_series_v1') || '[]');
 if (localSeries.length) {
@@ -2389,9 +2449,17 @@ saveTrackedSeriesLocal();
 }
 return true;
 } catch (e) {
-trackedSeriesCloudReady = false;
-console.warn('Table Supabase tracked_series absente ou inaccessible. Utilisation du stockage local.', e);
-return false;
+console.warn('Table Supabase tracked_series absente ou inaccessible. Utilisation du stockage cloud partagé.', e);
+trackedSeriesCloudMode = 'bundle';
+if (Array.isArray(trackedSeriesBundleFromCloud)) {
+trackedSeries = trackedSeriesBundleFromCloud;
+saveTrackedSeriesLocal();
+trackedSeriesCloudReady = true;
+return true;
+}
+const saved = await saveTrackedSeriesBundleCloud();
+if (!saved) showToast('⚠️ Le suivi des séries reste uniquement sur cet appareil.');
+return saved;
 }
 }
 
@@ -2401,7 +2469,7 @@ saveTrackedSeriesLocal();
 if (trackedSeriesCloudBusy) return;
 trackedSeriesCloudBusy = true;
 try {
-if (trackedSeriesCloudReady) await saveTrackedSeriesCloud(series);
+await saveTrackedSeriesCloud(series);
 } finally {
 trackedSeriesCloudBusy = false;
 }
@@ -2494,7 +2562,8 @@ if (!trackedSeries.length) { renderTrackedSeries(); return; }
 showToast('Actualisation des épisodes…');
 for (const series of trackedSeries) await fetchTrackedSeriesEpisodes(series);
 saveTrackedSeriesLocal(); renderTrackedSeries(); showToast('Calendrier des séries actualisé.');
-for (const series of trackedSeries) await saveTrackedSeriesCloud(series);
+if (trackedSeriesCloudMode === 'bundle') await saveTrackedSeriesBundleCloud();
+else for (const series of trackedSeries) await saveTrackedSeriesCloud(series);
 }
 
 function setTrackedSeriesFilter(filter) {
