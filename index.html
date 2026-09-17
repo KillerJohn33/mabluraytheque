@@ -1113,15 +1113,6 @@ if (m.imdbUserRating === undefined || m.imdbUserRating === null) return '';
 return `<span class="inline-flex items-center gap-1 text-amber-400 font-bold" title="Votre note IMDb">${ic('star', cls)}${m.imdbUserRating}/10</span>`;
 }
 
-function compactSeriesRatings(series) {
-const personal = series.imdbUserRating !== undefined && series.imdbUserRating !== null && !isNaN(series.imdbUserRating)
-? `<span class="text-amber-300" title="Ma note personnelle">★ Moi ${series.imdbUserRating}/10</span>` : '';
-const imdb = series.imdbRating !== undefined && series.imdbRating !== null && !isNaN(series.imdbRating)
-? `<span class="text-gray-400" title="Note générale IMDb"><span class="text-amber-400/80 font-bold">IMDb</span> ${series.imdbRating}/10</span>` : '';
-if (!personal && !imdb) return '';
-return `<span class="inline-flex items-center gap-2 text-[8px] font-medium opacity-80">${personal}${imdb}</span>`;
-}
-
 function escapeHtml(value) {
 return String(value ?? '')
 .replace(/&/g, '&amp;')
@@ -2640,7 +2631,7 @@ const filtered = trackedSeries.filter(s => trackedSeriesFilter === 'all' || seri
 if (!filtered.length) { grid.innerHTML = '<p class="text-[10px] text-gray-500 text-center py-6">Aucune série dans cette catégorie.</p>'; renderSeriesCalendar(); return; }
 grid.innerHTML = filtered.map(s => {
 const p = seriesProgress(s), status = seriesStatus(s), eps = seriesEpisodes(s); const next = eps.find(e => !e.watched && e.air_date && new Date(e.air_date) >= new Date(new Date().setHours(0,0,0,0)));
-return `<div onclick="openTrackedSeriesDetail(${Number(s.tmdb_id)})" class="glass-card rounded-2xl border border-white/10 p-2.5 flex gap-3 cursor-pointer hover:border-purple-400/30 hover:bg-white/[0.04] transition"><img src="${safeImageUrl(s.poster)}" class="w-16 h-24 object-cover rounded-xl border border-white/10 shadow"><div class="min-w-0 flex-1"><div class="flex items-center justify-between gap-2"><h4 class="text-xs font-bold text-white truncate">${escapeHtml(s.title)}</h4><button onclick="event.stopPropagation();removeTrackedSeries(${Number(s.tmdb_id)})" class="text-gray-500 hover:text-red-400 p-1">${ic('x','w-3.5 h-3.5')}</button></div><div class="flex items-center gap-1.5 mt-1 flex-wrap"><span class="text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-400/20">${seriesStatusLabel(status)}</span><span class="text-[9px] text-gray-500">${p.watched}/${p.total} épisodes</span></div><div class="mt-1">${compactSeriesRatings(s)}</div><div class="h-1.5 bg-white/10 rounded-full mt-2 overflow-hidden"><div class="h-full bg-purple-500 rounded-full" style="width:${p.pct}%"></div></div>${next ? `<p class="text-[9px] text-gray-400 mt-2">Prochain : <span class="text-white">S${String(next.season_number).padStart(2,'0')}E${String(next.episode_number).padStart(2,'0')}</span> · ${formatSeriesDate(next.air_date)}</p>` : '<p class="text-[9px] text-emerald-300 mt-2">Tous les épisodes disponibles sont vus.</p>'}<p class="text-[8px] text-purple-300 mt-2 font-semibold">Cliquer pour voir saisons et épisodes →</p></div></div>`;
+return `<div onclick="openTrackedSeriesDetail(${Number(s.tmdb_id)})" class="glass-card rounded-2xl border border-white/10 p-2.5 flex gap-3 cursor-pointer hover:border-purple-400/30 hover:bg-white/[0.04] transition"><img src="${safeImageUrl(s.poster)}" class="w-16 h-24 object-cover rounded-xl border border-white/10 shadow"><div class="min-w-0 flex-1"><div class="flex items-center justify-between gap-2"><h4 class="text-xs font-bold text-white truncate">${escapeHtml(s.title)}</h4><button onclick="event.stopPropagation();removeTrackedSeries(${Number(s.tmdb_id)})" class="text-gray-500 hover:text-red-400 p-1">${ic('x','w-3.5 h-3.5')}</button></div><div class="flex items-center gap-1.5 mt-1 flex-wrap"><span class="text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-400/20">${seriesStatusLabel(status)}</span><span class="text-[9px] text-gray-500">${p.watched}/${p.total} épisodes</span>${imdbBadge(s)}</div><div class="h-1.5 bg-white/10 rounded-full mt-2 overflow-hidden"><div class="h-full bg-purple-500 rounded-full" style="width:${p.pct}%"></div></div>${next ? `<p class="text-[9px] text-gray-400 mt-2">Prochain : <span class="text-white">S${String(next.season_number).padStart(2,'0')}E${String(next.episode_number).padStart(2,'0')}</span> · ${formatSeriesDate(next.air_date)}</p>` : '<p class="text-[9px] text-emerald-300 mt-2">Tous les épisodes disponibles sont vus.</p>'}<p class="text-[8px] text-purple-300 mt-2 font-semibold">Cliquer pour voir saisons et épisodes →</p></div></div>`;
 }).join('');
 renderSeriesCalendar();
 if (document.getElementById('homeCalendarGrid')) renderHomeSummaryCalendar();
@@ -2690,7 +2681,7 @@ const seasonHtml = orderedSeasons.map((sn, i) => {
  const shouldOpen = uiState?.openSeasons ? uiState.openSeasons.includes(sn) : sn === currentSeason;
  return `<details data-season="${sn}" class="rounded-2xl border border-white/10 bg-white/[0.025] overflow-hidden" ${shouldOpen?'open':''}><summary class="cursor-pointer list-none p-3 flex items-center justify-between gap-3 hover:bg-white/[0.035]"><div><span class="text-xs font-bold text-white">Saison ${sn}</span>${sn===currentSeason?'<span class="text-[8px] font-bold text-purple-300 ml-2 px-1.5 py-0.5 rounded-full bg-purple-500/10 border border-purple-400/20">EN COURS</span>':''}<span class="text-[9px] text-gray-500 ml-2">${seen}/${seps.length} vus</span></div><span class="text-[9px] text-purple-300">Afficher</span></summary><div class="border-t border-white/10"><div class="p-2 flex justify-end border-b border-white/5"><button onclick="event.stopPropagation();markTrackedSeasonFromDetail(${tmdbId},${sn},${allSeen?'false':'true'})" class="px-2.5 py-1.5 rounded-lg text-[9px] font-bold border ${allSeen?'bg-white/5 text-gray-400 border-white/10':'bg-emerald-500/10 text-emerald-300 border-emerald-400/20'}">${allSeen?'↶ Marquer la saison à voir':'✓ Marquer toute la saison comme vue'}</button></div><div class="divide-y divide-white/5">${seps.map(e=>`<div class="p-2.5 flex gap-2.5 items-center"><div class="w-16 h-10 rounded-lg bg-white/5 overflow-hidden flex-shrink-0">${e.still_path?`<img src="https://image.tmdb.org/t/p/w300${e.still_path}" class="w-full h-full object-cover">`:''}</div><div class="min-w-0 flex-1"><p class="text-[10px] font-semibold text-white truncate">E${e.episode_number} · ${e.name||'Épisode'}</p><p class="text-[8px] text-gray-500">${e.air_date?formatSeriesDate(e.air_date):'Date inconnue'}${e.runtime?` · ${e.runtime} min`:''}</p>${e.overview?`<p class="text-[9px] text-gray-400 mt-1 line-clamp-2">${e.overview}</p>`:''}</div><button onclick="toggleTrackedEpisodeFromDetail(${tmdbId},${sn},${e.episode_number})" class="px-2 py-1.5 rounded-lg text-[9px] font-bold border ${e.watched?'bg-emerald-500/15 text-emerald-300 border-emerald-400/20':'bg-white/5 text-gray-400 border-white/10'}">${e.watched?'✓ Vu':'À voir'}</button></div>`).join('')}</div></div></details>`;
 }).join('');
-content.innerHTML = `<div class="space-y-4"><div class="relative overflow-hidden rounded-3xl border border-white/10 bg-black/30"><div class="absolute inset-0 opacity-30 pointer-events-none" style="background-image:linear-gradient(90deg,rgba(0,0,0,.9),rgba(0,0,0,.35)),url('${series.poster}');background-size:cover;background-position:center;filter:blur(18px);transform:scale(1.08)"></div><div class="relative flex gap-3.5 p-3.5 sm:p-4"><img src="${series.poster}" class="w-24 h-36 sm:w-28 object-cover rounded-2xl shadow-xl border border-white/15"><div class="flex-1 min-w-0 flex flex-col justify-end"><span class="self-start px-2 py-1 rounded-full bg-purple-400/10 border border-purple-400/20 text-purple-300 text-[8px] font-bold uppercase">Série suivie</span><h3 class="text-lg sm:text-xl font-extrabold text-white leading-tight mt-2">${series.title}</h3><p class="text-[10px] text-gray-400 mt-1">${[year, `${seasons.length} saison${seasons.length>1?'s':''}`, `${p.total} épisodes`].filter(Boolean).join(' • ')}</p><div class="mt-1.5">${compactSeriesRatings(series)}</div><div class="mt-3"><span class="text-[10px] text-emerald-300 font-bold">${p.watched}/${p.total} vus · ${p.pct}%</span><div class="h-1.5 bg-white/10 rounded-full mt-1 overflow-hidden"><div class="h-full bg-purple-500 rounded-full" style="width:${p.pct}%"></div></div></div></div></div></div><div class="rounded-2xl border border-white/10 bg-white/[0.025] p-3 space-y-2">${genres.length?`<div class="flex flex-wrap gap-1.5">${genres.map(g=>`<span class="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] text-gray-300">${g}</span>`).join('')}</div>`:''}${creators?`<p class="text-[10px] text-gray-300"><span class="text-gray-500">Créateur :</span> ${creators}</p>`:''}${cast?`<p class="text-[10px] text-gray-300"><span class="text-gray-500">Casting :</span> ${cast}</p>`:''}${overview?`<p class="text-[10px] text-gray-400 leading-relaxed pt-1">${overview}</p>`:''}</div><div><h4 class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.16em] mb-2">Saisons et épisodes</h4><div class="space-y-2">${seasonHtml || '<p class="text-[10px] text-gray-500">Aucun épisode disponible.</p>'}</div></div></div>`;
+content.innerHTML = `<div class="space-y-4"><div class="relative overflow-hidden rounded-3xl border border-white/10 bg-black/30"><div class="absolute inset-0 opacity-30 pointer-events-none" style="background-image:linear-gradient(90deg,rgba(0,0,0,.9),rgba(0,0,0,.35)),url('${series.poster}');background-size:cover;background-position:center;filter:blur(18px);transform:scale(1.08)"></div><div class="relative flex gap-3.5 p-3.5 sm:p-4"><img src="${series.poster}" class="w-24 h-36 sm:w-28 object-cover rounded-2xl shadow-xl border border-white/15"><div class="flex-1 min-w-0 flex flex-col justify-end"><span class="self-start px-2 py-1 rounded-full bg-purple-400/10 border border-purple-400/20 text-purple-300 text-[8px] font-bold uppercase">Série suivie</span><h3 class="text-lg sm:text-xl font-extrabold text-white leading-tight mt-2">${series.title}</h3><p class="text-[10px] text-gray-400 mt-1">${[year, `${seasons.length} saison${seasons.length>1?'s':''}`, `${p.total} épisodes`].filter(Boolean).join(' • ')}</p>${series.imdbUserRating !== undefined && series.imdbUserRating !== null ? `<div class="mt-2 text-[10px]">${imdbBadge(series,'w-3.5 h-3.5')}</div>` : ''}<div class="mt-3"><span class="text-[10px] text-emerald-300 font-bold">${p.watched}/${p.total} vus · ${p.pct}%</span><div class="h-1.5 bg-white/10 rounded-full mt-1 overflow-hidden"><div class="h-full bg-purple-500 rounded-full" style="width:${p.pct}%"></div></div></div></div></div></div><div class="rounded-2xl border border-white/10 bg-white/[0.025] p-3 space-y-2">${genres.length?`<div class="flex flex-wrap gap-1.5">${genres.map(g=>`<span class="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] text-gray-300">${g}</span>`).join('')}</div>`:''}${creators?`<p class="text-[10px] text-gray-300"><span class="text-gray-500">Créateur :</span> ${creators}</p>`:''}${cast?`<p class="text-[10px] text-gray-300"><span class="text-gray-500">Casting :</span> ${cast}</p>`:''}${overview?`<p class="text-[10px] text-gray-400 leading-relaxed pt-1">${overview}</p>`:''}</div><div><h4 class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.16em] mb-2">Saisons et épisodes</h4><div class="space-y-2">${seasonHtml || '<p class="text-[10px] text-gray-500">Aucun épisode disponible.</p>'}</div></div></div>`;
 if (uiState) {
  const scroller = modal.querySelector(':scope > div');
  requestAnimationFrame(() => { if (scroller) scroller.scrollTop = uiState.scrollTop || 0; });
@@ -3555,12 +3546,8 @@ if (rows.length === 0) { showToast("Fichier vide ou invalide."); return; }
 const ratingsMap = {};
 rows.forEach(r => {
 const constId = (r['Const'] || r['const'] || '').trim();
-const personalRating = parseFloat(r['Your Rating'] || r['your rating']);
-const imdbRating = parseFloat(r['IMDb Rating'] || r['IMDb rating'] || r['imdb rating']);
-if (constId && (!isNaN(personalRating) || !isNaN(imdbRating))) ratingsMap[constId] = {
-personal: !isNaN(personalRating) ? personalRating : null,
-imdb: !isNaN(imdbRating) ? imdbRating : null
-};
+const rating = parseFloat(r['Your Rating'] || r['your rating']);
+if (constId && !isNaN(rating)) ratingsMap[constId] = rating;
 });
 
 if (Object.keys(ratingsMap).length === 0) {
@@ -3573,9 +3560,7 @@ let matchedSeries = 0;
 const allMovies = [...collection, ...wishlist];
 for (const m of allMovies) {
 if (m.imdb_id && ratingsMap.hasOwnProperty(m.imdb_id)) {
-const ratings = ratingsMap[m.imdb_id];
-if (ratings.personal !== null) m.imdbUserRating = ratings.personal;
-if (ratings.imdb !== null) m.imdbRating = ratings.imdb;
+m.imdbUserRating = ratingsMap[m.imdb_id];
 await updateMovieInCloud(m);
 matchedMovies++;
 }
@@ -3596,9 +3581,7 @@ console.warn(`Identifiant IMDb indisponible pour ${series.title}:`, error);
 }
 }
 if (series.imdb_id && Object.prototype.hasOwnProperty.call(ratingsMap, series.imdb_id)) {
-const ratings = ratingsMap[series.imdb_id];
-if (ratings.personal !== null) series.imdbUserRating = ratings.personal;
-if (ratings.imdb !== null) series.imdbRating = ratings.imdb;
+series.imdbUserRating = ratingsMap[series.imdb_id];
 matchedSeries++;
 trackedSeriesChanged = true;
 }
