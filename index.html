@@ -2351,7 +2351,7 @@ let trackedSeries = JSON.parse(localStorage.getItem('tracked_series_v1') || '[]'
 let trackedSeriesFilter = 'all';
 let trackedSeriesCloudReady = false;
 let trackedSeriesCloudBusy = false;
-let trackedSeriesCloudMode = 'dedicated';
+let trackedSeriesCloudMode = 'bundle';
 let seriesCalDate = new Date();
 let seriesCalSelected = null;
 
@@ -2389,78 +2389,32 @@ return false;
 
 async function saveTrackedSeriesCloud(series) {
 if (!db || !series || !series.tmdb_id) return false;
-if (trackedSeriesCloudMode === 'bundle') return saveTrackedSeriesBundleCloud();
-try {
-const payload = {
- tmdb_id: Number(series.tmdb_id),
- data: series,
- updated_at: new Date().toISOString()
-};
-const { error } = await db.from('tracked_series').upsert(payload, { onConflict: 'tmdb_id' });
-if (error) throw error;
-trackedSeriesCloudReady = true;
-return true;
-} catch (e) {
-console.warn('Table tracked_series indisponible, sauvegarde dans la table bluray:', e);
-trackedSeriesCloudMode = 'bundle';
 return saveTrackedSeriesBundleCloud();
-}
 }
 
 async function deleteTrackedSeriesCloud(tmdbId) {
 if (!db || !tmdbId) return false;
-if (trackedSeriesCloudMode === 'bundle') return saveTrackedSeriesBundleCloud();
-try {
-const { error } = await db.from('tracked_series').delete().eq('tmdb_id', Number(tmdbId));
-if (error) throw error;
-return true;
-} catch (e) {
-console.warn('Suppression tracked_series indisponible, mise à jour du bundle cloud:', e);
-trackedSeriesCloudMode = 'bundle';
 return saveTrackedSeriesBundleCloud();
-}
 }
 
 async function loadTrackedSeriesFromCloud() {
-try {
-const { data, error } = await db.from('tracked_series').select('tmdb_id,data,updated_at').order('updated_at', { ascending: false });
-if (error) throw error;
-trackedSeriesCloudReady = true;
-const cloudSeries = (data || []).map(row => row.data).filter(s => s && s.tmdb_id);
-if (cloudSeries.length) {
-trackedSeries = cloudSeries;
-saveTrackedSeriesLocal();
-return true;
-}
-
-if (Array.isArray(trackedSeriesBundleFromCloud) && trackedSeriesBundleFromCloud.length) {
-trackedSeries = trackedSeriesBundleFromCloud;
-saveTrackedSeriesLocal();
-for (const series of trackedSeries) await saveTrackedSeriesCloud(series);
-return true;
-}
-
-// Première activation : on migre automatiquement le suivi déjà présent dans le navigateur.
 const localSeries = JSON.parse(localStorage.getItem('tracked_series_v1') || '[]');
-if (localSeries.length) {
-for (const series of localSeries) await saveTrackedSeriesCloud(series);
-trackedSeries = localSeries;
+const cloudSeries = Array.isArray(trackedSeriesBundleFromCloud) ? trackedSeriesBundleFromCloud : [];
+const merged = new Map();
+localSeries.filter(s => s?.tmdb_id).forEach(s => merged.set(String(s.tmdb_id), s));
+cloudSeries.filter(s => s?.tmdb_id).forEach(s => merged.set(String(s.tmdb_id), s));
+trackedSeries = [...merged.values()];
 saveTrackedSeriesLocal();
-}
-return true;
-} catch (e) {
-console.warn('Table Supabase tracked_series absente ou inaccessible. Utilisation du stockage cloud partagé.', e);
 trackedSeriesCloudMode = 'bundle';
-if (Array.isArray(trackedSeriesBundleFromCloud)) {
-trackedSeries = trackedSeriesBundleFromCloud;
-saveTrackedSeriesLocal();
 trackedSeriesCloudReady = true;
-return true;
-}
+
+// Crée ou complète le bundle quand cet appareil possède des séries absentes du cloud.
+const cloudIds = new Set(cloudSeries.map(s => String(s.tmdb_id)));
+const mustUpload = !trackedSeriesBundleCloudId || localSeries.some(s => s?.tmdb_id && !cloudIds.has(String(s.tmdb_id)));
+if (!mustUpload) return true;
 const saved = await saveTrackedSeriesBundleCloud();
 if (!saved) showToast('⚠️ Le suivi des séries reste uniquement sur cet appareil.');
 return saved;
-}
 }
 
 async function persistTrackedSeries(series) {
