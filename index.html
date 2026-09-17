@@ -86,6 +86,110 @@ body.theme-light .divide-white\/10 > :not([hidden]) ~ :not([hidden]) { border-co
 body.theme-light .hover\:bg-white\/10:hover { background-color: rgba(14, 165, 233, 0.1) !important; }
 body.theme-light .shadow-black\/30 { --tw-shadow-color: rgba(15, 23, 42, 0.16) !important; }
 
+/* ===== Pages Stats et Options harmonisees ===== */
+.modern-page {
+gap: 1rem;
+align-items: start;
+}
+.modern-page:not(.hidden) { display: grid; }
+.page-hero {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 1rem;
+padding: 1.15rem 1.25rem;
+border-radius: 1.5rem;
+background: linear-gradient(135deg, rgba(0, 217, 255, 0.16), rgba(99, 102, 241, 0.10) 52%, rgba(255, 255, 255, 0.045));
+border: 1px solid rgba(0, 217, 255, 0.22);
+box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 14px 34px rgba(0,0,0,.2);
+backdrop-filter: blur(18px);
+overflow: hidden;
+position: relative;
+}
+.page-hero::after {
+content: "";
+position: absolute;
+width: 9rem;
+height: 9rem;
+right: -3rem;
+top: -4rem;
+border-radius: 999px;
+background: rgba(0, 217, 255, 0.14);
+filter: blur(18px);
+pointer-events: none;
+}
+.page-hero-icon {
+width: 2.85rem;
+height: 2.85rem;
+border-radius: 1rem;
+display: inline-flex;
+align-items: center;
+justify-content: center;
+flex-shrink: 0;
+color: #7df9ff;
+background: linear-gradient(145deg, rgba(0,217,255,.22), rgba(59,130,246,.12));
+border: 1px solid rgba(125,249,255,.3);
+box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 8px 24px rgba(0,184,217,.18);
+}
+.page-hero-icon svg { width: 1.45rem; height: 1.45rem; }
+.modern-panel {
+background: linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.035));
+border: 1px solid rgba(255,255,255,.11);
+border-radius: 1.35rem;
+box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 10px 28px rgba(0,0,0,.18);
+backdrop-filter: blur(16px);
+overflow: hidden;
+position: relative;
+}
+.modern-panel::before {
+content: "";
+position: absolute;
+left: 1rem;
+right: 1rem;
+top: 0;
+height: 1px;
+background: linear-gradient(90deg, transparent, rgba(0,217,255,.45), transparent);
+pointer-events: none;
+}
+.modern-panel > .flex:first-child .icon-chip {
+width: 2.35rem;
+height: 2.35rem;
+border-radius: .85rem;
+background: rgba(0,217,255,.09);
+border: 1px solid rgba(0,217,255,.16);
+}
+#tabSettings > .modern-panel:nth-child(6) {
+border-color: rgba(248, 113, 113, 0.24);
+background: linear-gradient(145deg, rgba(127,29,29,.15), rgba(255,255,255,.025));
+}
+#tabSettings > .modern-panel:nth-child(6)::before {
+background: linear-gradient(90deg, transparent, rgba(248,113,113,.55), transparent);
+}
+#syncStatus {
+background: linear-gradient(135deg, rgba(0,217,255,.09), rgba(255,255,255,.035));
+transition: transform .18s ease, border-color .18s ease, background .18s ease;
+}
+#syncStatus:hover { transform: translateY(-1px); border-color: rgba(0,217,255,.3); }
+body.theme-light .page-hero {
+background: linear-gradient(135deg, rgba(224,242,254,.96), rgba(238,242,255,.9));
+border-color: rgba(2,132,199,.22);
+box-shadow: 0 12px 30px rgba(15,23,42,.1), inset 0 1px 0 #fff;
+}
+body.theme-light .modern-panel {
+background: rgba(255,255,255,.78);
+border-color: rgba(15,23,42,.1);
+box-shadow: 0 10px 28px rgba(15,23,42,.09), inset 0 1px 0 #fff;
+}
+body.theme-light #tabSettings > .modern-panel:nth-child(6) {
+background: rgba(254,242,242,.9);
+border-color: rgba(220,38,38,.18);
+}
+@media (min-width: 900px) {
+  #tabStats.modern-page:not(.hidden), #tabSettings.modern-page:not(.hidden) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #tabStats > .page-hero, #tabSettings > .page-hero,
+  #tabStats > .modern-panel:nth-child(2), #tabStats > .modern-panel:nth-child(3), #tabStats > .modern-panel:nth-child(10),
+  #tabSettings > .modern-panel:nth-child(2), #tabSettings > .modern-panel:nth-child(8), #tabSettings > .modern-panel:nth-child(9) { grid-column: 1 / -1; }
+}
 .glass-card {
 background: rgba(255, 255, 255, 0.05);
 backdrop-filter: blur(16px);
@@ -716,8 +820,15 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 
 <!-- ONGLET STATS -->
-<div id="tabStats" class="hidden glass-card rounded-3xl border border-white/10 divide-y divide-white/10 overflow-hidden">
-<div class="p-4 md:p-5 space-y-3">
+<div id="tabStats" class="hidden modern-page">
+<div class="page-hero">
+<div class="flex items-center gap-3 relative z-10">
+<span class="page-hero-icon" data-icon="barchart"></span>
+<div><p class="text-[9px] uppercase tracking-[0.22em] text-cyan-300 font-black">Tableau de bord</p><h2 class="text-lg md:text-xl font-black text-white">Statistiques</h2><p class="text-[10px] md:text-xs text-gray-400 mt-0.5">Explorez votre collection en un coup d'oeil.</p></div>
+</div>
+<span class="relative z-10 text-[9px] font-bold text-cyan-200 bg-cyan-500/10 border border-cyan-400/20 px-2.5 py-1 rounded-full">Collection</span>
+</div>
+<div class="modern-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="barchart"></span>
 <div>
@@ -735,7 +846,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 
-<div class="p-4 md:p-5 space-y-3">
+<div class="modern-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="grid"></span>
 <div>
@@ -808,7 +919,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 
-<div class="p-4 md:p-5 space-y-3">
+<div class="modern-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="disc"></span>
 <div>
@@ -822,7 +933,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 
-<div class="p-4 md:p-5 space-y-3">
+<div class="modern-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="package"></span>
 <div>
@@ -836,7 +947,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 
-<div class="p-4 md:p-5 space-y-3">
+<div class="modern-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="store"></span>
 <div>
@@ -850,7 +961,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 
-<div class="p-4 md:p-5 space-y-3">
+<div class="modern-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="tag"></span>
 <div>
@@ -864,7 +975,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 
-<div class="p-4 md:p-5 space-y-3">
+<div class="modern-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="clapper"></span>
 <div>
@@ -878,7 +989,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 
-<div class="p-4 md:p-5 space-y-3">
+<div class="modern-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="users"></span>
 <div>
@@ -892,7 +1003,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 
-<div class="p-4 md:p-5 space-y-3">
+<div class="modern-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="trend"></span>
 <div>
@@ -909,15 +1020,22 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 
 <!-- PARAMETRES -->
-<div id="tabSettings" class="hidden glass-card rounded-3xl border border-white/10 divide-y divide-white/10 overflow-hidden">
-<div class="p-4 md:p-5 space-y-3">
+<div id="tabSettings" class="hidden modern-page">
+<div class="page-hero">
+<div class="flex items-center gap-3 relative z-10">
+<span class="page-hero-icon" data-icon="settings"></span>
+<div><p class="text-[9px] uppercase tracking-[0.22em] text-cyan-300 font-black">Personnalisation</p><h2 class="text-lg md:text-xl font-black text-white">Options</h2><p class="text-[10px] md:text-xs text-gray-400 mt-0.5">R&eacute;glez l'application selon vos pr&eacute;f&eacute;rences.</p></div>
+</div>
+<span class="relative z-10 text-[9px] font-bold text-cyan-200 bg-cyan-500/10 border border-cyan-400/20 px-2.5 py-1 rounded-full">R&eacute;glages</span>
+</div>
+<div class="modern-panel p-4 md:p-5 space-y-3">
 <button id="syncStatus" onclick="syncAllData()" class="w-full flex items-center justify-between gap-3 p-3 rounded-2xl bg-white/5 border border-white/10 text-gray-400" title="Synchroniser maintenant">
 <span class="flex items-center gap-2"><span id="syncStatusDot" class="w-2.5 h-2.5 rounded-full bg-gray-500"></span><span class="text-xs font-bold text-white">Synchronisation cloud</span></span>
 <span class="text-right"><span id="syncStatusLabel" class="block text-[10px] font-semibold">Connexion…</span><span id="settingsSyncStatus" class="block text-[8px] text-gray-500 mt-0.5">Touchez pour actualiser</span></span>
 </button>
 </div>
 
-<div class="p-4 md:p-5 space-y-3">
+<div class="modern-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="palette"></span>
 <div>
@@ -946,7 +1064,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 
-<div class="p-4 md:p-5 space-y-3">
+<div class="modern-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="key"></span>
 <div>
@@ -974,7 +1092,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 
-<div class="p-4 md:p-5 space-y-3">
+<div class="modern-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="refresh"></span>
 <div>
@@ -988,7 +1106,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <p class="text-[10px] text-gray-500">Récupère la durée, le réalisateur et les acteurs principaux pour tous les films déjà dans votre collection et votre wishlist.</p>
 </div>
 
-<div class="p-4 md:p-5 space-y-3">
+<div class="modern-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="trash"></span>
 <div>
@@ -1002,7 +1120,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <p class="text-[10px] text-red-300/70">Cette action supprimera tous les films de la collection <strong>et de la wishlist</strong> dans Supabase. Cette action est irréversible.</p>
 </div>
 
-<div class="p-4 md:p-5 space-y-3">
+<div class="modern-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="star"></span>
 <div>
@@ -1017,7 +1135,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 <p class="text-[10px] text-gray-500">Sur IMDb : votre profil → "Your Ratings" → icône Export (⋮ en haut à droite). Le fichier ratings.csv téléchargé se glisse directement ici. La correspondance se fait via l'identifiant IMDb du film, pas par le titre.</p>
 </div>
 
-<div class="p-4 md:p-5 space-y-3">
+<div class="modern-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="download"></span>
 <div>
@@ -1043,7 +1161,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </div>
 </div>
 
-<div class="p-4 md:p-5 space-y-2 text-xs text-gray-300">
+<div class="modern-panel p-4 md:p-5 space-y-2 text-xs text-gray-300">
 <div class="flex items-center gap-2 mb-1"><span class="icon-chip chip-sm" data-icon="info"></span><h3 class="text-sm font-bold text-white">Informations</h3></div>
 <div class="flex justify-between border-b border-white/10 py-1.5">
 <span class="text-gray-400">Total Films :</span>
