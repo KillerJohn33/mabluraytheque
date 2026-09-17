@@ -1162,6 +1162,11 @@ if (m.imdbUserRating === undefined || m.imdbUserRating === null || isNaN(m.imdbU
 return `<span class="inline-flex items-center gap-1 rounded-lg bg-black/80 backdrop-blur-md border border-amber-300/60 px-2 py-1 text-[11px] leading-none text-amber-300 font-black shadow-lg shadow-black/40" title="Ma note personnelle">${ic('star', cls)}<span>${escapeHtml(m.imdbUserRating)}/10</span></span>`;
 }
 
+function wishlistImdbRatingBadge(m) {
+if (m.imdbRating === undefined || m.imdbRating === null || isNaN(m.imdbRating)) return '';
+return `<span class="inline-flex items-center gap-1 rounded-md bg-black/70 backdrop-blur-sm border border-sky-300/35 px-1.5 py-1 text-[9px] leading-none text-sky-300 font-semibold" title="Note IMDb"><span class="font-black">IMDb</span><span>${escapeHtml(m.imdbRating)}/10</span></span>`;
+}
+
 function compactSeriesRatings(series) {
 const personal = series.imdbUserRating !== undefined && series.imdbUserRating !== null && !isNaN(series.imdbUserRating)
 ? `<span class="text-amber-300 font-semibold" title="Ma note personnelle">★ ${series.imdbUserRating}/10</span>` : '';
@@ -2250,14 +2255,11 @@ card.innerHTML = `
 <div class="absolute top-2 left-2">
 <span class="text-[8px] uppercase tracking-wider font-bold text-pink-100 bg-pink-500/20 backdrop-blur-md border border-pink-300/20 px-1.5 py-1 rounded-full">Wishlist</span>
 </div>
-<div class="absolute top-2 right-2">
-${wishlistPersonalRatingBadge(m)}
-</div>
 <div class="absolute inset-x-0 bottom-0 p-2.5">
 <h4 class="text-[11px] font-bold text-white leading-tight truncate">${escapeHtml(m.title)}</h4>
-<div class="flex items-center justify-between gap-2 mt-1.5">
-<span class="text-[10px] font-bold text-pink-300">${priceLabel}</span>
-
+<div class="flex items-end justify-between gap-2 mt-1.5">
+${wishlistPersonalRatingBadge(m, 'w-3 h-3')}
+${wishlistImdbRatingBadge(m)}
 </div>
 </div>
 </div>
