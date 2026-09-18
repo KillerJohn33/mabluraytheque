@@ -86,6 +86,48 @@ body.theme-light .divide-white\/10 > :not([hidden]) ~ :not([hidden]) { border-co
 body.theme-light .hover\:bg-white\/10:hover { background-color: rgba(14, 165, 233, 0.1) !important; }
 body.theme-light .shadow-black\/30 { --tw-shadow-color: rgba(15, 23, 42, 0.16) !important; }
 
+/* ===== En-tetes compacts des sections sur telephone ===== */
+.mobile-section-hero {
+display: flex;
+align-items: center;
+gap: .65rem;
+padding: .6rem .75rem;
+min-height: 3.15rem;
+border-radius: 1rem;
+background: linear-gradient(120deg, rgba(0,217,255,.14), rgba(99,102,241,.08), rgba(255,255,255,.04));
+border: 1px solid rgba(0,217,255,.2);
+box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 8px 22px rgba(0,0,0,.15);
+backdrop-filter: blur(16px);
+position: relative;
+overflow: hidden;
+}
+.mobile-section-hero::after {
+content: "";
+position: absolute;
+right: -1.5rem;
+top: -2.5rem;
+width: 6rem;
+height: 6rem;
+border-radius: 999px;
+background: rgba(0,217,255,.12);
+filter: blur(14px);
+pointer-events: none;
+}
+.mobile-section-hero .page-hero-icon {
+width: 2rem;
+height: 2rem;
+border-radius: .7rem;
+}
+.mobile-section-hero .page-hero-icon svg { width: 1.05rem; height: 1.05rem; }
+.mobile-section-hero h2 { font-size: .82rem; line-height: 1rem; letter-spacing: .01em; }
+body.theme-light .mobile-section-hero {
+background: linear-gradient(120deg, rgba(224,242,254,.95), rgba(238,242,255,.88));
+border-color: rgba(2,132,199,.2);
+box-shadow: 0 7px 20px rgba(15,23,42,.08), inset 0 1px 0 #fff;
+}
+@media (min-width: 768px) {
+  .mobile-section-hero { display: none !important; }
+}
 /* ===== Pages Stats et Options harmonisees ===== */
 .modern-page {
 gap: 1rem;
@@ -604,6 +646,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 <!-- ONGLET ACCUEIL -->
 <div id="tabHome" class="space-y-6">
+<div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="home"></span><h2 class="font-black text-white relative z-10">Accueil</h2></div>
 <div>
 <div class="flex items-center justify-between mb-3 px-1">
 <h2 class="text-xs font-bold uppercase tracking-wider text-gray-400">Derniers ajouts</h2>
@@ -648,6 +691,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 <!-- ONGLET COLLECTION AVEC FILTRES AVANCÉS -->
 <div id="tabCollection" class="hidden space-y-4">
+<div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="book"></span><h2 class="font-black text-white relative z-10">Collection</h2></div>
 <!-- FILTRE RAPIDE FILMS / SÉRIES -->
 <div class="glass-card w-full p-1 rounded-2xl border border-white/10 flex items-center gap-1">
 <button id="mediaTypeAllBtn" onclick="setMediaTypeFilter('all')" class="media-type-filter-btn flex-1 py-1.5 rounded-xl text-[11px] font-semibold transition">Tous</button>
@@ -712,6 +756,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 <!-- ONGLET WISHLIST -->
 <div id="tabWishlist" class="hidden space-y-4">
+<div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="sparkles"></span><h2 class="font-black text-white relative z-10">Wishlist</h2></div>
 <div class="glass-card p-3 rounded-2xl border border-pink-500/30 flex items-center justify-between">
 <div class="flex items-center gap-2.5">
 <span class="icon-chip chip-sm" data-icon="sparkles"></span>
@@ -798,6 +843,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 <!-- ONGLET MES SÉRIES -->
 <div id="tabSeries" class="hidden space-y-4">
+<div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="clapper"></span><h2 class="font-black text-white relative z-10">S&eacute;ries</h2></div>
 <div class="glass-card p-3 rounded-2xl border border-purple-400/20 flex items-center justify-between">
 <div class="flex items-center gap-2.5">
 <span class="icon-chip chip-sm" data-icon="tv"></span>
@@ -843,13 +889,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 <!-- ONGLET STATS -->
 <div id="tabStats" class="hidden modern-page">
-<div class="page-hero">
-<div class="flex items-center gap-3 relative z-10">
-<span class="page-hero-icon" data-icon="barchart"></span>
-<div><p class="text-[9px] uppercase tracking-[0.22em] text-cyan-300 font-black">Tableau de bord</p><h2 class="text-lg md:text-xl font-black text-white">Statistiques</h2><p class="text-[10px] md:text-xs text-gray-400 mt-0.5">Explorez votre collection en un coup d'oeil.</p></div>
-</div>
-<span class="relative z-10 text-[9px] font-bold text-cyan-200 bg-cyan-500/10 border border-cyan-400/20 px-2.5 py-1 rounded-full">Collection</span>
-</div>
+<div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="barchart"></span><h2 class="font-black text-white relative z-10">Statistiques</h2></div>
 <div class="modern-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="barchart"></span>
@@ -1043,13 +1083,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 <!-- PARAMETRES -->
 <div id="tabSettings" class="hidden modern-page">
-<div class="page-hero">
-<div class="flex items-center gap-3 relative z-10">
-<span class="page-hero-icon" data-icon="settings"></span>
-<div><p class="text-[9px] uppercase tracking-[0.22em] text-cyan-300 font-black">Personnalisation</p><h2 class="text-lg md:text-xl font-black text-white">Options</h2><p class="text-[10px] md:text-xs text-gray-400 mt-0.5">R&eacute;glez l'application selon vos pr&eacute;f&eacute;rences.</p></div>
-</div>
-<span class="relative z-10 text-[9px] font-bold text-cyan-200 bg-cyan-500/10 border border-cyan-400/20 px-2.5 py-1 rounded-full">R&eacute;glages</span>
-</div>
+<div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="settings"></span><h2 class="font-black text-white relative z-10">Options</h2></div>
 <div class="modern-panel p-4 md:p-5 space-y-3">
 <button id="syncStatus" onclick="syncAllData()" class="w-full flex items-center justify-between gap-3 p-3 rounded-2xl bg-white/5 border border-white/10 text-gray-400" title="Synchroniser maintenant">
 <span class="flex items-center gap-2"><span id="syncStatusDot" class="w-2.5 h-2.5 rounded-full bg-gray-500"></span><span class="text-xs font-bold text-white">Synchronisation cloud</span></span>
