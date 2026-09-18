@@ -1,0 +1,17 @@
+{
+  "id": "/",
+  "name": "Ma Blu-rayth\u00e8que",
+  "short_name": "Blu-rayth\u00e8que",
+  "description": "G\u00e9rez votre collection Blu-ray, votre wishlist et vos s\u00e9ries suivies.",
+  "lang": "fr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
