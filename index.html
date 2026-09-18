@@ -600,6 +600,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 <!-- RECHERCHE & SCANNER (visible uniquement sur Accueil et Collection) -->
 <div id="homeMobileHero" class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="home"></span><h2 class="font-black text-white relative z-10">Accueil</h2></div>
+<div id="collectionMobileHero" class="hidden mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="book"></span><h2 class="font-black text-white relative z-10">Collection</h2></div>
 <div id="searchSection" class="space-y-4">
 <div class="space-y-4">
 <div class="space-y-2">
@@ -689,7 +690,6 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 <!-- ONGLET COLLECTION AVEC FILTRES AVANCÉS -->
 <div id="tabCollection" class="hidden space-y-4">
-<div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="book"></span><h2 class="font-black text-white relative z-10">Collection</h2></div>
 <!-- FILTRE RAPIDE FILMS / SÉRIES -->
 <div class="glass-card w-full p-1 rounded-2xl border border-white/10 flex items-center gap-1">
 <button id="mediaTypeAllBtn" onclick="setMediaTypeFilter('all')" class="media-type-filter-btn flex-1 py-1.5 rounded-xl text-[11px] font-semibold transition">Tous</button>
@@ -1759,6 +1759,8 @@ else searchSection.classList.add('hidden');
 }
 const homeMobileHero = document.getElementById('homeMobileHero');
 if (homeMobileHero) homeMobileHero.classList.toggle('hidden', tab !== 'home');
+const collectionMobileHero = document.getElementById('collectionMobileHero');
+if (collectionMobileHero) collectionMobileHero.classList.toggle('hidden', tab !== 'collection');
 
 const inactiveClass = "flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent";
 const activeClass = "flex-1 py-2 font-bold text-[10px] transition flex items-center justify-center gap-1 text-cyan-400 border-b-[3px] border-cyan-400";
