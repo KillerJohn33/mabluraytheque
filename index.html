@@ -227,13 +227,23 @@ background: rgba(254,242,242,.9);
 border-color: rgba(220,38,38,.18);
 }
 @media (min-width: 900px) {
-  #tabStats.modern-page:not(.hidden),
+  #tabStats.modern-page:not(.hidden) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    width: 100%;
+  }
+  #tabStats > .modern-panel {
+    display: block;
+    width: 100%;
+    margin: 0;
+    break-inside: auto;
+  }
   #tabSettings.modern-page:not(.hidden) {
     display: block;
     column-count: 2;
     column-gap: 1rem;
   }
-  #tabStats > .modern-panel,
   #tabSettings > .modern-panel {
     display: inline-block;
     width: 100%;
@@ -241,11 +251,6 @@ border-color: rgba(220,38,38,.18);
     break-inside: avoid;
     -webkit-column-break-inside: avoid;
   }
-  #tabStats > .page-hero,
-  #tabSettings > .page-hero,
-  #tabStats > .modern-panel:nth-child(2),
-  #tabStats > .modern-panel:nth-child(3),
-  #tabStats > .modern-panel:nth-child(10),
   #tabSettings > .modern-panel:nth-child(2),
   #tabSettings > .modern-panel:nth-child(8),
   #tabSettings > .modern-panel:nth-child(9) {
@@ -601,6 +606,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 </nav>
 
 <!-- RECHERCHE & SCANNER (visible uniquement sur Accueil et Collection) -->
+<div id="homeMobileHero" class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="home"></span><h2 class="font-black text-white relative z-10">Accueil</h2></div>
 <div id="searchSection" class="space-y-4">
 <div class="space-y-4">
 <div class="space-y-2">
@@ -646,7 +652,6 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 <!-- ONGLET ACCUEIL -->
 <div id="tabHome" class="space-y-6">
-<div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="home"></span><h2 class="font-black text-white relative z-10">Accueil</h2></div>
 <div>
 <div class="flex items-center justify-between mb-3 px-1">
 <h2 class="text-xs font-bold uppercase tracking-wider text-gray-400">Derniers ajouts</h2>
@@ -1759,6 +1764,8 @@ if (searchSection) {
 if (tab === 'home' || tab === 'collection') searchSection.classList.remove('hidden');
 else searchSection.classList.add('hidden');
 }
+const homeMobileHero = document.getElementById('homeMobileHero');
+if (homeMobileHero) homeMobileHero.classList.toggle('hidden', tab !== 'home');
 
 const inactiveClass = "flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent";
 const activeClass = "flex-1 py-2 font-bold text-[10px] transition flex items-center justify-center gap-1 text-cyan-400 border-b-[3px] border-cyan-400";
@@ -1806,6 +1813,7 @@ document.getElementById('tabSettingsBtn').className = activeClass;
 document.getElementById('bottomTabSettingsBtn').classList.add('active');
 updateSettingsCounters();
 }
+if (window.innerWidth < 768) window.scrollTo(0, 0);
 }
 
 function toggleViewMode() {
