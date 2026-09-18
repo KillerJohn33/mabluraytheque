@@ -3534,7 +3534,7 @@ html5QrcodeScanner = new Html5Qrcode("reader");
 try {
 await html5QrcodeScanner.start(
 { facingMode: "environment" },
-{ fps: 10, qrbox: { width: 250, height: 150 } },
+{ fps: 12, qrbox: { width: 280, height: 150 }, formatsToSupport: [Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8, Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E] },
 onScanSuccess
 );
 } catch (err) {
@@ -3577,7 +3577,7 @@ return;
 const backCam = cameras.find(c => /back|arrière|rear|environment/i.test(c.label)) || cameras[cameras.length - 1];
 await html5QrcodeScanner.start(
 backCam.id,
-{ fps: 10, qrbox: { width: 250, height: 150 } },
+{ fps: 12, qrbox: { width: 280, height: 150 }, formatsToSupport: [Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8, Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E] },
 onScanSuccess
 );
 } catch (err2) {
@@ -3599,49 +3599,85 @@ document.getElementById('scanner-container').classList.add('hidden');
 }
 }
 
+function barcodeSearchCandidates(product) {
+const rawValues = [product?.title, product?.description, ...(product?.offerTitles || [])].filter(Boolean);
+const candidates = [];
+const add = value => {
+const clean = String(value || '').replace(/\s+/g, ' ').trim();
+if (clean.length > 1 && !candidates.some(item => item.toLowerCase() === clean.toLowerCase())) candidates.push(clean);
+};
+
+rawValues.forEach(value => {
+add(value);
+let clean = String(value)
+.replace(/\([^)]*(?:blu[ -]?ray|dvd|uhd|4k|steelbook|edition|disc|version)[^)]*\)/gi, ' ')
+.replace(/\[[^\]]*(?:blu[ -]?ray|dvd|uhd|4k|steelbook|edition|disc|version)[^\]]*\]/gi, ' ')
+.replace(/\b(?:ultra\s*hd|uhd|4k|blu[ -]?ray|bluray|dvd|steelbook|digibook|mediabook|collector(?:'s)?|limited|edition|edizione|edicion|version|combo|digital|copy|disc|discs|region\s*[a-z0-9]+)\b/gi, ' ')
+.replace(/\b(?:fr|french|anglais|english|import)\b/gi, ' ')
+.replace(/[|]/g, ' ')
+.replace(/\s*[-â€“â€”:]\s*(?:Ã©dition|edition|blu|dvd|uhd|4k|steelbook).*$/i, '')
+.replace(/\s+/g, ' ').trim();
+add(clean);
+const beforeSeparator = clean.split(/\s[-â€“â€”|:]\s/)[0];
+if (beforeSeparator.length >= 2) add(beforeSeparator);
+});
+return candidates.slice(0, 6);
+}
+
+async function searchTmdbFromBarcodeProduct(product) {
+const candidates = barcodeSearchCandidates(product);
+for (const query of candidates) {
+try {
+const response = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=fr-FR&page=1&include_adult=false`);
+if (!response.ok) continue;
+const data = await response.json();
+const results = (data.results || []).filter(item => item.media_type === 'movie' || item.media_type === 'tv');
+if (results.length) return { query, results };
+} catch (error) {
+console.warn('Recherche TMDB du code-barres impossible :', error);
+}
+}
+return null;
+}
+
 async function onScanSuccess(decodedText) {
 stopScanner();
-const barcode = String(decodedText || '').trim();
-if (!barcode) return;
-showToast(`Code scanné : ${barcode}`);
+const barcode = String(decodedText || '').replace(/\D/g, '');
+if (!/^\d{8,14}$/.test(barcode)) {
+showToast('Code-barres non reconnu. RÃ©essayez en cadrant uniquement les barres.');
+return;
+}
 
-// On tente d'abord une identification produit par EAN/UPC. Si elle échoue,
-// on conserve le comportement de secours via la recherche TMDB.
-try {
-const productRes = await fetch(`https://api.upcitemdb.com/prod/trial/lookup?upc=${encodeURIComponent(barcode)}`);
-if (productRes.ok) {
-const productData = await productRes.json();
-const item = productData?.items?.[0];
-const productTitle = item?.title || item?.description || '';
-if (productTitle) {
-const tmdbRes = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(productTitle)}&language=fr-FR&page=1`);
-const tmdbData = await tmdbRes.json();
-const results = (tmdbData.results || []).filter(m => m.media_type === 'movie' || m.media_type === 'tv');
-if (results.length) {
-// Mémorise le code pour le prochain ajout : l'utilisateur pourra le retrouver
-// dans le résultat sélectionné et le renseigner sur l'édition.
 window.lastScannedBarcode = barcode;
+window.lastScannedProductTitle = '';
+showToast(`Code ${barcode} lu. Identification en coursâ€¦`);
+
+try {
+const productRes = await fetch(`/api/barcode?code=${encodeURIComponent(barcode)}`, { cache: 'no-store' });
+const productData = await productRes.json().catch(() => ({}));
+if (!productRes.ok) throw new Error(productData.error || `Erreur ${productRes.status}`);
+
+if (productData.found && productData.product) {
+const match = await searchTmdbFromBarcodeProduct(productData.product);
+if (match) {
+const productTitle = productData.product.title || match.query;
 window.lastScannedProductTitle = productTitle;
-currentSearchQuery = productTitle;
+currentSearchQuery = match.query;
 currentSearchPage = 1;
 const input = document.getElementById('searchInput');
-if (input) input.value = productTitle;
-showToast(`Produit identifié : ${productTitle}`);
-return displaySearchResults(results);
+if (input) input.value = match.query;
+showToast(`Blu-ray identifiÃ© : ${productTitle}`);
+return displaySearchResults(match.results);
 }
 }
-}
-} catch (e) {
-console.warn('Identification EAN indisponible, recherche TMDB utilisée :', e);
-}
-
-window.lastScannedBarcode = barcode;
-document.getElementById('searchInput').value = barcode;
-currentSearchQuery = barcode;
-currentSearchPage = 1;
-await searchTMDB();
+} catch (error) {
+console.warn('Identification du code-barres indisponible :', error);
 }
 
+const input = document.getElementById('searchInput');
+if (input) { input.value = ''; input.focus(); }
+showToast(`Code ${barcode} conservÃ©. Produit inconnu : saisissez le titre du film.`);
+}
 
 // --- EXPORTS / IMPORTS ---
 function exportToExcel() {
@@ -4062,3 +4098,4 @@ if ('serviceWorker' in navigator) {
 </script>
 </body>
 </html>
+
