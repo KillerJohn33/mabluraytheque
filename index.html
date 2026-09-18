@@ -3536,7 +3536,7 @@ html5QrcodeScanner = new Html5Qrcode("reader");
 try {
 await html5QrcodeScanner.start(
 { facingMode: "environment" },
-{ fps: 12, qrbox: { width: 280, height: 150 }, formatsToSupport: [Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8, Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E] },
+{ fps: 20, qrbox: (viewfinderWidth) => ({ width: Math.min(320, Math.floor(viewfinderWidth * 0.9)), height: 140 }), aspectRatio: 1.777778, disableFlip: true, experimentalFeatures: { useBarCodeDetectorIfSupported: true }, formatsToSupport: [Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8, Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E] },
 onScanSuccess
 );
 } catch (err) {
@@ -3579,7 +3579,7 @@ return;
 const backCam = cameras.find(c => /back|arrière|rear|environment/i.test(c.label)) || cameras[cameras.length - 1];
 await html5QrcodeScanner.start(
 backCam.id,
-{ fps: 12, qrbox: { width: 280, height: 150 }, formatsToSupport: [Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8, Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E] },
+{ fps: 20, qrbox: (viewfinderWidth) => ({ width: Math.min(320, Math.floor(viewfinderWidth * 0.9)), height: 140 }), aspectRatio: 1.777778, disableFlip: true, experimentalFeatures: { useBarCodeDetectorIfSupported: true }, formatsToSupport: [Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8, Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E] },
 onScanSuccess
 );
 } catch (err2) {
