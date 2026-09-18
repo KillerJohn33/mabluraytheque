@@ -240,23 +240,16 @@ border-color: rgba(220,38,38,.18);
     break-inside: auto;
   }
   #tabSettings.modern-page:not(.hidden) {
-    display: block;
-    column-count: 2;
-    column-gap: 1rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    width: 100%;
   }
   #tabSettings > .modern-panel {
-    display: inline-block;
+    display: block;
     width: 100%;
-    margin: 0 0 1rem;
-    break-inside: avoid;
-    -webkit-column-break-inside: avoid;
-  }
-  #tabSettings > .modern-panel:nth-child(2),
-  #tabSettings > .modern-panel:nth-child(8),
-  #tabSettings > .modern-panel:nth-child(9) {
-    column-span: all;
-    width: 100%;
-    margin-bottom: 1rem;
+    margin: 0;
+    break-inside: auto;
   }
 }
 .glass-card {
