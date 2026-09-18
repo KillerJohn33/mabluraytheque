@@ -1,7 +1,7 @@
 const UPC_ENDPOINT = 'https://api.upcitemdb.com/prod/trial/lookup';
 const BNF_ENDPOINT = 'https://catalogue.bnf.fr/api/SRU';
 
-async function fetchWithTimeout(url, options = {}, timeoutMs = 7000) {
+async function fetchWithTimeout(url, options = {}, timeoutMs = 4500) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -66,10 +66,18 @@ export default async function handler(req, res) {
   if (!/^\d{8,14}$/.test(code)) return res.status(400).json({ error: 'Code-barres invalide.' });
 
   try {
+    const firstProduct = promise => promise.then(product => {
+      if (!product) throw new Error('Produit absent');
+      return product;
+    });
     let product = null;
-    try { product = await lookupUpcItemDb(code); } catch (error) { console.warn('UPCitemdb:', error); }
-    if (!product) {
-      try { product = await lookupBnf(code); } catch (error) { console.warn('BnF:', error); }
+    try {
+      product = await Promise.any([
+        firstProduct(lookupBnf(code)),
+        firstProduct(lookupUpcItemDb(code))
+      ]);
+    } catch (error) {
+      console.warn('EAN absent des catalogues BnF et UPCitemdb');
     }
 
     if (!product) {

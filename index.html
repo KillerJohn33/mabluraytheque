@@ -1893,11 +1893,13 @@ showToast("Erreur lors de la recherche TMDB");
 }
 }
 
-function displaySearchResults(results) {
+function displaySearchResults(results, options = {}) {
 const container = document.getElementById('searchResults');
 const box = document.getElementById('searchResultsContainer');
 const pageInfo = document.getElementById('searchPageInfo');
 const pagination = document.getElementById('searchPagination');
+const resultsTitle = document.getElementById('searchResultsTitle');
+if (resultsTitle) resultsTitle.textContent = options.scanned ? 'Film identifi\u00e9 par le code-barres' : 'R\u00e9sultats TMDB';
 
 container.innerHTML = '';
 box.classList.remove('hidden');
@@ -1908,8 +1910,8 @@ pagination.classList.add('hidden');
 return;
 }
 
-pageInfo.innerText = `Page ${currentSearchPage} / ${totalSearchPages}`;
-pagination.classList.remove('hidden');
+pageInfo.innerText = options.scanned ? '1 r\u00e9sultat exact' : `Page ${currentSearchPage} / ${totalSearchPages}`;
+pagination.classList.toggle('hidden', options.scanned || totalSearchPages <= 1);
 document.getElementById('prevPageBtn').disabled = (currentSearchPage <= 1);
 document.getElementById('nextPageBtn').disabled = (currentSearchPage >= totalSearchPages);
 
@@ -3664,10 +3666,16 @@ const productTitle = productData.product.title || match.query;
 window.lastScannedProductTitle = productTitle;
 currentSearchQuery = match.query;
 currentSearchPage = 1;
+totalSearchPages = 1;
+const normalizedProductTitle = normalizeTitleForMatch(match.query);
+const exactResult = match.results.find(item => normalizeTitleForMatch(item.title || item.name || '') === normalizedProductTitle) || match.results[0];
 const input = document.getElementById('searchInput');
-if (input) input.value = match.query;
-showToast(`Blu-ray identifiÃ© : ${productTitle}`);
-return displaySearchResults(match.results);
+if (input) input.value = '';
+displaySearchResults([exactResult], { scanned: true });
+const resultBox = document.getElementById('searchResultsContainer');
+if (resultBox) requestAnimationFrame(() => resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+showToast(`Film identifi\u00e9 : ${exactResult.title || exactResult.name || productTitle}`);
+return;
 }
 }
 } catch (error) {
