@@ -1,11 +1,12 @@
 const UPC = 'https://api.upcitemdb.com/prod/trial/lookup';
 const BNF = 'https://catalogue.bnf.fr/api/SRU';
 const COVER = 'https://openapi.bnf.fr/couverture/image/image/recupererImage';
+const GO_UPC = 'https://go-upc.com/api/v1/code/';
 
-async function timedFetch(url, ms = 4500) {
+async function timedFetch(url, ms = 4500, headers = {}) {
  const controller = new AbortController();
  const timer = setTimeout(() => controller.abort(), ms);
- try { return await fetch(url, { signal: controller.signal, headers: { 'User-Agent': 'MaBluraytheque/1.0' } }); }
+ try { return await fetch(url, { signal: controller.signal, headers: { 'User-Agent': 'MaBluraytheque/1.0', ...headers } }); }
  finally { clearTimeout(timer); }
 }
 function decodeXml(value = '') {
@@ -30,6 +31,17 @@ async function fromUpc(code) {
  if (!item) return null;
  return { title: item.title || '', publisher: item.brand || '', description: item.description || '', images: Array.isArray(item.images) ? item.images.filter(url => /^https:\/\//i.test(url)).slice(0, 5) : [], source: 'UPCitemdb' };
 }
+async function fromGoUpc(code) {
+ const key = process.env.GO_UPC_API_KEY;
+ if (!key) return null;
+ const response = await timedFetch(`${GO_UPC}${code}`, 4500, { Authorization: `Bearer ${key}` });
+ if (!response.ok) return null;
+ const data = await response.json();
+ const product = data?.product;
+ if (!product) return null;
+ const image = typeof product.imageUrl === 'string' && /^https:\/\//i.test(product.imageUrl) ? product.imageUrl : '';
+ return { title: product.name || '', publisher: product.brand || '', description: product.description || '', images: image ? [image] : [], source: 'Go-UPC' };
+}
 async function bnfCover(code) {
  const url = `${COVER}?EAN=${code}&couverture=1&taille=originale&largeur=500&hauteur=500`;
  try {
@@ -42,11 +54,12 @@ export default async function handler(req, res) {
  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
  const code = String(req.query.code || '').replace(/\D/g, '');
  if (!/^\d{8,14}$/.test(code)) return res.status(400).json({ error: 'Invalid barcode' });
- const [bnfResult, upcResult] = await Promise.allSettled([fromBnf(code), fromUpc(code)]);
+ const [bnfResult, upcResult, goUpcResult] = await Promise.allSettled([fromBnf(code), fromUpc(code), fromGoUpc(code)]);
  const bnf = bnfResult.status === 'fulfilled' ? bnfResult.value : null;
  const upc = upcResult.status === 'fulfilled' ? upcResult.value : null;
- if (!bnf && !upc) { res.setHeader('Cache-Control', 'no-store'); return res.status(200).json({ found: false, code }); }
- const image = upc?.images?.[0] || (bnf ? await bnfCover(code) : '');
- res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate=604800');
- return res.status(200).json({ found: true, code, title: bnf?.title || upc?.title || '', publisher: bnf?.publisher || upc?.publisher || '', description: bnf?.description || upc?.description || '', image, source: [bnf?.source, upc?.source].filter(Boolean).join(' + ') });
+ const goUpc = goUpcResult.status === 'fulfilled' ? goUpcResult.value : null;
+ if (!bnf && !upc && !goUpc) { res.setHeader('Cache-Control', 'no-store'); return res.status(200).json({ found: false, code }); }
+ const image = goUpc?.images?.[0] || upc?.images?.[0] || (bnf ? await bnfCover(code) : '');
+ res.setHeader('Cache-Control', image ? 's-maxage=86400, stale-while-revalidate=604800' : 'no-store');
+ return res.status(200).json({ found: true, code, title: goUpc?.title || bnf?.title || upc?.title || '', publisher: goUpc?.publisher || bnf?.publisher || upc?.publisher || '', description: goUpc?.description || bnf?.description || upc?.description || '', image, source: [bnf?.source, upc?.source, goUpc?.source].filter(Boolean).join(' + ') });
 }
