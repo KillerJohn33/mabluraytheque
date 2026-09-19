@@ -491,8 +491,27 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
   #tabSettings > div, #tabStats > div { margin: 0 !important; }
 
-  #detailModal > div { max-width: 620px !important; }
-  #detailModal .flex.gap-4.items-start img { width: 9rem !important; height: 13.5rem !important; }
+  #detailModal > div {
+    width: min(1040px, calc(100vw - 3rem)) !important;
+    max-width: 1040px !important;
+    max-height: 92vh !important;
+  }
+  #modalContent > div > div:first-child img {
+    width: 8.5rem !important;
+    height: 12.75rem !important;
+  }
+}
+
+@media (min-width: 900px) {
+  #modalContent > div {
+    display: grid;
+    grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+    gap: 1rem;
+    align-items: start;
+  }
+  #modalContent > div > * { min-width: 0; margin-top: 0 !important; }
+  #modalContent > div > :first-child,
+  #modalContent > div > :last-child { grid-column: 1 / -1; }
 }
 
 @media (min-width: 1200px) {
