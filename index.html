@@ -2997,7 +2997,7 @@ async function loadPhysicalEditionDetails(movieId, forceIndex = -1) {
  for (let index = 0; index < movie.editions.length; index++) {
   const edition = movie.editions[index];
   const barcode = String(edition.barcode || '').replace(/\D/g, '');
-  if (!/^\d{8,14}$/.test(barcode) || (edition.metadataChecked && index !== forceIndex)) continue;
+  if (!/^\d{8,14}$/.test(barcode) || (edition.metadataChecked && (edition.image || edition.metadataVersion >= 2) && index !== forceIndex)) continue;
   const requestKey = `${movie.id}:${edition.id}:${barcode}`;
   if (physicalEditionRequests.has(requestKey)) continue;
   physicalEditionRequests.add(requestKey);
@@ -3016,6 +3016,7 @@ async function loadPhysicalEditionDetails(movieId, forceIndex = -1) {
    }
    edition.metadataFound = !!data.found;
    edition.metadataChecked = true;
+   edition.metadataVersion = 2;
    await updateMovieInCloud(movie);
    if (!document.getElementById('detailModal').classList.contains('hidden') && document.getElementById('modalContent').dataset.movieId === String(movie.id)) {
     const scroller = document.getElementById('detailModal').querySelector(':scope > div');
