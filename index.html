@@ -1569,6 +1569,7 @@ let trackedSeriesBundleFromCloud = null;
 let isListView = false;
 let isWishlistListView = false;
 let html5QrcodeScanner = null;
+let barcodeScanBusy = false;
 const renderedTabs = { collection: false, wishlist: false, series: false };
 let chartInstances = {};
 let statsShowCharts = true;
@@ -2035,7 +2036,7 @@ const box = document.getElementById('searchResultsContainer');
 const pageInfo = document.getElementById('searchPageInfo');
 const pagination = document.getElementById('searchPagination');
 const resultsTitle = document.getElementById('searchResultsTitle');
-if (resultsTitle) resultsTitle.textContent = options.scanned ? 'Film identifi\u00e9 par le code-barres' : 'R\u00e9sultats TMDB';
+if (resultsTitle) resultsTitle.textContent = options.scanned ? (options.suggestions ? 'Films possibles — choisissez le bon' : 'Film identifié par le code-barres') : 'Résultats TMDB';
 
 container.innerHTML = '';
 box.classList.remove('hidden');
@@ -2046,7 +2047,7 @@ pagination.classList.add('hidden');
 return;
 }
 
-pageInfo.innerText = options.scanned ? '1 r\u00e9sultat exact' : `Page ${currentSearchPage} / ${totalSearchPages}`;
+pageInfo.innerText = options.scanned ? (options.suggestions ? `${results.length} films possibles` : '1 résultat exact') : `Page ${currentSearchPage} / ${totalSearchPages}`;
 pagination.classList.toggle('hidden', options.scanned || totalSearchPages <= 1);
 document.getElementById('prevPageBtn').disabled = (currentSearchPage <= 1);
 document.getElementById('nextPageBtn').disabled = (currentSearchPage >= totalSearchPages);
@@ -3724,6 +3725,7 @@ stopScanner();
 }
 
 async function startScanner() {
+barcodeScanBusy = false;
 // Vérifications préalables spécifiques à iOS / Safari
 if (!window.isSecureContext) {
 showToast("⚠️ La caméra nécessite une connexion sécurisée (HTTPS).");
@@ -3808,89 +3810,115 @@ document.getElementById('scanner-container').classList.add('hidden');
 }
 
 function barcodeSearchCandidates(product) {
-const rawValues = [product?.title, product?.description, ...(product?.offerTitles || [])].filter(Boolean);
+const values = [product?.title, ...(product?.offerTitles || [])].filter(Boolean);
 const candidates = [];
 const add = value => {
-const clean = String(value || '').replace(/\s+/g, ' ').trim();
-if (clean.length > 1 && !candidates.some(item => item.toLowerCase() === clean.toLowerCase())) candidates.push(clean);
+ const title = String(value || '').replace(/\s+/g, ' ').trim();
+ if (title.length > 1 && title.length < 140 && !candidates.some(item => normalizeTitleForMatch(item) === normalizeTitleForMatch(title))) candidates.push(title);
 };
+for (const value of values) {
+ const clean = String(value)
+  .replace(/\([^)]*(?:blu[ -]?ray|dvd|uhd|4k|steelbook|[ée]dition|disc|version)[^)]*\)/gi, ' ')
+  .replace(/\[[^\]]*(?:blu[ -]?ray|dvd|uhd|4k|steelbook|[ée]dition|disc|version)[^\]]*\]/gi, ' ')
+  .replace(/\s*[-–—|]\s*(?:[ée]dition|blu[ -]?ray|dvd|uhd|4k|steelbook).*$/i, '')
+  .replace(/\b(?:ultra\s*hd|uhd|4k|blu[ -]?ray|bluray|dvd|steelbook|digibook|mediabook|collector|limited|[ée]dition|version|combo|digital|copy|discs?|import)\b/gi, ' ')
+  .replace(/\s+/g, ' ').trim();
+ add(clean);
+ add(value);
+}
+return candidates.slice(0, 5);
+}
 
-rawValues.forEach(value => {
-add(value);
-let clean = String(value)
-.replace(/\([^)]*(?:blu[ -]?ray|dvd|uhd|4k|steelbook|edition|disc|version)[^)]*\)/gi, ' ')
-.replace(/\[[^\]]*(?:blu[ -]?ray|dvd|uhd|4k|steelbook|edition|disc|version)[^\]]*\]/gi, ' ')
-.replace(/\b(?:ultra\s*hd|uhd|4k|blu[ -]?ray|bluray|dvd|steelbook|digibook|mediabook|collector(?:'s)?|limited|edition|edizione|edicion|version|combo|digital|copy|disc|discs|region\s*[a-z0-9]+)\b/gi, ' ')
-.replace(/\b(?:fr|french|anglais|english|import)\b/gi, ' ')
-.replace(/[|]/g, ' ')
-.replace(/\s*[-â€“â€”:]\s*(?:Ã©dition|edition|blu|dvd|uhd|4k|steelbook).*$/i, '')
-.replace(/\s+/g, ' ').trim();
-add(clean);
-const beforeSeparator = clean.split(/\s[-â€“â€”|:]\s/)[0];
-if (beforeSeparator.length >= 2) add(beforeSeparator);
-});
-return candidates.slice(0, 6);
+function barcodeTitleScore(query, item) {
+ const tokens = value => normalizeTitleForMatch(value).split(' ').filter(word => word && !/^(le|la|les|l|un|une|the|a|an|de|du|des|d|of|and|et)$/.test(word));
+ const wanted = tokens(query);
+ if (!wanted.length) return 0;
+ return Math.max(...[item.title, item.name, item.original_title, item.original_name].filter(Boolean).map(value => {
+  const found = tokens(value);
+  if (!found.length) return 0;
+  if (wanted.join(' ') === found.join(' ')) return 1;
+  const shared = wanted.filter(word => found.includes(word)).length;
+  return (2 * shared) / (wanted.length + found.length);
+ }), 0);
 }
 
 async function searchTmdbFromBarcodeProduct(product) {
-const candidates = barcodeSearchCandidates(product);
-for (const query of candidates) {
-try {
-const response = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=fr-FR&page=1&include_adult=false`);
-if (!response.ok) continue;
-const data = await response.json();
-const results = (data.results || []).filter(item => item.media_type === 'movie' || item.media_type === 'tv');
-if (results.length) return { query, results };
-} catch (error) {
-console.warn('Recherche TMDB du code-barres impossible :', error);
-}
-}
-return null;
+ const candidates = barcodeSearchCandidates(product);
+ let suggestion = null;
+ for (const query of candidates) {
+  try {
+   const response = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=fr-FR&page=1&include_adult=false`);
+   if (!response.ok) continue;
+   const data = await response.json();
+   const results = (data.results || []).filter(item => item.media_type === 'movie' || item.media_type === 'tv');
+   if (!results.length) continue;
+   const ranked = results.map(item => ({ item, score: barcodeTitleScore(query, item) })).sort((a, b) => b.score - a.score);
+   if (ranked[0].score >= .82) return { query, results: [ranked[0].item], confident: true };
+   if (!suggestion) suggestion = { query, results: ranked.slice(0, 3).map(entry => entry.item), confident: false };
+  } catch (error) {
+   console.warn('Recherche TMDB du code-barres impossible :', error);
+  }
+ }
+ return suggestion;
 }
 
 async function onScanSuccess(decodedText) {
+if (barcodeScanBusy) return;
+barcodeScanBusy = true;
 stopScanner();
 const barcode = String(decodedText || '').replace(/\D/g, '');
 if (!/^\d{8,14}$/.test(barcode)) {
-showToast('Code-barres non reconnu. RÃ©essayez en cadrant uniquement les barres.');
-return;
+ showToast('Code-barres non reconnu. Réessayez en cadrant uniquement les barres.');
+ return;
 }
 
 window.lastScannedBarcode = barcode;
 window.lastScannedProductTitle = '';
-showToast(`Code ${barcode} lu. Identification en coursâ€¦`);
+showToast(`Code ${barcode} lu. Identification en cours…`);
 
+let product = null;
+let match = null;
 try {
-const productRes = await fetch(`/api/barcode?code=${encodeURIComponent(barcode)}`, { cache: 'no-store' });
-const productData = await productRes.json().catch(() => ({}));
-if (!productRes.ok) throw new Error(productData.error || `Erreur ${productRes.status}`);
-
-if (productData.found && productData.product) {
-const match = await searchTmdbFromBarcodeProduct(productData.product);
-if (match) {
-const productTitle = productData.product.title || match.query;
-window.lastScannedProductTitle = productTitle;
-currentSearchQuery = match.query;
-currentSearchPage = 1;
-totalSearchPages = 1;
-const normalizedProductTitle = normalizeTitleForMatch(match.query);
-const exactResult = match.results.find(item => normalizeTitleForMatch(item.title || item.name || '') === normalizedProductTitle) || match.results[0];
-const input = document.getElementById('searchInput');
-if (input) input.value = '';
-displaySearchResults([exactResult], { scanned: true });
-const resultBox = document.getElementById('searchResultsContainer');
-if (resultBox) requestAnimationFrame(() => resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' }));
-showToast(`Film identifi\u00e9 : ${exactResult.title || exactResult.name || productTitle}`);
-return;
-}
-}
+ const productRes = await fetch(`/api/barcode?code=${encodeURIComponent(barcode)}`, { cache: 'no-store' });
+ const productData = await productRes.json().catch(() => ({}));
+ if (!productRes.ok) throw new Error(productData.error || `Erreur ${productRes.status}`);
+ if (productData.found && productData.product) {
+  product = productData.product;
+  window.lastScannedProductTitle = product.title || '';
+  match = await searchTmdbFromBarcodeProduct(product);
+ }
+ if ((!match || !match.confident) && product?.source !== 'Go-UPC') {
+  const fallbackRes = await fetch(`/api/barcode?code=${encodeURIComponent(barcode)}&source=go-upc`, { cache: 'no-store' });
+  if (fallbackRes.ok) {
+   const fallback = await fallbackRes.json();
+   if (fallback.found && fallback.product) {
+    product = fallback.product;
+    window.lastScannedProductTitle = product.title || window.lastScannedProductTitle;
+    const alternative = await searchTmdbFromBarcodeProduct(product);
+    if (alternative?.confident || (!match && alternative)) match = alternative;
+   }
+  }
+ }
 } catch (error) {
-console.warn('Identification du code-barres indisponible :', error);
+ console.warn('Identification du code-barres indisponible :', error);
+}
+
+if (match?.results?.length) {
+ currentSearchQuery = match.query;
+ currentSearchPage = 1;
+ totalSearchPages = 1;
+ const input = document.getElementById('searchInput');
+ if (input) input.value = '';
+ displaySearchResults(match.results, { scanned: true, suggestions: !match.confident });
+ const resultBox = document.getElementById('searchResultsContainer');
+ if (resultBox) requestAnimationFrame(() => resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+ showToast(match.confident ? `Film identifié : ${match.results[0].title || match.results[0].name}` : 'Plusieurs films possibles : choisissez le bon.');
+ return;
 }
 
 const input = document.getElementById('searchInput');
 if (input) { input.value = ''; input.focus(); }
-showToast(`Code ${barcode} conservÃ©. Produit inconnu : saisissez le titre du film.`);
+showToast(`Code ${barcode} conservé. Film introuvable : saisissez son titre.`);
 }
 
 // --- EXPORTS / IMPORTS ---
