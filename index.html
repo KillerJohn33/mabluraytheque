@@ -3222,6 +3222,39 @@ async function refreshPhysicalEdition(movieId, index) {
  await loadPhysicalEditionDetails(movieId, index);
 }
 
+async function attachBlurayEdition(movieId, index) {
+ const movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+ const edition = movie?.editions?.[index];
+ const input = document.getElementById(`blurayUrl-${index}`);
+ if (!edition || !input) return;
+ const url = input.value.trim();
+ if (!/^https:\/\/www\.blu-ray\.com\/movies\/[a-z0-9-]+\/\d+\/?$/i.test(url)) return showToast('Lien Blu-ray.com invalide.');
+ const button = document.getElementById(`blurayLoad-${index}`);
+ if (button) { button.disabled = true; button.textContent = 'Chargement…'; }
+ try {
+  const response = await fetch(`/api/bluray-edition?url=${encodeURIComponent(url)}`);
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Fiche indisponible');
+  const previous = { ...edition };
+  Object.assign(edition, {
+   blurayUrl: data.url, title: data.title || edition.title,
+   image: data.image || edition.image,
+   videoCodec: data.videoCodec || edition.videoCodec || '',
+   audioTracks: (data.audioTracks || []).join(' · '),
+   subtitles: (data.subtitles || []).join(', '),
+   editionType: /steelbook/i.test(data.packaging) ? 'Steelbook' : edition.editionType,
+   format: /4K/i.test(data.title) ? '4K UHD' : edition.format
+  });
+  const result = await updateMovieInCloud(movie);
+  if (!result.success) { Object.assign(edition, previous); throw new Error('Enregistrement impossible'); }
+  openMovieDetail(movie.id, true);
+  showToast('Informations de l’édition enregistrées.');
+ } catch (error) {
+  showToast(`Édition indisponible : ${error.message}`);
+  if (button) { button.disabled = false; button.textContent = 'Utiliser cette édition'; }
+ }
+}
+
 const editionTechDesktopQuery = window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine)');
 editionTechDesktopQuery.addEventListener?.('change', event => {
  document.querySelectorAll('.edition-tech-details').forEach(details => { details.open = event.matches; });
@@ -3357,6 +3390,8 @@ ${movie.editions.length > 1 ? `<button onclick="removeEdition(${movieIdArg}, ${i
 </div>
 </div>
 <div class="edition-extra-fields space-y-1.5">
+<label class="block text-[8px] text-gray-500 uppercase tracking-wider">Lien de l’édition Blu-ray.com</label>
+<div class="flex gap-2"><input id="blurayUrl-${idx}" type="url" value="${escapeHtml(ed.blurayUrl || '')}" placeholder="https://www.blu-ray.com/movies/..." class="flex-1 min-w-0 glass-input text-white text-[10px] px-2.5 py-2 rounded-xl"><button id="blurayLoad-${idx}" onclick="attachBlurayEdition(${movieIdArg}, ${idx})" class="px-3 rounded-xl bg-cyan-400/15 text-cyan-300 text-[10px] font-semibold">Utiliser</button></div>
 <label class="block text-[8px] text-gray-500 uppercase tracking-wider">Photo du boîtier (URL)</label>
 <input type="url" value="${escapeHtml(ed.image || '')}" onchange="updateEditionField(${movieIdArg}, ${idx}, 'image', this.value)" placeholder="https://..." class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
 <label class="block text-[8px] text-gray-500 uppercase tracking-wider mt-2">Éditeur</label>
@@ -4499,4 +4534,5 @@ if ('serviceWorker' in navigator) {
 </script>
 </body>
 </html>
+
 
