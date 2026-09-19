@@ -606,6 +606,40 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
   body.theme-light #topNav button.text-cyan-400 { color: #eaffff !important; }
 }
 
+/* Defilement des fiches de film sur ordinateur */
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  #detailModal {
+    --detail-scroll-thumb: #22c7db;
+    --detail-scroll-thumb-hover: #67e8f9;
+    --detail-scroll-track: #11151d;
+  }
+  body.theme-midnight #detailModal { --detail-scroll-thumb: #38bdf8; --detail-scroll-thumb-hover: #7dd3fc; }
+  body.theme-amber #detailModal { --detail-scroll-thumb: #f59e0b; --detail-scroll-thumb-hover: #fbbf24; }
+  body.theme-emerald #detailModal { --detail-scroll-thumb: #10b981; --detail-scroll-thumb-hover: #6ee7b7; }
+  body.theme-light #detailModal { --detail-scroll-thumb: #0284c7; --detail-scroll-thumb-hover: #0369a1; --detail-scroll-track: #e2e8f0; }
+  #detailModal > div,
+  #modalContent .edition-list {
+    scrollbar-width: thin;
+    scrollbar-color: var(--detail-scroll-thumb) var(--detail-scroll-track);
+  }
+  #detailModal > div::-webkit-scrollbar,
+  #modalContent .edition-list::-webkit-scrollbar { width: 9px; }
+  #detailModal > div::-webkit-scrollbar-track,
+  #modalContent .edition-list::-webkit-scrollbar-track {
+    background: var(--detail-scroll-track);
+    border-radius: 999px;
+    margin-block: 16px;
+  }
+  #detailModal > div::-webkit-scrollbar-thumb,
+  #modalContent .edition-list::-webkit-scrollbar-thumb {
+    background: var(--detail-scroll-thumb);
+    border: 2px solid var(--detail-scroll-track);
+    border-radius: 999px;
+  }
+  #detailModal > div::-webkit-scrollbar-thumb:hover,
+  #modalContent .edition-list::-webkit-scrollbar-thumb:hover { background: var(--detail-scroll-thumb-hover); }
+}
+
 /* ===== Barre de navigation fixe en bas d'écran (mobile uniquement) ===== */
 @media (max-width: 767px), (hover: none) and (pointer: coarse) and (max-width: 1024px) {
   html { background: #000000; }
