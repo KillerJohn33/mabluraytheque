@@ -3823,6 +3823,8 @@ for (const value of values) {
   .replace(/\s*[-–—|]\s*(?:[ée]dition|blu[ -]?ray|dvd|uhd|4k|steelbook).*$/i, '')
   .replace(/\b(?:ultra\s*hd|uhd|4k|blu[ -]?ray|bluray|dvd|steelbook|digibook|mediabook|collector|limited|[ée]dition|version|combo|digital|copy|discs?|import)\b/gi, ' ')
   .replace(/\s+/g, ' ').trim();
+ const brand = String(product?.brand || '').trim();
+ if (brand && clean.toLowerCase().startsWith(brand.toLowerCase() + ' ')) add(clean.slice(brand.length).trim());
  add(clean);
  add(value);
 }
