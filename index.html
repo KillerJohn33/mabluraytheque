@@ -3227,8 +3227,13 @@ async function attachBlurayEdition(movieId, index) {
  const edition = movie?.editions?.[index];
  const input = document.getElementById(`blurayUrl-${index}`);
  if (!edition || !input) return;
- const url = input.value.trim();
- if (!/^https:\/\/www\.blu-ray\.com\/movies\/[a-z0-9-]+\/\d+\/?$/i.test(url)) return showToast('Lien Blu-ray.com invalide.');
+ const pasted = input.value.trim();
+ if (!pasted) { input.focus(); return showToast('Collez d’abord le lien de l’édition Blu-ray.com dans le champ au-dessus.'); }
+ const found = pasted.match(/https?:\/\/(?:www\.)?blu-ray\.com\/movies\/[a-z0-9%-]+\/\d+\/?/i);
+ if (!found) { input.focus(); return showToast('Il faut le lien complet d’une édition Blu-ray.com, pas seulement le titre du film.'); }
+ const parsed = new URL(found[0]);
+ const url = `https://www.blu-ray.com${parsed.pathname}`;
+ input.value = url;
  const button = document.getElementById(`blurayLoad-${index}`);
  if (button) { button.disabled = true; button.textContent = 'Chargement…'; }
  try {
@@ -3251,7 +3256,7 @@ async function attachBlurayEdition(movieId, index) {
   showToast('Informations de l’édition enregistrées.');
  } catch (error) {
   showToast(`Édition indisponible : ${error.message}`);
-  if (button) { button.disabled = false; button.textContent = 'Utiliser cette édition'; }
+  if (button) { button.disabled = false; button.textContent = 'Importer'; }
  }
 }
 
@@ -3390,8 +3395,9 @@ ${movie.editions.length > 1 ? `<button onclick="removeEdition(${movieIdArg}, ${i
 </div>
 </div>
 <div class="edition-extra-fields space-y-1.5">
-<label class="block text-[8px] text-gray-500 uppercase tracking-wider">Lien de l’édition Blu-ray.com</label>
-<div class="flex gap-2"><input id="blurayUrl-${idx}" type="url" value="${escapeHtml(ed.blurayUrl || '')}" placeholder="https://www.blu-ray.com/movies/..." class="flex-1 min-w-0 glass-input text-white text-[10px] px-2.5 py-2 rounded-xl"><button id="blurayLoad-${idx}" onclick="attachBlurayEdition(${movieIdArg}, ${idx})" class="px-3 rounded-xl bg-cyan-400/15 text-cyan-300 text-[10px] font-semibold">Utiliser</button></div>
+<label class="block text-[8px] text-gray-500 uppercase tracking-wider">Édition exacte sur Blu-ray.com</label>
+<p class="text-[9px] text-gray-400"><a href="https://www.blu-ray.com/search/?quicksearch=1&amp;quicksearch_country=all&amp;quicksearch_keyword=${encodeURIComponent(movie.title)}&amp;section=bluraymovies" target="_blank" rel="noopener noreferrer" class="text-cyan-300 underline">Chercher les éditions du film</a>, puis copiez le lien de la bonne fiche ci-dessous.</p>
+<div class="flex gap-2"><input id="blurayUrl-${idx}" type="text" inputmode="url" value="${escapeHtml(ed.blurayUrl || '')}" placeholder="Collez ici le lien de l’édition" class="flex-1 min-w-0 glass-input text-white text-[10px] px-2.5 py-2 rounded-xl"><button id="blurayLoad-${idx}" onclick="attachBlurayEdition(${movieIdArg}, ${idx})" class="px-3 rounded-xl bg-cyan-400/15 text-cyan-300 text-[10px] font-semibold">Importer</button></div>
 <label class="block text-[8px] text-gray-500 uppercase tracking-wider">Photo du boîtier (URL)</label>
 <input type="url" value="${escapeHtml(ed.image || '')}" onchange="updateEditionField(${movieIdArg}, ${idx}, 'image', this.value)" placeholder="https://..." class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
 <label class="block text-[8px] text-gray-500 uppercase tracking-wider mt-2">Éditeur</label>
