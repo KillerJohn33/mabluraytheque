@@ -738,6 +738,9 @@ body { padding-bottom: 7rem !important; }
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
   .mobile-bottom-nav { display: none !important; }
 }
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+.edition-tech-details > summary { display: none; }
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -3191,6 +3194,11 @@ async function refreshPhysicalEdition(movieId, index) {
  await loadPhysicalEditionDetails(movieId, index);
 }
 
+const editionTechDesktopQuery = window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine)');
+editionTechDesktopQuery.addEventListener?.('change', event => {
+ document.querySelectorAll('.edition-tech-details').forEach(details => { details.open = event.matches; });
+});
+
 // --- MODAL & ÉDITION AVANCÉE DES ÉDITIONS ---
 function openMovieDetail(movieId, skipPhysicalLookup = false) {
 let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
@@ -3270,7 +3278,7 @@ ${movie.editions.length > 1 ? `<button onclick="removeEdition(${movieIdArg}, ${i
 <input type="text" value="${escapeHtml(ed.publisher || '')}" onchange="updateEditionField(${movieIdArg}, ${idx}, 'publisher', this.value)" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
 <label class="block text-[8px] text-gray-500 uppercase tracking-wider mt-2">Description du support</label>
 <input type="text" value="${escapeHtml(ed.physicalDescription || '')}" onchange="updateEditionField(${movieIdArg}, ${idx}, 'physicalDescription', this.value)" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
-<details class="rounded-xl border border-white/10 bg-white/[0.025] p-2.5 mt-2">
+<details class="edition-tech-details rounded-xl border border-white/10 bg-white/[0.025] p-2.5 mt-2" ${editionTechDesktopQuery.matches ? "open" : ""}>
 <summary class="cursor-pointer text-[10px] font-semibold text-cyan-300">Vidéo, audio et sous-titres</summary>
 <div class="space-y-2 mt-2">
 <div><label class="block text-[9px] text-gray-400 mb-1">Codec vidéo</label>
