@@ -1,5 +1,6 @@
 const UPC_ENDPOINT = 'https://api.upcitemdb.com/prod/trial/lookup';
 const BNF_ENDPOINT = 'https://catalogue.bnf.fr/api/SRU';
+const GO_UPC_ENDPOINT = 'https://go-upc.com/api/v1/code/';
 
 async function fetchWithTimeout(url, options = {}, timeoutMs = 4500) {
   const controller = new AbortController();
@@ -60,6 +61,26 @@ async function lookupBnf(code) {
   return { title, description: format, brand: publisher, category: 'VidÃ©o', offerTitles: [], source: 'BnF' };
 }
 
+async function lookupGoUpc(code) {
+  const key = process.env.GO_UPC_API_KEY;
+  if (!key) return null;
+  const response = await fetchWithTimeout(`${GO_UPC_ENDPOINT}${code}`, {
+    headers: { Accept: 'application/json', Authorization: `Bearer ${key}` }
+  });
+  if (!response.ok) return null;
+  const data = await response.json();
+  const product = data?.product;
+  if (!product?.name) return null;
+  return {
+    title: product.name,
+    description: product.description || '',
+    brand: product.brand || '',
+    category: product.category || '',
+    offerTitles: [],
+    source: 'Go-UPC'
+  };
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'MÃ©thode non autorisÃ©e.' });
   const code = String(req.query.code || '').replace(/\D/g, '');
@@ -71,13 +92,18 @@ export default async function handler(req, res) {
       return product;
     });
     let product = null;
-    try {
-      product = await Promise.any([
-        firstProduct(lookupBnf(code)),
-        firstProduct(lookupUpcItemDb(code))
-      ]);
-    } catch (error) {
-      console.warn('EAN absent des catalogues BnF et UPCitemdb');
+    if (req.query.source === 'go-upc') {
+      product = await lookupGoUpc(code).catch(() => null);
+    } else {
+      try {
+        product = await Promise.any([
+          firstProduct(lookupBnf(code)),
+          firstProduct(lookupUpcItemDb(code))
+        ]);
+      } catch (_) {
+        // Les deux catalogues gratuits ne connaissent pas cet EAN.
+      }
+      if (!product) product = await lookupGoUpc(code).catch(() => null);
     }
 
     if (!product) {
