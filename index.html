@@ -665,6 +665,14 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
   body > header { top: env(safe-area-inset-top); }
 }
 body { padding-bottom: 7rem !important; }
+#detailModal {
+  align-items: flex-start;
+  padding-top: calc(env(safe-area-inset-top) + 1rem);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 1rem);
+}
+#detailModal > div {
+  max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 2rem) !important;
+}
 }
 .mobile-bottom-nav {
   position: fixed;
@@ -3282,6 +3290,7 @@ if (!movie) return;
 
 movie = normalizeMovieData(movie);
 const modal = document.getElementById('detailModal');
+const wasHidden = modal.classList.contains('hidden');
 const content = document.getElementById('modalContent');
 content.dataset.movieId = String(movie.id);
 
@@ -3446,6 +3455,7 @@ ${movie.isWishlist ? `<button onclick="moveWishlistToCollection(${movieIdArg})" 
 </div>`;
 
 modal.classList.remove('hidden');
+if (wasHidden) modal.querySelector(':scope > div').scrollTop = 0;
 lockDetailBackgroundScroll();
 if (!skipPhysicalLookup) {
  loadPhysicalEditionDetails(movie.id);
