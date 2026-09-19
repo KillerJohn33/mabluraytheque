@@ -502,8 +502,8 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
     height: 12.75rem !important;
   }
   #modalContent .detail-edition-cover {
-    width: 6.5rem !important;
-    height: 9.75rem !important;
+    width: 5.5rem !important;
+    height: 8.25rem !important;
   }
 }
 
@@ -3349,15 +3349,24 @@ const metaParts = isSeriesMovie
 : [infoYear, infoRuntime].filter(Boolean);
 const genreChips = infoGenres.slice(0, 4).map(g => `<span class="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] text-gray-300">${escapeHtml(g)}</span>`).join('');
 
-const editionWithImage = movie.editions.find(ed => ed.image);
 const editionsHtml = movie.editions.map((ed, idx) => `
 <div class="edition-card rounded-2xl bg-white/[0.035] border border-white/10 p-3 space-y-2.5">
-<div class="flex items-center justify-between gap-2">
-<div class="flex items-center gap-2 min-w-0">
-<span class="w-6 h-6 rounded-lg bg-cyan-400/10 text-cyan-300 flex items-center justify-center text-[9px] font-bold">${idx + 1}</span>
-<span class="text-[11px] font-semibold text-white truncate">${escapeHtml(ed.title || 'Édition sans nom')}</span>
+<div class="flex items-start justify-between gap-3">
+<div class="min-w-0 flex-1 flex items-start gap-2.5">
+<span class="w-6 h-6 flex-shrink-0 rounded-lg bg-cyan-400/10 text-cyan-300 flex items-center justify-center text-[9px] font-bold">${idx + 1}</span>
+<div class="min-w-0">
+<p class="text-[11px] font-semibold text-white leading-snug break-words">${escapeHtml(ed.title || 'Édition sans nom')}</p>
+<div class="flex flex-wrap gap-1 mt-1.5">
+<span class="rounded-md bg-cyan-400/10 px-1.5 py-0.5 text-[9px] text-cyan-200">${escapeHtml(ed.format || 'Blu-ray 1080p')}</span>
+<span class="rounded-md bg-white/5 px-1.5 py-0.5 text-[9px] text-gray-300">${escapeHtml(ed.editionType || 'Amaray')}</span>
 </div>
+${ed.barcode ? `<p class="mt-1.5 text-[9px] text-gray-500">EAN ${escapeHtml(ed.barcode)}</p>` : ''}
+</div>
+</div>
+<div class="flex flex-shrink-0 items-start gap-1.5">
+${ed.image ? `<img src="${safeImageUrl(ed.image)}" alt="Jaquette de ${escapeHtml(ed.title || movie.title)}" loading="lazy" onerror="this.style.display='none'" class="detail-edition-cover w-16 h-24 sm:w-20 sm:h-30 object-contain bg-black/40 rounded-xl shadow-lg border border-cyan-400/20">` : ''}
 ${movie.editions.length > 1 ? `<button onclick="removeEdition(${movieIdArg}, ${idx})" class="text-gray-500 hover:text-red-400 transition p-1 rounded-lg hover:bg-red-400/10" title="Supprimer">${ic('x','w-3.5 h-3.5')}</button>` : ''}
+</div>
 </div>
 <div class="edition-form-fields grid grid-cols-2 gap-2">
 <div>
@@ -3450,7 +3459,6 @@ ${movie.isWishlist ? '<span class="px-2 py-1 rounded-full bg-pink-400/10 border 
 ${metaParts.length ? `<p class="text-[10px] text-gray-400 mt-1.5">${metaParts.join(' • ')}</p>` : ''}
 <div class="flex items-center gap-1.5 flex-wrap mt-3">${seenHtml}${ratingHtml}</div>
 </div>
-${editionWithImage ? `<div class="flex-shrink-0 self-center"><img src="${safeImageUrl(editionWithImage.image)}" onerror="this.closest('div').style.display='none'" class="detail-edition-cover w-16 h-24 sm:w-24 sm:h-36 object-contain bg-black/50 rounded-2xl shadow-xl border border-cyan-400/20"><p class="text-[8px] text-cyan-300 text-center mt-1">Boîtier</p></div>` : ''}
 </div>
 </div>
 
