@@ -3270,6 +3270,16 @@ ${movie.editions.length > 1 ? `<button onclick="removeEdition(${movieIdArg}, ${i
 <input type="text" value="${escapeHtml(ed.publisher || '')}" onchange="updateEditionField(${movieIdArg}, ${idx}, 'publisher', this.value)" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
 <label class="block text-[8px] text-gray-500 uppercase tracking-wider mt-2">Description du support</label>
 <input type="text" value="${escapeHtml(ed.physicalDescription || '')}" onchange="updateEditionField(${movieIdArg}, ${idx}, 'physicalDescription', this.value)" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
+<details class="rounded-xl border border-white/10 bg-white/[0.025] p-2.5 mt-2">
+<summary class="cursor-pointer text-[10px] font-semibold text-cyan-300">Vidéo, audio et sous-titres</summary>
+<div class="space-y-2 mt-2">
+<div><label class="block text-[9px] text-gray-400 mb-1">Codec vidéo</label>
+<input type="text" value="${escapeHtml(ed.videoCodec || '')}" onchange="updateEditionField(${movieIdArg}, ${idx}, 'videoCodec', this.value)" placeholder="HEVC / H.265, AVC / H.264..." class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl"></div>
+<div><label class="block text-[9px] text-gray-400 mb-1">Pistes audio (langue et format)</label>
+<textarea rows="2" onchange="updateEditionField(${movieIdArg}, ${idx}, 'audioTracks', this.value)" placeholder="VF : DTS-HD MA 5.1&#10;VO : Dolby Atmos" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl resize-y">${escapeHtml(ed.audioTracks || '')}</textarea></div>
+<div><label class="block text-[9px] text-gray-400 mb-1">Sous-titres</label>
+<textarea rows="2" onchange="updateEditionField(${movieIdArg}, ${idx}, 'subtitles', this.value)" placeholder="Français, anglais, français SDH..." class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl resize-y">${escapeHtml(ed.subtitles || '')}</textarea></div>
+</div></details>
 ${ed.barcode ? `<button onclick="refreshPhysicalEdition(${movieIdArg}, ${idx})" class="text-[9px] text-cyan-300 hover:text-white">Actualiser les informations de cette édition</button>` : ''}
 </div>
 </div>`).join('');
@@ -3406,8 +3416,8 @@ openMovieDetail(movieId);
 return;
 }
 const result = await updateMovieInCloud(movie);
-if (!result.success) movie.editions[editionIdx][field] = previous;
-else { renderCollection(); renderWishlist(); openMovieDetail(movieId); }
+if (!result.success) { movie.editions[editionIdx][field] = previous; openMovieDetail(movieId); }
+else { renderCollection(); renderWishlist(); if (!['videoCodec', 'audioTracks', 'subtitles'].includes(field)) openMovieDetail(movieId); }
 }
 
 async function moveWishlistToCollection(movieId) {
@@ -3967,6 +3977,9 @@ excelData.push({
 'Photo du boitier': ed.image || '',
 'Editeur du support': ed.publisher || '',
 'Description du support': ed.physicalDescription || '',
+'Codec vidéo': ed.videoCodec || '',
+'Pistes audio': ed.audioTracks || '',
+'Sous-titres': ed.subtitles || '',
 'Genres': genresStr,
 'Durée (minutes)': m.runtime || '',
 'Réalisateur / Créateur': m.director || '',
@@ -4246,6 +4259,9 @@ const barcode = String(row['EAN'] || row['EAN / Code-barres'] || row['Code-barre
 const editionImage = String(row['Photo du boitier'] || row['Photo du boîtier'] || '');
 const editionPublisher = String(row['Editeur du support'] || row['Éditeur du support'] || '');
 const physicalDescription = String(row['Description du support'] || '');
+const videoCodec = String(row['Codec vidéo'] || row['Codec video'] || '');
+const audioTracks = String(row['Pistes audio'] || row['Audio'] || '');
+const subtitles = String(row['Sous-titres'] || row['Sous titres'] || '');
 const genre = row['Genre'] || row['genre'] || row['Genres'] || '';
 const seen = parseBoolean(row['Vu'] || row['vu']);
 const listValue = row['Statut'] || row['Liste'] || row['Wishlist'];
@@ -4277,7 +4293,7 @@ const edition = {
 id: 'ed_' + Date.now() + '_' + Math.floor(Math.random() * 100000),
 title: String(editionTitle), format: String(format), editionType: String(editionType),
 purchasePrice: price, estimatedPrice, purchaseLocation: String(location), barcode,
-image: editionImage, publisher: editionPublisher, physicalDescription, metadataChecked: !!(editionImage || editionPublisher || physicalDescription)
+image: editionImage, publisher: editionPublisher, physicalDescription, videoCodec, audioTracks, subtitles, metadataChecked: !!(editionImage || editionPublisher || physicalDescription)
 };
 
 if (existingMovie) {
