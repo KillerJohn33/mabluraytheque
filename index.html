@@ -3014,6 +3014,7 @@ async function loadPhysicalEditionDetails(movieId, forceIndex = -1) {
     if (data.title && /steelbook/i.test(data.title) && edition.editionType === 'Amaray') edition.editionType = 'Steelbook';
     if (data.title && /\b(4k|uhd|ultra hd)\b/i.test(data.title) && edition.format === 'Blu-ray 1080p') edition.format = '4K UHD';
    }
+   edition.metadataFound = !!data.found;
    edition.metadataChecked = true;
    await updateMovieInCloud(movie);
    if (!document.getElementById('detailModal').classList.contains('hidden') && document.getElementById('modalContent').dataset.movieId === String(movie.id)) {
@@ -3023,7 +3024,7 @@ async function loadPhysicalEditionDetails(movieId, forceIndex = -1) {
     if (scroller) scroller.scrollTop = oldScroll;
    }
   } catch (error) {
-   console.warn('Informations de l edition indisponibles:', error);
+   console.warn('Informations de l\u2019édition indisponibles:', error);
   } finally {
    physicalEditionRequests.delete(requestKey);
   }
@@ -3032,17 +3033,17 @@ async function loadPhysicalEditionDetails(movieId, forceIndex = -1) {
 
 async function refreshPhysicalEdition(movieId, index) {
  const movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
- if (!movie || !movie.editions[index]?.barcode) return showToast('Renseignez d abord un code-barres pour cette edition.');
- showToast('Recherche des informations de l edition...');
+ if (!movie || !movie.editions[index]?.barcode) return showToast('Renseignez d\u2019abord un code-barres pour cette édition.');
+ showToast('Recherche des informations de l\u2019édition...');
  await loadPhysicalEditionDetails(movieId, index);
 }
 
 function physicalEditionSpecs(edition) {
  const specs = [
   ['Support', edition.format],
-  ['Boitier', edition.editionType],
+  ['Boîtier', edition.editionType],
   ['EAN / code-barres', edition.barcode],
-  ['Editeur', edition.publisher],
+  ['Éditeur', edition.publisher],
   ['Description du support', edition.physicalDescription]
  ].filter(([, value]) => String(value || '').trim());
  return specs.map(([label, value]) => `<div class="rounded-xl bg-white/[0.035] p-2.5"><dt class="text-[9px] text-gray-500">${escapeHtml(label)}</dt><dd class="text-[11px] text-white font-medium mt-0.5 break-words">${escapeHtml(value)}</dd></div>`).join('');
@@ -3120,9 +3121,13 @@ ${movie.editions.length > 1 ? `<button onclick="removeEdition(${movieIdArg}, ${i
 </div>
 </div>
 <div class="space-y-1.5">
-<label class="block text-[8px] text-gray-500 uppercase tracking-wider">Photo du boitier (URL)</label>
+<label class="block text-[8px] text-gray-500 uppercase tracking-wider">Photo du boîtier (URL)</label>
 <input type="url" value="${escapeHtml(ed.image || '')}" onchange="updateEditionField(${movieIdArg}, ${idx}, 'image', this.value)" placeholder="https://..." class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
-${ed.barcode ? `<button onclick="refreshPhysicalEdition(${movieIdArg}, ${idx})" class="text-[9px] text-cyan-300 hover:text-white">Actualiser les informations de cette edition</button>` : ''}
+<label class="block text-[8px] text-gray-500 uppercase tracking-wider mt-2">Éditeur</label>
+<input type="text" value="${escapeHtml(ed.publisher || '')}" onchange="updateEditionField(${movieIdArg}, ${idx}, 'publisher', this.value)" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
+<label class="block text-[8px] text-gray-500 uppercase tracking-wider mt-2">Description du support</label>
+<input type="text" value="${escapeHtml(ed.physicalDescription || '')}" onchange="updateEditionField(${movieIdArg}, ${idx}, 'physicalDescription', this.value)" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
+${ed.barcode ? `<button onclick="refreshPhysicalEdition(${movieIdArg}, ${idx})" class="text-[9px] text-cyan-300 hover:text-white">Actualiser les informations de cette édition</button>` : ''}
 </div>
 </div>`).join('');
 
@@ -3184,8 +3189,8 @@ ${infoCast.length ? `<div class="text-gray-300"><span class="text-gray-500">Avec
 
 <!-- SPECIFICATIONS TECHNIQUES DES EDITIONS PHYSIQUES -->
 <div class="rounded-2xl border border-white/10 bg-white/[0.025] p-3 space-y-3">
-<h4 class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.16em]">Specifications techniques</h4>
-${movie.editions.map((ed, idx) => `<div class="rounded-xl border border-white/10 p-2.5 space-y-2"><div class="flex items-center gap-2"><span class="text-[10px] font-bold text-cyan-300">${escapeHtml(ed.title || `Edition ${idx + 1}`)}</span>${ed.metadataChecked ? '<span class="text-[8px] text-gray-500">EAN verifie</span>' : ''}</div><dl class="grid grid-cols-2 gap-2">${physicalEditionSpecs(ed)}</dl>${!ed.metadataChecked && ed.barcode ? '<p class="text-[9px] text-gray-500">Recherche des donnees de l edition...</p>' : ''}</div>`).join('')}
+<h4 class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.16em]">Spécifications techniques</h4>
+${movie.editions.map((ed, idx) => `<div class="rounded-xl border border-white/10 p-2.5 space-y-2"><div class="flex items-center gap-2"><span class="text-[10px] font-bold text-cyan-300">${escapeHtml(ed.title || `Édition ${idx + 1}`)}</span>${ed.metadataChecked ? `<span class="text-[8px] text-gray-500">${ed.metadataFound ? 'Données trouvées' : 'Aucune donnée trouvée'}</span>` : ''}</div><dl class="grid grid-cols-2 gap-2">${physicalEditionSpecs(ed)}</dl>${!ed.metadataChecked && ed.barcode ? '<p class="text-[9px] text-gray-500">Recherche des données de l\u2019édition...</p>' : ''}</div>`).join('')}
 </div>
 <!-- ACTIONS -->
 <div class="flex gap-2 pt-1">
@@ -4010,7 +4015,7 @@ renderTrackedSeries();
 
 const matched = matchedMovies + matchedSeries;
 if (matched === 0) {
-showToast("Aucune correspondance trouvée. Essayez d'abord \"Rafraîchir les infos TMDB\" pour récupérer les identifiants IMDb de vos films.");
+showToast("Aucune correspondance trouvée. Essayez d\u2019abord \"Rafraîchir les infos TMDB\" pour récupérer les identifiants IMDb de vos films.");
 } else {
 showToast(`${matchedMovies} film(s) et ${matchedSeries} série(s) noté(s) depuis IMDb.`);
 }
