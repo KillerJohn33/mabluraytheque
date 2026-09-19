@@ -55,6 +55,7 @@ html { background: #000000; }
   }
   body > header { top: env(safe-area-inset-top); }
 }
+#detailModal > div { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
 body {
 background: radial-gradient(circle at 50% -20%, #2e1065, #0f172a, #030712);
 background-attachment: fixed;
@@ -3252,6 +3253,28 @@ async function loadMovieFinancials(movie) {
  }
 }
 
+let detailModalScrollY = null;
+function lockDetailBackgroundScroll() {
+ if (detailModalScrollY !== null || !window.matchMedia('(max-width: 767px), (hover: none) and (pointer: coarse) and (max-width: 1024px)').matches) return;
+ detailModalScrollY = window.scrollY;
+ document.body.style.position = 'fixed';
+ document.body.style.top = `-${detailModalScrollY}px`;
+ document.body.style.left = '0';
+ document.body.style.right = '0';
+ document.body.style.width = '100%';
+}
+function unlockDetailBackgroundScroll() {
+ if (detailModalScrollY === null) return;
+ const scrollY = detailModalScrollY;
+ detailModalScrollY = null;
+ document.body.style.position = '';
+ document.body.style.top = '';
+ document.body.style.left = '';
+ document.body.style.right = '';
+ document.body.style.width = '';
+ window.scrollTo(0, scrollY);
+}
+
 // --- MODAL & ÉDITION AVANCÉE DES ÉDITIONS ---
 function openMovieDetail(movieId, skipPhysicalLookup = false) {
 let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
@@ -3423,6 +3446,7 @@ ${movie.isWishlist ? `<button onclick="moveWishlistToCollection(${movieIdArg})" 
 </div>`;
 
 modal.classList.remove('hidden');
+lockDetailBackgroundScroll();
 if (!skipPhysicalLookup) {
  loadPhysicalEditionDetails(movie.id);
  loadMovieFinancials(movie);
@@ -3431,6 +3455,7 @@ if (!skipPhysicalLookup) {
 
 function closeModal() {
 document.getElementById('detailModal').classList.add('hidden');
+unlockDetailBackgroundScroll();
 }
 
 async function toggleMovieSeen(movieId) {
