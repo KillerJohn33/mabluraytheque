@@ -512,26 +512,33 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
   #modalContent > div > * { width: 100%; min-width: 0; margin-top: 0 !important; }
   #modalContent .edition-list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
-    gap: 1rem;
+    grid-template-columns: minmax(0, 1fr);
+    gap: .75rem;
     max-height: none;
     overflow: visible;
   }
   #modalContent .edition-list > * { margin-top: 0 !important; }
-  #modalContent .edition-card { min-width: 0; }
-  #modalContent .edition-card:only-child {
+  #modalContent .edition-card {
     display: grid;
-    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-    gap: .75rem 1.25rem;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.06fr);
+    grid-template-areas:
+      "heading extras"
+      "fields extras"
+      "tech tech";
+    grid-template-rows: auto auto auto;
+    gap: .65rem 1rem;
+    min-width: 0;
+    align-items: start;
   }
-  #modalContent .edition-card:only-child > * { margin-top: 0 !important; }
-  #modalContent .edition-card:only-child > :first-child { grid-column: 1 / -1; }
-  #modalContent .edition-card:only-child .edition-form-fields {
+  #modalContent .edition-card > * { margin-top: 0 !important; min-width: 0; }
+  #modalContent .edition-card > :first-child { grid-area: heading; }
+  #modalContent .edition-card .edition-form-fields {
+    grid-area: fields;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-content: start;
   }
-  #modalContent .edition-card:only-child .edition-extra-fields { min-width: 0; }
-  #modalContent .edition-card:only-child .edition-tech-inline { grid-column: 1 / -1; }
+  #modalContent .edition-card .edition-extra-fields { grid-area: extras; }
+  #modalContent .edition-card .edition-tech-inline { grid-area: tech; }
 }
 
 @media (min-width: 1200px) {
