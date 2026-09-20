@@ -1171,7 +1171,7 @@ body.theme-light #incompletePanel .icon-chip { color: #b45309; }
 <span class="flex items-center gap-2"><span class="icon-chip chip-sm" data-icon="alert"></span><span class="text-xs font-bold text-white">Fiches à compléter</span></span>
 <span class="flex items-center gap-2"><span id="incompleteCount" class="text-[11px] font-bold text-amber-300 rounded-full bg-amber-400/10 px-2 py-1">0</span><span class="text-gray-400 text-xs">⌄</span></span>
 </summary>
-<p class="text-[10px] text-gray-400 mt-1">Nom, format ou boîtier manquant, ou aucune vignette disponible.</p>
+<p class="text-[10px] text-gray-400 mt-1">Nom, format ou boîtier manquant, ou jaquette d’édition absente.</p>
 <div id="incompleteList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-3"></div>
 </details>
 
@@ -1911,6 +1911,7 @@ else collection.push(m);
 });
 renderCollection();
 renderWishlist();
+renderIncompletePanel();
 return true;
 }
 } catch (err) {
@@ -1954,6 +1955,7 @@ finishCloudWrite(false);
 return { success: false, error };
 }
 finishCloudWrite(true);
+if (!document.getElementById('tabStats').classList.contains('hidden')) renderIncompletePanel();
 return { success: true };
 } catch (error) {
 console.error("Update exception:", error);
@@ -3863,8 +3865,8 @@ editions.forEach(ed => {
   if (!String(ed.title || '').trim()) missing.add('nom');
   if (!String(ed.format || '').trim()) missing.add('format');
   if (!String(ed.editionType || '').trim()) missing.add('boîtier');
+  if (!hasDisplayedThumbnail(ed.image)) missing.add('jaquette');
 });
-if (!hasDisplayedThumbnail(movie.poster) && !editions.some(ed => hasDisplayedThumbnail(ed.image))) missing.add('vignette');
 return [...missing];
 }
 
