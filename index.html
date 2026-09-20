@@ -3872,6 +3872,7 @@ function renderIncompletePanel() {
 const list = document.getElementById('incompleteList');
 if (!list) return;
 const incomplete = collection.filter(movie => !isSeries(movie)).map(movie => ({movie, reasons: getIncompleteReasons(movie)})).filter(item => item.reasons.length);
+document.getElementById('incompletePanel').style.display = incomplete.length ? '' : 'none';
 document.getElementById('incompleteCount').textContent = incomplete.length;
 list.innerHTML = incomplete.length ? incomplete.map(({movie, reasons}) =>
   `<button type="button" data-movie-id="${escapeHtml(movie.id)}" class="incomplete-item text-left flex items-center gap-2.5 min-w-0 rounded-xl border border-white/10 bg-white/[0.035] p-2 hover:border-cyan-400/30">
