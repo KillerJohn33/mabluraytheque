@@ -811,6 +811,41 @@ body.theme-light #incompletePanel {
   box-shadow: 0 10px 28px rgba(120,53,15,.08), inset 0 1px 0 rgba(255,255,255,.8);
 }
 body.theme-light #incompletePanel .icon-chip { color: #b45309; }
+/* Actions cohérentes avec les boutons des fiches */
+.app-action {
+  --action-rgb: 34, 211, 238;
+  --action-text: #a5f3fc;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .375rem;
+  min-height: 40px;
+  border: 1px solid rgba(var(--action-rgb), .26);
+  border-radius: .75rem;
+  background: rgba(var(--action-rgb), .12);
+  color: var(--action-text);
+  font-weight: 600;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+  transition: background .18s ease, border-color .18s ease, transform .18s ease;
+}
+.app-action:hover { background: rgba(var(--action-rgb), .22); border-color: rgba(var(--action-rgb), .42); transform: translateY(-1px); }
+.app-action:active { transform: scale(.98); }
+.app-action:focus-visible { outline: 2px solid rgba(var(--action-rgb), .8); outline-offset: 2px; }
+.app-action:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.app-action-cyan { --action-rgb: 34, 211, 238; --action-text: #a5f3fc; }
+.app-action-pink { --action-rgb: 244, 114, 182; --action-text: #fbcfe8; }
+.app-action-violet { --action-rgb: 167, 139, 250; --action-text: #ddd6fe; }
+.app-action-green { --action-rgb: 52, 211, 153; --action-text: #a7f3d0; }
+.app-action-amber { --action-rgb: 251, 191, 36; --action-text: #fde68a; }
+.app-action-red { --action-rgb: 248, 113, 113; --action-text: #fca5a5; }
+.app-action-slate { --action-rgb: 148, 163, 184; --action-text: #cbd5e1; }
+body.theme-light .app-action-cyan { --action-text: #0e7490; }
+body.theme-light .app-action-pink { --action-text: #be185d; }
+body.theme-light .app-action-violet { --action-text: #6d28d9; }
+body.theme-light .app-action-green { --action-text: #047857; }
+body.theme-light .app-action-amber { --action-text: #92400e; }
+body.theme-light .app-action-red { --action-text: #b91c1c; }
+body.theme-light .app-action-slate { --action-text: #334155; }
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -855,7 +890,7 @@ body.theme-light #incompletePanel .icon-chip { color: #b45309; }
 <span class="icon-inline w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" data-icon="search"></span>
 <input id="searchInput" type="text" placeholder="Rechercher un film ou une série (TMDB)..." class="w-full pl-10 pr-4 py-3 rounded-2xl glass-input text-white text-sm placeholder-gray-400 focus:outline-none transition">
 </div>
-<button onclick="triggerNewSearch()" class="shine-btn bg-cyan-600 hover:bg-cyan-500 px-5 py-3 rounded-2xl font-semibold text-sm shadow-lg shadow-cyan-600/30 transition transform active:scale-95">Chercher</button>
+<button onclick="triggerNewSearch()" class="app-action app-action-cyan px-5 py-3 text-sm">Chercher</button>
 </div>
 <div class="flex justify-start px-2">
 <button id="clearSearchBtn" onclick="clearSearch()" class="hidden text-[11px] text-gray-400 hover:text-red-400 transition flex items-center gap-1">
@@ -864,13 +899,13 @@ body.theme-light #incompletePanel .icon-chip { color: #b45309; }
 </div>
 </div>
 
-<button onclick="toggleScanner()" class="shine-btn w-full glass-card hover:bg-white/10 text-white font-semibold py-2.5 rounded-2xl flex items-center justify-center gap-2 shadow transition transform active:scale-95 text-xs">
+<button onclick="toggleScanner()" class="app-action app-action-cyan w-full px-3 py-2.5 text-xs">
 <span class="icon-chip chip-sm" data-icon="camera"></span> <span>Scanner un code-barres</span>
 </button>
 
 <div id="scanner-container" class="hidden glass-card p-4 rounded-3xl border border-white/20 overflow-hidden">
 <div id="reader" class="w-full rounded-2xl overflow-hidden"></div>
-<button onclick="stopScanner()" class="mt-3 w-full bg-red-500/80 hover:bg-red-500 text-white py-2 rounded-xl text-xs font-semibold backdrop-blur-md transition">Fermer la caméra</button>
+<button onclick="stopScanner()" class="app-action app-action-red mt-3 w-full py-2 text-xs">Fermer la caméra</button>
 </div>
 
 </div>
@@ -932,7 +967,7 @@ body.theme-light #incompletePanel .icon-chip { color: #b45309; }
 <option class="bg-gray-900" value="unseen">Seulement les films NON VUS</option>
 <option class="bg-gray-900" value="4k">Seulement les films en 4K UHD</option>
 </select>
-<button onclick="pickRandomMovie()" class="shine-btn bg-gradient-to-r from-cyan-500 via-cyan-400 to-sky-500 hover:opacity-90 text-white font-extrabold px-4 py-2 rounded-xl text-xs shadow-lg transition transform active:scale-95 flex items-center gap-1">
+<button onclick="pickRandomMovie()" class="app-action app-action-cyan px-4 py-2 text-xs">
 <span>Lancer</span>
 </button>
 </div>
@@ -1018,11 +1053,11 @@ body.theme-light #incompletePanel .icon-chip { color: #b45309; }
 <div id="bulkToolbar" class="hidden glass-card rounded-2xl border border-cyan-400/20 p-2.5 space-y-2">
 <div class="flex items-center justify-between gap-2"><span id="bulkCount" class="text-[11px] font-semibold text-cyan-200">0 sélectionné</span><div class="flex gap-1"><button onclick="selectVisibleMovies()" class="text-[10px] text-gray-300 px-2 py-2 rounded-lg hover:bg-white/10">Tout sélectionner</button><button onclick="toggleBulkMode()" class="text-[10px] text-gray-400 px-2 py-2 rounded-lg hover:bg-white/10">Annuler</button></div></div>
 <div class="flex flex-wrap items-center gap-2">
-<button data-bulk-action onclick="applyBulkSeen(true)" class="glass-pill px-3 py-2 rounded-xl text-[11px] text-emerald-300 disabled:opacity-40">Marquer vus</button>
-<button data-bulk-action onclick="applyBulkSeen(false)" class="glass-pill px-3 py-2 rounded-xl text-[11px] text-gray-200 disabled:opacity-40">Marquer non vus</button>
+<button data-bulk-action onclick="applyBulkSeen(true)" class="app-action app-action-green px-3 py-2 text-[11px]">Marquer vus</button>
+<button data-bulk-action onclick="applyBulkSeen(false)" class="app-action app-action-slate px-3 py-2 text-[11px]">Marquer non vus</button>
 <select id="bulkLocation" aria-label="Lieu d'achat pour les éditions sélectionnées" class="glass-input text-white text-[11px] px-2 py-2 rounded-xl"><option value="">Lieu d'achat…</option><option>Fnac</option><option>Amazon</option><option>Vinted</option><option>Leclerc</option><option>Ebay</option><option>LeBonCoin</option><option>Best Buy</option><option>Autres</option></select>
-<button data-bulk-action onclick="applyBulkLocation()" class="glass-pill px-3 py-2 rounded-xl text-[11px] text-cyan-300 disabled:opacity-40">Appliquer</button>
-<button data-bulk-action onclick="deleteBulkMovies()" class="ml-auto glass-pill px-3 py-2 rounded-xl text-[11px] text-red-300 disabled:opacity-40">Supprimer</button>
+<button data-bulk-action onclick="applyBulkLocation()" class="app-action app-action-cyan px-3 py-2 text-[11px]">Appliquer</button>
+<button data-bulk-action onclick="deleteBulkMovies()" class="app-action app-action-red ml-auto px-3 py-2 text-[11px]">Supprimer</button>
 </div></div>
 <div id="collectionGrid" class="grid grid-cols-2 gap-4"></div>
 </div>
@@ -1129,7 +1164,7 @@ body.theme-light #incompletePanel .icon-chip { color: #b45309; }
 </div>
 
 <div class="glass-card p-3 rounded-2xl border border-white/10 space-y-3">
-<div class="flex items-center justify-between gap-2"><div><h3 class="text-xs font-bold text-white">Ajouter une série à suivre</h3><p class="text-[9px] text-gray-500">Recherchez-la dans le champ TMDB en haut de l'application.</p></div><button onclick="addTrackedSeriesFromCollection()" class="shine-btn bg-purple-600 hover:bg-purple-500 text-white px-3 py-2 rounded-xl text-[10px] font-bold">Depuis ma collection</button></div>
+<div class="flex items-center justify-between gap-2"><div><h3 class="text-xs font-bold text-white">Ajouter une série à suivre</h3><p class="text-[9px] text-gray-500">Recherchez-la dans le champ TMDB en haut de l'application.</p></div><button onclick="addTrackedSeriesFromCollection()" class="app-action app-action-violet px-3 py-2 text-[10px]">Depuis ma collection</button></div>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-[340px_minmax(0,1fr)] gap-4 items-start">
@@ -1417,7 +1452,7 @@ body.theme-light #incompletePanel .icon-chip { color: #b45309; }
 <label class="block text-[10px] text-gray-400 font-semibold mb-1">Clé Anon Supabase :</label>
 <input type="password" id="settingSupaKey" class="w-full glass-input text-white text-xs p-2 rounded-xl focus:outline-none">
 </div>
-<button onclick="saveApiKeysFromSettings()" class="shine-btn w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 rounded-xl text-xs transition active:scale-95 flex items-center justify-center gap-1.5">
+<button onclick="saveApiKeysFromSettings()" class="app-action app-action-cyan w-full px-3 py-2 text-xs">
 <span class="icon-inline w-3.5 h-3.5" data-icon="check"></span><span>Enregistrer la configuration</span>
 </button>
 </div>
@@ -1431,7 +1466,7 @@ body.theme-light #incompletePanel .icon-chip { color: #b45309; }
 <p class="text-[11px] text-gray-400">Mettre à jour les fiches films déjà ajoutées.</p>
 </div>
 </div>
-<button id="refreshTmdbBtn" onclick="refreshAllTMDBInfo()" class="shine-btn w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 rounded-2xl text-xs shadow-lg transition transform active:scale-95 flex items-center justify-center gap-1.5">
+<button id="refreshTmdbBtn" onclick="refreshAllTMDBInfo()" class="app-action app-action-cyan w-full px-3 py-2.5 text-xs">
 <span class="icon-inline w-3.5 h-3.5" data-icon="refresh"></span><span id="refreshTmdbBtnText">Rafraîchir les infos TMDB (durée, réalisateur, acteurs...)</span>
 </button>
 <p class="text-[10px] text-gray-500">Récupère la durée, le réalisateur et les acteurs principaux pour tous les films déjà dans votre collection et votre wishlist.</p>
@@ -1445,7 +1480,7 @@ body.theme-light #incompletePanel .icon-chip { color: #b45309; }
 <p class="text-[11px] text-gray-400">Importer vos notes personnelles depuis votre compte IMDb.</p>
 </div>
 </div>
-<label class="shine-btn w-full bg-amber-500 hover:bg-amber-400 text-gray-900 font-bold py-2.5 rounded-2xl text-xs shadow-lg transition transform active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+<label class="app-action app-action-amber w-full px-3 py-2.5 text-xs cursor-pointer">
 <span class="icon-inline w-3.5 h-3.5" data-icon="upload"></span><span>Importer le fichier ratings.csv</span>
 <input type="file" id="imdbCsvInput" accept=".csv" class="hidden" onchange="importImdbRatings(event)">
 </label>
@@ -1461,17 +1496,17 @@ body.theme-light #incompletePanel .icon-chip { color: #b45309; }
 </div>
 </div>
 <div class="grid grid-cols-2 gap-2">
-<button onclick="exportToExcel()" class="shine-btn bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-3 rounded-2xl text-xs shadow-lg transition transform active:scale-95 flex items-center justify-center gap-1.5">
+<button onclick="exportToExcel()" class="app-action app-action-green px-3 py-2.5 text-xs">
 <span class="icon-inline w-3.5 h-3.5" data-icon="barchart"></span><span>Excel (.xlsx)</span>
 </button>
-<button onclick="exportToJSON()" class="shine-btn bg-sky-600 hover:bg-sky-500 text-white font-bold py-2.5 px-3 rounded-2xl text-xs shadow-lg transition transform active:scale-95 flex items-center justify-center gap-1.5">
+<button onclick="exportToJSON()" class="app-action app-action-cyan px-3 py-2.5 text-xs">
 <span class="icon-inline w-3.5 h-3.5" data-icon="download"></span><span>JSON (.json)</span>
 </button>
-<label class="shine-btn bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 px-3 rounded-2xl text-xs shadow-lg transition transform active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+<label class="app-action app-action-violet px-3 py-2.5 text-xs cursor-pointer">
 <span class="icon-inline w-3.5 h-3.5" data-icon="upload"></span><span>Restaurer JSON</span>
 <input type="file" accept=".json,application/json" class="hidden" onchange="importBackupJSON(event)">
 </label>
-<label class="shine-btn bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 px-3 rounded-2xl text-xs shadow-lg transition transform active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+<label class="app-action app-action-amber px-3 py-2.5 text-xs cursor-pointer">
 <span class="icon-inline w-3.5 h-3.5" data-icon="upload"></span><span>Importer Excel</span>
 <input type="file" accept=".xlsx,.xls" class="hidden" onchange="importExcel(event)">
 </label>
@@ -1486,7 +1521,7 @@ body.theme-light #incompletePanel .icon-chip { color: #b45309; }
 <p class="text-[11px] text-gray-400">Supprimer définitivement toutes les données stockées dans Supabase.</p>
 </div>
 </div>
-<button id="deleteCollectionBtn" onclick="deleteEntireCollection()" class="shine-btn w-full bg-red-600 hover:bg-red-500 text-white font-bold py-2.5 rounded-2xl text-xs shadow-lg transition transform active:scale-95 flex items-center justify-center gap-1.5">
+<button id="deleteCollectionBtn" onclick="deleteEntireCollection()" class="app-action app-action-red w-full px-3 py-2.5 text-xs">
 <span class="icon-inline w-3.5 h-3.5" data-icon="trash"></span><span>Supprimer ma collection</span>
 </button>
 <p class="text-[10px] text-red-300/70">Cette action supprimera tous les films de la collection <strong>et de la wishlist</strong> dans Supabase. Cette action est irréversible.</p>
@@ -2197,9 +2232,9 @@ item.innerHTML = `
   </div>
 </div>
 <div class="grid grid-cols-2 gap-2 w-full">
-  <button type="button" data-search-action="collection" class="min-h-[42px] rounded-xl border border-cyan-300/30 bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-100 font-semibold px-3 py-2 text-[11px] transition flex items-center justify-center gap-1.5 active:scale-[.98]">${ic('plus','w-3.5 h-3.5')} Collection</button>
-  <button type="button" data-search-action="wishlist" class="min-h-[42px] rounded-xl border border-pink-300/30 bg-pink-500/15 hover:bg-pink-500/25 text-pink-100 font-semibold px-3 py-2 text-[11px] transition flex items-center justify-center gap-1.5 active:scale-[.98]">${ic('plus','w-3.5 h-3.5')} Wishlist</button>
-  ${isTv ? `<button type="button" data-search-action="series" class="col-span-2 min-h-[42px] rounded-xl border border-violet-300/30 bg-violet-500/15 hover:bg-violet-500/25 text-violet-100 font-semibold px-3 py-2 text-[11px] transition flex items-center justify-center gap-1.5 active:scale-[.98]">${ic('tv','w-3.5 h-3.5')} Suivre la série</button>` : ''}
+  <button type="button" data-search-action="collection" class="app-action app-action-cyan min-h-[42px] px-3 py-2 text-[11px]">${ic('plus','w-3.5 h-3.5')} Collection</button>
+  <button type="button" data-search-action="wishlist" class="app-action app-action-pink min-h-[42px] px-3 py-2 text-[11px]">${ic('plus','w-3.5 h-3.5')} Wishlist</button>
+  ${isTv ? `<button type="button" data-search-action="series" class="app-action app-action-violet col-span-2 min-h-[42px] px-3 py-2 text-[11px]">${ic('tv','w-3.5 h-3.5')} Suivre la série</button>` : ''}
 </div>`;
 item.querySelector('[data-search-action="collection"]').addEventListener('click', () => addMovieFromTMDB(m, false));
 item.querySelector('[data-search-action="wishlist"]').addEventListener('click', () => addMovieFromTMDB(m, true));
@@ -3651,7 +3686,7 @@ ${ed.image ? `<figure class="edition-cover-desktop">
 <label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">Édition Blu-ray.com</label>
 <a href="https://www.blu-ray.com/search/?quicksearch=1&amp;quicksearch_country=all&amp;quicksearch_keyword=${encodeURIComponent(movie.title)}&amp;section=bluraymovies" target="_blank" rel="noopener noreferrer" class="text-[9px] text-cyan-300 hover:text-white">Chercher une édition ↗</a>
 </div>
-<div class="flex gap-2"><input id="blurayUrl-${idx}" type="text" inputmode="url" value="${escapeHtml(ed.blurayUrl || '')}" placeholder="Lien de l’édition exacte" class="flex-1 min-w-0 glass-input text-white text-[10px] px-2.5 py-2 rounded-xl"><button id="blurayLoad-${idx}" onclick="attachBlurayEdition(${movieIdArg}, ${idx})" class="px-3 rounded-xl bg-cyan-400/15 text-cyan-300 text-[10px] font-semibold">Importer</button></div>
+<div class="flex gap-2"><input id="blurayUrl-${idx}" type="text" inputmode="url" value="${escapeHtml(ed.blurayUrl || '')}" placeholder="Lien de l’édition exacte" class="flex-1 min-w-0 glass-input text-white text-[10px] px-2.5 py-2 rounded-xl"><button id="blurayLoad-${idx}" onclick="attachBlurayEdition(${movieIdArg}, ${idx})" class="app-action app-action-cyan px-3 text-[10px]">Importer</button></div>
 </div>
 <div>
 <label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">Éditeur</label>
@@ -3689,7 +3724,7 @@ ${ed.barcode ? `<button onclick="refreshPhysicalEdition(${movieIdArg}, ${idx})" 
 </div>`).join('');
 
 const ratingHtml = imdbRating !== null ? `<div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-300 text-[10px] font-bold">${ic('star','w-3.5 h-3.5')} IMDb ${imdbRating}/10</div>` : '';
-const seenHtml = `<button onclick="toggleMovieSeen(${movieIdArg})" class="px-2.5 py-1.5 rounded-xl text-[10px] font-semibold transition flex items-center gap-1.5 ${movie.seen ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20' : 'bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10'}">${movie.seen ? ic('check','w-3.5 h-3.5') + ' Vu' : ic('eye','w-3.5 h-3.5') + ' Non vu'}</button>`;
+const seenHtml = `<button onclick="toggleMovieSeen(${movieIdArg})" class="app-action ${movie.seen ? 'app-action-green' : 'app-action-slate'} px-2.5 py-1.5 text-[10px]">${movie.seen ? ic('check','w-3.5 h-3.5') + ' Vu' : ic('eye','w-3.5 h-3.5') + ' Non vu'}</button>`;
 
 content.innerHTML = `
 <div class="space-y-4">
@@ -3737,7 +3772,7 @@ ${!isSeriesMovie ? `<div class="text-gray-300"><span class="text-gray-500">Budge
 <div class="rounded-2xl border border-white/10 bg-white/[0.025] p-3 space-y-3">
 <div class="flex items-center justify-between gap-2">
 <div><h4 class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.16em]">Éditions</h4><p class="text-[10px] text-gray-400 mt-0.5">${movie.editions.length} édition${movie.editions.length > 1 ? 's' : ''}</p></div>
-<button onclick="addEditionToMovie(${movieIdArg})" class="w-8 h-8 rounded-xl bg-cyan-400/10 border border-cyan-400/20 text-cyan-300 hover:bg-cyan-400/20 transition flex items-center justify-center" title="Ajouter une édition">${ic('plus','w-4 h-4')}</button>
+<button onclick="addEditionToMovie(${movieIdArg})" class="app-action app-action-cyan w-10 h-10" title="Ajouter une édition">${ic('plus','w-4 h-4')}</button>
 </div>
 <div class="edition-list space-y-2 max-h-64 overflow-y-auto pr-0.5">${editionsHtml}</div>
 <div class="grid grid-cols-2 gap-2 pt-2 border-t border-white/5">
@@ -3748,9 +3783,9 @@ ${!isSeriesMovie ? `<div class="text-gray-300"><span class="text-gray-500">Budge
 
 <!-- ACTIONS -->
 <div class="flex gap-2 pt-1">
-${isSeriesMovie ? `<button onclick="trackSeriesFromMovie(${movieIdArg})" class="shine-btn flex-1 bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 rounded-xl text-[10px] shadow-lg transition flex items-center justify-center gap-1.5">${ic('tv','w-3.5 h-3.5')} ${isTrackedSeries(movie.tmdb_id) ? 'Gérer le suivi' : 'Suivre la série'}</button>` : ''}
-${movie.isWishlist ? `<button onclick="moveWishlistToCollection(${movieIdArg})" class="shine-btn flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-[10px] shadow-lg transition flex items-center justify-center gap-1.5">${ic('download','w-3.5 h-3.5')} Ajouter à la collection</button>` : ''}
-<button onclick="deleteMovie(${movieIdArg})" class="${movie.isWishlist ? 'px-3' : 'flex-1'} bg-red-500/10 hover:bg-red-500/20 border border-red-400/20 text-red-300 font-semibold py-2.5 rounded-xl text-[10px] transition flex items-center justify-center gap-1.5">${ic('trash','w-3.5 h-3.5')} Supprimer</button>
+${isSeriesMovie ? `<button onclick="trackSeriesFromMovie(${movieIdArg})" class="app-action app-action-violet flex-1 px-3 py-2.5 text-[10px]">${ic('tv','w-3.5 h-3.5')} ${isTrackedSeries(movie.tmdb_id) ? 'Gérer le suivi' : 'Suivre la série'}</button>` : ''}
+${movie.isWishlist ? `<button onclick="moveWishlistToCollection(${movieIdArg})" class="app-action app-action-green flex-1 px-3 py-2.5 text-[10px]">${ic('download','w-3.5 h-3.5')} Ajouter à la collection</button>` : ''}
+<button onclick="deleteMovie(${movieIdArg})" class="app-action app-action-red ${movie.isWishlist ? 'px-3' : 'flex-1'} py-2.5 text-[10px]">${ic('trash','w-3.5 h-3.5')} Supprimer</button>
 </div>
 </div>`;
 
