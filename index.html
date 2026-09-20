@@ -846,6 +846,45 @@ body.theme-light .app-action-green { --action-text: #047857; }
 body.theme-light .app-action-amber { --action-text: #92400e; }
 body.theme-light .app-action-red { --action-text: #b91c1c; }
 body.theme-light .app-action-slate { --action-text: #334155; }
+/* Barres de choix : même finition sobre que les actions */
+.choice-bar {
+  display: flex;
+  gap: .3rem;
+  padding: .3rem;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 1rem;
+  background: rgba(255,255,255,.035);
+}
+.choice-option {
+  --choice-rgb: 34, 211, 238;
+  --choice-text: #a5f3fc;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 40px;
+  padding: .45rem .35rem;
+  border: 1px solid transparent;
+  border-radius: .75rem;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  transition: color .18s ease, background .18s ease, border-color .18s ease;
+}
+.choice-option:hover { color: var(--choice-text); background: rgba(var(--choice-rgb), .08); }
+.choice-option.is-active {
+  color: var(--choice-text);
+  background: rgba(var(--choice-rgb), .16);
+  border-color: rgba(var(--choice-rgb), .34);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+.choice-option:focus-visible { outline: 2px solid rgba(var(--choice-rgb), .8); outline-offset: 2px; }
+.choice-bar-violet .choice-option { --choice-rgb: 167, 139, 250; --choice-text: #ddd6fe; }
+body.theme-light .choice-bar { background: rgba(255,255,255,.6); border-color: rgba(15,23,42,.13); }
+body.theme-light .choice-option { color: #64748b; --choice-text: #0e7490; }
+body.theme-light .choice-bar-violet .choice-option { --choice-text: #6d28d9; }
+body.theme-light .choice-option:hover, body.theme-light .choice-option.is-active { color: var(--choice-text); }
+@media (max-width: 380px) { .choice-bar-violet .choice-option { font-size: 10px; padding-inline: .2rem; } }
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -982,10 +1021,10 @@ body.theme-light .app-action-slate { --action-text: #334155; }
 </div>
 <div id="collectionFilterPanel" class="hidden space-y-3">
 <!-- FILTRE RAPIDE FILMS / SÉRIES -->
-<div class="glass-card w-full p-1 rounded-2xl border border-white/10 flex items-center gap-1">
-<button id="mediaTypeAllBtn" onclick="setMediaTypeFilter('all')" class="media-type-filter-btn flex-1 py-1.5 rounded-xl text-[11px] font-semibold transition">Tous</button>
-<button id="mediaTypeMovieBtn" onclick="setMediaTypeFilter('movie')" class="media-type-filter-btn flex-1 py-1.5 rounded-xl text-[11px] font-semibold transition">Films</button>
-<button id="mediaTypeSeriesBtn" onclick="setMediaTypeFilter('series')" class="media-type-filter-btn flex-1 py-1.5 rounded-xl text-[11px] font-semibold transition">Séries</button>
+<div class="choice-bar w-full" role="group" aria-label="Type de contenu">
+<button id="mediaTypeAllBtn" aria-pressed="true" onclick="setMediaTypeFilter('all')" class="choice-option is-active">Tous</button>
+<button id="mediaTypeMovieBtn" aria-pressed="false" onclick="setMediaTypeFilter('movie')" class="choice-option">Films</button>
+<button id="mediaTypeSeriesBtn" aria-pressed="false" onclick="setMediaTypeFilter('series')" class="choice-option">Séries</button>
 </div>
 <input id="filterMediaType" type="hidden" value="all">
 
@@ -1179,11 +1218,11 @@ body.theme-light .app-action-slate { --action-text: #334155; }
 
 <!-- SÉRIES SUIVIES -->
 <div class="min-w-0 space-y-3">
-<div class="flex items-center gap-1 p-1 glass-pill rounded-xl">
-<button onclick="setTrackedSeriesFilter('all')" id="seriesFilterAll" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold">Toutes</button>
-<button onclick="setTrackedSeriesFilter('watching')" id="seriesFilterWatching" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold text-gray-400">En cours</button>
-<button onclick="setTrackedSeriesFilter('upcoming')" id="seriesFilterUpcoming" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold text-gray-400">À venir</button>
-<button onclick="setTrackedSeriesFilter('completed')" id="seriesFilterCompleted" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold text-gray-400">Terminées</button>
+<div class="choice-bar choice-bar-violet" role="group" aria-label="Filtrer les séries suivies">
+<button onclick="setTrackedSeriesFilter('all')" id="seriesFilterAll" aria-pressed="true" class="choice-option is-active">Toutes</button>
+<button onclick="setTrackedSeriesFilter('watching')" id="seriesFilterWatching" aria-pressed="false" class="choice-option">En cours</button>
+<button onclick="setTrackedSeriesFilter('upcoming')" id="seriesFilterUpcoming" aria-pressed="false" class="choice-option">À venir</button>
+<button onclick="setTrackedSeriesFilter('completed')" id="seriesFilterCompleted" aria-pressed="false" class="choice-option">Terminées</button>
 </div>
 <div id="trackedSeriesGrid" class="grid grid-cols-1 xl:grid-cols-2 gap-3"></div>
 </div>
@@ -1206,11 +1245,11 @@ body.theme-light .app-action-slate { --action-text: #334155; }
 <p class="text-[11px] text-gray-400">Choisir comment les données sont présentées.</p>
 </div>
 </div>
-<div class="glass-pill p-1.5 rounded-2xl flex justify-between items-center shadow-md">
-<button id="statsViewListBtn" onclick="setStatsView(false)" class="flex-1 py-2 rounded-xl font-bold text-xs transition text-gray-400 hover:text-white flex items-center justify-center gap-1.5">
+<div class="choice-bar" role="group" aria-label="Affichage des répartitions">
+<button id="statsViewListBtn" aria-pressed="false" onclick="setStatsView(false)" class="choice-option flex items-center justify-center gap-1.5">
 <span class="icon-inline w-3.5 h-3.5" data-icon="list"></span> Liste simple
 </button>
-<button id="statsViewChartBtn" onclick="setStatsView(true)" class="flex-1 py-2 rounded-xl font-bold text-xs transition bg-cyan-600 text-white shadow flex items-center justify-center gap-1.5">
+<button id="statsViewChartBtn" aria-pressed="true" onclick="setStatsView(true)" class="choice-option flex items-center justify-center gap-1.5 is-active">
 <span class="icon-inline w-3.5 h-3.5" data-icon="barchart"></span> Avec diagramme
 </button>
 </div>
@@ -2595,10 +2634,8 @@ series: document.getElementById('mediaTypeSeriesBtn')
 
 Object.entries(buttons).forEach(([key, btn]) => {
 if (!btn) return;
-btn.classList.toggle('bg-cyan-600', key === type);
-btn.classList.toggle('text-white', key === type);
-btn.classList.toggle('text-gray-400', key !== type);
-btn.classList.toggle('hover:text-white', key !== type);
+btn.classList.toggle('is-active', key === type);
+btn.setAttribute('aria-pressed', String(key === type));
 });
 
 renderCollection();
@@ -3352,7 +3389,7 @@ trackedSeriesFilter = filter;
 ['all','watching','upcoming','completed'].forEach(k => {
 const b = document.getElementById('seriesFilter' + k.charAt(0).toUpperCase() + k.slice(1));
 if (!b) return;
-b.classList.toggle('bg-purple-600', k === filter); b.classList.toggle('text-white', k === filter); b.classList.toggle('text-gray-400', k !== filter);
+b.classList.toggle('is-active', k === filter); b.setAttribute('aria-pressed', String(k === filter));
 });
 renderTrackedSeries();
 }
@@ -3377,7 +3414,7 @@ renderSeriesCalendar();
 if (document.getElementById('homeCalendarGrid')) renderHomeSummaryCalendar();
 }
 function setTrackedSeriesFilterVisual() {
-['all','watching','upcoming','completed'].forEach(k => { const b=document.getElementById('seriesFilter'+k.charAt(0).toUpperCase()+k.slice(1)); if(b){b.classList.toggle('bg-purple-600',k===trackedSeriesFilter);b.classList.toggle('text-white',k===trackedSeriesFilter);b.classList.toggle('text-gray-400',k!==trackedSeriesFilter);} });
+['all','watching','upcoming','completed'].forEach(k => { const b=document.getElementById('seriesFilter'+k.charAt(0).toUpperCase()+k.slice(1)); if(b){b.classList.toggle('is-active',k===trackedSeriesFilter);b.setAttribute('aria-pressed',String(k===trackedSeriesFilter));} });
 }
 function formatSeriesDate(date) { if (!date) return 'Date inconnue'; return new Date(date+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}); }
 async function toggleTrackedEpisode(tmdbId, season, episode) { const s=getTrackedSeries(tmdbId); if(!s)return; const e=(s.episodes||[]).find(x=>Number(x.season_number)===Number(season)&&Number(x.episode_number)===Number(episode)); if(!e)return; e.watched=!e.watched; e.watchedAt=e.watched?new Date().toISOString():null; saveTrackedSeriesLocal(); renderTrackedSeries(); await saveTrackedSeriesCloud(s); }
@@ -3904,10 +3941,10 @@ function setStatsView(showCharts) {
 statsShowCharts = showCharts;
 const listBtn = document.getElementById('statsViewListBtn');
 const chartBtn = document.getElementById('statsViewChartBtn');
-const activeClass = 'flex-1 py-2 rounded-xl font-bold text-xs transition bg-cyan-600 text-white shadow flex items-center justify-center gap-1.5';
-const inactiveClass = 'flex-1 py-2 rounded-xl font-bold text-xs transition text-gray-400 hover:text-white flex items-center justify-center gap-1.5';
-listBtn.className = showCharts ? inactiveClass : activeClass;
-chartBtn.className = showCharts ? activeClass : inactiveClass;
+listBtn.classList.toggle('is-active', !showCharts);
+chartBtn.classList.toggle('is-active', showCharts);
+listBtn.setAttribute('aria-pressed', String(!showCharts));
+chartBtn.setAttribute('aria-pressed', String(showCharts));
 renderStats();
 }
 
