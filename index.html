@@ -872,6 +872,14 @@ body.theme-light #incompletePanel .icon-chip { color: #b45309; }
 <div id="reader" class="w-full rounded-2xl overflow-hidden"></div>
 <button onclick="stopScanner()" class="mt-3 w-full bg-red-500/80 hover:bg-red-500 text-white py-2 rounded-xl text-xs font-semibold backdrop-blur-md transition">Fermer la caméra</button>
 </div>
+<details id="incompletePanel" class="hidden modern-panel px-3 py-1 md:px-4">
+<summary class="cursor-pointer list-none flex items-center justify-between gap-3 min-h-[40px]">
+<span class="flex items-center gap-2"><span class="icon-chip chip-sm" data-icon="alert"></span><span class="text-xs font-bold text-white">Fiches à compléter</span></span>
+<span class="flex items-center gap-2"><span id="incompleteCount" class="text-[11px] font-bold text-amber-300 rounded-full bg-amber-400/10 px-2 py-1">0</span><span class="text-gray-400 text-xs">⌄</span></span>
+</summary>
+<p class="text-[10px] text-gray-400 mt-1">Nom, format ou boîtier manquant, ou jaquette d’édition absente.</p>
+<div id="incompleteList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-3"></div>
+</details>
 </div>
 
 <!-- RÉSULTATS DE RECHERCHE AMÉLIORÉS DE TMDB -->
@@ -1166,14 +1174,7 @@ body.theme-light #incompletePanel .icon-chip { color: #b45309; }
 </div>
 </div>
 
-<details id="incompletePanel" class="modern-panel p-3 md:p-4">
-<summary class="cursor-pointer list-none flex items-center justify-between gap-3 min-h-[44px]">
-<span class="flex items-center gap-2"><span class="icon-chip chip-sm" data-icon="alert"></span><span class="text-xs font-bold text-white">Fiches à compléter</span></span>
-<span class="flex items-center gap-2"><span id="incompleteCount" class="text-[11px] font-bold text-amber-300 rounded-full bg-amber-400/10 px-2 py-1">0</span><span class="text-gray-400 text-xs">⌄</span></span>
-</summary>
-<p class="text-[10px] text-gray-400 mt-1">Nom, format ou boîtier manquant, ou jaquette d’édition absente.</p>
-<div id="incompleteList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-3"></div>
-</details>
+
 
 <div class="modern-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
@@ -1955,7 +1956,7 @@ finishCloudWrite(false);
 return { success: false, error };
 }
 finishCloudWrite(true);
-if (!document.getElementById('tabStats').classList.contains('hidden')) renderIncompletePanel();
+if (!document.getElementById('tabCollection').classList.contains('hidden')) renderIncompletePanel();
 return { success: true };
 } catch (error) {
 console.error("Update exception:", error);
@@ -2099,6 +2100,7 @@ document.getElementById('tabSettingsBtn').className = activeClass;
 document.getElementById('bottomTabSettingsBtn').classList.add('active');
 updateSettingsCounters();
 }
+renderIncompletePanel();
 if (window.innerWidth < 768) window.scrollTo(0, 0);
 }
 
@@ -3804,7 +3806,7 @@ return;
 }
 const result = await updateMovieInCloud(movie);
 if (!result.success) { movie.editions[editionIdx][field] = previous; openMovieDetail(movieId); }
-else { renderCollection(); renderWishlist(); if (!document.getElementById('tabStats').classList.contains('hidden')) renderIncompletePanel(); if (!['videoCodec', 'audioTracks', 'subtitles'].includes(field)) openMovieDetail(movieId); }
+else { renderCollection(); renderWishlist(); if (!document.getElementById('tabCollection').classList.contains('hidden')) renderIncompletePanel(); if (!['videoCodec', 'audioTracks', 'subtitles'].includes(field)) openMovieDetail(movieId); }
 }
 
 async function moveWishlistToCollection(movieId) {
@@ -3874,7 +3876,8 @@ function renderIncompletePanel() {
 const list = document.getElementById('incompleteList');
 if (!list) return;
 const incomplete = collection.filter(movie => !isSeries(movie)).map(movie => ({movie, reasons: getIncompleteReasons(movie)})).filter(item => item.reasons.length);
-document.getElementById('incompletePanel').style.display = incomplete.length ? '' : 'none';
+const panel = document.getElementById('incompletePanel');
+panel.classList.toggle('hidden', !incomplete.length || document.getElementById('tabCollection').classList.contains('hidden'));
 document.getElementById('incompleteCount').textContent = incomplete.length;
 list.innerHTML = incomplete.length ? incomplete.map(({movie, reasons}) =>
   `<button type="button" data-movie-id="${escapeHtml(movie.id)}" class="incomplete-item text-left flex items-center gap-2.5 min-w-0 rounded-xl border border-white/10 bg-white/[0.035] p-2 hover:border-cyan-400/30">
@@ -3885,7 +3888,6 @@ list.querySelectorAll('.incomplete-item').forEach(button => button.addEventListe
 }
 
 function renderStats() {
-renderIncompletePanel();
 const totalMovies = collection.length;
 let movieCount = 0;
 let seriesCount = 0;
