@@ -3390,7 +3390,7 @@ ${movie.editions.length > 1 ? `<button onclick="removeEdition(${movieIdArg}, ${i
 </div>
 </div>
 ${ed.image ? `<figure class="edition-cover-desktop">
-<img src="${safeImageUrl(ed.image)}" alt="Jaquette de ${escapeHtml(ed.title || movie.title)}" loading="lazy" onerror="this.closest('figure').style.display='none'" class="detail-edition-cover object-contain bg-black/40 rounded-xl shadow-lg border border-cyan-400/20">
+<img src="${safeImageUrl(ed.image)}" alt="Jaquette de ${escapeHtml(ed.title || movie.title)}" loading="lazy" onerror="this.closest('.edition-card').classList.remove('has-edition-cover');this.closest('figure').style.display='none'" class="detail-edition-cover object-contain bg-black/40 rounded-xl shadow-lg border border-cyan-400/20">
 <figcaption class="mt-1 text-center text-[9px] text-gray-500">Boîtier de l’édition</figcaption>
 </figure>` : ''}
 <div class="edition-form-fields grid grid-cols-2 gap-2">
