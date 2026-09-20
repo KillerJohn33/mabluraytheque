@@ -872,14 +872,7 @@ body.theme-light #incompletePanel .icon-chip { color: #b45309; }
 <div id="reader" class="w-full rounded-2xl overflow-hidden"></div>
 <button onclick="stopScanner()" class="mt-3 w-full bg-red-500/80 hover:bg-red-500 text-white py-2 rounded-xl text-xs font-semibold backdrop-blur-md transition">Fermer la caméra</button>
 </div>
-<details id="incompletePanel" class="hidden modern-panel px-3 py-1 md:px-4">
-<summary class="cursor-pointer list-none flex items-center justify-between gap-3 min-h-[40px]">
-<span class="flex items-center gap-2"><span class="icon-chip chip-sm" data-icon="alert"></span><span class="text-xs font-bold text-white">Fiches à compléter</span></span>
-<span class="flex items-center gap-2"><span id="incompleteCount" class="text-[11px] font-bold text-amber-300 rounded-full bg-amber-400/10 px-2 py-1">0</span><span class="text-gray-400 text-xs">⌄</span></span>
-</summary>
-<p class="text-[10px] text-gray-400 mt-1">Nom, format ou boîtier manquant, ou jaquette d’édition absente.</p>
-<div id="incompleteList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-3"></div>
-</details>
+
 </div>
 
 <!-- RÉSULTATS DE RECHERCHE AMÉLIORÉS DE TMDB -->
@@ -948,6 +941,11 @@ body.theme-light #incompletePanel .icon-chip { color: #b45309; }
 
 <!-- ONGLET COLLECTION AVEC FILTRES AVANCÉS -->
 <div id="tabCollection" class="hidden space-y-4">
+<div class="flex items-center justify-between gap-2">
+<button id="collectionFilterToggle" type="button" onclick="toggleCollectionFilters()" aria-expanded="false" aria-controls="collectionFilterPanel" class="glass-pill px-3 py-2 rounded-xl text-[11px] font-semibold text-cyan-300 hover:text-white flex items-center gap-2 min-h-[42px]"><span class="icon-inline w-3.5 h-3.5" data-icon="filter"></span> Filtrer <span id="activeFilterCount" class="hidden bg-cyan-400/20 text-cyan-200 rounded-full px-1.5 py-0.5 text-[9px]"></span></button>
+<button id="bulkToggle" onclick="toggleBulkMode()" class="text-[11px] text-gray-400 hover:text-cyan-300 px-2 py-2 rounded-xl min-h-[42px]" aria-expanded="false" aria-controls="bulkToolbar">Sélectionner</button>
+</div>
+<div id="collectionFilterPanel" class="hidden space-y-3">
 <!-- FILTRE RAPIDE FILMS / SÉRIES -->
 <div class="glass-card w-full p-1 rounded-2xl border border-white/10 flex items-center gap-1">
 <button id="mediaTypeAllBtn" onclick="setMediaTypeFilter('all')" class="media-type-filter-btn flex-1 py-1.5 rounded-xl text-[11px] font-semibold transition">Tous</button>
@@ -1007,7 +1005,16 @@ body.theme-light #incompletePanel .icon-chip { color: #b45309; }
 </div>
 </div>
 
-<div class="flex justify-end"><button id="bulkToggle" onclick="toggleBulkMode()" class="text-[11px] text-gray-400 hover:text-cyan-300 px-2 py-2 rounded-xl" aria-expanded="false" aria-controls="bulkToolbar">Sélectionner</button></div>
+</div>
+
+<details id="incompletePanel" class="hidden modern-panel px-3 py-1 md:px-4">
+<summary class="cursor-pointer list-none flex items-center justify-between gap-3 min-h-[40px]">
+<span class="flex items-center gap-2"><span class="icon-chip chip-sm" data-icon="alert"></span><span class="text-xs font-bold text-white">Fiches à compléter</span></span>
+<span class="flex items-center gap-2"><span id="incompleteCount" class="text-[11px] font-bold text-amber-300 rounded-full bg-amber-400/10 px-2 py-1">0</span><span class="text-gray-400 text-xs">⌄</span></span>
+</summary>
+<p class="text-[10px] text-gray-400 mt-1">Nom, format ou boîtier manquant, ou jaquette d’édition absente.</p>
+<div id="incompleteList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-3"></div>
+</details>
 <div id="bulkToolbar" class="hidden glass-card rounded-2xl border border-cyan-400/20 p-2.5 space-y-2">
 <div class="flex items-center justify-between gap-2"><span id="bulkCount" class="text-[11px] font-semibold text-cyan-200">0 sélectionné</span><div class="flex gap-1"><button onclick="selectVisibleMovies()" class="text-[10px] text-gray-300 px-2 py-2 rounded-lg hover:bg-white/10">Tout sélectionner</button><button onclick="toggleBulkMode()" class="text-[10px] text-gray-400 px-2 py-2 rounded-lg hover:bg-white/10">Annuler</button></div></div>
 <div class="flex flex-wrap items-center gap-2">
@@ -2046,8 +2053,8 @@ if (el) el.classList.add('hidden');
 
 const searchSection = document.getElementById('searchSection');
 if (searchSection) {
-if (tab === 'home' || tab === 'collection') searchSection.classList.remove('hidden');
-else searchSection.classList.add('hidden');
+searchSection.classList.toggle('hidden', tab !== 'home');
+if (tab !== 'home' && !document.getElementById('scanner-container').classList.contains('hidden')) stopScanner();
 }
 const homeMobileHero = document.getElementById('homeMobileHero');
 if (homeMobileHero) homeMobileHero.classList.toggle('hidden', tab !== 'home');
@@ -2651,6 +2658,13 @@ renderCollection();
 showToast(`${deleted} fiche${deleted > 1 ? 's' : ''} supprimée${deleted > 1 ? 's' : ''}${failed ? `, ${failed} échec${failed > 1 ? 's' : ''}` : ''}.`);
 }
 
+function toggleCollectionFilters() {
+const panel = document.getElementById('collectionFilterPanel');
+const button = document.getElementById('collectionFilterToggle');
+const open = panel.classList.toggle('hidden') === false;
+button.setAttribute('aria-expanded', String(open));
+}
+
 function renderCollection() {
 renderedTabs.collection = true;
 const grid = document.getElementById('collectionGrid');
@@ -2675,6 +2689,10 @@ filtered = filtered.filter(m => !isSeries(m));
 }
 const sortVal = document.getElementById('sortSelect').value;
 const textFilter = document.getElementById('filterText').value.toLowerCase().trim();
+const activeFilterCount = [mediaTypeFilter !== 'all', formatFilter !== 'all', seenFilter !== 'all', !!textFilter, sortVal !== 'added_desc'].filter(Boolean).length;
+const activeFilterBadge = document.getElementById('activeFilterCount');
+activeFilterBadge.textContent = activeFilterCount ? String(activeFilterCount) : '';
+activeFilterBadge.classList.toggle('hidden', !activeFilterCount);
 
 if (formatFilter !== 'all') {
 filtered = filtered.filter(m => m.editions && m.editions.some(e => e.format === formatFilter));
