@@ -859,7 +859,7 @@ body { padding-bottom: 7rem !important; }
 <!-- ONGLET ACCUEIL -->
 <div id="tabHome" class="space-y-6">
 <div class="glass-card rounded-2xl border border-white/10 p-3 md:p-4">
-<div class="flex items-center justify-between gap-3 mb-3"><div class="flex items-center gap-2"><span class="icon-chip chip-sm" data-icon="barchart"></span><h2 class="text-xs font-bold text-white">Tableau de bord</h2></div><button onclick="switchTab('stats')" class="text-[10px] font-semibold text-cyan-300 hover:text-white">Toutes les stats →</button></div>
+<div class="flex items-center justify-between gap-3 mb-3"><div class="flex items-center gap-2"><span class="icon-chip chip-sm" data-icon="notebook"></span><h2 class="text-xs font-bold text-white">Tableau de bord</h2></div><button onclick="switchTab('stats')" class="text-[10px] font-semibold text-cyan-300 hover:text-white">Toutes les stats →</button></div>
 <div id="homeDashboard" class="grid grid-cols-2 md:grid-cols-4 gap-2"></div>
 </div>
 <div>
@@ -1493,6 +1493,7 @@ body { padding-bottom: 7rem !important; }
 const ICON_SVG = {
 home: '<path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h3m6 0h3a1 1 0 001-1V10"/><path d="M9 21V12h6v9"/>',
 book: '<path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/>',
+notebook: '<rect x="5" y="2.5" width="16" height="19" rx="2"/><path d="M9 2.5v19M3 7h4M3 12h4M3 17h4M12 8h6M12 12h5"/>',
 sparkles: '<path d="M12 3l1.8 4.9L19 9.5l-4.9 1.8L12 16l-1.8-4.7L5 9.5l5.2-1.6L12 3z"/><path d="M19 15l.7 1.8L22 18l-1.8.9L19 21l-.9-2.1L16 18l2.1-.7L19 15z"/>',
 barchart: '<path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/>',
 settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>',
@@ -2402,19 +2403,19 @@ showToast(`Infos à jour (${updated} film${updated > 1 ? 's' : ''}) ✅`);
 function renderHomeDashboard() {
 const dashboard = document.getElementById('homeDashboard');
 if (!dashboard) return;
-let editions = 0, purchase = 0, seen = 0;
+let editions = 0, steelbooks = 0, estimatedValue = 0;
 collection.forEach(movie => {
-  if (movie.seen) seen++;
   (movie.editions || []).forEach(edition => {
     editions++;
-    purchase += Number(edition.purchasePrice) || 0;
+    if (String(edition.editionType || '').trim().toLowerCase() === 'steelbook') steelbooks++;
+    estimatedValue += parseFloat(edition.estimatedPrice) || 0;
   });
 });
 const tiles = [
   ['Œuvres', collection.length, 'text-cyan-300'],
   ['Éditions', editions, 'text-blue-300'],
-  ['Vus', `${seen} / ${collection.length}`, 'text-emerald-300'],
-  ["Prix d'achat", `${purchase.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €`, 'text-amber-300']
+  ['Steelbooks', steelbooks, 'text-emerald-300'],
+  ['Valeur de la collection', `${estimatedValue.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €`, 'text-amber-300']
 ];
 dashboard.innerHTML = tiles.map(([label, value, color]) =>
   `<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0"><p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold">${label}</p><p class="mt-1 text-lg md:text-xl font-black leading-tight break-words ${color}">${value}</p></div>`
