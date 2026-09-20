@@ -794,6 +794,23 @@ body { padding-bottom: 7rem !important; }
   #bulkToolbar button, #bulkToolbar select { min-height: 42px; }
   #incompleteList .incomplete-item { min-height: 72px; }
 }
+#incompletePanel {
+  background: linear-gradient(145deg, rgba(245,158,11,.16), rgba(120,53,15,.09));
+  border-color: rgba(251,191,36,.3);
+  box-shadow: inset 0 1px 0 rgba(255,237,179,.14), 0 10px 28px rgba(0,0,0,.16);
+}
+#incompletePanel::before { background: linear-gradient(90deg, transparent, rgba(251,191,36,.62), transparent); }
+#incompletePanel .icon-chip {
+  color: #fbbf24;
+  background: rgba(245,158,11,.14);
+  border-color: rgba(251,191,36,.28);
+}
+body.theme-light #incompletePanel {
+  background: linear-gradient(145deg, rgba(255,237,199,.9), rgba(254,243,221,.82));
+  border-color: rgba(217,119,6,.28);
+  box-shadow: 0 10px 28px rgba(120,53,15,.08), inset 0 1px 0 rgba(255,255,255,.8);
+}
+body.theme-light #incompletePanel .icon-chip { color: #b45309; }
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
