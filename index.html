@@ -507,6 +507,8 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
   }
 }
 
+#modalContent .edition-cover-desktop { display: none; }
+
 @media (min-width: 900px) {
   #modalContent > div { display: flex; flex-direction: column; gap: 1rem; }
   #modalContent > div > * { width: 100%; min-width: 0; margin-top: 0 !important; }
@@ -520,15 +522,21 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
   #modalContent .edition-list > * { margin-top: 0 !important; }
   #modalContent .edition-card {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.06fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-areas:
-      "heading extras"
+      "heading heading"
       "fields extras"
       "tech tech";
-    grid-template-rows: auto auto auto;
-    gap: .65rem 1rem;
+    gap: .7rem 1rem;
     min-width: 0;
     align-items: start;
+  }
+  #modalContent .edition-card.has-edition-cover {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 8.75rem;
+    grid-template-areas:
+      "heading heading cover"
+      "fields extras cover"
+      "tech tech tech";
   }
   #modalContent .edition-card > * { margin-top: 0 !important; min-width: 0; }
   #modalContent .edition-card > :first-child { grid-area: heading; }
@@ -539,6 +547,12 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
   }
   #modalContent .edition-card .edition-extra-fields { grid-area: extras; }
   #modalContent .edition-card .edition-tech-inline { grid-area: tech; }
+  #modalContent .edition-card .edition-cover-mobile { display: none; }
+  #modalContent .edition-card .edition-cover-desktop { grid-area: cover; display: block; }
+  #modalContent .edition-card .edition-cover-desktop .detail-edition-cover {
+    width: 8.75rem !important;
+    height: 13.125rem !important;
+  }
 }
 
 @media (min-width: 1200px) {
@@ -3357,7 +3371,7 @@ const metaParts = isSeriesMovie
 const genreChips = infoGenres.slice(0, 4).map(g => `<span class="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] text-gray-300">${escapeHtml(g)}</span>`).join('');
 
 const editionsHtml = movie.editions.map((ed, idx) => `
-<div class="edition-card rounded-2xl bg-white/[0.035] border border-white/10 p-3 space-y-2.5">
+<div class="edition-card ${ed.image ? 'has-edition-cover' : ''} rounded-2xl bg-white/[0.035] border border-white/10 p-3 space-y-2.5">
 <div class="flex items-start justify-between gap-3">
 <div class="min-w-0 flex-1 flex items-start gap-2.5">
 <span class="w-6 h-6 flex-shrink-0 rounded-lg bg-cyan-400/10 text-cyan-300 flex items-center justify-center text-[9px] font-bold">${idx + 1}</span>
@@ -3371,10 +3385,14 @@ ${ed.barcode ? `<p class="mt-1.5 text-[9px] text-gray-500">EAN ${escapeHtml(ed.b
 </div>
 </div>
 <div class="flex flex-shrink-0 items-start gap-1.5">
-${ed.image ? `<img src="${safeImageUrl(ed.image)}" alt="Jaquette de ${escapeHtml(ed.title || movie.title)}" loading="lazy" onerror="this.style.display='none'" class="detail-edition-cover w-16 h-24 sm:w-20 sm:h-30 object-contain bg-black/40 rounded-xl shadow-lg border border-cyan-400/20">` : ''}
+${ed.image ? `<img src="${safeImageUrl(ed.image)}" alt="Jaquette de ${escapeHtml(ed.title || movie.title)}" loading="lazy" onerror="this.style.display='none'" class="edition-cover-mobile detail-edition-cover w-16 h-24 sm:w-20 sm:h-30 object-contain bg-black/40 rounded-xl shadow-lg border border-cyan-400/20">` : ''}
 ${movie.editions.length > 1 ? `<button onclick="removeEdition(${movieIdArg}, ${idx})" class="text-gray-500 hover:text-red-400 transition p-1 rounded-lg hover:bg-red-400/10" title="Supprimer">${ic('x','w-3.5 h-3.5')}</button>` : ''}
 </div>
 </div>
+${ed.image ? `<figure class="edition-cover-desktop">
+<img src="${safeImageUrl(ed.image)}" alt="Jaquette de ${escapeHtml(ed.title || movie.title)}" loading="lazy" onerror="this.closest('.edition-card').classList.remove('has-edition-cover');this.closest('figure').style.display='none'" class="detail-edition-cover object-contain bg-black/40 rounded-xl shadow-lg border border-cyan-400/20">
+<figcaption class="mt-1 text-center text-[9px] text-gray-500">Boîtier de l’édition</figcaption>
+</figure>` : ''}
 <div class="edition-form-fields grid grid-cols-2 gap-2">
 <div>
 <label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">Nom</label>
@@ -3411,11 +3429,15 @@ ${movie.editions.length > 1 ? `<button onclick="removeEdition(${movieIdArg}, ${i
 </div>
 </div>
 <div class="edition-extra-fields space-y-1.5">
-<label class="block text-[8px] text-gray-500 uppercase tracking-wider">Édition exacte sur Blu-ray.com</label>
-<p class="text-[9px] text-gray-400"><a href="https://www.blu-ray.com/search/?quicksearch=1&amp;quicksearch_country=all&amp;quicksearch_keyword=${encodeURIComponent(movie.title)}&amp;section=bluraymovies" target="_blank" rel="noopener noreferrer" class="text-cyan-300 underline">Chercher les éditions du film</a>, puis copiez le lien de la bonne fiche ci-dessous.</p>
-<div class="flex gap-2"><input id="blurayUrl-${idx}" type="text" inputmode="url" value="${escapeHtml(ed.blurayUrl || '')}" placeholder="Collez ici le lien de l’édition" class="flex-1 min-w-0 glass-input text-white text-[10px] px-2.5 py-2 rounded-xl"><button id="blurayLoad-${idx}" onclick="attachBlurayEdition(${movieIdArg}, ${idx})" class="px-3 rounded-xl bg-cyan-400/15 text-cyan-300 text-[10px] font-semibold">Importer</button></div>
-<label class="block text-[8px] text-gray-500 uppercase tracking-wider">Photo du boîtier (URL)</label>
-<input type="url" value="${escapeHtml(ed.image || '')}" onchange="updateEditionField(${movieIdArg}, ${idx}, 'image', this.value)" placeholder="https://..." class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
+<div class="flex items-center justify-between gap-2">
+<label class="block text-[8px] text-gray-500 uppercase tracking-wider">Édition Blu-ray.com</label>
+<a href="https://www.blu-ray.com/search/?quicksearch=1&amp;quicksearch_country=all&amp;quicksearch_keyword=${encodeURIComponent(movie.title)}&amp;section=bluraymovies" target="_blank" rel="noopener noreferrer" class="text-[9px] text-cyan-300 hover:text-white">Chercher une édition ↗</a>
+</div>
+<div class="flex gap-2"><input id="blurayUrl-${idx}" type="text" inputmode="url" value="${escapeHtml(ed.blurayUrl || '')}" placeholder="Lien de l’édition exacte" class="flex-1 min-w-0 glass-input text-white text-[10px] px-2.5 py-2 rounded-xl"><button id="blurayLoad-${idx}" onclick="attachBlurayEdition(${movieIdArg}, ${idx})" class="px-3 rounded-xl bg-cyan-400/15 text-cyan-300 text-[10px] font-semibold">Importer</button></div>
+<details class="rounded-lg border border-white/10 px-2.5 py-1.5">
+<summary class="cursor-pointer text-[9px] text-gray-400">Photo personnalisée (facultatif)</summary>
+<input type="url" value="${escapeHtml(ed.image || '')}" onchange="updateEditionField(${movieIdArg}, ${idx}, 'image', this.value)" placeholder="https://..." class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl mt-2">
+</details>
 <label class="block text-[8px] text-gray-500 uppercase tracking-wider mt-2">Éditeur</label>
 <input type="text" value="${escapeHtml(ed.publisher || '')}" onchange="updateEditionField(${movieIdArg}, ${idx}, 'publisher', this.value)" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
 <label class="block text-[8px] text-gray-500 uppercase tracking-wider mt-2">Description du support</label>
