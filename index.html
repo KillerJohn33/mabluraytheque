@@ -523,6 +523,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
     grid-template-areas:
       "heading heading"
       "fields extras"
+      "discs discs"
       "tech tech";
     gap: .55rem 1rem;
     min-width: 0;
@@ -533,6 +534,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
     grid-template-areas:
       "heading heading cover"
       "fields extras cover"
+      "discs discs cover"
       "tech tech tech";
   }
   #modalContent .edition-card > * { margin-top: 0 !important; min-width: 0; }
@@ -544,6 +546,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
     align-content: stretch;
   }
   #modalContent .edition-card .edition-extra-fields { grid-area: extras; display: grid; grid-template-rows: repeat(3, minmax(0, 1fr)); gap: .5rem; }
+  #modalContent .edition-card .edition-disc-composition { grid-area: discs; }
   #modalContent .edition-card .edition-tech-inline { grid-area: tech; }
   #modalContent .edition-card .edition-cover-mobile { display: none; }
   #modalContent .edition-card .edition-cover-desktop { grid-area: cover; display: block; }
@@ -564,7 +567,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
   #wishlistGrid {
     grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
   }
-  #statsTopGrid { grid-template-columns: repeat(7, minmax(0, 1fr)) !important; }
+  #statsTopGrid { grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)) !important; }
 }
 
 /* Navigation ordinateur : onglet actif souligne */
@@ -1368,6 +1371,10 @@ body.theme-light #detailModal > div > button:first-child:hover {
 <p id="statTotalEditions" class="text-3xl font-black text-cyan-300 mt-1">0</p>
 </div>
 <div class="stat-tile text-center">
+<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Disques physiques</p>
+<p id="statTotalDiscs" class="text-3xl font-black text-purple-300 mt-1">0</p>
+</div>
+<div class="stat-tile text-center">
 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Prix d'achat</p>
 <p id="statTotalValue" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 mt-1">0 €</p>
 </div>
@@ -1434,6 +1441,23 @@ body.theme-light #detailModal > div > button:first-child:hover {
 <div id="statFormatsList" class="space-y-2 text-xs text-gray-300"></div>
 <div id="chartContainerFormat" class="hidden w-full py-2 chart-box">
 <canvas id="chartFormat"></canvas>
+</div>
+</div>
+
+<div class="modern-panel p-4 md:p-5 space-y-3">
+<div class="flex items-center gap-2">
+<span class="icon-chip" data-icon="disc"></span>
+<div>
+<h3 class="text-sm font-bold text-white">Supports physiques</h3>
+<p class="text-[11px] text-gray-400">Composition réelle des disques de vos éditions.</p>
+</div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+<div class="stat-tile text-center"><p class="text-[9px] text-gray-400 font-bold uppercase">4K UHD</p><p id="statDisc4k" class="text-xl font-black text-purple-300 mt-1">0</p></div>
+<div class="stat-tile text-center"><p class="text-[9px] text-gray-400 font-bold uppercase">Blu-ray</p><p id="statDiscBluray" class="text-xl font-black text-cyan-300 mt-1">0</p></div>
+<div class="stat-tile text-center"><p class="text-[9px] text-gray-400 font-bold uppercase">Blu-ray 3D</p><p id="statDisc3d" class="text-xl font-black text-sky-300 mt-1">0</p></div>
+<div class="stat-tile text-center"><p class="text-[9px] text-gray-400 font-bold uppercase">DVD</p><p id="statDiscDvd" class="text-xl font-black text-amber-300 mt-1">0</p></div>
+<div class="stat-tile text-center"><p class="text-[9px] text-gray-400 font-bold uppercase">Bonus</p><p id="statDiscBonus" class="text-xl font-black text-pink-300 mt-1">0</p></div>
 </div>
 </div>
 
@@ -2008,6 +2032,71 @@ function editionTitleWithoutBrand(title, brand = '') {
  return value;
 }
 
+const DISC_TYPES = [
+ { key: 'bluray4k', label: '4K UHD' },
+ { key: 'bluray', label: 'Blu-ray' },
+ { key: 'bluray3d', label: 'Blu-ray 3D' },
+ { key: 'dvd', label: 'DVD' },
+ { key: 'bonus', label: 'Bonus' }
+];
+
+function normalizeDiscComposition(value = {}) {
+ const result = {};
+ DISC_TYPES.forEach(({ key }) => {
+  const count = parseInt(value?.[key], 10);
+  result[key] = Number.isFinite(count) && count > 0 ? Math.min(count, 99) : 0;
+ });
+ return result;
+}
+
+function inferDiscComposition(label = '', fallbackFormat = '') {
+ const text = String(label || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+ const result = normalizeDiscComposition();
+ const quantity = pattern => {
+  const match = text.match(new RegExp('(\\d{1,2})\\s*(?:x\\s*)?(?:disques?\\s*)?(?:' + pattern + ')', 'i'));
+  return match ? Math.min(parseInt(match[1], 10) || 1, 99) : 1;
+ };
+ if (/blu[ -]?ray\s*3d|3d\s*blu[ -]?ray/.test(text)) result.bluray3d = quantity('blu[ -]?ray\\s*3d|3d\\s*blu[ -]?ray');
+ if (/4k|uhd/.test(text)) result.bluray4k = quantity('(?:blu[ -]?ray\\s*)?(?:4k|uhd)|(?:4k|uhd)(?:\\s*blu[ -]?ray)?');
+ const withoutSpecial = text.replace(/blu[ -]?ray\s*3d|3d\s*blu[ -]?ray|blu[ -]?ray\s*(?:4k|uhd)|(?:4k|uhd)\s*blu[ -]?ray/g, ' ');
+ if (/blu[ -]?ray|bluray/.test(withoutSpecial)) result.bluray = quantity('blu[ -]?ray|bluray');
+ if (/\bdvd\b/.test(text)) result.dvd = quantity('dvd');
+ if (/disque\s*bonus|bonus\s*disc|bonus\s*disk/.test(text)) result.bonus = quantity('(?:disque\\s*bonus|bonus\\s*disc|bonus\\s*disk)');
+ if (!Object.values(result).some(Boolean)) {
+  const format = String(fallbackFormat || '').toLowerCase();
+  if (/3d/.test(format)) result.bluray3d = 1;
+  else if (/4k|uhd/.test(format)) result.bluray4k = 1;
+  else if (/dvd/.test(format)) result.dvd = 1;
+  else result.bluray = 1;
+ }
+ return result;
+}
+
+function discCompositionTotal(edition) {
+ return Object.values(normalizeDiscComposition(edition?.discComposition)).reduce((sum, count) => sum + count, 0);
+}
+
+function editionDiscSummaryHtml(edition) {
+ const composition = normalizeDiscComposition(edition?.discComposition);
+ return DISC_TYPES.filter(type => composition[type.key]).map(type =>
+  `<span class="rounded-md bg-violet-400/10 px-1.5 py-0.5 text-[9px] text-purple-200">${composition[type.key]}× ${type.label}</span>`
+ ).join('');
+}
+
+function editionDiscEditorHtml(edition, movieIdArg, editionIdx) {
+ const composition = normalizeDiscComposition(edition?.discComposition);
+ const total = Object.values(composition).reduce((sum, count) => sum + count, 0);
+ return `<div class="edition-disc-composition rounded-xl border border-violet-400/20 bg-violet-400/[0.045] p-2.5">
+ <div class="flex items-center justify-between gap-2 mb-2">
+  <p class="text-[10px] font-semibold text-purple-200">Composition des disques</p>
+  <span id="discTotal-${editionIdx}" class="text-[9px] text-gray-400">${total} disque${total > 1 ? 's' : ''}</span>
+ </div>
+ <div class="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
+ ${DISC_TYPES.map(type => `<label class="min-w-0"><span class="block text-[8px] text-gray-500 truncate mb-1">${type.label}</span><input type="number" min="0" max="99" inputmode="numeric" value="${composition[type.key]}" onchange="updateEditionDiscCount(${movieIdArg}, ${editionIdx}, '${type.key}', this.value)" class="w-full glass-input text-white text-center text-[10px] px-1.5 py-2 rounded-lg"></label>`).join('')}
+ </div>
+ </div>`;
+}
+
 function normalizeMovieData(movie) {
 if (!movie.editions || !Array.isArray(movie.editions) || movie.editions.length === 0) {
 movie.editions = [{
@@ -2023,6 +2112,10 @@ barcode: movie.barcode || ''
 }
 movie.editions.forEach(edition => {
  edition.title = editionTitleWithoutBrand(edition.title, edition.publisher);
+ if (!edition.discComposition || typeof edition.discComposition !== 'object') {
+  edition.discComposition = inferDiscComposition(edition.title, edition.format);
+  edition.discCompositionManual = false;
+ } else edition.discComposition = normalizeDiscComposition(edition.discComposition);
 });
 return movie;
 }
@@ -3627,6 +3720,7 @@ async function loadPhysicalEditionDetails(movieId, forceIndex = -1) {
     if (!edition.title || edition.title === 'Édition Standard') edition.title = editionTitleWithoutBrand(data.title, data.publisher) || edition.title;
     if (data.title && /steelbook/i.test(data.title) && edition.editionType === 'Amaray') edition.editionType = 'Steelbook';
     if (data.title && /\b(4k|uhd|ultra hd)\b/i.test(data.title) && edition.format === 'Blu-ray 1080p') edition.format = '4K UHD';
+    if (!edition.discCompositionManual) edition.discComposition = inferDiscComposition([data.title, data.description].filter(Boolean).join(' '), edition.format);
    }
    edition.metadataFound = !!data.found;
    edition.metadataChecked = true;
@@ -3681,6 +3775,7 @@ async function attachBlurayEdition(movieId, index) {
    editionType: /steelbook/i.test(data.packaging) ? 'Steelbook' : edition.editionType,
    format: /4K/i.test(data.title) ? '4K UHD' : edition.format
   });
+  if (!edition.discCompositionManual) edition.discComposition = inferDiscComposition([data.title, data.packaging].filter(Boolean).join(' '), edition.format);
   const result = await updateMovieInCloud(movie);
   if (!result.success) { Object.assign(edition, previous); throw new Error('Enregistrement impossible'); }
   openMovieDetail(movie.id, true);
@@ -3790,6 +3885,7 @@ const editionsHtml = movie.editions.map((ed, idx) => `
 <div class="flex flex-wrap gap-1 mt-1.5">
 <span class="rounded-md bg-cyan-400/10 px-1.5 py-0.5 text-[9px] text-cyan-200">${escapeHtml(ed.format || 'Blu-ray 1080p')}</span>
 <span class="rounded-md bg-white/5 px-1.5 py-0.5 text-[9px] text-gray-300">${escapeHtml(ed.editionType || 'Amaray')}</span>
+${editionDiscSummaryHtml(ed)}
 </div>
 ${ed.barcode ? `<p class="mt-1.5 text-[9px] text-gray-500">EAN ${escapeHtml(ed.barcode)}</p>` : ''}
 </div>
@@ -3869,6 +3965,7 @@ ${ed.barcode ? `<button onclick="refreshPhysicalEdition(${movieIdArg}, ${idx})" 
 </div></details>
 
 </div>
+${editionDiscEditorHtml(ed, movieIdArg, idx)}
 <div class="edition-tech-inline rounded-xl border border-white/10 bg-white/[0.025] p-2.5">
 <p class="text-[10px] font-semibold text-cyan-300">Vidéo, audio et sous-titres</p>
 <div class="space-y-2 mt-2">
@@ -4007,11 +4104,37 @@ if (!result.success) movie.editions.splice(editionIdx, 0, removed);
 else { openMovieDetail(movieId); renderCollection(); renderWishlist(); }
 }
 
+async function updateEditionDiscCount(movieId, editionIdx, discType, value) {
+const movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+if (!movie || !movie.editions[editionIdx] || !DISC_TYPES.some(type => type.key === discType)) return;
+const edition = movie.editions[editionIdx];
+const previous = normalizeDiscComposition(edition.discComposition);
+const previousManual = !!edition.discCompositionManual;
+edition.discCompositionManual = true;
+edition.discComposition = { ...previous, [discType]: Math.min(99, Math.max(0, parseInt(value, 10) || 0)) };
+const result = await updateMovieInCloud(movie);
+if (!result.success) {
+ edition.discComposition = previous;
+ edition.discCompositionManual = previousManual;
+ openMovieDetail(movieId);
+ return;
+}
+const total = discCompositionTotal(edition);
+const totalLabel = document.getElementById(`discTotal-${editionIdx}`);
+if (totalLabel) totalLabel.textContent = `${total} disque${total > 1 ? 's' : ''}`;
+renderCollection();
+}
+
 async function updateEditionField(movieId, editionIdx, field, val) {
 let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
 if (!movie || !movie.editions[editionIdx]) return;
-const previous = movie.editions[editionIdx][field];
-movie.editions[editionIdx][field] = val;
+const edition = movie.editions[editionIdx];
+const previous = edition[field];
+const previousDiscComposition = { ...normalizeDiscComposition(edition.discComposition) };
+edition[field] = val;
+if (!edition.discCompositionManual && (field === 'title' || field === 'format')) {
+ edition.discComposition = inferDiscComposition(edition.title, edition.format);
+}
 if (field === 'barcode' && val !== previous) { movie.editions[editionIdx].metadataChecked = false; movie.editions[editionIdx].image = ''; movie.editions[editionIdx].publisher = ''; movie.editions[editionIdx].physicalDescription = ''; }
 if (field === 'barcode' && val && movie.editions.some((ed, idx) => idx !== editionIdx && String(ed.barcode || '') === String(val))) {
 movie.editions[editionIdx][field] = previous;
@@ -4020,7 +4143,7 @@ openMovieDetail(movieId);
 return;
 }
 const result = await updateMovieInCloud(movie);
-if (!result.success) { movie.editions[editionIdx][field] = previous; openMovieDetail(movieId); }
+if (!result.success) { edition[field] = previous; edition.discComposition = previousDiscComposition; openMovieDetail(movieId); }
 else { renderCollection(); renderWishlist(); if (!document.getElementById('tabCollection').classList.contains('hidden')) renderIncompletePanel(); if (!['videoCodec', 'audioTracks', 'subtitles'].includes(field)) openMovieDetail(movieId); }
 }
 
@@ -4107,6 +4230,8 @@ const totalMovies = collection.length;
 let movieCount = 0;
 let seriesCount = 0;
 let totalEditions = 0;
+let totalDiscs = 0;
+const discTotals = { bluray4k: 0, bluray: 0, bluray3d: 0, dvd: 0, bonus: 0 };
 let totalPurchaseVal = 0;
 let totalEstimatedVal = 0;
 let seenCount = 0;
@@ -4180,11 +4305,21 @@ editionsMap[type] = (editionsMap[type] || 0) + 1;
 
 const loc = ed.purchaseLocation || 'Non spécifié';
 locationsMap[loc] = (locationsMap[loc] || 0) + 1;
+
+const composition = normalizeDiscComposition(ed.discComposition);
+DISC_TYPES.forEach(({ key }) => { discTotals[key] += composition[key]; });
+totalDiscs += Object.values(composition).reduce((sum, count) => sum + count, 0);
 });
 });
 
 document.getElementById('statTotalMovies').innerText = totalMovies;
 document.getElementById('statTotalEditions').innerText = totalEditions;
+document.getElementById('statTotalDiscs').innerText = totalDiscs;
+document.getElementById('statDisc4k').innerText = discTotals.bluray4k;
+document.getElementById('statDiscBluray').innerText = discTotals.bluray;
+document.getElementById('statDisc3d').innerText = discTotals.bluray3d;
+document.getElementById('statDiscDvd').innerText = discTotals.dvd;
+document.getElementById('statDiscBonus').innerText = discTotals.bonus;
 document.getElementById('statSeenMovies').innerText = `${seenCount} / ${totalMovies}`;
 document.getElementById('statWatchTime').innerText = formatWatchTime(totalWatchMinutes);
 document.getElementById('statTotalValue').innerText = `${totalPurchaseVal.toFixed(2)} €`;
@@ -4780,6 +4915,12 @@ excelData.push({
 'Codec vidéo': ed.videoCodec || '',
 'Pistes audio': ed.audioTracks || '',
 'Sous-titres': ed.subtitles || '',
+'Disques 4K UHD': normalizeDiscComposition(ed.discComposition).bluray4k,
+'Disques Blu-ray': normalizeDiscComposition(ed.discComposition).bluray,
+'Disques Blu-ray 3D': normalizeDiscComposition(ed.discComposition).bluray3d,
+'Disques DVD': normalizeDiscComposition(ed.discComposition).dvd,
+'Disques bonus': normalizeDiscComposition(ed.discComposition).bonus,
+'Nombre total de disques': discCompositionTotal(ed),
 'Genres': genresStr,
 'Durée (minutes)': m.runtime || '',
 'Réalisateur / Créateur': m.director || '',
@@ -4806,7 +4947,7 @@ showToast("Exportation Excel terminée ! 📊");
 function exportToJSON() {
 if (collection.length === 0 && wishlist.length === 0 && trackedSeries.length === 0) return showToast("Aucune donnée à exporter.");
 const backup = {
-schemaVersion: 2,
+schemaVersion: 3,
 exportedAt: new Date().toISOString(),
 collection,
 wishlist,
@@ -5064,6 +5205,15 @@ const physicalDescription = String(row['Description du support'] || '');
 const videoCodec = String(row['Codec vidéo'] || row['Codec video'] || '');
 const audioTracks = String(row['Pistes audio'] || row['Audio'] || '');
 const subtitles = String(row['Sous-titres'] || row['Sous titres'] || '');
+const discNumber = value => Math.min(99, Math.max(0, parseInt(value, 10) || 0));
+const importedDiscComposition = normalizeDiscComposition({
+ bluray4k: discNumber(row['Disques 4K UHD'] || row['Disques 4K'] || row['4K UHD']),
+ bluray: discNumber(row['Disques Blu-ray'] || row['Blu-ray']),
+ bluray3d: discNumber(row['Disques Blu-ray 3D'] || row['Blu-ray 3D']),
+ dvd: discNumber(row['Disques DVD'] || row['DVD']),
+ bonus: discNumber(row['Disques bonus'] || row['Bonus'])
+});
+const hasImportedDiscComposition = Object.values(importedDiscComposition).some(Boolean);
 const genre = row['Genre'] || row['genre'] || row['Genres'] || '';
 const seen = parseBoolean(row['Vu'] || row['vu']);
 const listValue = row['Statut'] || row['Liste'] || row['Wishlist'];
@@ -5098,7 +5248,9 @@ const edition = {
 id: 'ed_' + Date.now() + '_' + Math.floor(Math.random() * 100000),
 title: String(editionTitle), format: String(format), editionType: String(editionType),
 purchasePrice: price, estimatedPrice, purchaseLocation: String(location), barcode,
-image: editionImage, publisher: editionPublisher, physicalDescription, videoCodec, audioTracks, subtitles, metadataChecked: !!(editionImage || editionPublisher || physicalDescription)
+image: editionImage, publisher: editionPublisher, physicalDescription, videoCodec, audioTracks, subtitles,
+discComposition: hasImportedDiscComposition ? importedDiscComposition : inferDiscComposition(editionTitle, format),
+discCompositionManual: hasImportedDiscComposition, metadataChecked: !!(editionImage || editionPublisher || physicalDescription)
 };
 
 if (existingMovie) {
