@@ -1121,6 +1121,42 @@ body.theme-light .projects-section { border-color: rgba(15,23,42,.1); }
 body.theme-light .project-empty { border-color: rgba(15,23,42,.12); }
 body.theme-light .project-type { color: #4338ca; background: rgba(99,102,241,.1); }
 
+/* Mon installation repliable sur téléphone */
+.mobile-installation-toggle { display: none; }
+@media (max-width: 767px), (hover: none) and (pointer: coarse) and (max-width: 1024px) {
+  #tabSettings .mobile-installation-toggle {
+    display: flex; align-items: center; justify-content: space-between; gap: .75rem;
+    width: 100%; min-height: 3.15rem; padding: .7rem .85rem;
+    border: 1px solid rgba(255,255,255,.09); border-radius: 1rem;
+    color: #e2e8f0; background: rgba(255,255,255,.035);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.045);
+    font-size: .72rem; text-align: left;
+  }
+  #tabSettings .mobile-installation-toggle[aria-expanded="true"] {
+    color: #cffafe; border-color: rgba(34,211,238,.18);
+    background: rgba(34,211,238,.055);
+  }
+  .mobile-installation-chevron { color: #64748b; transition: transform .2s ease, color .2s ease; }
+  .mobile-installation-toggle[aria-expanded="true"] .mobile-installation-chevron { transform: rotate(90deg); color: #67e8f9; }
+  #spaceInstallationSection:not(.mobile-expanded) { display: none !important; }
+  #spaceInstallationSection.mobile-expanded {
+    display: grid !important; gap: .7rem; padding: .8rem !important;
+    border-radius: 1rem; margin-top: -.15rem;
+  }
+  #spaceInstallationSection > .installation-heading { justify-content: flex-end; }
+  #spaceInstallationSection > .installation-heading > div:first-child { display: none; }
+  #spaceInstallationSection .equipment-card { padding: .5rem .55rem; gap: .5rem; }
+  #spaceInstallationSection .equipment-form { padding: .7rem; }
+  #spaceInstallationSection .installation-total { margin-top: .25rem; }
+  body.theme-light #tabSettings .mobile-installation-toggle {
+    color: #334155; background: rgba(255,255,255,.72); border-color: rgba(15,23,42,.1);
+    box-shadow: inset 0 1px 0 #fff;
+  }
+  body.theme-light #tabSettings .mobile-installation-toggle[aria-expanded="true"] {
+    color: #0e7490; background: rgba(6,182,212,.08); border-color: rgba(8,145,178,.18);
+  }
+}
+
 /* Sous-menu Mon espace : ordinateur uniquement */
 .space-submenu { display: none; }
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
@@ -1821,6 +1857,10 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <!-- PARAMETRES -->
 <div id="tabSettings" class="hidden modern-page">
 <div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="user"></span><h2 class="font-black text-white relative z-10">Mon espace</h2></div>
+<button id="mobileInstallationToggle" type="button" class="mobile-installation-toggle" onclick="toggleMobileInstallation()" aria-expanded="false" aria-controls="spaceInstallationSection">
+<span class="flex items-center gap-2 min-w-0"><span class="icon-inline w-4 h-4" data-icon="tv"></span><span class="font-bold">Mon installation</span><span id="mobileEquipmentCount" class="installation-count">0</span></span>
+<span class="mobile-installation-chevron icon-inline w-4 h-4" data-icon="chevronright"></span>
+</button>
 <div id="spaceInstallationSection" class="modern-panel installation-panel p-4 md:p-5">
 <div class="installation-heading">
 <div class="flex items-center gap-2 min-w-0"><span class="icon-chip" data-icon="tv"></span><h3 class="text-sm font-bold text-white">Mon installation</h3><span id="equipmentCount" class="installation-count">0</span></div>
@@ -2483,6 +2523,8 @@ function renderEquipment() {
  const equipment = normalizeProfileData(profileData).equipment;
  const count = equipmentField('equipmentCount');
  if (count) count.textContent = equipment.length;
+ const mobileCount = equipmentField('mobileEquipmentCount');
+ if (mobileCount) mobileCount.textContent = equipment.length;
  empty.classList.toggle('hidden', equipment.length > 0);
  list.replaceChildren();
  EQUIPMENT_CATEGORIES.forEach(category => {
@@ -2957,6 +2999,16 @@ applyStaticIcons();
 }
 
 // --- NAVIGATION ET TABS ---
+function toggleMobileInstallation(forceOpen) {
+ const section = document.getElementById('spaceInstallationSection');
+ const button = document.getElementById('mobileInstallationToggle');
+ if (!section || !button) return;
+ const open = typeof forceOpen === 'boolean' ? forceOpen : !section.classList.contains('mobile-expanded');
+ section.classList.toggle('mobile-expanded', open);
+ button.setAttribute('aria-expanded', String(open));
+ if (open) setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
+}
+
 function applySpaceSection(section = 'installation') {
  activeSpaceSection = section === 'options' ? 'options' : 'installation';
  const desktop = window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine)').matches;
