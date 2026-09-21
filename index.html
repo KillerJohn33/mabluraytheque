@@ -1041,44 +1041,74 @@ body.theme-light .equipment-notes { border-color: rgba(15,23,42,.1); }
   #spaceSubmenu {
     position: absolute;
     z-index: 60;
-    top: calc(100% - 1px);
+    top: 100%;
     right: 1.5rem;
-    width: 16rem;
-    padding: .45rem;
-    border-radius: 1rem;
-    background: rgba(10, 13, 20, .97);
-    border: 1px solid rgba(255,255,255,.13);
-    box-shadow: 0 16px 36px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.08);
-    backdrop-filter: blur(20px);
+    width: 15rem;
+    padding: .22rem .45rem .38rem;
+    border: 0;
+    border-top: 1px solid rgba(255,255,255,.06);
+    border-radius: 0 0 .7rem .7rem;
+    background: #08090d;
+    box-shadow: 0 9px 16px rgba(0,0,0,.22);
   }
   #tabSettingsBtn:hover + #spaceSubmenu,
   #tabSettingsBtn:focus-visible + #spaceSubmenu,
   #spaceSubmenu:hover,
-  #spaceSubmenu:focus-within { display: grid; gap: .25rem; }
+  #spaceSubmenu:focus-within { display: grid; gap: 0; }
   #spaceSubmenu > button {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: .7rem;
+    justify-content: flex-start;
+    gap: .55rem;
     width: 100%;
-    padding: .7rem .75rem;
-    border-radius: .75rem;
-    color: #94a3b8;
+    min-height: 2.55rem;
+    padding: .55rem .65rem !important;
+    border: 0 !important;
+    border-radius: .45rem;
+    color: #aeb7c5;
+    background: transparent;
     text-align: left;
-    transition: color .16s ease, background .16s ease;
+    transition: color .2s ease;
   }
   #spaceSubmenu > button:hover,
-  #spaceSubmenu > button.is-active { color: #cffafe; background: rgba(34,211,238,.1); }
-  #spaceSubmenu strong { display: block; color: inherit; font-size: .72rem; line-height: 1rem; }
-  #spaceSubmenu small { display: block; margin-top: .08rem; color: #64748b; font-size: .58rem; line-height: .8rem; }
-  body.theme-light #spaceSubmenu {
-    background: rgba(248,250,252,.98);
-    border-color: rgba(15,23,42,.14);
-    box-shadow: 0 16px 34px rgba(15,23,42,.15), inset 0 1px 0 #fff;
+  #spaceSubmenu > button.is-active {
+    color: #fff !important;
+    background: transparent;
+    font-weight: 700;
   }
-  body.theme-light #spaceSubmenu > button { color: #475569; }
+  #spaceSubmenu > button.is-active::after {
+    content: "";
+    position: absolute;
+    left: .65rem;
+    right: .65rem;
+    bottom: .18rem;
+    height: 2px;
+    border-radius: 2px;
+    background: rgba(34,211,238,.58);
+  }
+  #spaceSubmenu > button .icon-inline,
+  #spaceSubmenu > button .icon-inline svg {
+    width: 1rem;
+    height: 1rem;
+    flex: none;
+  }
+  #spaceSubmenu strong {
+    display: block;
+    color: inherit;
+    font-size: .76rem;
+    line-height: 1rem;
+    font-weight: inherit;
+  }
+  #spaceSubmenu small { display: none; }
+  body.theme-light #spaceSubmenu {
+    background: #08090d;
+    border-top-color: rgba(255,255,255,.06);
+    box-shadow: 0 9px 16px rgba(0,0,0,.22);
+  }
+  body.theme-light #spaceSubmenu > button { color: #aeb7c5 !important; }
   body.theme-light #spaceSubmenu > button:hover,
-  body.theme-light #spaceSubmenu > button.is-active { color: #075985; background: rgba(14,165,233,.12); }
-  body.theme-light #spaceSubmenu small { color: #64748b; }
+  body.theme-light #spaceSubmenu > button.is-active { color: #fff !important; }
 }
 </style>
 </head>
