@@ -1157,6 +1157,37 @@ body.theme-light .project-type { color: #4338ca; background: rgba(99,102,241,.1)
   }
 }
 
+/* Options repliables et correction de largeur sur téléphone */
+@media (max-width: 767px), (hover: none) and (pointer: coarse) and (max-width: 1024px) {
+  #spaceOptionsHeading { display: none !important; }
+  #tabSettings:not(.mobile-options-expanded) .space-options-panel:not(#spaceOptionsHeading) { display: none !important; }
+  #tabSettings { min-width: 0; max-width: 100%; overflow-x: hidden; }
+  #spaceInstallationSection,
+  #spaceInstallationSection > *,
+  #spaceInstallationSection .equipment-group,
+  #spaceInstallationSection .equipment-group-items { min-width: 0; max-width: 100%; }
+  #spaceInstallationSection .equipment-group .equipment-card {
+    position: relative; display: flex; width: 100%; min-width: 0;
+    padding-right: 4.15rem !important; overflow: hidden;
+  }
+  #spaceInstallationSection .equipment-group .equipment-card > div.min-w-0 { min-width: 0; overflow: hidden; }
+  #spaceInstallationSection .equipment-group .equipment-actions {
+    position: absolute; top: .38rem; right: .38rem;
+  }
+  #spaceInstallationSection .equipment-group .equipment-price {
+    position: absolute; right: .48rem; bottom: .38rem;
+    max-width: 3.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font-size: .55rem;
+  }
+  #spaceInstallationSection .equipment-form,
+  #spaceInstallationSection .equipment-form input,
+  #spaceInstallationSection .equipment-form select,
+  #spaceInstallationSection .equipment-form textarea { min-width: 0; max-width: 100%; }
+  #spaceInstallationSection .project-card { min-width: 0; max-width: 100%; overflow: hidden; }
+  #spaceInstallationSection .project-card > div { min-width: 0; }
+  #bottomTabSettingsBtn .bottom-nav-label { font-size: .58rem; white-space: nowrap; }
+}
+
 /* Sous-menu Mon espace : ordinateur uniquement */
 .space-submenu { display: none; }
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
@@ -1907,6 +1938,10 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 </section>
 </div>
 
+<button id="mobileOptionsToggle" type="button" class="mobile-installation-toggle" onclick="toggleMobileOptions()" aria-expanded="false" aria-controls="spaceOptionsHeading">
+<span class="flex items-center gap-2 min-w-0"><span class="icon-inline w-4 h-4" data-icon="settings"></span><span class="font-bold">Options</span></span>
+<span class="mobile-installation-chevron icon-inline w-4 h-4" data-icon="chevronright"></span>
+</button>
 <div id="spaceOptionsHeading" class="space-options-panel flex items-center gap-2 px-1 pt-1"><span class="icon-chip chip-sm" data-icon="settings"></span><div><h3 class="text-sm font-bold text-white">Options de l’application</h3><p class="text-[11px] text-gray-400">Préférences, synchronisation, sauvegardes et configuration.</p></div></div>
 
 <div class="modern-panel space-options-panel p-4 md:p-5 space-y-3">
@@ -2082,7 +2117,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 </button>
 <button id="bottomTabSettingsBtn" onclick="switchTab('settings')" class="bottom-nav-btn">
 <span class="icon-inline w-8 h-8" data-icon="user"></span>
-<span class="bottom-nav-label">Espace</span>
+<span class="bottom-nav-label">Mon espace</span>
 </button>
 </nav>
 
@@ -3007,6 +3042,16 @@ function toggleMobileInstallation(forceOpen) {
  section.classList.toggle('mobile-expanded', open);
  button.setAttribute('aria-expanded', String(open));
  if (open) setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
+}
+
+function toggleMobileOptions(forceOpen) {
+ const tab = document.getElementById('tabSettings');
+ const button = document.getElementById('mobileOptionsToggle');
+ if (!tab || !button) return;
+ const open = typeof forceOpen === 'boolean' ? forceOpen : !tab.classList.contains('mobile-options-expanded');
+ tab.classList.toggle('mobile-options-expanded', open);
+ button.setAttribute('aria-expanded', String(open));
+ if (open) setTimeout(() => button.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
 }
 
 function applySpaceSection(section = 'installation') {
