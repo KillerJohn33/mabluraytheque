@@ -1716,6 +1716,10 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <p id="statTotalDiscs" class="text-3xl font-black text-purple-300 mt-1">0</p>
 </div>
 <div class="stat-tile text-center">
+<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Coffrets Collector</p>
+<p id="statCollectorBoxes" class="text-3xl font-black text-amber-300 mt-1">0</p>
+</div>
+<div class="stat-tile text-center">
 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Prix d'achat</p>
 <p id="statTotalValue" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 mt-1">0 €</p>
 </div>
@@ -5083,6 +5087,7 @@ let movieCount = 0;
 let seriesCount = 0;
 let totalEditions = 0;
 let totalDiscs = 0;
+let collectorBoxCount = 0;
 const discTotals = { bluray4k: 0, bluray: 0, bluray3d: 0, dvd: 0, bonus: 0 };
 let totalPurchaseVal = 0;
 let totalEstimatedVal = 0;
@@ -5154,6 +5159,7 @@ formatsMap[fmt] = (formatsMap[fmt] || 0) + 1;
 
 const type = ed.editionType || 'Amaray';
 editionsMap[type] = (editionsMap[type] || 0) + 1;
+if (String(type).trim().toLowerCase() === 'coffret collector') collectorBoxCount++;
 
 const loc = ed.purchaseLocation || 'Non spécifié';
 locationsMap[loc] = (locationsMap[loc] || 0) + 1;
@@ -5167,6 +5173,7 @@ totalDiscs += Object.values(composition).reduce((sum, count) => sum + count, 0);
 document.getElementById('statTotalMovies').innerText = totalMovies;
 document.getElementById('statTotalEditions').innerText = totalEditions;
 document.getElementById('statTotalDiscs').innerText = totalDiscs;
+document.getElementById('statCollectorBoxes').innerText = collectorBoxCount;
 document.getElementById('statSeenMovies').innerText = `${seenCount} / ${totalMovies}`;
 document.getElementById('statWatchTime').innerText = formatWatchTime(totalWatchMinutes);
 document.getElementById('statTotalValue').innerText = `${totalPurchaseVal.toFixed(2)} €`;
