@@ -1446,18 +1446,15 @@ body.theme-light #detailModal > div > button:first-child:hover {
 
 <div class="modern-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
-<span class="icon-chip" data-icon="disc"></span>
+<span class="icon-chip" data-icon="pie"></span>
 <div>
 <h3 class="text-sm font-bold text-white">Supports physiques</h3>
-<p class="text-[11px] text-gray-400">Composition réelle des disques de vos éditions.</p>
+<p class="text-[11px] text-gray-400">Nombre réel de disques 4K, Blu-ray, 3D, DVD et bonus.</p>
 </div>
 </div>
-<div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
-<div class="stat-tile text-center"><p class="text-[9px] text-gray-400 font-bold uppercase">4K UHD</p><p id="statDisc4k" class="text-xl font-black text-purple-300 mt-1">0</p></div>
-<div class="stat-tile text-center"><p class="text-[9px] text-gray-400 font-bold uppercase">Blu-ray</p><p id="statDiscBluray" class="text-xl font-black text-cyan-300 mt-1">0</p></div>
-<div class="stat-tile text-center"><p class="text-[9px] text-gray-400 font-bold uppercase">Blu-ray 3D</p><p id="statDisc3d" class="text-xl font-black text-sky-300 mt-1">0</p></div>
-<div class="stat-tile text-center"><p class="text-[9px] text-gray-400 font-bold uppercase">DVD</p><p id="statDiscDvd" class="text-xl font-black text-amber-300 mt-1">0</p></div>
-<div class="stat-tile text-center"><p class="text-[9px] text-gray-400 font-bold uppercase">Bonus</p><p id="statDiscBonus" class="text-xl font-black text-pink-300 mt-1">0</p></div>
+<div id="statPhysicalSupportsList" class="space-y-2 text-xs text-gray-300"></div>
+<div id="chartContainerPhysicalSupports" class="hidden w-full py-2 chart-box">
+<canvas id="chartPhysicalSupports"></canvas>
 </div>
 </div>
 
@@ -4315,11 +4312,6 @@ totalDiscs += Object.values(composition).reduce((sum, count) => sum + count, 0);
 document.getElementById('statTotalMovies').innerText = totalMovies;
 document.getElementById('statTotalEditions').innerText = totalEditions;
 document.getElementById('statTotalDiscs').innerText = totalDiscs;
-document.getElementById('statDisc4k').innerText = discTotals.bluray4k;
-document.getElementById('statDiscBluray').innerText = discTotals.bluray;
-document.getElementById('statDisc3d').innerText = discTotals.bluray3d;
-document.getElementById('statDiscDvd').innerText = discTotals.dvd;
-document.getElementById('statDiscBonus').innerText = discTotals.bonus;
 document.getElementById('statSeenMovies').innerText = `${seenCount} / ${totalMovies}`;
 document.getElementById('statWatchTime').innerText = formatWatchTime(totalWatchMinutes);
 document.getElementById('statTotalValue').innerText = `${totalPurchaseVal.toFixed(2)} €`;
@@ -4348,6 +4340,15 @@ document.getElementById('statAvgPriceMovie').innerText = `${avgPriceMovie.toFixe
 document.getElementById('statAvgPriceEdition').innerText = `${avgPriceEdition.toFixed(2)} €`;
 
 renderStatListAndChart('Format', formatsMap, 'statFormatsList', 'chartContainerFormat', 'chartFormat');
+const physicalSupportsMap = {
+ '4K UHD': discTotals.bluray4k,
+ 'Blu-ray': discTotals.bluray,
+ 'Blu-ray 3D': discTotals.bluray3d,
+ 'DVD': discTotals.dvd,
+ 'Disques bonus': discTotals.bonus
+};
+Object.keys(physicalSupportsMap).forEach(key => { if (!physicalSupportsMap[key]) delete physicalSupportsMap[key]; });
+renderStatListAndChart('Support', physicalSupportsMap, 'statPhysicalSupportsList', 'chartContainerPhysicalSupports', 'chartPhysicalSupports');
 renderStatListAndChart('Boîtier', editionsMap, 'statEditionsList', 'chartContainerEdition', 'chartEdition');
 renderStatListAndChart('Lieu', locationsMap, 'statLocationsList', 'chartContainerLocation', 'chartLocation');
 renderStatListAndChart('Genre', genresMap, 'statGenresList', 'chartContainerGenre', 'chartGenre');
