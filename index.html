@@ -1018,13 +1018,26 @@ body.theme-light #detailModal > div > button:first-child:hover {
 </div>
 </div>
 
-<button onclick="toggleScanner()" class="app-action app-action-cyan w-full px-3 py-2.5 text-xs">
-<span class="icon-chip chip-sm" data-icon="camera"></span> <span>Scanner un code-barres</span>
+<div class="grid grid-cols-2 gap-2">
+<button onclick="toggleScanner()" class="app-action app-action-cyan w-full px-2 py-2.5 text-xs">
+<span class="icon-chip chip-sm" data-icon="camera"></span> <span>Scanner un film</span>
 </button>
+<button onclick="toggleBatchScanner()" class="app-action app-action-violet w-full px-2 py-2.5 text-xs">
+<span class="icon-chip chip-sm" data-icon="disc"></span> <span>Scan à la chaîne</span>
+</button>
+</div>
 
 <div id="scanner-container" class="hidden glass-card p-4 rounded-3xl border border-white/20 overflow-hidden">
 <div id="reader" class="w-full rounded-2xl overflow-hidden"></div>
-<button onclick="stopScanner()" class="app-action app-action-red mt-3 w-full py-2 text-xs">Fermer la caméra</button>
+<button id="stopScannerBtn" onclick="stopScanner()" class="app-action app-action-red mt-3 w-full py-2 text-xs">Fermer la caméra</button>
+</div>
+<div id="batchScanPanel" class="hidden glass-card rounded-2xl p-3 border border-violet-400/25 space-y-2" aria-live="polite">
+<div class="flex items-center justify-between gap-2">
+<span class="text-xs font-bold text-purple-300 flex items-center gap-1.5"><span class="icon-inline w-4 h-4" data-icon="disc"></span> Inventaire express</span>
+<span id="batchScanCount" class="text-[11px] font-bold text-white">0 ajouté</span>
+</div>
+<p id="batchScanHint" class="text-[11px] text-gray-400">Les films reconnus sont ajoutés automatiquement. Les codes incertains restent à vérifier.</p>
+<div id="batchScanList" class="space-y-1.5 max-h-48 overflow-y-auto"></div>
 </div>
 
 </div>
@@ -1828,6 +1841,12 @@ let isListView = false;
 let isWishlistListView = false;
 let html5QrcodeScanner = null;
 let barcodeScanBusy = false;
+let batchScanActive = false;
+let batchScanSeen = new Set();
+let batchScanQueue = [];
+let batchScanProcessing = false;
+let batchScanAdded = 0;
+let batchScanEntries = [];
 const renderedTabs = { collection: false, wishlist: false, series: false };
 let chartInstances = {};
 let statsShowCharts = true;
@@ -2400,11 +2419,24 @@ return sameType && sameTitle && normalizedTitle && (!year || !movieYear || year 
 });
 }
 
-async function addMovieFromTMDB(tmdbData, isWishlist = false) {
+async function addMovieFromTMDB(tmdbData, isWishlist = false, options = {}) {
 const isTv = tmdbData.media_type === 'tv' || !!tmdbData.first_air_date;
 const title = tmdbData.title || tmdbData.name || 'Sans titre';
 const releaseDateForMatch = tmdbData.release_date || tmdbData.first_air_date || '';
 const existingWork = findExistingWork(tmdbData, isTv, title, releaseDateForMatch);
+if (options.batch && existingWork && !isWishlist && !existingWork.isWishlist) {
+ normalizeMovieData(existingWork);
+ const barcode = String(options.barcode || '').replace(/\D/g, '');
+ if (existingWork.editions.some(ed => barcode && canonicalBarcode(ed.barcode) === canonicalBarcode(barcode))) return 'duplicate';
+ const scannedTitle = options.productTitle || '';
+ const format = /4k|uhd/i.test(scannedTitle) ? '4K UHD' : (/dvd/i.test(scannedTitle) && !/blu-ray/i.test(scannedTitle) ? 'DVD' : 'Blu-ray 1080p');
+ const editionType = /steelbook/i.test(scannedTitle) ? 'Steelbook' : (/coffret|boxset|box set/i.test(scannedTitle) ? 'Coffret' : 'Amaray');
+ existingWork.editions.push({ id: 'ed_' + Date.now() + '_' + Math.floor(Math.random() * 1000), title: scannedTitle || 'Nouvelle édition', format, editionType, barcode, purchasePrice: '', estimatedPrice: '', purchaseLocation: 'Fnac' });
+ const result = await updateMovieInCloud(existingWork);
+ if (!result.success) { existingWork.editions.pop(); return 'error'; }
+ renderCollection();
+ return 'added';
+}
 if (existingWork && !isWishlist && !existingWork.isWishlist) {
 normalizeMovieData(existingWork);
 if (window.lastScannedBarcode) {
@@ -2432,7 +2464,7 @@ return;
 const existsIn = collection.some(m => m.tmdb_id === tmdbData.id && isSeries(m) === isTv) ? 'votre collection'
 : wishlist.some(m => m.tmdb_id === tmdbData.id && isSeries(m) === isTv) ? 'votre wishlist' : null;
 
-if (existsIn) {
+if (existsIn && !options.batch) {
 const confirmAdd = confirm(`"${title}" est déjà présent dans ${existsIn}. Voulez-vous quand même l'ajouter en double ?`);
 if (!confirmAdd) return;
 }
@@ -2504,7 +2536,14 @@ addedAt: new Date().toISOString(),
 editions: [{ id: 'ed_' + Date.now(), title: 'Édition Standard', format: 'Blu-ray 1080p', editionType: 'Amaray', barcode: '', purchasePrice: '', estimatedPrice: '', purchaseLocation: 'Fnac' }]
 };
 
-if (window.lastScannedBarcode) {
+if (options.batch) {
+movie.editions[0].barcode = String(options.barcode || '').replace(/\D/g, '');
+if (options.productTitle) {
+  movie.editions[0].title = options.productTitle;
+  movie.editions[0].format = /4k|uhd/i.test(options.productTitle) ? '4K UHD' : (/dvd/i.test(options.productTitle) && !/blu-ray/i.test(options.productTitle) ? 'DVD' : 'Blu-ray 1080p');
+  movie.editions[0].editionType = /steelbook/i.test(options.productTitle) ? 'Steelbook' : (/coffret|boxset|box set/i.test(options.productTitle) ? 'Coffret' : 'Amaray');
+}
+} else if (window.lastScannedBarcode) {
 movie.editions[0].barcode = window.lastScannedBarcode;
 if (window.lastScannedProductTitle) {
   movie.editions[0].title = window.lastScannedProductTitle;
@@ -2519,8 +2558,10 @@ const saveResult = await saveMovieToCloud(movie);
 if (saveResult?.success && saveResult.cloudId) {
 movie.cloud_id = saveResult.cloudId;
 if (isWishlist) { wishlist.push(movie); renderWishlist(); showToast("Ajouté à la Wishlist ! ✨"); }
-else { collection.push(movie); renderCollection(); showToast("Ajouté à la Collection ! 💿"); }
+else { collection.push(movie); renderCollection(); if (!options.batch) showToast("Ajouté à la Collection ! 💿"); }
+return 'added';
 }
+return 'error';
 }
 
 // --- RAFRAÎCHISSEMENT RÉTROACTIF DES INFOS TMDB ---
@@ -4339,10 +4380,39 @@ document.getElementById('settingsWishlistCount').innerText = wishlist.length;
 function toggleScanner() {
 const container = document.getElementById('scanner-container');
 if (container.classList.contains('hidden')) {
+batchScanActive = false;
 container.classList.remove('hidden');
+document.getElementById('stopScannerBtn').textContent = 'Fermer la caméra';
 startScanner();
+} else if (batchScanActive) {
+batchScanActive = false;
+document.getElementById('stopScannerBtn').textContent = 'Fermer la caméra';
+showToast('Scan simple activé.');
 } else {
 stopScanner();
+}
+}
+
+function toggleBatchScanner() {
+const container = document.getElementById('scanner-container');
+if (batchScanActive && !container.classList.contains('hidden')) {
+stopScanner();
+return;
+}
+batchScanActive = true;
+if (!batchScanProcessing && !batchScanQueue.length) {
+batchScanSeen = new Set();
+batchScanAdded = 0;
+batchScanEntries = [];
+document.getElementById('batchScanList').replaceChildren();
+document.getElementById('batchScanCount').textContent = '0 ajouté';
+}
+document.getElementById('batchScanPanel').classList.remove('hidden');
+document.getElementById('batchScanHint').textContent = 'Les films reconnus sont ajoutés automatiquement. Les codes incertains restent à vérifier.';
+document.getElementById('stopScannerBtn').textContent = 'Terminer le scan à la chaîne';
+if (container.classList.contains('hidden')) {
+container.classList.remove('hidden');
+startScanner();
 }
 }
 
@@ -4351,12 +4421,14 @@ barcodeScanBusy = false;
 // Vérifications préalables spécifiques à iOS / Safari
 if (!window.isSecureContext) {
 showToast("⚠️ La caméra nécessite une connexion sécurisée (HTTPS).");
+batchScanActive = false;
 document.getElementById('scanner-container').classList.add('hidden');
 return;
 }
 
 if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
 showToast("⚠️ Ce navigateur ne permet pas l'accès à la caméra.");
+batchScanActive = false;
 document.getElementById('scanner-container').classList.add('hidden');
 return;
 }
@@ -4394,6 +4466,7 @@ showToast("⚠️ La caméra est déjà utilisée par une autre application.");
 } else {
 showToast("Impossible d'ouvrir la caméra. Vérifiez les autorisations dans Réglages.");
 }
+batchScanActive = false;
 document.getElementById('scanner-container').classList.add('hidden');
 }
 
@@ -4402,6 +4475,7 @@ try {
 const cameras = await Html5Qrcode.getCameras();
 if (!cameras || cameras.length === 0) {
 showToast("📷 Aucune caméra détectée.");
+batchScanActive = false;
 document.getElementById('scanner-container').classList.add('hidden');
 return;
 }
@@ -4415,19 +4489,22 @@ onScanSuccess
 } catch (err2) {
 console.error("Erreur scanner (fallback):", err2);
 showToast("Impossible d'ouvrir la caméra. Vérifiez les autorisations dans Réglages.");
+batchScanActive = false;
 document.getElementById('scanner-container').classList.add('hidden');
 }
 }
 
 function stopScanner() {
-if (html5QrcodeScanner) {
-html5QrcodeScanner.stop().then(() => {
-document.getElementById('scanner-container').classList.add('hidden');
-}).catch(() => {
-document.getElementById('scanner-container').classList.add('hidden');
-});
-} else {
-document.getElementById('scanner-container').classList.add('hidden');
+batchScanActive = false;
+document.getElementById('stopScannerBtn').textContent = 'Fermer la caméra';
+const scanner = html5QrcodeScanner;
+html5QrcodeScanner = null;
+const container = document.getElementById('scanner-container');
+if (scanner) {
+scanner.stop().catch(() => {}).finally(() => container.classList.add('hidden'));
+} else container.classList.add('hidden');
+if (batchScanProcessing || batchScanQueue.length) {
+document.getElementById('batchScanHint').textContent = 'Caméra fermée. Les films déjà lus terminent leur enregistrement.';
 }
 }
 
@@ -4501,7 +4578,144 @@ async function searchTmdbFromBarcodeProduct(product, searchCache = new Map()) {
  return suggestion;
 }
 
+function canonicalBarcode(value) {
+const code = String(value || '').replace(/\D/g, '');
+return code.length === 13 && code.startsWith('0') ? code.slice(1) : code;
+}
+
+function updateBatchScanEntry(entry, status, title = '', poster = '') {
+entry.status = status;
+if (title) entry.title = title;
+if (poster) entry.poster = poster;
+const row = entry.element;
+if (!row) return;
+row.replaceChildren();
+row.className = 'flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-2.5 py-2 min-w-0';
+if (entry.poster) {
+ const img = document.createElement('img');
+ img.src = safeImageUrl(entry.poster);
+ img.alt = '';
+ img.loading = 'lazy';
+ img.className = 'w-8 h-11 rounded object-cover flex-none';
+ row.appendChild(img);
+}
+const body = document.createElement('div');
+body.className = 'min-w-0 flex-1';
+const name = document.createElement('p');
+name.className = 'text-[11px] font-bold text-white truncate';
+name.textContent = entry.title;
+const detail = document.createElement('p');
+detail.className = 'text-[10px] text-gray-400';
+detail.textContent = entry.barcode;
+body.append(name, detail);
+row.appendChild(body);
+const badge = document.createElement('span');
+badge.className = 'text-[10px] font-bold flex-none ' + ({ added: 'text-emerald-300', duplicate: 'text-amber-300', review: 'text-amber-300', error: 'text-red-300', saving: 'text-cyan-300' }[status] || 'text-purple-300');
+badge.textContent = { queued: 'En attente', searching: 'Recherche…', saving: 'Enregistrement…', added: 'Ajouté', duplicate: 'Déjà présent', review: 'À vérifier', error: 'Erreur' }[status] || status;
+row.appendChild(badge);
+if (status === 'review' || status === 'error') {
+ const button = document.createElement('button');
+ button.type = 'button';
+ button.className = 'app-action app-action-amber min-h-8 px-2 text-[10px] flex-none';
+ button.textContent = 'Rechercher';
+ button.addEventListener('click', () => reviewBatchBarcode(entry.barcode));
+ row.appendChild(button);
+}
+const attention = batchScanEntries.filter(item => item.status === 'review' || item.status === 'error').length;
+const waiting = batchScanEntries.filter(item => ['queued', 'searching', 'saving'].includes(item.status)).length;
+document.getElementById('batchScanCount').textContent = `${batchScanAdded} ajouté${batchScanAdded > 1 ? 's' : ''}${waiting ? ` · ${waiting} en cours` : ''}${attention ? ` · ${attention} à vérifier` : ''}`;
+}
+
+function queueBatchBarcode(decodedText) {
+const barcode = String(decodedText || '').replace(/\D/g, '');
+if (!/^\d{8,14}$/.test(barcode)) return;
+const key = canonicalBarcode(barcode);
+if (batchScanSeen.has(key)) return;
+batchScanSeen.add(key);
+const entry = { barcode, title: barcode, status: 'queued', poster: '', element: document.createElement('div') };
+batchScanEntries.push(entry);
+const list = document.getElementById('batchScanList');
+list.prepend(entry.element);
+while (list.children.length > 30) list.lastChild.remove();
+navigator.vibrate?.(45);
+if (collection.some(movie => (movie.editions || []).some(ed => canonicalBarcode(ed.barcode) === key))) {
+ updateBatchScanEntry(entry, 'duplicate');
+ return;
+}
+updateBatchScanEntry(entry, 'queued');
+batchScanQueue.push(entry);
+processBatchScanQueue();
+}
+
+async function processBatchScanQueue() {
+if (batchScanProcessing) return;
+batchScanProcessing = true;
+while (batchScanQueue.length) {
+ const entry = batchScanQueue.shift();
+ try {
+  updateBatchScanEntry(entry, 'searching');
+  const { match, productTitle } = await identifyScannedBarcode(entry.barcode);
+  const movie = match?.confident && match.results?.[0]?.media_type === 'movie' ? match.results[0] : null;
+  if (!movie) {
+   updateBatchScanEntry(entry, 'review');
+   continue;
+  }
+  updateBatchScanEntry(entry, 'saving', movie.title || productTitle || entry.barcode, movie.poster_path ? `https://image.tmdb.org/t/p/w200${movie.poster_path}` : '');
+  const result = await addMovieFromTMDB(movie, false, { batch: true, barcode: entry.barcode, productTitle });
+  if (result === 'added') {
+   batchScanAdded++;
+   updateBatchScanEntry(entry, 'added');
+  } else updateBatchScanEntry(entry, result === 'duplicate' ? 'duplicate' : 'error');
+ } catch (error) {
+  console.error('Erreur pendant le scan à la chaîne :', error);
+  updateBatchScanEntry(entry, 'error');
+ }
+}
+batchScanProcessing = false;
+if (!batchScanActive) document.getElementById('batchScanHint').textContent = 'Scan terminé. Les films à vérifier peuvent être recherchés individuellement.';
+}
+
+function reviewBatchBarcode(barcode) {
+batchScanActive = false;
+if (!document.getElementById('scanner-container').classList.contains('hidden')) stopScanner();
+barcodeScanBusy = false;
+onScanSuccess(barcode);
+}
+
+async function identifyScannedBarcode(barcode) {
+let product = null;
+let match = null;
+const tmdbSearchCache = new Map();
+try {
+ const productRes = await fetch(`/api/barcode?code=${encodeURIComponent(barcode)}`, { cache: 'no-store' });
+ const productData = await productRes.json().catch(() => ({}));
+ if (!productRes.ok) throw new Error(productData.error || `Erreur ${productRes.status}`);
+ if (productData.found && productData.product) {
+  product = productData.product;
+  match = await searchTmdbFromBarcodeProduct(product, tmdbSearchCache);
+ }
+ if ((!match || !match.confident) && product?.source !== 'Go-UPC') {
+  const fallbackRes = await fetch(`/api/barcode?code=${encodeURIComponent(barcode)}&source=go-upc`, { cache: 'no-store' });
+  if (fallbackRes.ok) {
+   const fallback = await fallbackRes.json();
+   if (fallback.found && fallback.product) {
+    product = fallback.product;
+    const alternative = await searchTmdbFromBarcodeProduct(product, tmdbSearchCache);
+    if (alternative?.confident || (!match && alternative)) match = alternative;
+   }
+  }
+ }
+} catch (error) {
+ console.warn('Identification du code-barres indisponible :', error);
+}
+return { product, match, productTitle: product ? editionTitleWithoutBrand(product.title, product.brand) : '' };
+}
+
 async function onScanSuccess(decodedText) {
+if (batchScanActive) {
+ queueBatchBarcode(decodedText);
+ return;
+}
 if (barcodeScanBusy) return;
 barcodeScanBusy = true;
 stopScanner();
@@ -4514,34 +4728,8 @@ if (!/^\d{8,14}$/.test(barcode)) {
 window.lastScannedBarcode = barcode;
 window.lastScannedProductTitle = '';
 showToast(`Code ${barcode} lu. Identification en cours…`);
-
-let product = null;
-let match = null;
-const tmdbSearchCache = new Map();
-try {
- const productRes = await fetch(`/api/barcode?code=${encodeURIComponent(barcode)}`, { cache: 'no-store' });
- const productData = await productRes.json().catch(() => ({}));
- if (!productRes.ok) throw new Error(productData.error || `Erreur ${productRes.status}`);
- if (productData.found && productData.product) {
-  product = productData.product;
-  window.lastScannedProductTitle = editionTitleWithoutBrand(product.title, product.brand);
-  match = await searchTmdbFromBarcodeProduct(product, tmdbSearchCache);
- }
- if ((!match || !match.confident) && product?.source !== 'Go-UPC') {
-  const fallbackRes = await fetch(`/api/barcode?code=${encodeURIComponent(barcode)}&source=go-upc`, { cache: 'no-store' });
-  if (fallbackRes.ok) {
-   const fallback = await fallbackRes.json();
-   if (fallback.found && fallback.product) {
-    product = fallback.product;
-    window.lastScannedProductTitle = editionTitleWithoutBrand(product.title, product.brand) || window.lastScannedProductTitle;
-    const alternative = await searchTmdbFromBarcodeProduct(product, tmdbSearchCache);
-    if (alternative?.confident || (!match && alternative)) match = alternative;
-   }
-  }
- }
-} catch (error) {
- console.warn('Identification du code-barres indisponible :', error);
-}
+const { match, productTitle } = await identifyScannedBarcode(barcode);
+window.lastScannedProductTitle = productTitle;
 
 if (match?.results?.length) {
  currentSearchQuery = match.query;
