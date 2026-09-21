@@ -1077,12 +1077,15 @@ body.theme-light .equipment-more summary { color: #475569; }
 .equipment-inline-form { margin: .35rem 0 .1rem; }
 .installation-total {
   display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-  padding: .75rem .85rem; border-radius: .75rem;
-  color: #94a3b8; background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.075);
+  margin: .45rem 0 .2rem; padding: .85rem 1rem; border-radius: .85rem;
+  color: #86efac;
+  background: linear-gradient(135deg, rgba(34,197,94,.13), rgba(16,185,129,.055));
+  border: 1px solid rgba(74,222,128,.22);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.055), 0 8px 22px rgba(0,0,0,.1);
   font-size: .68rem; font-weight: 700;
 }
-.installation-total > span { display: flex; align-items: center; gap: .45rem; }
-.installation-total strong { color: #fff; font-size: .85rem; }
+.installation-total > span { display: flex; align-items: center; gap: .5rem; }
+.installation-total strong { color: #bbf7d0; font-size: .9rem; }
 .projects-section {
   display: grid; gap: .65rem; padding-top: .85rem;
   border-top: 1px solid rgba(255,255,255,.08);
@@ -1103,9 +1106,14 @@ body.theme-light .equipment-more summary { color: #475569; }
 }
 body.theme-light .equipment-group-heading { color: #64748b; }
 body.theme-light .equipment-price { color: #334155; }
-body.theme-light .installation-total,
 body.theme-light .project-card { color: #475569; background: rgba(255,255,255,.72); border-color: rgba(15,23,42,.1); }
-body.theme-light .installation-total strong { color: #0f172a; }
+body.theme-light .installation-total {
+  color: #15803d;
+  background: linear-gradient(135deg, rgba(220,252,231,.92), rgba(236,253,245,.72));
+  border-color: rgba(22,163,74,.22);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 8px 20px rgba(22,101,52,.08);
+}
+body.theme-light .installation-total strong { color: #166534; }
 body.theme-light .projects-section { border-color: rgba(15,23,42,.1); }
 body.theme-light .project-empty { border-color: rgba(15,23,42,.12); }
 body.theme-light .project-type { color: #4338ca; background: rgba(99,102,241,.1); }
