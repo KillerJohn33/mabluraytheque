@@ -220,11 +220,11 @@ border-radius: .85rem;
 background: rgba(0,217,255,.09);
 border: 1px solid rgba(0,217,255,.16);
 }
-#tabSettings > .modern-panel:nth-child(8) {
+#dangerZonePanel {
 border-color: rgba(248, 113, 113, 0.24);
 background: linear-gradient(145deg, rgba(127,29,29,.15), rgba(255,255,255,.025));
 }
-#tabSettings > .modern-panel:nth-child(8)::before {
+#dangerZonePanel::before {
 background: linear-gradient(90deg, transparent, rgba(248,113,113,.55), transparent);
 }
 #syncStatus {
@@ -242,7 +242,7 @@ background: rgba(255,255,255,.78);
 border-color: rgba(15,23,42,.1);
 box-shadow: 0 10px 28px rgba(15,23,42,.09), inset 0 1px 0 #fff;
 }
-body.theme-light #tabSettings > .modern-panel:nth-child(8) {
+body.theme-light #dangerZonePanel {
 background: rgba(254,242,242,.9);
 border-color: rgba(220,38,38,.18);
 }
@@ -1689,7 +1689,7 @@ body.theme-light #detailModal > div > button:first-child:hover {
 </div>
 </div>
 
-<div class="modern-panel p-4 md:p-5 space-y-3">
+<div id="dangerZonePanel" class="modern-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="trash"></span>
 <div>
