@@ -523,6 +523,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
     grid-template-areas:
       "heading heading"
       "fields extras"
+      "boxset boxset"
       "discs discs"
       "tech tech";
     gap: .55rem 1rem;
@@ -534,6 +535,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
     grid-template-areas:
       "heading heading cover"
       "fields extras cover"
+      "boxset boxset cover"
       "discs discs cover"
       "tech tech tech";
   }
@@ -546,6 +548,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
     align-content: stretch;
   }
   #modalContent .edition-card .edition-extra-fields { grid-area: extras; display: grid; grid-template-rows: repeat(3, minmax(0, 1fr)); gap: .5rem; }
+  #modalContent .edition-card .edition-boxset { grid-area: boxset; }
   #modalContent .edition-card .edition-disc-composition { grid-area: discs; }
   #modalContent .edition-card .edition-tech-inline { grid-area: tech; }
   #modalContent .edition-card .edition-cover-mobile { display: none; }
@@ -1194,6 +1197,23 @@ body.theme-light .project-type { color: #4338ca; background: rgba(99,102,241,.1)
   body.theme-light #spaceSubmenu > button:hover,
   body.theme-light #spaceSubmenu > button.is-active { color: #fff !important; }
 }
+
+/* Coffret associé à une édition */
+.edition-boxset {
+  padding: .7rem; border: 1px solid rgba(168,85,247,.18); border-radius: .8rem;
+  background: rgba(168,85,247,.045);
+}
+.edition-boxset-toggle { display: flex; align-items: center; gap: .55rem; cursor: pointer; }
+.edition-boxset-toggle input { width: 1rem; height: 1rem; accent-color: #a855f7; }
+.edition-boxset-details { display: grid; gap: .6rem; margin-top: .65rem; padding-top: .65rem; border-top: 1px solid rgba(168,85,247,.14); }
+.edition-boxset-card {
+  display: flex; align-items: center; gap: .7rem; min-width: 0;
+  padding: .55rem; border-radius: .7rem; background: rgba(0,0,0,.16);
+}
+.edition-boxset-cover { width: 3.5rem; height: 4.6rem; flex: none; object-fit: contain; border-radius: .45rem; background: rgba(0,0,0,.3); }
+body.theme-light .edition-boxset { background: rgba(168,85,247,.055); border-color: rgba(126,34,206,.16); }
+body.theme-light .edition-boxset-details { border-color: rgba(126,34,206,.13); }
+body.theme-light .edition-boxset-card { background: rgba(255,255,255,.72); }
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -2695,6 +2715,18 @@ barcode: movie.barcode || ''
 }
 movie.editions.forEach(edition => {
  edition.title = editionTitleWithoutBrand(edition.title, edition.publisher);
+ edition.inBoxSet = Boolean(edition.inBoxSet);
+ const boxSet = edition.boxSet && typeof edition.boxSet === 'object' ? edition.boxSet : {};
+ edition.boxSet = {
+  title: String(boxSet.title || '').trim(),
+  url: String(boxSet.url || '').trim(),
+  image: String(boxSet.image || '').trim(),
+  publisher: String(boxSet.publisher || '').trim(),
+  packaging: String(boxSet.packaging || '').trim(),
+  videoCodec: String(boxSet.videoCodec || '').trim(),
+  audioTracks: Array.isArray(boxSet.audioTracks) ? boxSet.audioTracks.join(' · ') : String(boxSet.audioTracks || '').trim(),
+  subtitles: Array.isArray(boxSet.subtitles) ? boxSet.subtitles.join(', ') : String(boxSet.subtitles || '').trim()
+ };
  if (!edition.discComposition || typeof edition.discComposition !== 'object') {
   edition.discComposition = inferDiscComposition(edition.title, edition.format);
   edition.discCompositionManual = false;
@@ -4360,6 +4392,78 @@ async function refreshPhysicalEdition(movieId, index) {
  await loadPhysicalEditionDetails(movieId, index);
 }
 
+async function toggleEditionBoxSet(movieId, index, checked) {
+ const movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+ const edition = movie?.editions?.[index];
+ if (!edition) return;
+ const previous = edition.inBoxSet;
+ edition.inBoxSet = Boolean(checked);
+ openMovieDetail(movie.id, true);
+ const result = await updateMovieInCloud(movie);
+ if (!result.success) {
+  edition.inBoxSet = previous;
+  openMovieDetail(movie.id, true);
+ }
+}
+
+async function updateEditionBoxSetField(movieId, index, field, value) {
+ const movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+ const edition = movie?.editions?.[index];
+ if (!edition) return;
+ edition.boxSet ||= {};
+ const previous = edition.boxSet[field];
+ edition.boxSet[field] = String(value || '').trim();
+ const result = await updateMovieInCloud(movie);
+ if (!result.success) {
+  edition.boxSet[field] = previous;
+  openMovieDetail(movie.id, true);
+ }
+}
+
+async function attachBlurayBoxSet(movieId, index) {
+ const movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
+ const edition = movie?.editions?.[index];
+ const input = document.getElementById(`boxSetUrl-${index}`);
+ if (!edition || !input) return;
+ const pasted = input.value.trim();
+ if (!pasted) { input.focus(); return showToast('Collez d’abord le lien Blu-ray.com du coffret.'); }
+ const found = pasted.match(/https?:\/\/(?:www\.)?blu-ray\.com\/movies\/[a-z0-9%-]+\/\d+\/?/i);
+ if (!found) { input.focus(); return showToast('Le lien du coffret Blu-ray.com est invalide.'); }
+ const parsed = new URL(found[0]);
+ const url = `https://www.blu-ray.com${parsed.pathname}`;
+ input.value = url;
+ const button = document.getElementById(`boxSetLoad-${index}`);
+ if (button) { button.disabled = true; button.textContent = 'Chargement…'; }
+ const previous = JSON.parse(JSON.stringify(edition.boxSet || {}));
+ try {
+  const response = await fetch(`/api/bluray-edition?url=${encodeURIComponent(url)}`);
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Fiche du coffret indisponible');
+  edition.inBoxSet = true;
+  edition.boxSet = {
+   url: data.url || url,
+   title: data.title || edition.boxSet?.title || 'Coffret',
+   image: data.image || edition.boxSet?.image || '',
+   publisher: data.publisher || data.studio || edition.boxSet?.publisher || '',
+   packaging: data.packaging || edition.boxSet?.packaging || '',
+   videoCodec: data.videoCodec || '',
+   audioTracks: Array.isArray(data.audioTracks) ? data.audioTracks.join(' · ') : String(data.audioTracks || ''),
+   subtitles: Array.isArray(data.subtitles) ? data.subtitles.join(', ') : String(data.subtitles || '')
+  };
+  const result = await updateMovieInCloud(movie);
+  if (!result.success) {
+   edition.boxSet = previous;
+   throw new Error('Enregistrement impossible');
+  }
+  openMovieDetail(movie.id, true);
+  showToast('Coffret associé à cette édition.');
+ } catch (error) {
+  edition.boxSet = previous;
+  showToast(`Coffret indisponible : ${error.message}`);
+  if (button) { button.disabled = false; button.textContent = 'Importer'; }
+ }
+}
+
 async function attachBlurayEdition(movieId, index) {
  const movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
  const edition = movie?.editions?.[index];
@@ -4577,6 +4681,19 @@ ${ed.barcode ? `<button onclick="refreshPhysicalEdition(${movieIdArg}, ${idx})" 
 <textarea rows="2" onchange="updateEditionField(${movieIdArg}, ${idx}, 'subtitles', this.value)" placeholder="Français, anglais, français SDH..." class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl resize-y">${escapeHtml(ed.subtitles || '')}</textarea></div>
 </div></details>
 
+</div>
+<div class="edition-boxset">
+<label class="edition-boxset-toggle">
+<input type="checkbox" ${ed.inBoxSet ? 'checked' : ''} onchange="toggleEditionBoxSet(${movieIdArg}, ${idx}, this.checked)">
+<span class="text-[10px] font-semibold text-purple-200">Cette édition est incluse dans un coffret</span>
+</label>
+${ed.inBoxSet ? `<div class="edition-boxset-details">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+<div><label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">Nom du coffret</label><input type="text" value="${escapeHtml(ed.boxSet?.title || '')}" onchange="updateEditionBoxSetField(${movieIdArg}, ${idx}, 'title', this.value)" placeholder="Nom du coffret" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl"></div>
+<div><div class="flex items-center justify-between gap-2"><label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">Lien Blu-ray.com du coffret</label><a href="https://www.blu-ray.com/search/?quicksearch=1&amp;quicksearch_country=all&amp;quicksearch_keyword=${encodeURIComponent(movie.title)}%20box%20set&amp;section=bluraymovies" target="_blank" rel="noopener noreferrer" class="text-[9px] text-purple-300 hover:text-white">Rechercher ↗</a></div><div class="flex gap-2"><input id="boxSetUrl-${idx}" type="text" inputmode="url" value="${escapeHtml(ed.boxSet?.url || '')}" placeholder="Lien Blu-ray.com du coffret" class="flex-1 min-w-0 glass-input text-white text-[10px] px-2.5 py-2 rounded-xl"><button id="boxSetLoad-${idx}" onclick="attachBlurayBoxSet(${movieIdArg}, ${idx})" class="app-action app-action-violet px-3 text-[10px]">Importer</button></div></div>
+</div>
+${ed.boxSet?.image || ed.boxSet?.title ? `<div class="edition-boxset-card">${ed.boxSet?.image ? `<img src="${safeImageUrl(ed.boxSet.image)}" alt="Coffret ${escapeHtml(ed.boxSet.title || movie.title)}" loading="lazy" onerror="this.style.display='none'" class="edition-boxset-cover">` : ''}<div class="min-w-0 flex-1"><p class="text-[10px] font-bold text-white truncate">${escapeHtml(ed.boxSet?.title || 'Coffret')}</p>${ed.boxSet?.publisher ? `<p class="text-[9px] text-gray-400 mt-0.5">Éditeur : ${escapeHtml(ed.boxSet.publisher)}</p>` : ''}${ed.boxSet?.packaging ? `<p class="text-[9px] text-gray-500 mt-0.5">${escapeHtml(ed.boxSet.packaging)}</p>` : ''}${ed.boxSet?.url ? `<a href="${escapeHtml(ed.boxSet.url)}" target="_blank" rel="noopener noreferrer" class="inline-block text-[9px] text-purple-300 hover:text-white mt-1">Voir le coffret sur Blu-ray.com ↗</a>` : ''}</div></div>` : ''}
+</div>` : ''}
 </div>
 ${editionDiscEditorHtml(ed, movieIdArg, idx)}
 <div class="edition-tech-inline rounded-xl border border-white/10 bg-white/[0.025] p-2.5">
