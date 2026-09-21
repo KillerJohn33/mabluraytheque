@@ -1033,6 +1033,53 @@ body.theme-light .equipment-card {
 }
 body.theme-light .equipment-visual-placeholder { color: #0e7490; background: rgba(207,250,254,.86); }
 body.theme-light .equipment-notes { border-color: rgba(15,23,42,.1); }
+
+/* Sous-menu Mon espace : ordinateur uniquement */
+.space-submenu { display: none; }
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  #topNav { overflow: visible !important; }
+  #spaceSubmenu {
+    position: absolute;
+    z-index: 60;
+    top: calc(100% - 1px);
+    right: 1.5rem;
+    width: 16rem;
+    padding: .45rem;
+    border-radius: 1rem;
+    background: rgba(10, 13, 20, .97);
+    border: 1px solid rgba(255,255,255,.13);
+    box-shadow: 0 16px 36px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.08);
+    backdrop-filter: blur(20px);
+  }
+  #tabSettingsBtn:hover + #spaceSubmenu,
+  #tabSettingsBtn:focus-visible + #spaceSubmenu,
+  #spaceSubmenu:hover,
+  #spaceSubmenu:focus-within { display: grid; gap: .25rem; }
+  #spaceSubmenu > button {
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+    width: 100%;
+    padding: .7rem .75rem;
+    border-radius: .75rem;
+    color: #94a3b8;
+    text-align: left;
+    transition: color .16s ease, background .16s ease;
+  }
+  #spaceSubmenu > button:hover,
+  #spaceSubmenu > button.is-active { color: #cffafe; background: rgba(34,211,238,.1); }
+  #spaceSubmenu strong { display: block; color: inherit; font-size: .72rem; line-height: 1rem; }
+  #spaceSubmenu small { display: block; margin-top: .08rem; color: #64748b; font-size: .58rem; line-height: .8rem; }
+  body.theme-light #spaceSubmenu {
+    background: rgba(248,250,252,.98);
+    border-color: rgba(15,23,42,.14);
+    box-shadow: 0 16px 34px rgba(15,23,42,.15), inset 0 1px 0 #fff;
+  }
+  body.theme-light #spaceSubmenu > button { color: #475569; }
+  body.theme-light #spaceSubmenu > button:hover,
+  body.theme-light #spaceSubmenu > button.is-active { color: #075985; background: rgba(14,165,233,.12); }
+  body.theme-light #spaceSubmenu small { color: #64748b; }
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -1061,9 +1108,13 @@ body.theme-light .equipment-notes { border-color: rgba(15,23,42,.1); }
 <button id="tabStatsBtn" onclick="switchTab('stats')" class="flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent">
 <span class="icon-inline w-3.5 h-3.5" data-icon="barchart"></span> <span>Stats</span>
 </button>
-<button id="tabSettingsBtn" onclick="switchTab('settings')" class="flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent">
+<button id="tabSettingsBtn" onclick="openSpaceSection('installation')" class="flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent" aria-haspopup="true">
 <span class="icon-inline w-3.5 h-3.5" data-icon="user"></span> <span>Mon espace</span>
 </button>
+<div id="spaceSubmenu" class="space-submenu" role="menu" aria-label="Mon espace">
+<button type="button" data-space-target="installation" onclick="openSpaceSection('installation')" role="menuitem"><span class="icon-inline w-4 h-4" data-icon="tv"></span><span><strong>Mon installation</strong><small>Équipements et compatibilités</small></span></button>
+<button type="button" data-space-target="options" onclick="openSpaceSection('options')" role="menuitem"><span class="icon-inline w-4 h-4" data-icon="settings"></span><span><strong>Options</strong><small>Préférences, données et services</small></span></button>
+</div>
 </nav>
 
 <!-- RECHERCHE & SCANNER (visible uniquement sur Accueil et Collection) -->
@@ -1612,7 +1663,7 @@ body.theme-light .equipment-notes { border-color: rgba(15,23,42,.1); }
 <!-- PARAMETRES -->
 <div id="tabSettings" class="hidden modern-page">
 <div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="user"></span><h2 class="font-black text-white relative z-10">Mon espace</h2></div>
-<div class="modern-panel p-4 md:p-5 space-y-3">
+<div id="spaceInstallationSection" class="modern-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center justify-between gap-3">
 <div class="flex items-center gap-2 min-w-0"><span class="icon-chip" data-icon="tv"></span><div class="min-w-0"><h3 class="text-sm font-bold text-white">Mon installation</h3><p class="text-[11px] text-gray-400">Les équipements utilisés pour profiter de vos films.</p></div></div>
 <button type="button" onclick="openEquipmentForm()" class="app-action app-action-violet px-3 py-2 text-[10px] flex-none"><span class="icon-inline w-3.5 h-3.5" data-icon="plus"></span> Ajouter</button>
@@ -1636,16 +1687,16 @@ body.theme-light .equipment-notes { border-color: rgba(15,23,42,.1); }
 </div>
 </div>
 
-<div class="flex items-center gap-2 px-1 pt-1"><span class="icon-chip chip-sm" data-icon="settings"></span><div><h3 class="text-sm font-bold text-white">Options de l’application</h3><p class="text-[11px] text-gray-400">Préférences, synchronisation, sauvegardes et configuration.</p></div></div>
+<div id="spaceOptionsHeading" class="space-options-panel flex items-center gap-2 px-1 pt-1"><span class="icon-chip chip-sm" data-icon="settings"></span><div><h3 class="text-sm font-bold text-white">Options de l’application</h3><p class="text-[11px] text-gray-400">Préférences, synchronisation, sauvegardes et configuration.</p></div></div>
 
-<div class="modern-panel p-4 md:p-5 space-y-3">
+<div class="modern-panel space-options-panel p-4 md:p-5 space-y-3">
 <button id="syncStatus" onclick="syncAllData()" class="w-full flex items-center justify-between gap-3 p-3 rounded-2xl bg-white/5 border border-white/10 text-gray-400" title="Synchroniser maintenant">
 <span class="flex items-center gap-2"><span id="syncStatusDot" class="w-2.5 h-2.5 rounded-full bg-gray-500"></span><span class="text-xs font-bold text-white">Synchronisation cloud</span></span>
 <span class="text-right"><span id="syncStatusLabel" class="block text-[10px] font-semibold">Connexion…</span><span id="settingsSyncStatus" class="block text-[8px] text-gray-500 mt-0.5">Touchez pour actualiser</span></span>
 </button>
 </div>
 
-<div class="modern-panel p-4 md:p-5 space-y-3">
+<div class="modern-panel space-options-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="palette"></span>
 <div>
@@ -1671,7 +1722,7 @@ body.theme-light .equipment-notes { border-color: rgba(15,23,42,.1); }
 </div>
 </div>
 
-<div class="modern-panel p-4 md:p-5 space-y-3">
+<div class="modern-panel space-options-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="key"></span>
 <div>
@@ -1699,7 +1750,7 @@ body.theme-light .equipment-notes { border-color: rgba(15,23,42,.1); }
 </div>
 </div>
 
-<div class="modern-panel p-4 md:p-5 space-y-3">
+<div class="modern-panel space-options-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="refresh"></span>
 <div>
@@ -1713,7 +1764,7 @@ body.theme-light .equipment-notes { border-color: rgba(15,23,42,.1); }
 <p class="text-[10px] text-gray-500">Récupère la durée, le réalisateur et les acteurs principaux pour tous les films déjà dans votre collection et votre wishlist.</p>
 </div>
 
-<div class="modern-panel p-4 md:p-5 space-y-3">
+<div class="modern-panel space-options-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="star"></span>
 <div>
@@ -1728,7 +1779,7 @@ body.theme-light .equipment-notes { border-color: rgba(15,23,42,.1); }
 <p class="text-[10px] text-gray-500">Sur IMDb : votre profil → "Your Ratings" → icône Export (⋮ en haut à droite). Le fichier ratings.csv téléchargé se glisse directement ici. La correspondance se fait via l'identifiant IMDb du film, pas par le titre.</p>
 </div>
 
-<div class="modern-panel p-4 md:p-5 space-y-3">
+<div class="modern-panel space-options-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="download"></span>
 <div>
@@ -1754,7 +1805,7 @@ body.theme-light .equipment-notes { border-color: rgba(15,23,42,.1); }
 </div>
 </div>
 
-<div id="dangerZonePanel" class="modern-panel p-4 md:p-5 space-y-3">
+<div id="dangerZonePanel" class="modern-panel space-options-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="trash"></span>
 <div>
@@ -1768,7 +1819,7 @@ body.theme-light .equipment-notes { border-color: rgba(15,23,42,.1); }
 <p class="text-[10px] text-red-300/70">Cette action supprimera tous les films de la collection <strong>et de la wishlist</strong> dans Supabase. Cette action est irréversible.</p>
 </div>
 
-<div class="modern-panel p-4 md:p-5 space-y-2 text-xs text-gray-300">
+<div class="modern-panel space-options-panel p-4 md:p-5 space-y-2 text-xs text-gray-300">
 <div class="flex items-center gap-2 mb-1"><span class="icon-chip chip-sm" data-icon="info"></span><h3 class="text-sm font-bold text-white">Informations</h3></div>
 <div class="flex justify-between border-b border-white/10 py-1.5">
 <span class="text-gray-400">Total Films :</span>
@@ -1968,6 +2019,7 @@ let batchScanEntries = [];
 const renderedTabs = { collection: false, wishlist: false, series: false };
 let chartInstances = {};
 let statsShowCharts = true;
+let activeSpaceSection = 'installation';
 
 // Recherche TMDB
 let currentSearchQuery = '';
@@ -2035,7 +2087,7 @@ document.getElementById('topNav')?.classList.toggle('hidden', isPhone);
 document.getElementById('bottomNav')?.classList.toggle('hidden', !isPhone);
 };
 updateMobileNavigation();
-window.addEventListener('resize', updateMobileNavigation);
+window.addEventListener('resize', () => { updateMobileNavigation(); applySpaceSection(activeSpaceSection); });
 
 const savedTheme = localStorage.getItem('app_theme') || 'theme-noir';
 changeTheme(savedTheme);
@@ -2593,6 +2645,27 @@ applyStaticIcons();
 }
 
 // --- NAVIGATION ET TABS ---
+function applySpaceSection(section = 'installation') {
+ activeSpaceSection = section === 'options' ? 'options' : 'installation';
+ const desktop = window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine)').matches;
+ const installation = document.getElementById('spaceInstallationSection');
+ const optionPanels = document.querySelectorAll('#tabSettings .space-options-panel');
+ if (installation) installation.style.display = !desktop || activeSpaceSection === 'installation' ? '' : 'none';
+ optionPanels.forEach(panel => { panel.style.display = !desktop || activeSpaceSection === 'options' ? '' : 'none'; });
+ document.querySelectorAll('#spaceSubmenu [data-space-target]').forEach(button => {
+  button.classList.toggle('is-active', button.dataset.spaceTarget === activeSpaceSection);
+ });
+}
+
+function openSpaceSection(section) {
+ activeSpaceSection = section === 'options' ? 'options' : 'installation';
+ switchTab('settings');
+ applySpaceSection(activeSpaceSection);
+ if (window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine)').matches) {
+  document.getElementById('tabSettings')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+ }
+}
+
 function switchTab(tab) {
 ['tabHome', 'tabCollection', 'tabWishlist', 'tabSeries', 'tabStats', 'tabSettings'].forEach(id => {
 const el = document.getElementById(id);
@@ -2651,6 +2724,7 @@ document.getElementById('bottomTabStatsBtn').classList.add('active');
 renderStats();
 } else if (tab === 'settings') {
 document.getElementById('tabSettings').classList.remove('hidden');
+applySpaceSection(activeSpaceSection);
 renderEquipment();
 document.getElementById('tabSettingsBtn').className = activeClass;
 document.getElementById('bottomTabSettingsBtn').classList.add('active');
