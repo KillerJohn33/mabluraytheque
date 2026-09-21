@@ -1004,8 +1004,8 @@ body.theme-light #bottomNav .bottom-nav-btn.active {
 .equipment-card {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(167,139,250,.09), rgba(255,255,255,.045) 44%, rgba(34,211,238,.035));
-  border: 1px solid rgba(167,139,250,.2);
+  background: linear-gradient(135deg, rgba(8,47,73,.5), rgba(15,23,42,.62) 48%, rgba(6,78,99,.3));
+  border: 1px solid rgba(34,211,238,.2);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.09), 0 8px 22px rgba(0,0,0,.13);
 }
 .equipment-card::before {
@@ -1015,23 +1015,23 @@ body.theme-light #bottomNav .bottom-nav-btn.active {
   right: 1rem;
   top: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(167,139,250,.62), transparent);
+  background: linear-gradient(90deg, transparent, rgba(34,211,238,.58), transparent);
 }
 .equipment-visual {
-  border: 1px solid rgba(167,139,250,.24);
+  border: 1px solid rgba(34,211,238,.24);
   box-shadow: 0 7px 18px rgba(0,0,0,.2);
 }
 .equipment-visual-placeholder {
-  color: #c4b5fd;
-  background: linear-gradient(145deg, rgba(167,139,250,.16), rgba(34,211,238,.07));
+  color: #67e8f9;
+  background: linear-gradient(145deg, rgba(8,145,178,.2), rgba(14,116,144,.09));
 }
 .equipment-notes { border-top: 1px solid rgba(255,255,255,.08); }
 body.theme-light .equipment-card {
-  background: linear-gradient(135deg, rgba(245,243,255,.98), rgba(255,255,255,.9) 48%, rgba(240,249,255,.88));
-  border-color: rgba(109,40,217,.2);
+  background: linear-gradient(135deg, rgba(224,242,254,.96), rgba(248,250,252,.94) 50%, rgba(207,250,254,.72));
+  border-color: rgba(8,145,178,.24);
   box-shadow: inset 0 1px 0 #fff, 0 8px 22px rgba(15,23,42,.08);
 }
-body.theme-light .equipment-visual-placeholder { color: #6d28d9; background: rgba(237,233,254,.9); }
+body.theme-light .equipment-visual-placeholder { color: #0e7490; background: rgba(207,250,254,.86); }
 body.theme-light .equipment-notes { border-color: rgba(15,23,42,.1); }
 </style>
 </head>
@@ -2221,7 +2221,7 @@ function renderEquipment() {
   group.className = 'space-y-1';
   const heading = document.createElement('div');
   heading.className = 'flex items-center justify-between px-1';
-  heading.innerHTML = `<h4 class="text-[10px] font-bold uppercase tracking-wider text-purple-200">${escapeHtml(category)}</h4><span class="text-[9px] text-gray-500">${items.length}</span>`;
+  heading.innerHTML = `<h4 class="text-[10px] font-bold uppercase tracking-wider text-cyan-300">${escapeHtml(category)}</h4><span class="text-[9px] text-gray-500">${items.length}</span>`;
   group.appendChild(heading);
   const grid = document.createElement('div');
   grid.className = 'space-y-1';
