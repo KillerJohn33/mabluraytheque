@@ -997,7 +997,7 @@ body.theme-light #detailModal > div > button:first-child:hover {
 <span class="icon-inline w-3.5 h-3.5" data-icon="barchart"></span> <span>Stats</span>
 </button>
 <button id="tabSettingsBtn" onclick="switchTab('settings')" class="flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent">
-<span class="icon-inline w-3.5 h-3.5" data-icon="settings"></span> <span>Options</span>
+<span class="icon-inline w-3.5 h-3.5" data-icon="user"></span> <span>Mon espace</span>
 </button>
 </nav>
 
@@ -1546,7 +1546,33 @@ body.theme-light #detailModal > div > button:first-child:hover {
 
 <!-- PARAMETRES -->
 <div id="tabSettings" class="hidden modern-page">
-<div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="settings"></span><h2 class="font-black text-white relative z-10">Options</h2></div>
+<div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="user"></span><h2 class="font-black text-white relative z-10">Mon espace</h2></div>
+<div class="modern-panel p-4 md:p-5 space-y-3">
+<div class="flex items-center justify-between gap-3">
+<div class="flex items-center gap-2 min-w-0"><span class="icon-chip" data-icon="tv"></span><div class="min-w-0"><h3 class="text-sm font-bold text-white">Mon installation</h3><p class="text-[11px] text-gray-400">Les équipements utilisés pour profiter de vos films.</p></div></div>
+<button type="button" onclick="openEquipmentForm()" class="app-action app-action-violet px-3 py-2 text-[10px] flex-none"><span class="icon-inline w-3.5 h-3.5" data-icon="plus"></span> Ajouter</button>
+</div>
+<div id="equipmentEmptyState" class="rounded-2xl border border-dashed border-white/15 p-5 text-center"><p class="text-xs font-semibold text-gray-300">Aucun équipement enregistré</p><p class="text-[10px] text-gray-500 mt-1">Ajoutez votre téléviseur, lecteur, amplificateur ou console.</p></div>
+<div id="equipmentList" class="space-y-4"></div>
+<div id="equipmentForm" class="hidden rounded-2xl border border-violet-400/20 bg-violet-400/[0.04] p-3 space-y-3">
+<div class="flex items-center justify-between"><h4 id="equipmentFormTitle" class="text-xs font-bold text-purple-200">Ajouter un équipement</h4><button type="button" onclick="closeEquipmentForm()" class="text-gray-400 hover:text-white p-1"><span class="icon-inline w-3.5 h-3.5" data-icon="x"></span></button></div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+<div><label class="block text-[9px] text-gray-400 mb-1">Catégorie</label><select id="equipmentCategory" class="w-full glass-input text-white text-xs px-2.5 py-2 rounded-xl"><option class="bg-gray-900">Téléviseur</option><option class="bg-gray-900">Vidéoprojecteur</option><option class="bg-gray-900">Amplificateur</option><option class="bg-gray-900">Barre de son</option><option class="bg-gray-900">Enceintes</option><option class="bg-gray-900">Lecteur Blu-ray</option><option class="bg-gray-900">Console de jeux</option><option class="bg-gray-900">Lecteur multimédia</option><option class="bg-gray-900">Autre</option></select></div>
+<div><label class="block text-[9px] text-gray-400 mb-1">Marque</label><input id="equipmentBrand" type="text" placeholder="Sony, LG, Denon…" class="w-full glass-input text-white text-xs px-2.5 py-2 rounded-xl"></div>
+<div><label class="block text-[9px] text-gray-400 mb-1">Modèle ou nom *</label><input id="equipmentModel" type="text" placeholder="UBP-X800M2…" class="w-full glass-input text-white text-xs px-2.5 py-2 rounded-xl"></div>
+<div><label class="block text-[9px] text-gray-400 mb-1">Pièce</label><input id="equipmentRoom" type="text" placeholder="Salon, salle cinéma…" class="w-full glass-input text-white text-xs px-2.5 py-2 rounded-xl"></div>
+<div><label class="block text-[9px] text-gray-400 mb-1">Année d’achat</label><input id="equipmentYear" type="number" min="1950" max="2100" inputmode="numeric" placeholder="2026" class="w-full glass-input text-white text-xs px-2.5 py-2 rounded-xl"></div>
+<div><label class="block text-[9px] text-gray-400 mb-1">Photo (URL)</label><input id="equipmentImage" type="url" placeholder="https://…" class="w-full glass-input text-white text-xs px-2.5 py-2 rounded-xl"></div>
+<div><label class="block text-[9px] text-gray-400 mb-1">Formats vidéo</label><input id="equipmentVideo" type="text" placeholder="4K, Dolby Vision, HDR10…" class="w-full glass-input text-white text-xs px-2.5 py-2 rounded-xl"></div>
+<div><label class="block text-[9px] text-gray-400 mb-1">Formats audio</label><input id="equipmentAudio" type="text" placeholder="Dolby Atmos, DTS:X, 7.1…" class="w-full glass-input text-white text-xs px-2.5 py-2 rounded-xl"></div>
+</div>
+<div><label class="block text-[9px] text-gray-400 mb-1">Description et notes</label><textarea id="equipmentNotes" rows="3" placeholder="Branchements, réglages, particularités…" class="w-full glass-input text-white text-xs px-2.5 py-2 rounded-xl resize-y"></textarea></div>
+<div class="grid grid-cols-2 gap-2"><button type="button" onclick="closeEquipmentForm()" class="app-action app-action-slate px-3 py-2 text-xs">Annuler</button><button type="button" onclick="saveEquipment()" class="app-action app-action-violet px-3 py-2 text-xs"><span class="icon-inline w-3.5 h-3.5" data-icon="check"></span> Enregistrer</button></div>
+</div>
+</div>
+
+<div class="flex items-center gap-2 px-1 pt-1"><span class="icon-chip chip-sm" data-icon="settings"></span><div><h3 class="text-sm font-bold text-white">Options de l’application</h3><p class="text-[11px] text-gray-400">Préférences, synchronisation, sauvegardes et configuration.</p></div></div>
+
 <div class="modern-panel p-4 md:p-5 space-y-3">
 <button id="syncStatus" onclick="syncAllData()" class="w-full flex items-center justify-between gap-3 p-3 rounded-2xl bg-white/5 border border-white/10 text-gray-400" title="Synchroniser maintenant">
 <span class="flex items-center gap-2"><span id="syncStatusDot" class="w-2.5 h-2.5 rounded-full bg-gray-500"></span><span class="text-xs font-bold text-white">Synchronisation cloud</span></span>
@@ -1642,7 +1668,7 @@ body.theme-light #detailModal > div > button:first-child:hover {
 <span class="icon-chip" data-icon="download"></span>
 <div>
 <h3 class="text-sm font-bold text-white">Sauvegarde & Exportation</h3>
-<p class="text-[11px] text-gray-400">Exporter ou restaurer la collection, la wishlist et les séries suivies.</p>
+<p class="text-[11px] text-gray-400">Exporter ou restaurer la collection, les séries suivies et votre installation.</p>
 </div>
 </div>
 <div class="grid grid-cols-2 gap-2">
@@ -1668,7 +1694,7 @@ body.theme-light #detailModal > div > button:first-child:hover {
 <span class="icon-chip" data-icon="trash"></span>
 <div>
 <h3 class="text-sm font-bold text-white">Zone dangereuse</h3>
-<p class="text-[11px] text-gray-400">Supprimer définitivement toutes les données stockées dans Supabase.</p>
+<p class="text-[11px] text-gray-400">Supprimer définitivement les films de la collection et de la wishlist.</p>
 </div>
 </div>
 <button id="deleteCollectionBtn" onclick="deleteEntireCollection()" class="app-action app-action-red w-full px-3 py-2.5 text-xs">
@@ -1719,8 +1745,8 @@ body.theme-light #detailModal > div > button:first-child:hover {
 <span class="bottom-nav-label">Stats</span>
 </button>
 <button id="bottomTabSettingsBtn" onclick="switchTab('settings')" class="bottom-nav-btn">
-<span class="icon-inline w-8 h-8" data-icon="settings"></span>
-<span class="bottom-nav-label">Options</span>
+<span class="icon-inline w-8 h-8" data-icon="user"></span>
+<span class="bottom-nav-label">Espace</span>
 </button>
 </nav>
 
@@ -1744,6 +1770,7 @@ notebook: '<rect x="5" y="2.5" width="16" height="19" rx="2"/><path d="M9 2.5v19
 sparkles: '<path d="M12 3l1.8 4.9L19 9.5l-4.9 1.8L12 16l-1.8-4.7L5 9.5l5.2-1.6L12 3z"/><path d="M19 15l.7 1.8L22 18l-1.8.9L19 21l-.9-2.1L16 18l2.1-.7L19 15z"/>',
 barchart: '<path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/>',
 settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>',
+user: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/>',
 dice: '<rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8" cy="8" r="1.4" fill="currentColor" stroke="none"/><circle cx="16" cy="8" r="1.4" fill="currentColor" stroke="none"/><circle cx="8" cy="16" r="1.4" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/>',
 filter: '<path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>',
 camera: '<path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/>',
@@ -1859,6 +1886,10 @@ let collection = [];
 let wishlist = [];
 let trackedSeriesBundleCloudId = null;
 let trackedSeriesBundleFromCloud = null;
+let profileBundleCloudId = null;
+let profileBundleFromCloud = null;
+let profileData = { equipment: [], updatedAt: '' };
+let editingEquipmentId = null;
 let isListView = false;
 let isWishlistListView = false;
 let html5QrcodeScanner = null;
@@ -1906,12 +1937,14 @@ if (!navigator.onLine) { setSyncStatus('offline'); if (!silent) showToast('Mode 
 setSyncStatus('syncing');
 const collectionOk = await fetchCollectionFromCloud();
 const seriesOk = await loadTrackedSeriesFromCloud();
-if (collectionOk && seriesOk) {
+const profileOk = await loadProfileFromCloud();
+if (collectionOk && seriesOk && profileOk) {
 localStorage.setItem('last_cloud_sync', new Date().toISOString());
 setSyncStatus('synced');
 renderCollection();
 renderWishlist();
 renderTrackedSeries();
+renderEquipment();
 updateSettingsCounters();
 if (!silent) showToast('Données synchronisées avec le cloud.');
 return true;
@@ -2014,6 +2047,184 @@ db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 showToast("Identifiants enregistrés !");
 await syncAllData(true);
 renderTrackedSeries();
+}
+
+// --- MON ESPACE : INSTALLATION ---
+const EQUIPMENT_CATEGORIES = ['Téléviseur', 'Vidéoprojecteur', 'Amplificateur', 'Barre de son', 'Enceintes', 'Lecteur Blu-ray', 'Console de jeux', 'Lecteur multimédia', 'Autre'];
+
+function normalizeProfileData(value) {
+ const equipment = Array.isArray(value?.equipment) ? value.equipment.filter(Boolean).map(item => ({
+  id: String(item.id || `eq_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`),
+  category: EQUIPMENT_CATEGORIES.includes(item.category) ? item.category : 'Autre',
+  brand: String(item.brand || '').trim(),
+  model: String(item.model || item.name || '').trim(),
+  room: String(item.room || '').trim(),
+  year: String(item.year || '').replace(/\D/g, '').slice(0, 4),
+  image: String(item.image || '').trim(),
+  video: String(item.video || '').trim(),
+  audio: String(item.audio || '').trim(),
+  notes: String(item.notes || '').trim(),
+  updatedAt: item.updatedAt || new Date().toISOString()
+ })) : [];
+ return { equipment, updatedAt: value?.updatedAt || '' };
+}
+
+function saveProfileLocal() {
+ localStorage.setItem('profile_bundle_v1', JSON.stringify(profileData));
+}
+
+async function saveProfileBundleCloud() {
+ if (!db) return false;
+ beginCloudWrite();
+ const payload = { recordType: 'profile_bundle', equipment: profileData.equipment, updatedAt: profileData.updatedAt || new Date().toISOString() };
+ try {
+  if (profileBundleCloudId) {
+   const { error } = await db.from('bluray').update({ data: payload }).eq('id', profileBundleCloudId);
+   if (error) throw error;
+  } else {
+   const { data, error } = await db.from('bluray').insert([{ data: payload }]).select('id');
+   if (error) throw error;
+   profileBundleCloudId = data?.[0]?.id || null;
+   if (!profileBundleCloudId) throw new Error('Identifiant du profil cloud introuvable');
+  }
+  profileBundleFromCloud = payload;
+  finishCloudWrite(true);
+  return true;
+ } catch (error) {
+  console.warn('Sauvegarde de Mon espace indisponible :', error);
+  finishCloudWrite(false);
+  return false;
+ }
+}
+
+async function loadProfileFromCloud() {
+ let localProfile;
+ try { localProfile = normalizeProfileData(JSON.parse(localStorage.getItem('profile_bundle_v1') || '{}')); }
+ catch (_) { localProfile = normalizeProfileData({}); }
+ const cloudProfile = normalizeProfileData(profileBundleFromCloud || {});
+ const localDate = Date.parse(localProfile.updatedAt || '') || 0;
+ const cloudDate = Date.parse(cloudProfile.updatedAt || '') || 0;
+ profileData = localDate > cloudDate ? localProfile : cloudProfile;
+ saveProfileLocal();
+ renderEquipment();
+ if (!profileBundleCloudId || localDate > cloudDate) {
+  const saved = await saveProfileBundleCloud();
+  if (!saved && profileData.equipment.length) showToast('⚠️ Votre installation reste uniquement sur cet appareil.');
+  return saved || profileData.equipment.length === 0;
+ }
+ return true;
+}
+
+function equipmentField(id) {
+ return document.getElementById(id);
+}
+
+function openEquipmentForm(equipmentId = null) {
+ editingEquipmentId = equipmentId;
+ const equipment = profileData.equipment.find(item => item.id === equipmentId);
+ equipmentField('equipmentFormTitle').textContent = equipment ? 'Modifier l’équipement' : 'Ajouter un équipement';
+ equipmentField('equipmentCategory').value = equipment?.category || 'Téléviseur';
+ equipmentField('equipmentBrand').value = equipment?.brand || '';
+ equipmentField('equipmentModel').value = equipment?.model || '';
+ equipmentField('equipmentRoom').value = equipment?.room || '';
+ equipmentField('equipmentYear').value = equipment?.year || '';
+ equipmentField('equipmentImage').value = equipment?.image || '';
+ equipmentField('equipmentVideo').value = equipment?.video || '';
+ equipmentField('equipmentAudio').value = equipment?.audio || '';
+ equipmentField('equipmentNotes').value = equipment?.notes || '';
+ equipmentField('equipmentForm').classList.remove('hidden');
+ equipmentField('equipmentForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+ setTimeout(() => equipmentField('equipmentModel').focus(), 250);
+}
+
+function closeEquipmentForm() {
+ editingEquipmentId = null;
+ equipmentField('equipmentForm')?.classList.add('hidden');
+}
+
+function renderEquipment() {
+ const list = equipmentField('equipmentList');
+ const empty = equipmentField('equipmentEmptyState');
+ if (!list || !empty) return;
+ const equipment = normalizeProfileData(profileData).equipment;
+ empty.classList.toggle('hidden', equipment.length > 0);
+ list.replaceChildren();
+ EQUIPMENT_CATEGORIES.forEach(category => {
+  const items = equipment.filter(item => item.category === category);
+  if (!items.length) return;
+  const group = document.createElement('section');
+  group.className = 'space-y-2';
+  const heading = document.createElement('div');
+  heading.className = 'flex items-center justify-between px-1';
+  heading.innerHTML = `<h4 class="text-[10px] font-bold uppercase tracking-wider text-purple-200">${escapeHtml(category)}</h4><span class="text-[9px] text-gray-500">${items.length}</span>`;
+  group.appendChild(heading);
+  const grid = document.createElement('div');
+  grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-2';
+  items.forEach(item => {
+   const card = document.createElement('article');
+   card.className = 'glass-card rounded-2xl border border-white/10 p-3 flex gap-3 min-w-0';
+   const image = item.image ? `<img src="${safeImageUrl(item.image)}" alt="" loading="lazy" onerror="this.style.display='none'" class="w-16 h-16 rounded-xl object-cover bg-black/30 flex-none">` : `<span class="icon-chip flex-none" data-icon="${category.includes('Télé') || category.includes('projecteur') ? 'tv' : category.includes('Lecteur') ? 'disc' : 'package'}"></span>`;
+   const chips = [item.room, item.year, item.video, item.audio].filter(Boolean).map(value => `<span class="rounded-md bg-white/5 border border-white/10 px-1.5 py-0.5 text-[8px] text-gray-300">${escapeHtml(value)}</span>`).join('');
+   card.innerHTML = `${image}<div class="min-w-0 flex-1"><div class="flex items-start justify-between gap-2"><div class="min-w-0"><p class="text-xs font-bold text-white break-words">${escapeHtml([item.brand, item.model].filter(Boolean).join(' ') || 'Équipement')}</p><p class="text-[9px] text-gray-500 mt-0.5">${escapeHtml(item.category)}</p></div><div class="flex gap-1 flex-none"><button type="button" data-equipment-edit="${escapeHtml(item.id)}" class="app-action app-action-slate min-h-8 px-2 text-[9px]">Modifier</button><button type="button" data-equipment-delete="${escapeHtml(item.id)}" class="app-action app-action-red min-h-8 px-2 text-[9px]" title="Supprimer"><span class="icon-inline w-3 h-3" data-icon="trash"></span></button></div></div>${chips ? `<div class="flex flex-wrap gap-1 mt-2">${chips}</div>` : ''}${item.notes ? `<p class="text-[10px] text-gray-400 mt-2 whitespace-pre-line">${escapeHtml(item.notes)}</p>` : ''}</div>`;
+   card.querySelector('[data-equipment-edit]')?.addEventListener('click', () => openEquipmentForm(item.id));
+   card.querySelector('[data-equipment-delete]')?.addEventListener('click', () => deleteEquipment(item.id));
+   grid.appendChild(card);
+  });
+  group.appendChild(grid);
+  list.appendChild(group);
+ });
+ applyStaticIcons();
+}
+
+async function saveEquipment() {
+ const model = equipmentField('equipmentModel').value.trim();
+ if (!model) { equipmentField('equipmentModel').focus(); return showToast('Indiquez le modèle ou le nom de l’équipement.'); }
+ const previous = JSON.parse(JSON.stringify(profileData));
+ const item = {
+  id: editingEquipmentId || `eq_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+  category: equipmentField('equipmentCategory').value,
+  brand: equipmentField('equipmentBrand').value.trim(),
+  model,
+  room: equipmentField('equipmentRoom').value.trim(),
+  year: equipmentField('equipmentYear').value.trim(),
+  image: equipmentField('equipmentImage').value.trim(),
+  video: equipmentField('equipmentVideo').value.trim(),
+  audio: equipmentField('equipmentAudio').value.trim(),
+  notes: equipmentField('equipmentNotes').value.trim(),
+  updatedAt: new Date().toISOString()
+ };
+ const index = profileData.equipment.findIndex(entry => entry.id === item.id);
+ if (index >= 0) profileData.equipment[index] = item; else profileData.equipment.push(item);
+ profileData.updatedAt = item.updatedAt;
+ saveProfileLocal();
+ renderEquipment();
+ closeEquipmentForm();
+ const saved = await saveProfileBundleCloud();
+ if (!saved) {
+  profileData = previous;
+  saveProfileLocal();
+  renderEquipment();
+  showToast('⚠️ Équipement non enregistré.');
+  return;
+ }
+ showToast(index >= 0 ? 'Équipement modifié.' : 'Équipement ajouté à votre installation.');
+}
+
+async function deleteEquipment(equipmentId) {
+ const item = profileData.equipment.find(entry => entry.id === equipmentId);
+ if (!item || !confirm(`Supprimer "${[item.brand, item.model].filter(Boolean).join(' ')}" de votre installation ?`)) return;
+ const previous = JSON.parse(JSON.stringify(profileData));
+ profileData.equipment = profileData.equipment.filter(entry => entry.id !== equipmentId);
+ profileData.updatedAt = new Date().toISOString();
+ saveProfileLocal();
+ renderEquipment();
+ const saved = await saveProfileBundleCloud();
+ if (!saved) {
+  profileData = previous;
+  saveProfileLocal();
+  renderEquipment();
+  showToast('⚠️ Suppression non enregistrée.');
+ } else showToast('Équipement supprimé.');
 }
 
 // --- NORMALISATION DES DONNÉES (POUR LES ÉDITIONS MULTIPLES) ---
@@ -2170,10 +2381,17 @@ collection = [];
 wishlist = [];
 trackedSeriesBundleCloudId = null;
 trackedSeriesBundleFromCloud = null;
+profileBundleCloudId = null;
+profileBundleFromCloud = null;
 data.forEach(item => {
 if (item.data?.recordType === 'tracked_series_bundle') {
 trackedSeriesBundleCloudId = item.id;
 trackedSeriesBundleFromCloud = Array.isArray(item.data.series) ? item.data.series : [];
+return;
+}
+if (item.data?.recordType === 'profile_bundle') {
+profileBundleCloudId = item.id;
+profileBundleFromCloud = item.data;
 return;
 }
 let m = { ...item.data, cloud_id: item.id };
@@ -2277,10 +2495,10 @@ applyStaticIcons();
 }
 
 try {
-const { error } = await db
-.from('bluray')
-.delete()
-.not('id', 'is', null);
+const cloudIds = [...collection, ...wishlist].map(item => item.cloud_id).filter(Boolean);
+const { error } = cloudIds.length
+ ? await db.from('bluray').delete().in('id', cloudIds)
+ : { error: null };
 
 if (error) {
 console.error('Delete collection error:', error);
@@ -2367,6 +2585,7 @@ document.getElementById('bottomTabStatsBtn').classList.add('active');
 renderStats();
 } else if (tab === 'settings') {
 document.getElementById('tabSettings').classList.remove('hidden');
+renderEquipment();
 document.getElementById('tabSettingsBtn').className = activeClass;
 document.getElementById('bottomTabSettingsBtn').classList.add('active');
 updateSettingsCounters();
@@ -4949,11 +5168,12 @@ showToast("Exportation Excel terminée ! 📊");
 function exportToJSON() {
 if (collection.length === 0 && wishlist.length === 0 && trackedSeries.length === 0) return showToast("Aucune donnée à exporter.");
 const backup = {
-schemaVersion: 3,
+schemaVersion: 4,
 exportedAt: new Date().toISOString(),
 collection,
 wishlist,
 trackedSeries,
+profile: profileData,
 preferences: {
 theme: localStorage.getItem('app_theme') || 'theme-noir',
 defaultView: localStorage.getItem('default_view') || 'grid'
@@ -5016,11 +5236,18 @@ trackedSeries = [...seriesMap.values()];
 saveTrackedSeriesLocal();
 await saveTrackedSeriesBundleCloud();
 }
+if (backup.profile && Array.isArray(backup.profile.equipment)) {
+ profileData = normalizeProfileData(backup.profile);
+ profileData.updatedAt = new Date().toISOString();
+ saveProfileLocal();
+ await saveProfileBundleCloud();
+ renderEquipment();
+}
 if (backup.preferences?.theme) changeTheme(backup.preferences.theme);
 if (backup.preferences?.defaultView) saveDefaultViewPref(backup.preferences.defaultView);
 renderCollection(); renderWishlist(); renderTrackedSeries(); updateSettingsCounters();
 finishCloudWrite(true);
-showToast(`${restoredCollection + restoredWishlist} titre(s) restauré(s), ${trackedSeries.length} série(s) suivie(s).`);
+showToast(`${restoredCollection + restoredWishlist} titre(s), ${trackedSeries.length} série(s) et ${profileData.equipment.length} équipement(s) restaurés.`);
 } catch (error) {
 console.error('Import JSON:', error);
 finishCloudWrite(false);
