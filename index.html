@@ -1305,11 +1305,12 @@ body.theme-light .project-type { color: #4338ca; background: rgba(99,102,241,.1)
 .space-submenu { display: none; }
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
   #topNav { overflow: visible !important; }
+  #spaceMenuWrapper { overflow: visible; }
   #spaceSubmenu {
     position: absolute;
     z-index: 60;
     top: 100%;
-    right: 1.5rem;
+    right: 0;
     width: 15rem;
     padding: .22rem .45rem .38rem;
     border: 0;
@@ -1318,7 +1319,7 @@ body.theme-light .project-type { color: #4338ca; background: rgba(99,102,241,.1)
     background: #08090d;
     box-shadow: 0 9px 16px rgba(0,0,0,.22);
   }
-  #tabSettingsBtn:hover + #spaceSubmenu,
+  #spaceMenuWrapper:hover #spaceSubmenu,
   #tabSettingsBtn:focus-visible + #spaceSubmenu,
   #spaceSubmenu:hover,
   #spaceSubmenu:focus-within { display: grid; gap: 0; }
@@ -1458,13 +1459,15 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <button id="tabStatsBtn" onclick="switchTab('stats')" class="flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent">
 <span class="icon-inline w-3.5 h-3.5" data-icon="barchart"></span> <span>Stats</span>
 </button>
-<button id="tabSettingsBtn" onclick="openSpaceSection('installation')" class="flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent" aria-haspopup="true">
+<div id="spaceMenuWrapper" class="flex-1 relative flex">
+<button id="tabSettingsBtn" onclick="openSpaceSection('installation')" class="w-full py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent" aria-haspopup="true">
 <span class="icon-inline w-3.5 h-3.5" data-icon="user"></span> <span>Mon espace</span>
 </button>
 <div id="spaceSubmenu" class="space-submenu" role="menu" aria-label="Mon espace">
 <button type="button" data-space-target="installation" onclick="openSpaceSection('installation')" role="menuitem"><span class="icon-inline w-4 h-4" data-icon="tv"></span><span><strong>Mon installation</strong><small>Équipements et compatibilités</small></span></button>
 <button type="button" data-space-target="subscriptions" onclick="openSpaceSection('subscriptions')" role="menuitem"><span class="icon-inline w-4 h-4" data-icon="wallet"></span><span><strong>Mes abonnements</strong><small>Streaming, internet, mobile</small></span></button>
 <button type="button" data-space-target="options" onclick="openSpaceSection('options')" role="menuitem"><span class="icon-inline w-4 h-4" data-icon="settings"></span><span><strong>Options</strong><small>Préférences, données et services</small></span></button>
+</div>
 </div>
 </nav>
 
@@ -1578,10 +1581,10 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 
 <!-- ONGLET COLLECTION AVEC FILTRES AVANCÉS -->
 <div id="tabCollection" class="hidden space-y-4">
-<button id="collectionWishlistBtn" type="button" onclick="switchTab('wishlist')" class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-2xl border border-pink-400/25 bg-pink-400/10 text-pink-200 hover:text-white hover:bg-pink-400/15 transition min-h-[42px]">
-<span class="flex items-center gap-2 text-xs font-bold"><span class="icon-inline w-4 h-4" data-icon="sparkles"></span> Wishlist</span>
-<span class="flex items-center gap-2"><span id="wishlistBadge" class="hidden bg-pink-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">0</span><span class="icon-inline w-3.5 h-3.5" data-icon="chevronright"></span></span>
-</button>
+<div class="choice-bar w-full" role="group" aria-label="Affichage de la collection">
+<button type="button" class="choice-option is-active" aria-pressed="true" disabled>Ma collection</button>
+<button type="button" onclick="switchTab('wishlist')" class="choice-option flex items-center justify-center gap-1.5" aria-pressed="false">Wishlist<span id="wishlistBadge" class="hidden bg-pink-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">0</span></button>
+</div>
 <div class="flex items-center justify-between gap-2">
 <button id="collectionFilterToggle" type="button" onclick="toggleCollectionFilters()" aria-expanded="false" aria-controls="collectionFilterPanel" class="glass-pill px-3 py-2 rounded-xl text-[11px] font-semibold text-cyan-300 hover:text-white flex items-center gap-2 min-h-[42px]"><span class="icon-inline w-3.5 h-3.5" data-icon="filter"></span> Filtrer <span id="activeFilterCount" class="hidden bg-cyan-400/20 text-cyan-200 rounded-full px-1.5 py-0.5 text-[9px]"></span></button>
 <button id="bulkToggle" onclick="toggleBulkMode()" class="text-[11px] text-gray-400 hover:text-cyan-300 px-2 py-2 rounded-xl min-h-[42px]" aria-expanded="false" aria-controls="bulkToolbar">Sélectionner</button>
@@ -1809,6 +1812,42 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <div><p class="text-sm font-bold text-white">Bibliothèque numérique</p><p class="text-[11px] text-gray-400 mt-1">Connectez votre compte Plex depuis Mon espace → Mes abonnements pour importer vos films, séries et concerts numériques ici.</p></div>
 <button type="button" onclick="openSpaceSection('subscriptions')" class="app-action app-action-cyan px-4 py-2.5 text-xs mx-auto"><span class="icon-inline w-3.5 h-3.5" data-icon="wallet"></span> Aller à Mes abonnements</button>
 </div>
+<div id="digitalFilterBar" class="hidden space-y-3">
+<div class="flex items-center justify-between gap-2">
+<button id="digitalFilterToggle" type="button" onclick="toggleDigitalFilters()" aria-expanded="false" aria-controls="digitalFilterPanel" class="glass-pill px-3 py-2 rounded-xl text-[11px] font-semibold text-cyan-300 hover:text-white flex items-center gap-2 min-h-[42px]"><span class="icon-inline w-3.5 h-3.5" data-icon="filter"></span> Filtrer <span id="digitalActiveFilterCount" class="hidden bg-cyan-400/20 text-cyan-200 rounded-full px-1.5 py-0.5 text-[9px]"></span></button>
+<span id="digitalResultCount" class="text-[10px] text-gray-400"></span>
+</div>
+<div id="digitalFilterPanel" class="hidden space-y-3">
+<div class="choice-bar w-full" role="group" aria-label="Type de contenu">
+<button id="digitalTypeAllBtn" aria-pressed="true" onclick="setDigitalTypeFilter('all')" class="choice-option is-active">Tous</button>
+<button id="digitalTypeMovieBtn" aria-pressed="false" onclick="setDigitalTypeFilter('movie')" class="choice-option">Films</button>
+<button id="digitalTypeShowBtn" aria-pressed="false" onclick="setDigitalTypeFilter('show')" class="choice-option">Séries</button>
+<button id="digitalTypeConcertBtn" aria-pressed="false" onclick="setDigitalTypeFilter('concert')" class="choice-option">Concerts</button>
+</div>
+<div class="glass-card p-3 rounded-2xl space-y-2 border border-white/10">
+<div class="relative">
+<span class="icon-inline w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" data-icon="search"></span>
+<input id="digitalSearchInput" type="text" oninput="renderDigital()" placeholder="Rechercher dans Digital..." class="w-full pl-9 pr-3 py-2 rounded-xl glass-input text-white text-xs placeholder-gray-400 focus:outline-none">
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+<div>
+<label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Bibliothèque</label>
+<select id="digitalLibraryFilter" onchange="renderDigital()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none"><option value="all">Toutes</option></select>
+</div>
+<div>
+<label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Trier par</label>
+<select id="digitalSortSelect" onchange="renderDigital()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
+<option value="added_desc">Date d'ajout (Récents)</option>
+<option value="added_asc">Date d'ajout (Anciens)</option>
+<option value="title_asc">Titre (A-Z)</option>
+<option value="title_desc">Titre (Z-A)</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="digitalNoResults" class="hidden glass-card p-5 rounded-2xl border border-white/10 text-center"><p class="text-xs font-semibold text-gray-300">Aucun résultat</p><p class="text-[10px] text-gray-500 mt-1">Modifiez vos filtres ou votre recherche.</p></div>
 <div id="digitalGrid" class="hidden grid grid-cols-2 gap-4"></div>
 </div>
 
@@ -4527,16 +4566,92 @@ document.getElementById('viewModeLabelWishlist').innerText = isWishlistListView 
 renderWishlist();
 }
 
+let digitalTypeFilter = 'all';
+
+function toggleDigitalFilters() {
+ const panel = document.getElementById('digitalFilterPanel');
+ const button = document.getElementById('digitalFilterToggle');
+ const open = panel.classList.toggle('hidden') === false;
+ button.setAttribute('aria-expanded', String(open));
+}
+
+function setDigitalTypeFilter(type) {
+ digitalTypeFilter = type;
+ const buttons = {
+  all: document.getElementById('digitalTypeAllBtn'),
+  movie: document.getElementById('digitalTypeMovieBtn'),
+  show: document.getElementById('digitalTypeShowBtn'),
+  concert: document.getElementById('digitalTypeConcertBtn')
+ };
+ Object.entries(buttons).forEach(([key, btn]) => {
+  if (!btn) return;
+  btn.classList.toggle('is-active', key === type);
+  btn.setAttribute('aria-pressed', String(key === type));
+ });
+ renderDigital();
+}
+
+function isDigitalConcert(item) {
+ return item.type === 'movie' && /concert/i.test(item.sectionTitle || '');
+}
+
 function renderDigital() {
  renderedTabs.digital = true;
  const empty = document.getElementById('digitalEmptyState');
+ const filterBar = document.getElementById('digitalFilterBar');
+ const noResults = document.getElementById('digitalNoResults');
  const grid = document.getElementById('digitalGrid');
  if (!empty || !grid) return;
- const hasItems = Array.isArray(digitalLibrary) && digitalLibrary.length > 0;
+ const library = Array.isArray(digitalLibrary) ? digitalLibrary : [];
+ const hasItems = library.length > 0;
  empty.classList.toggle('hidden', hasItems);
- grid.classList.toggle('hidden', !hasItems);
- if (!hasItems) { grid.innerHTML = ''; return; }
- const sorted = [...digitalLibrary].sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
+ if (filterBar) filterBar.classList.toggle('hidden', !hasItems);
+ if (!hasItems) { grid.classList.add('hidden'); if (noResults) noResults.classList.add('hidden'); grid.innerHTML = ''; return; }
+
+ const librarySelect = document.getElementById('digitalLibraryFilter');
+ if (librarySelect && librarySelect.dataset.count !== String(library.length)) {
+  const sections = [...new Set(library.map(d => d.sectionTitle).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'fr'));
+  const current = librarySelect.value || 'all';
+  librarySelect.innerHTML = '<option value="all">Toutes</option>' + sections.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+  librarySelect.value = sections.includes(current) ? current : 'all';
+  librarySelect.dataset.count = String(library.length);
+ }
+
+ const query = (document.getElementById('digitalSearchInput')?.value || '').trim().toLowerCase();
+ const libraryFilter = document.getElementById('digitalLibraryFilter')?.value || 'all';
+ const sortValue = document.getElementById('digitalSortSelect')?.value || 'added_desc';
+
+ let filtered = library.filter(item => {
+  if (query && !item.title.toLowerCase().includes(query)) return false;
+  if (libraryFilter !== 'all' && item.sectionTitle !== libraryFilter) return false;
+  if (digitalTypeFilter === 'movie' && (item.type !== 'movie' || isDigitalConcert(item))) return false;
+  if (digitalTypeFilter === 'show' && item.type !== 'show') return false;
+  if (digitalTypeFilter === 'concert' && !isDigitalConcert(item)) return false;
+  return true;
+ });
+
+ const sorters = {
+  added_desc: (a, b) => (b.addedAt || 0) - (a.addedAt || 0),
+  added_asc: (a, b) => (a.addedAt || 0) - (b.addedAt || 0),
+  title_asc: (a, b) => a.title.localeCompare(b.title, 'fr'),
+  title_desc: (a, b) => b.title.localeCompare(a.title, 'fr')
+ };
+ const sorted = filtered.sort(sorters[sortValue] || sorters.added_desc);
+
+ const activeFilterCount = [query, libraryFilter !== 'all', digitalTypeFilter !== 'all'].filter(Boolean).length;
+ const filterCountEl = document.getElementById('digitalActiveFilterCount');
+ if (filterCountEl) { filterCountEl.textContent = activeFilterCount || ''; filterCountEl.classList.toggle('hidden', !activeFilterCount); }
+ const resultCountEl = document.getElementById('digitalResultCount');
+ if (resultCountEl) resultCountEl.textContent = `${sorted.length} élément${sorted.length > 1 ? 's' : ''}`;
+
+ if (!sorted.length) {
+  grid.classList.add('hidden');
+  grid.innerHTML = '';
+  if (noResults) noResults.classList.remove('hidden');
+  return;
+ }
+ if (noResults) noResults.classList.add('hidden');
+ grid.classList.remove('hidden');
  grid.innerHTML = sorted.map(item => {
   const poster = item.posterData || item.poster || '';
   return `
