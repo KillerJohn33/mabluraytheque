@@ -150,6 +150,22 @@ border-radius: .7rem;
 }
 .hero-filter-btn:hover { background: rgba(255,255,255,.22); }
 body.theme-light .hero-filter-btn { background: rgba(15,23,42,.08); color: #0f172a; }
+.hero-select-btn {
+  height: 1.6rem; flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0 .5rem;
+  border-radius: .5rem;
+  background: rgba(255,255,255,.1);
+  color: #cbd5e1;
+  font-size: .6rem;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background .15s ease, color .15s ease;
+}
+.hero-select-btn:hover { background: rgba(255,255,255,.18); }
+.hero-select-btn[aria-expanded="true"] { background: rgba(34,211,238,.22); color: #67e8f9; }
+body.theme-light .hero-select-btn { background: rgba(15,23,42,.06); color: #475569; }
+body.theme-light .hero-select-btn[aria-expanded="true"] { background: rgba(8,145,178,.16); color: #0e7490; }
 body.theme-light .mobile-section-hero {
 background: linear-gradient(120deg, rgba(224,242,254,.95), rgba(238,242,255,.88));
 border-color: rgba(2,132,199,.2);
@@ -1574,7 +1590,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 
 <!-- RECHERCHE & SCANNER (visible uniquement sur Accueil et Collection) -->
 <div id="homeMobileHero" class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="home"></span><h2 class="font-black text-white relative z-10">Accueil</h2></div>
-<div id="collectionMobileHero" class="hidden mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="disc"></span><h2 class="font-black text-white relative z-10">Collection</h2><button type="button" onclick="toggleCollectionFilters()" aria-expanded="false" aria-controls="collectionFilterPanel" class="hero-filter-btn ml-auto relative z-10"><span class="icon-inline w-3.5 h-3.5" data-icon="filter"></span></button></div>
+<div id="collectionMobileHero" class="hidden mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="disc"></span><h2 class="font-black text-white relative z-10">Collection</h2><button id="collectionSelectHeroBtn" type="button" onclick="toggleBulkMode()" aria-expanded="false" aria-controls="bulkToolbar" class="hero-select-btn ml-auto relative z-10">Sélectionner</button><button type="button" onclick="toggleCollectionFilters()" aria-expanded="false" aria-controls="collectionFilterPanel" class="hero-filter-btn relative z-10"><span class="icon-inline w-3.5 h-3.5" data-icon="filter"></span></button></div>
 <div id="searchSection" class="space-y-4">
 <div class="space-y-4">
 <div class="space-y-2">
@@ -4475,6 +4491,7 @@ let bulkVisibleIds = [];
 
 function updateBulkToolbar() {
 const toggle = document.getElementById('bulkToggle');
+const heroToggle = document.getElementById('collectionSelectHeroBtn');
 const toolbar = document.getElementById('bulkToolbar');
 if (!toggle || !toolbar) return;
 toggle.textContent = bulkMode ? 'Sélection active' : 'Sélectionner';
@@ -4484,6 +4501,10 @@ const count = bulkSelected.size;
 document.getElementById('bulkCount').textContent = `${count} sélectionné${count > 1 ? 's' : ''}`;
 toolbar.querySelectorAll('[data-bulk-action]').forEach(button => button.disabled = !count || bulkBusy);
 toggle.disabled = bulkBusy;
+if (heroToggle) {
+heroToggle.setAttribute('aria-expanded', String(bulkMode));
+heroToggle.disabled = bulkBusy;
+}
 }
 
 function toggleBulkMode() {
@@ -4660,35 +4681,11 @@ const fragment = document.createDocumentFragment();
 filtered.forEach(m => {
 const totals = calculateMovieTotals(m);
 const card = document.createElement('div');
+card.onclick = () => bulkMode ? toggleBulkMovie(m.id) : openMovieDetail(m.id);
 card.setAttribute('role', 'button');
 card.tabIndex = 0;
 card.setAttribute('aria-label', bulkMode ? `Sélectionner ${m.title}` : `Ouvrir ${m.title}`);
 card.onkeydown = event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); card.click(); } };
-
-let longPressFired = false;
-let longPressTimer = null;
-const startLongPress = () => {
- longPressFired = false;
- clearTimeout(longPressTimer);
- longPressTimer = setTimeout(() => {
-  longPressFired = true;
-  if (navigator.vibrate) navigator.vibrate(15);
-  bulkMode = true;
-  toggleBulkMovie(m.id);
- }, 900);
-};
-const cancelLongPress = () => clearTimeout(longPressTimer);
-card.addEventListener('touchstart', startLongPress, { passive: true });
-card.addEventListener('touchend', cancelLongPress);
-card.addEventListener('touchmove', cancelLongPress);
-card.addEventListener('touchcancel', cancelLongPress);
-card.addEventListener('mousedown', startLongPress);
-card.addEventListener('mouseup', cancelLongPress);
-card.addEventListener('mouseleave', cancelLongPress);
-card.onclick = event => {
- if (longPressFired) { event.preventDefault(); return; }
- bulkMode ? toggleBulkMovie(m.id) : openMovieDetail(m.id);
-};
 
 const statusRow = `
 <div class="flex items-center gap-2 mt-1 text-[10px]">
