@@ -3272,6 +3272,35 @@ async function disconnectPlex() {
  showToast('Compte Plex déconnecté.');
 }
 
+async function mapWithConcurrency(list, limit, worker) {
+ let index = 0;
+ async function next() {
+  while (index < list.length) {
+   const current = index++;
+   await worker(list[current], current);
+  }
+ }
+ await Promise.all(Array.from({ length: Math.min(limit, list.length) }, next));
+}
+
+async function fetchPlexPosterDataUri(base, token, thumbPath) {
+ if (!thumbPath) return '';
+ try {
+  const sourceUrl = `${base}${thumbPath}?X-Plex-Token=${encodeURIComponent(token)}`;
+  const transcodeUrl = `${base}/photo/:/transcode?width=300&height=450&minSize=1&upscale=0&url=${encodeURIComponent(sourceUrl)}&X-Plex-Token=${encodeURIComponent(token)}`;
+  const res = await fetch(transcodeUrl);
+  if (!res.ok) return '';
+  const blob = await res.blob();
+  if (!blob || blob.size > 250000) return '';
+  return await new Promise(resolve => {
+   const reader = new FileReader();
+   reader.onload = () => resolve(String(reader.result || ''));
+   reader.onerror = () => resolve('');
+   reader.readAsDataURL(blob);
+  });
+ } catch (_) { return ''; }
+}
+
 async function syncPlexLibrary(silent = false) {
  const plex = profileData.plex || {};
  if (!plex.token || !plex.serverUri) { if (!silent) showToast('Connectez d’abord votre compte Plex.'); return false; }
@@ -3300,6 +3329,8 @@ async function syncPlexLibrary(silent = false) {
      sectionTitle: section.title,
      tmdbId: tmdbGuid ? tmdbGuid.id.replace('tmdb://', '') : '',
      poster: m.thumb ? `${base}${m.thumb}?X-Plex-Token=${encodeURIComponent(plex.token)}` : '',
+     thumbPath: m.thumb || '',
+     posterData: '',
      duration: m.duration ? Math.round(m.duration / 60000) : 0,
      resolution: media?.videoResolution || '',
      videoCodec: media?.videoCodec || '',
@@ -3312,6 +3343,19 @@ async function syncPlexLibrary(silent = false) {
     });
    });
   }
+
+  // Recupere et met en cache les affiches (en base64) pour un affichage rapide sans dependre de Plex
+  if (!silent) showToast('Téléchargement des affiches…');
+  const previousByKey = new Map(digitalLibrary.map(d => [d.ratingKey, d]));
+  await mapWithConcurrency(items, 5, async item => {
+   const previous = previousByKey.get(item.ratingKey);
+   if (previous && previous.thumbPath === item.thumbPath && previous.posterData) {
+    item.posterData = previous.posterData;
+    return;
+   }
+   item.posterData = await fetchPlexPosterDataUri(base, plex.token, item.thumbPath);
+  });
+
   digitalLibrary = items;
   saveDigitalLibraryLocal();
   profileData.plex.lastSyncAt = new Date().toISOString();
@@ -3321,7 +3365,7 @@ async function syncPlexLibrary(silent = false) {
   renderPlexCard();
   await saveDigitalLibraryBundleCloud();
   await saveProfileBundleCloud();
-  if (!silent) showToast(`${items.length} élément(s) importé(s) depuis Plex.`);
+  if (!silent) showToast(`${items.length} élément(s) importé(s) et mis en cache depuis Plex.`);
   return true;
  } catch (error) {
   console.warn('Synchronisation Plex indisponible :', error);
@@ -4490,10 +4534,12 @@ function renderDigital() {
  grid.classList.toggle('hidden', !hasItems);
  if (!hasItems) { grid.innerHTML = ''; return; }
  const sorted = [...digitalLibrary].sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
- grid.innerHTML = sorted.map(item => `
+ grid.innerHTML = sorted.map(item => {
+  const poster = item.posterData || item.poster || '';
+  return `
   <div onclick="openDigitalDetail('${item.id}')" class="movie-card-item glass-card rounded-2xl overflow-hidden border border-white/10 cursor-pointer">
    <div class="relative aspect-[2/3] bg-black/40">
-    ${item.poster ? `<img src="${escapeHtml(item.poster)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.style.display='none'" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-gray-600"><span class="icon-inline w-8 h-8" data-icon="cloud"></span></div>`}
+    ${poster ? `<img src="${escapeHtml(poster)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.style.display='none'" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-gray-600"><span class="icon-inline w-8 h-8" data-icon="cloud"></span></div>`}
     <span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-black/70 text-[8px] font-bold text-amber-300 uppercase tracking-wider">${escapeHtml(item.sectionTitle || (item.type === 'show' ? 'Série' : 'Film'))}</span>
     ${item.resolution ? `<span class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md bg-black/70 text-[8px] font-bold text-cyan-300 uppercase">${escapeHtml(item.resolution)}</span>` : ''}
    </div>
@@ -4502,7 +4548,8 @@ function renderDigital() {
     <p class="text-[9px] text-gray-500 mt-0.5">${[item.year, item.duration ? formatRuntime(item.duration) : ''].filter(Boolean).join(' · ')}</p>
    </div>
   </div>
- `).join('');
+ `;
+ }).join('');
 }
 
 function digitalPlexLink(item) {
@@ -4520,7 +4567,7 @@ function formatDigitalSize(bytes) {
 function renderDigitalDetail(item, extra = {}) {
  const content = document.getElementById('modalContent');
  if (!content || content.dataset.digitalId !== item.id) return;
- const poster = item.poster || extra.poster || '';
+ const poster = item.posterData || item.poster || extra.poster || '';
  const isShow = item.type === 'show';
  const metaParts = [item.year, extra.runtime ? formatRuntime(extra.runtime) : (item.duration ? formatRuntime(item.duration) : '')].filter(Boolean);
  const genreChips = (extra.genres || []).slice(0, 4).map(g => `<span class="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] text-gray-300">${escapeHtml(g)}</span>`).join('');
@@ -4604,7 +4651,7 @@ async function openDigitalDetail(digitalId) {
    budget: typeof detail.budget === 'number' ? detail.budget : null,
    revenue: typeof detail.revenue === 'number' ? detail.revenue : null,
    runtime: detail.runtime || (Array.isArray(detail.episode_run_time) ? detail.episode_run_time[0] : null),
-   poster: (!item.poster && detail.poster_path) ? `https://image.tmdb.org/t/p/w500${detail.poster_path}` : '',
+   poster: (!item.posterData && !item.poster && detail.poster_path) ? `https://image.tmdb.org/t/p/w500${detail.poster_path}` : '',
    director: crew.filter(p => p.job === 'Director').map(p => p.name).join(', ') || (detail.created_by || []).map(c => c.name).join(', '),
    cast: (detail.credits?.cast || []).slice(0, 5).map(p => p.name)
   };
