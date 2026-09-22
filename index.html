@@ -1555,6 +1555,9 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 
   /* Barre de navigation epuree : plus de fond ni de contour, juste le texte et le trait actif + une fine separation en bas */
   #topNav {
+    position: sticky !important;
+    top: var(--header-h, 4.5rem);
+    z-index: 39;
     background: transparent !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -1562,8 +1565,10 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
     box-shadow: none !important;
     border-radius: 0 !important;
     border-bottom: 1px solid rgba(255,255,255,.1) !important;
+    padding: .4rem .5rem !important;
   }
   #topNav::before, #topNav::after { display: none !important; }
+  #topNav button { padding-top: .4rem !important; padding-bottom: .4rem !important; }
   body.theme-light #topNav { background: transparent !important; border-bottom: 1px solid rgba(15,23,42,.1) !important; box-shadow: none !important; }
 }
 </style>
@@ -2805,7 +2810,8 @@ function updateDesktopNavOffsets() {
  const nav = document.getElementById('topNav');
  if (!header || !nav) return;
  const desktop = window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine)').matches;
- if (!desktop) return;
+ const tablet = window.matchMedia('(min-width: 768px) and (hover: none) and (pointer: coarse)').matches;
+ if (!desktop && !tablet) return;
  document.documentElement.style.setProperty('--header-h', `${header.offsetHeight}px`);
  document.documentElement.style.setProperty('--topnav-h', `${nav.offsetHeight}px`);
 }
