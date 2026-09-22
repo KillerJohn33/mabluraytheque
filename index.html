@@ -223,6 +223,9 @@ box-shadow: 0 7px 20px rgba(15,23,42,.08), inset 0 1px 0 #fff;
   /* Espaces plus resserres sur les onglets Collection et Digital */
   #tabCollection, #tabDigital { row-gap: .75rem !important; }
   #tabCollection > * + *, #tabDigital > * + * { margin-top: .75rem !important; }
+
+  /* Meme ecart entre la barre de titre et le contenu sur Collection et Digital (evite le decalage au changement d'onglet) */
+  #tabCollection { margin-top: .75rem !important; }
 }
 #filterDropdownBackdrop { display: none; }
 /* ===== Pages Stats et Options harmonisees ===== */
