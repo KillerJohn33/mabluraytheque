@@ -797,6 +797,30 @@ body { padding-bottom: 7rem !important; }
   #bulkToolbar button, #bulkToolbar select { min-height: 42px; }
   #incompleteList .incomplete-item { min-height: 72px; }
 }
+
+/* Fiche film sur telephone : la fenetre utilise toute la largeur de l'ecran (HERO et INFOS inchanges) */
+@media (max-width: 767px) {
+  #detailModal { padding: .4rem !important; }
+  #detailModal > div {
+    max-width: 100% !important;
+    width: 100% !important;
+    border-radius: 1.1rem !important;
+  }
+
+  /* Editions (3e bloc) et actions (4e bloc) : espacement resserre */
+  #modalContent > div > :nth-child(3) { margin-top: .6rem !important; padding: .65rem !important; }
+  #modalContent > div > :nth-child(4) { margin-top: .6rem !important; }
+
+  /* La liste des editions n'est plus limitee en hauteur : c'est la fiche entiere qui defile */
+  #modalContent .edition-list { max-height: none !important; overflow: visible !important; }
+  #modalContent .edition-list > * + * { margin-top: .5rem !important; }
+
+  #modalContent .edition-card { padding: .6rem !important; }
+  #modalContent .edition-card > * + * { margin-top: .5rem !important; }
+  #modalContent .edition-card .edition-form-fields { gap: .4rem !important; }
+  #modalContent .edition-boxset { padding: .55rem !important; }
+  #modalContent .edition-disc-composition { padding: .55rem !important; }
+}
 #incompletePanel {
   background: linear-gradient(145deg, rgba(245,158,11,.16), rgba(120,53,15,.09));
   border-color: rgba(251,191,36,.3);
