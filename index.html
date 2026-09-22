@@ -110,6 +110,49 @@ body.theme-light .shadow-black\/30 { --tw-shadow-color: rgba(15, 23, 42, 0.16) !
 /* Cartes/pastilles a opacite arbitraire (bg-white/[0.025], [0.035]...) : invisibles sur fond clair sans cette regle */
 body.theme-light [class*="bg-white/[0."] { background-color: rgba(255, 255, 255, 0.55) !important; }
 body.theme-light [class*="hover:bg-white/[0."]:hover { background-color: rgba(255, 255, 255, 0.8) !important; }
+/* Jaquettes de film et pastilles sur fond noir (bg-black, bg-black/NN) : le texte doit rester clair meme en theme clair, car il repose toujours sur l'affiche ou un bandeau sombre, jamais sur la page elle-meme */
+body.theme-light .bg-black .text-white,
+body.theme-light [class*="bg-black/"].text-white,
+body.theme-light .bg-black .text-gray-100,
+body.theme-light [class*="bg-black/"].text-gray-100 { color: #ffffff !important; }
+body.theme-light .bg-black .text-gray-200,
+body.theme-light [class*="bg-black/"].text-gray-200,
+body.theme-light .bg-black .text-gray-300,
+body.theme-light [class*="bg-black/"].text-gray-300 { color: #e2e8f0 !important; }
+body.theme-light .bg-black .text-gray-400,
+body.theme-light [class*="bg-black/"].text-gray-400 { color: #cbd5e1 !important; }
+body.theme-light .bg-black .text-gray-500,
+body.theme-light [class*="bg-black/"].text-gray-500 { color: #94a3b8 !important; }
+body.theme-light .bg-black .text-cyan-300,
+body.theme-light [class*="bg-black/"].text-cyan-300,
+body.theme-light .bg-black .text-cyan-400,
+body.theme-light [class*="bg-black/"].text-cyan-400 { color: #67e8f9 !important; }
+body.theme-light .bg-black .text-sky-300,
+body.theme-light [class*="bg-black/"].text-sky-300,
+body.theme-light .bg-black .text-blue-300,
+body.theme-light [class*="bg-black/"].text-blue-300 { color: #7dd3fc !important; }
+body.theme-light .bg-black .text-amber-300,
+body.theme-light [class*="bg-black/"].text-amber-300,
+body.theme-light .bg-black .text-amber-400,
+body.theme-light [class*="bg-black/"].text-amber-400 { color: #fcd34d !important; }
+body.theme-light .bg-black .text-pink-100,
+body.theme-light [class*="bg-black/"].text-pink-100,
+body.theme-light .bg-black .text-pink-200,
+body.theme-light [class*="bg-black/"].text-pink-200,
+body.theme-light .bg-black .text-pink-300,
+body.theme-light [class*="bg-black/"].text-pink-300 { color: #fbcfe8 !important; }
+body.theme-light .bg-black .text-purple-200,
+body.theme-light [class*="bg-black/"].text-purple-200,
+body.theme-light .bg-black .text-purple-300,
+body.theme-light [class*="bg-black/"].text-purple-300 { color: #e9d5ff !important; }
+body.theme-light .bg-black .text-emerald-300,
+body.theme-light [class*="bg-black/"].text-emerald-300,
+body.theme-light .bg-black .text-emerald-400,
+body.theme-light [class*="bg-black/"].text-emerald-400 { color: #6ee7b7 !important; }
+body.theme-light .bg-black .text-red-300,
+body.theme-light [class*="bg-black/"].text-red-300,
+body.theme-light .bg-black .text-red-400,
+body.theme-light [class*="bg-black/"].text-red-400 { color: #fca5a5 !important; }
 
 /* ===== En-tetes compacts des sections sur telephone ===== */
 .mobile-section-hero {
