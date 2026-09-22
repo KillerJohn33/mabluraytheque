@@ -1857,6 +1857,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 
 <!-- ONGLET DIGITAL -->
 <div id="tabDigital" class="hidden space-y-4">
+<div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="cloud"></span><h2 class="font-black text-white relative z-10">Digital</h2></div>
 <div class="choice-bar w-full" role="group" aria-label="Affichage de la collection">
 <button type="button" onclick="switchTab('collection')" class="choice-option" aria-pressed="false">Ma collection</button>
 <button type="button" class="choice-option is-active" aria-pressed="true" disabled>Digital</button>
@@ -1866,7 +1867,6 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <span class="text-gray-600">•</span>
 <span><strong id="digitalSeriesCountTop" class="text-amber-300 font-black text-xl">0</strong> série<span id="digitalSeriesPlural"></span></span>
 </div>
-<div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="cloud"></span><h2 class="font-black text-white relative z-10">Digital</h2></div>
 <div id="digitalEmptyState" class="glass-card p-5 rounded-2xl border border-white/10 text-center space-y-3">
 <span class="icon-chip chip-lg mx-auto" data-icon="cloud"></span>
 <div><p class="text-sm font-bold text-white">Bibliothèque numérique</p><p class="text-[11px] text-gray-400 mt-1">Connectez votre compte Plex depuis Mon espace → Mes abonnements pour importer vos films, séries et concerts numériques ici.</p></div>
@@ -1961,7 +1961,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Coffrets Collector</p>
 <p id="statCollectorBoxes" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-amber-300">0</p>
 </div>
-<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0 text-center">
+<div class="col-span-2 md:col-span-1 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0 text-center">
 <p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Vus</p>
 <p id="statSeenMovies" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-emerald-300">0</p>
 </div>
@@ -1987,7 +1987,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Prix moyen / édition</p>
 <p id="statAvgPriceEdition" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-teal-300">0 €</p>
 </div>
-<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0 text-center">
+<div class="col-span-2 md:col-span-1 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0 text-center">
 <p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Plus-value estimée</p>
 <p id="statEstimatedGain" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-emerald-300">0 €</p>
 </div>
