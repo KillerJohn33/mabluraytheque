@@ -2088,6 +2088,19 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <div class="flex items-center gap-2 min-w-0"><span class="icon-chip" data-icon="wallet"></span><h3 class="text-sm font-bold text-white">Mes abonnements</h3><span id="subscriptionCount" class="installation-count">0</span></div>
 <button type="button" onclick="openSubscriptionForm()" class="app-action app-action-violet px-3 py-2 text-[10px] flex-none"><span class="icon-inline w-3.5 h-3.5" data-icon="plus"></span> Ajouter</button>
 </div>
+<div id="plexCard" class="rounded-2xl border border-amber-400/25 bg-amber-400/[0.06] p-3">
+<div id="plexDisconnected" class="flex items-center justify-between gap-3 flex-wrap">
+<div class="flex items-center gap-2.5 min-w-0"><span class="icon-chip chip-sm" data-icon="cloud"></span><div class="min-w-0"><p class="text-xs font-bold text-white">Plex</p><p class="text-[10px] text-gray-400">Importez vos films, séries et concerts numériques.</p></div></div>
+<button type="button" onclick="startPlexLink()" class="app-action app-action-amber px-3 py-2 text-[10px] flex-none">Connecter mon compte</button>
+</div>
+<div id="plexConnected" class="hidden flex items-center justify-between gap-3 flex-wrap">
+<div class="flex items-center gap-2.5 min-w-0"><span class="icon-chip chip-sm" data-icon="cloud"></span><div class="min-w-0"><p class="text-xs font-bold text-white">Plex · <span id="plexServerName">-</span></p><p id="plexSyncStatus" class="text-[10px] text-gray-400 truncate">Jamais synchronisé</p></div></div>
+<div class="flex items-center gap-1.5 flex-none">
+<button type="button" onclick="syncPlexLibrary()" class="app-action app-action-cyan px-3 py-2 text-[10px]"><span class="icon-inline w-3.5 h-3.5" data-icon="refresh"></span> Synchroniser</button>
+<button type="button" onclick="disconnectPlex()" class="equipment-icon-button danger" aria-label="Déconnecter Plex" title="Déconnecter Plex"><span class="icon-inline w-3.5 h-3.5" data-icon="x"></span></button>
+</div>
+</div>
+</div>
 <div id="subscriptionEmptyState" class="installation-empty"><span class="icon-inline w-5 h-5" data-icon="wallet"></span><div><p class="text-xs font-semibold text-gray-300">Aucun abonnement</p><p class="text-[10px] text-gray-500">Netflix, Canal+, Disney+, votre box internet…</p></div></div>
 <div id="subscriptionList" class="equipment-list"></div>
 <div id="subscriptionFormHome"></div>
@@ -2435,7 +2448,7 @@ let trackedSeriesBundleCloudId = null;
 let trackedSeriesBundleFromCloud = null;
 let profileBundleCloudId = null;
 let profileBundleFromCloud = null;
-let profileData = { equipment: [], projects: [], subscriptions: [], updatedAt: '' };
+let profileData = { equipment: [], projects: [], subscriptions: [], plex: {}, updatedAt: '' };
 let editingEquipmentId = null;
 let editingSubscriptionId = null;
 let isListView = false;
@@ -2487,13 +2500,15 @@ setSyncStatus('syncing');
 const collectionOk = await fetchCollectionFromCloud();
 const seriesOk = await loadTrackedSeriesFromCloud();
 const profileOk = await loadProfileFromCloud();
-if (collectionOk && seriesOk && profileOk) {
+const digitalOk = await loadDigitalLibraryFromCloud();
+if (collectionOk && seriesOk && profileOk && digitalOk) {
 localStorage.setItem('last_cloud_sync', new Date().toISOString());
 setSyncStatus('synced');
 renderCollection();
 renderWishlist();
 renderTrackedSeries();
 renderEquipment();
+renderDigital();
 updateSettingsCounters();
 if (!silent) showToast('Données synchronisées avec le cloud.');
 return true;
@@ -2642,7 +2657,17 @@ function normalizeProfileData(value) {
   notes: String(item.notes || '').trim(),
   updatedAt: item.updatedAt || new Date().toISOString()
  })).filter(item => item.name) : [];
- return { equipment, projects, subscriptions, updatedAt: value?.updatedAt || '' };
+ const plexRaw = value?.plex && typeof value.plex === 'object' ? value.plex : {};
+ const plex = {
+  token: String(plexRaw.token || '').trim(),
+  clientId: String(plexRaw.clientId || '').trim(),
+  serverName: String(plexRaw.serverName || '').trim(),
+  serverUri: String(plexRaw.serverUri || '').trim(),
+  serverClientIdentifier: String(plexRaw.serverClientIdentifier || '').trim(),
+  connectedAt: String(plexRaw.connectedAt || '').trim(),
+  lastSyncAt: String(plexRaw.lastSyncAt || '').trim()
+ };
+ return { equipment, projects, subscriptions, plex, updatedAt: value?.updatedAt || '' };
 }
 
 function formatInstallationPrice(value) {
@@ -2656,7 +2681,7 @@ function saveProfileLocal() {
 async function saveProfileBundleCloud() {
  if (!db) return false;
  beginCloudWrite();
- const payload = { recordType: 'profile_bundle', equipment: profileData.equipment, projects: profileData.projects, subscriptions: profileData.subscriptions, updatedAt: profileData.updatedAt || new Date().toISOString() };
+ const payload = { recordType: 'profile_bundle', equipment: profileData.equipment, projects: profileData.projects, subscriptions: profileData.subscriptions, plex: profileData.plex, updatedAt: profileData.updatedAt || new Date().toISOString() };
  try {
   if (profileBundleCloudId) {
    const { error } = await db.from('bluray').update({ data: payload }).eq('id', profileBundleCloudId);
@@ -2784,6 +2809,7 @@ function renderEquipment() {
  if (totalNode) totalNode.textContent = formatInstallationPrice(total);
  renderProjects();
  renderSubscriptions();
+ renderPlexCard();
  applyStaticIcons();
 }
 
@@ -3057,6 +3083,214 @@ function toggleMobileSubscriptions(forceOpen) {
  if (open) setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
 }
 
+// --- PLEX : connexion au compte et synchronisation de la bibliotheque ---
+let digitalLibrary = JSON.parse(localStorage.getItem('digital_library_v1') || '[]');
+let digitalLibraryBundleCloudId = null;
+let digitalLibraryBundleFromCloud = null;
+let plexPinPollTimer = null;
+
+function getPlexClientId() {
+ let id = localStorage.getItem('plex_client_id');
+ if (!id) { id = `bluraytheque-${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`; localStorage.setItem('plex_client_id', id); }
+ return id;
+}
+
+function saveDigitalLibraryLocal() {
+ localStorage.setItem('digital_library_v1', JSON.stringify(digitalLibrary));
+}
+
+async function saveDigitalLibraryBundleCloud() {
+ if (!db) return false;
+ beginCloudWrite();
+ const payload = { recordType: 'digital_library_bundle', items: digitalLibrary, updatedAt: new Date().toISOString() };
+ try {
+  if (digitalLibraryBundleCloudId) {
+   const { error } = await db.from('bluray').update({ data: payload }).eq('id', digitalLibraryBundleCloudId);
+   if (error) throw error;
+  } else {
+   const { data, error } = await db.from('bluray').insert([{ data: payload }]).select('id');
+   if (error) throw error;
+   digitalLibraryBundleCloudId = data?.[0]?.id || null;
+   if (!digitalLibraryBundleCloudId) throw new Error('Identifiant Digital cloud introuvable');
+  }
+  digitalLibraryBundleFromCloud = digitalLibrary;
+  finishCloudWrite(true);
+  return true;
+ } catch (e) {
+  console.warn('Sauvegarde cloud Digital indisponible :', e);
+  finishCloudWrite(false);
+  return false;
+ }
+}
+
+async function loadDigitalLibraryFromCloud() {
+ let local;
+ try { local = JSON.parse(localStorage.getItem('digital_library_v1') || '[]'); } catch (_) { local = []; }
+ const cloud = Array.isArray(digitalLibraryBundleFromCloud) ? digitalLibraryBundleFromCloud : [];
+ digitalLibrary = cloud.length >= local.length ? cloud : local;
+ saveDigitalLibraryLocal();
+ if (!digitalLibraryBundleCloudId && digitalLibrary.length) {
+  const saved = await saveDigitalLibraryBundleCloud();
+  if (!saved) showToast('⚠️ Votre bibliothèque numérique reste uniquement sur cet appareil.');
+  return saved;
+ }
+ return true;
+}
+
+function renderPlexCard() {
+ const plex = profileData.plex || {};
+ const connected = !!(plex.token && plex.serverUri);
+ const disconnectedBox = document.getElementById('plexDisconnected');
+ const connectedBox = document.getElementById('plexConnected');
+ if (!disconnectedBox || !connectedBox) return;
+ disconnectedBox.classList.toggle('hidden', connected);
+ connectedBox.classList.toggle('hidden', !connected);
+ if (connected) {
+  const nameNode = document.getElementById('plexServerName');
+  if (nameNode) nameNode.textContent = plex.serverName || 'Serveur Plex';
+  const statusNode = document.getElementById('plexSyncStatus');
+  if (statusNode) {
+   statusNode.textContent = plex.lastSyncAt
+    ? `${digitalLibrary.length} élément(s) · synchronisé le ${new Date(plex.lastSyncAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}`
+    : 'Jamais synchronisé';
+  }
+ }
+}
+
+async function startPlexLink() {
+ const clientId = getPlexClientId();
+ try {
+  const res = await fetch(`/api/plex?action=pin&clientId=${encodeURIComponent(clientId)}`);
+  if (!res.ok) throw new Error('pin');
+  const data = await res.json();
+  if (!data?.id || !data?.code) throw new Error('pin');
+  const authUrl = `https://app.plex.tv/auth#?clientID=${encodeURIComponent(clientId)}&code=${encodeURIComponent(data.code)}&context%5Bdevice%5D%5Bproduct%5D=${encodeURIComponent('Ma Bluraythèque')}`;
+  window.open(authUrl, '_blank', 'noopener');
+  showToast('Validez la connexion dans l’onglet Plex ouvert, puis revenez ici.');
+  clearInterval(plexPinPollTimer);
+  let attempts = 0;
+  plexPinPollTimer = setInterval(async () => {
+   attempts++;
+   if (attempts > 60) { clearInterval(plexPinPollTimer); return; }
+   try {
+    const checkRes = await fetch(`/api/plex?action=check&id=${encodeURIComponent(data.id)}&clientId=${encodeURIComponent(clientId)}`);
+    if (!checkRes.ok) return;
+    const checkData = await checkRes.json();
+    if (checkData?.authToken) {
+     clearInterval(plexPinPollTimer);
+     await finishPlexLink(checkData.authToken, clientId);
+    }
+   } catch (_) {}
+  }, 3000);
+ } catch (error) {
+  showToast('⚠️ Connexion à Plex impossible.');
+ }
+}
+
+async function finishPlexLink(token, clientId) {
+ try {
+  const res = await fetch(`/api/plex?action=resources&token=${encodeURIComponent(token)}&clientId=${encodeURIComponent(clientId)}`);
+  if (!res.ok) throw new Error('resources');
+  const servers = await res.json();
+  if (!Array.isArray(servers) || !servers.length) { showToast('⚠️ Aucun serveur Plex trouvé sur ce compte.'); return; }
+  const server = servers[0];
+  const previous = JSON.parse(JSON.stringify(profileData));
+  profileData.plex = {
+   token, clientId,
+   serverName: server.name || 'Serveur Plex',
+   serverUri: server.uri || '',
+   serverClientIdentifier: server.clientIdentifier || '',
+   connectedAt: new Date().toISOString(),
+   lastSyncAt: ''
+  };
+  profileData.updatedAt = new Date().toISOString();
+  saveProfileLocal();
+  renderPlexCard();
+  const saved = await saveProfileBundleCloud();
+  if (!saved) {
+   profileData = previous;
+   saveProfileLocal();
+   renderPlexCard();
+   showToast('⚠️ Connexion Plex non enregistrée.');
+   return;
+  }
+  showToast(`Connecté à ${profileData.plex.serverName}.`);
+  syncPlexLibrary();
+ } catch (error) {
+  showToast('⚠️ Impossible de récupérer vos serveurs Plex.');
+ }
+}
+
+async function disconnectPlex() {
+ if (!confirm('Déconnecter votre compte Plex ? Les éléments déjà importés resteront dans Digital.')) return;
+ const previous = JSON.parse(JSON.stringify(profileData));
+ profileData.plex = {};
+ profileData.updatedAt = new Date().toISOString();
+ saveProfileLocal();
+ renderPlexCard();
+ const saved = await saveProfileBundleCloud();
+ if (!saved) {
+  profileData = previous;
+  saveProfileLocal();
+  renderPlexCard();
+  showToast('⚠️ Déconnexion non enregistrée.');
+  return;
+ }
+ showToast('Compte Plex déconnecté.');
+}
+
+async function syncPlexLibrary(silent = false) {
+ const plex = profileData.plex || {};
+ if (!plex.token || !plex.serverUri) { if (!silent) showToast('Connectez d’abord votre compte Plex.'); return false; }
+ if (!silent) showToast('Synchronisation Plex en cours…');
+ try {
+  const base = plex.serverUri.replace(/\/$/, '');
+  const sectionsRes = await fetch(`${base}/library/sections?X-Plex-Token=${encodeURIComponent(plex.token)}`, { headers: { Accept: 'application/json' } });
+  if (!sectionsRes.ok) throw new Error('sections');
+  const sectionsData = await sectionsRes.json();
+  const sections = (sectionsData?.MediaContainer?.Directory || []).filter(s => s.type === 'movie' || s.type === 'show');
+  const items = [];
+  for (const section of sections) {
+   const itemsRes = await fetch(`${base}/library/sections/${section.key}/all?X-Plex-Token=${encodeURIComponent(plex.token)}`, { headers: { Accept: 'application/json' } });
+   if (!itemsRes.ok) continue;
+   const itemsData = await itemsRes.json();
+   (itemsData?.MediaContainer?.Metadata || []).forEach(m => {
+    const tmdbGuid = (m.Guid || []).find(g => g.id && g.id.startsWith('tmdb://'));
+    const media = Array.isArray(m.Media) ? m.Media[0] : null;
+    items.push({
+     id: `plex_${m.ratingKey}`,
+     ratingKey: String(m.ratingKey),
+     title: m.title || 'Sans titre',
+     year: m.year || null,
+     type: section.type,
+     sectionTitle: section.title,
+     tmdbId: tmdbGuid ? tmdbGuid.id.replace('tmdb://', '') : '',
+     poster: m.thumb ? `${base}${m.thumb}?X-Plex-Token=${encodeURIComponent(plex.token)}` : '',
+     duration: m.duration ? Math.round(m.duration / 60000) : 0,
+     resolution: media?.videoResolution || '',
+     addedAt: m.addedAt ? m.addedAt * 1000 : Date.now(),
+     updatedAt: new Date().toISOString()
+    });
+   });
+  }
+  digitalLibrary = items;
+  saveDigitalLibraryLocal();
+  profileData.plex.lastSyncAt = new Date().toISOString();
+  profileData.updatedAt = new Date().toISOString();
+  saveProfileLocal();
+  renderDigital();
+  renderPlexCard();
+  await saveDigitalLibraryBundleCloud();
+  await saveProfileBundleCloud();
+  if (!silent) showToast(`${items.length} élément(s) importé(s) depuis Plex.`);
+  return true;
+ } catch (error) {
+  console.warn('Synchronisation Plex indisponible :', error);
+  if (!silent) showToast('⚠️ Synchronisation Plex impossible (vérifiez que le serveur est accessible depuis cet appareil).');
+  return false;
+ }
+}
+
 // --- NORMALISATION DES DONNÉES (POUR LES ÉDITIONS MULTIPLES) ---
 function editionTitleWithoutBrand(title, brand = '') {
  const value = String(title || '').trim();
@@ -3225,6 +3459,8 @@ trackedSeriesBundleCloudId = null;
 trackedSeriesBundleFromCloud = null;
 profileBundleCloudId = null;
 profileBundleFromCloud = null;
+digitalLibraryBundleCloudId = null;
+digitalLibraryBundleFromCloud = null;
 data.forEach(item => {
 if (item.data?.recordType === 'tracked_series_bundle') {
 trackedSeriesBundleCloudId = item.id;
@@ -3234,6 +3470,11 @@ return;
 if (item.data?.recordType === 'profile_bundle') {
 profileBundleCloudId = item.id;
 profileBundleFromCloud = item.data;
+return;
+}
+if (item.data?.recordType === 'digital_library_bundle') {
+digitalLibraryBundleCloudId = item.id;
+digitalLibraryBundleFromCloud = Array.isArray(item.data.items) ? item.data.items : [];
 return;
 }
 let m = { ...item.data, cloud_id: item.id };
@@ -4205,9 +4446,24 @@ function renderDigital() {
  const empty = document.getElementById('digitalEmptyState');
  const grid = document.getElementById('digitalGrid');
  if (!empty || !grid) return;
- const hasItems = Array.isArray(window.digitalLibrary) && window.digitalLibrary.length > 0;
+ const hasItems = Array.isArray(digitalLibrary) && digitalLibrary.length > 0;
  empty.classList.toggle('hidden', hasItems);
  grid.classList.toggle('hidden', !hasItems);
+ if (!hasItems) { grid.innerHTML = ''; return; }
+ const sorted = [...digitalLibrary].sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
+ grid.innerHTML = sorted.map(item => `
+  <div class="movie-card-item glass-card rounded-2xl overflow-hidden border border-white/10">
+   <div class="relative aspect-[2/3] bg-black/40">
+    ${item.poster ? `<img src="${escapeHtml(item.poster)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.style.display='none'" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-gray-600"><span class="icon-inline w-8 h-8" data-icon="cloud"></span></div>`}
+    <span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-black/70 text-[8px] font-bold text-amber-300 uppercase tracking-wider">${escapeHtml(item.sectionTitle || (item.type === 'show' ? 'Série' : 'Film'))}</span>
+    ${item.resolution ? `<span class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md bg-black/70 text-[8px] font-bold text-cyan-300 uppercase">${escapeHtml(item.resolution)}</span>` : ''}
+   </div>
+   <div class="p-2">
+    <p class="text-[11px] font-semibold text-white truncate" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</p>
+    <p class="text-[9px] text-gray-500 mt-0.5">${[item.year, item.duration ? formatRuntime(item.duration) : ''].filter(Boolean).join(' · ')}</p>
+   </div>
+  </div>
+ `).join('');
 }
 
 function renderWishlist() {
