@@ -1214,6 +1214,9 @@ body.theme-light #bottomNav .bottom-nav-btn.active {
 
 /* Mon installation : présentation épurée */
 .installation-panel { display: grid; gap: .85rem; }
+#spaceSubscriptionsSection.installation-panel { gap: 1.1rem; }
+#spaceSubscriptionsSection #subscriptionList.equipment-list { gap: .75rem; }
+#spaceSubscriptionsSection .equipment-card { padding: .75rem .8rem; }
 .installation-heading { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
 .installation-count {
   display: inline-flex; align-items: center; justify-content: center;
@@ -1354,12 +1357,14 @@ body.theme-light .project-type { color: #4338ca; background: rgba(99,102,241,.1)
     display: grid !important; gap: .7rem; padding: .8rem !important;
     border-radius: 1rem; margin-top: -.15rem;
   }
+  #spaceSubscriptionsSection.mobile-expanded { gap: .9rem; }
   #spaceInstallationSection > .installation-heading,
   #spaceSubscriptionsSection > .installation-heading { justify-content: flex-end; }
   #spaceInstallationSection > .installation-heading > div:first-child,
   #spaceSubscriptionsSection > .installation-heading > div:first-child { display: none; }
   #spaceInstallationSection .equipment-card,
   #spaceSubscriptionsSection .equipment-card { padding: .5rem .55rem; gap: .5rem; }
+  #spaceSubscriptionsSection .equipment-card { padding: .65rem .7rem; }
   #spaceInstallationSection .equipment-form,
   #spaceSubscriptionsSection .equipment-form { padding: .7rem; }
   #spaceInstallationSection .installation-total,
