@@ -1222,16 +1222,23 @@ body.theme-light .project-type { color: #4338ca; background: rgba(99,102,241,.1)
   }
   .mobile-installation-chevron { color: #64748b; transition: transform .2s ease, color .2s ease; }
   .mobile-installation-toggle[aria-expanded="true"] .mobile-installation-chevron { transform: rotate(90deg); color: #67e8f9; }
-  #spaceInstallationSection:not(.mobile-expanded) { display: none !important; }
-  #spaceInstallationSection.mobile-expanded {
+  #spaceInstallationSection:not(.mobile-expanded),
+  #spaceSubscriptionsSection:not(.mobile-expanded) { display: none !important; }
+  #spaceInstallationSection.mobile-expanded,
+  #spaceSubscriptionsSection.mobile-expanded {
     display: grid !important; gap: .7rem; padding: .8rem !important;
     border-radius: 1rem; margin-top: -.15rem;
   }
-  #spaceInstallationSection > .installation-heading { justify-content: flex-end; }
-  #spaceInstallationSection > .installation-heading > div:first-child { display: none; }
-  #spaceInstallationSection .equipment-card { padding: .5rem .55rem; gap: .5rem; }
-  #spaceInstallationSection .equipment-form { padding: .7rem; }
-  #spaceInstallationSection .installation-total { margin-top: .25rem; }
+  #spaceInstallationSection > .installation-heading,
+  #spaceSubscriptionsSection > .installation-heading { justify-content: flex-end; }
+  #spaceInstallationSection > .installation-heading > div:first-child,
+  #spaceSubscriptionsSection > .installation-heading > div:first-child { display: none; }
+  #spaceInstallationSection .equipment-card,
+  #spaceSubscriptionsSection .equipment-card { padding: .5rem .55rem; gap: .5rem; }
+  #spaceInstallationSection .equipment-form,
+  #spaceSubscriptionsSection .equipment-form { padding: .7rem; }
+  #spaceInstallationSection .installation-total,
+  #spaceSubscriptionsSection .installation-total { margin-top: .25rem; }
   body.theme-light #tabSettings .mobile-installation-toggle {
     color: #334155; background: rgba(255,255,255,.72); border-color: rgba(15,23,42,.1);
     box-shadow: inset 0 1px 0 #fff;
@@ -1269,6 +1276,24 @@ body.theme-light .project-type { color: #4338ca; background: rgba(99,102,241,.1)
   #spaceInstallationSection .equipment-form textarea { min-width: 0; max-width: 100%; }
   #spaceInstallationSection .project-card { min-width: 0; max-width: 100%; overflow: hidden; }
   #spaceInstallationSection .project-card > div { min-width: 0; }
+  #spaceSubscriptionsSection,
+  #spaceSubscriptionsSection > *,
+  #spaceSubscriptionsSection .equipment-list { min-width: 0; max-width: 100%; }
+  #spaceSubscriptionsSection .equipment-card {
+    position: relative; display: flex; width: 100%; min-width: 0;
+    padding-right: 4.15rem !important; overflow: hidden;
+  }
+  #spaceSubscriptionsSection .equipment-card > div.min-w-0 { min-width: 0; overflow: hidden; }
+  #spaceSubscriptionsSection .equipment-actions { position: absolute; top: .38rem; right: .38rem; }
+  #spaceSubscriptionsSection .equipment-price {
+    position: absolute; right: .48rem; bottom: .38rem;
+    max-width: 3.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font-size: .55rem;
+  }
+  #spaceSubscriptionsSection .equipment-form,
+  #spaceSubscriptionsSection .equipment-form input,
+  #spaceSubscriptionsSection .equipment-form select,
+  #spaceSubscriptionsSection .equipment-form textarea { min-width: 0; max-width: 100%; }
   #bottomTabSettingsBtn .bottom-nav-label { font-size: .58rem; white-space: nowrap; }
 }
 
@@ -1402,12 +1427,14 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
   #seriesSidebarLayout { grid-template-columns: 300px minmax(0, 1fr) !important; }
   #trackedSeriesGrid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 
-  /* Mon installation et Options : assez de place pour les afficher ouverts, sans accordeon */
+  /* Mon installation, Mes abonnements et Options : assez de place pour les afficher ouverts, sans accordeon */
   #tabSettings .mobile-installation-toggle { display: none !important; }
-  #ipadOptionsTabBtn { display: inline-flex !important; }
+  #ipadSpaceTabs { display: flex !important; }
   #spaceInstallationSection:not(.mobile-expanded) { display: grid !important; }
   #spaceInstallationSection .equipment-group-items { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
   #spaceInstallationSection .project-list { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  #spaceSubscriptionsSection:not(.mobile-expanded) { display: grid !important; }
+  #spaceSubscriptionsSection .equipment-list { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
   #tabSettings:not(.mobile-options-expanded) .space-options-panel:not(#spaceOptionsHeading) { display: block !important; }
 }
 </style>
@@ -1417,7 +1444,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <header class="relative sticky top-0 z-40 p-4 glass-card border-b-0 border-b-[0.5px] border-white/10 text-center font-extrabold text-xl tracking-wide flex items-center justify-center gap-2.5">
 <span class="icon-chip chip-lg" data-icon="disc"></span>
 <span class="bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">Blu-rayth&egrave;que</span>
-<button id="ipadOptionsTabBtn" type="button" onclick="openSpaceSection('options')" class="hidden absolute right-4 top-1/2 -translate-y-1/2 items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-[11px] font-bold text-gray-200 hover:text-white hover:bg-white/15 transition"><span class="icon-inline w-3.5 h-3.5" data-icon="settings"></span><span>Options</span></button>
+<div id="ipadSpaceTabs" class="hidden absolute right-4 top-1/2 -translate-y-1/2 items-center gap-2"><button id="ipadSubscriptionsTabBtn" type="button" onclick="openSpaceSection('subscriptions')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-[11px] font-bold text-gray-200 hover:text-white hover:bg-white/15 transition"><span class="icon-inline w-3.5 h-3.5" data-icon="wallet"></span><span>Abonnements</span></button><button id="ipadOptionsTabBtn" type="button" onclick="openSpaceSection('options')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-[11px] font-bold text-gray-200 hover:text-white hover:bg-white/15 transition"><span class="icon-inline w-3.5 h-3.5" data-icon="settings"></span><span>Options</span></button></div>
 </header>
 
 <main class="p-4 max-w-md mx-auto space-y-5">
@@ -1444,6 +1471,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 </button>
 <div id="spaceSubmenu" class="space-submenu" role="menu" aria-label="Mon espace">
 <button type="button" data-space-target="installation" onclick="openSpaceSection('installation')" role="menuitem"><span class="icon-inline w-4 h-4" data-icon="tv"></span><span><strong>Mon installation</strong><small>Équipements et compatibilités</small></span></button>
+<button type="button" data-space-target="subscriptions" onclick="openSpaceSection('subscriptions')" role="menuitem"><span class="icon-inline w-4 h-4" data-icon="wallet"></span><span><strong>Mes abonnements</strong><small>Streaming, internet, mobile</small></span></button>
 <button type="button" data-space-target="options" onclick="openSpaceSection('options')" role="menuitem"><span class="icon-inline w-4 h-4" data-icon="settings"></span><span><strong>Options</strong><small>Préférences, données et services</small></span></button>
 </div>
 </nav>
@@ -1809,45 +1837,45 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 </div>
 </div>
 <div id="statsTopGrid" class="grid grid-cols-2 gap-3">
-<div class="stat-tile text-center">
-<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Œuvres</p>
-<p id="statTotalMovies" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 mt-1">0</p>
+<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0">
+<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Œuvres</p>
+<p id="statTotalMovies" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-cyan-300">0</p>
 </div>
-<div class="stat-tile text-center">
-<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Éditions</p>
-<p id="statTotalEditions" class="text-3xl font-black text-cyan-300 mt-1">0</p>
+<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0">
+<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Éditions</p>
+<p id="statTotalEditions" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-blue-300">0</p>
 </div>
-<div class="stat-tile text-center">
-<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Disques physiques</p>
-<p id="statTotalDiscs" class="text-3xl font-black text-purple-300 mt-1">0</p>
+<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0">
+<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Disques physiques</p>
+<p id="statTotalDiscs" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-purple-300">0</p>
 </div>
-<div class="stat-tile text-center">
-<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Coffrets Collector</p>
-<p id="statCollectorBoxes" class="text-3xl font-black text-amber-300 mt-1">0</p>
+<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0">
+<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Coffrets Collector</p>
+<p id="statCollectorBoxes" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-amber-300">0</p>
 </div>
-<div class="stat-tile text-center">
-<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Prix d'achat</p>
-<p id="statTotalValue" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 mt-1">0 €</p>
+<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0">
+<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Prix d'achat</p>
+<p id="statTotalValue" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-emerald-300">0 €</p>
 </div>
-<div class="stat-tile text-center">
-<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Valeur estimée</p>
-<p id="statTotalEstimatedValue" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-sky-400 mt-1">0 €</p>
+<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0">
+<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Valeur estimée</p>
+<p id="statTotalEstimatedValue" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-sky-300">0 €</p>
 </div>
-<div class="stat-tile text-center">
-<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Prix moyen / œuvre</p>
-<p id="statAvgPriceMovie" class="text-lg font-black text-cyan-400 mt-0.5">0 €</p>
+<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0">
+<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Prix moyen / œuvre</p>
+<p id="statAvgPriceMovie" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-cyan-300">0 €</p>
 </div>
-<div class="stat-tile text-center">
-<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Prix moyen / édition</p>
-<p id="statAvgPriceEdition" class="text-lg font-black text-teal-400 mt-0.5">0 €</p>
+<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0">
+<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Prix moyen / édition</p>
+<p id="statAvgPriceEdition" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-teal-300">0 €</p>
 </div>
-<div class="stat-tile text-center">
-<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Vus</p>
-<p id="statSeenMovies" class="text-2xl font-black text-emerald-400 mt-1">0</p>
+<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0">
+<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Vus</p>
+<p id="statSeenMovies" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-emerald-300">0</p>
 </div>
-<div class="stat-tile text-center">
-<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Plus-value estimée</p>
-<p id="statEstimatedGain" class="text-2xl font-black text-emerald-400 mt-1">0 €</p>
+<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0">
+<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Plus-value estimée</p>
+<p id="statEstimatedGain" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-emerald-300">0 €</p>
 </div>
 </div>
 
@@ -2046,6 +2074,41 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <div class="flex justify-end gap-2"><button type="button" onclick="closeProjectForm()" class="app-action app-action-slate px-3 py-2 text-xs">Annuler</button><button type="button" onclick="saveProject()" class="app-action app-action-violet px-3 py-2 text-xs"><span class="icon-inline w-3.5 h-3.5" data-icon="check"></span> Enregistrer</button></div>
 </div>
 </section>
+</div>
+
+<button id="mobileSubscriptionsToggle" type="button" class="mobile-installation-toggle" onclick="toggleMobileSubscriptions()" aria-expanded="false" aria-controls="spaceSubscriptionsSection">
+<span class="flex items-center gap-2 min-w-0"><span class="icon-inline w-4 h-4" data-icon="wallet"></span><span class="font-bold">Mes abonnements</span><span id="mobileSubscriptionCount" class="installation-count">0</span></span>
+<span class="mobile-installation-chevron icon-inline w-4 h-4" data-icon="chevronright"></span>
+</button>
+<div id="spaceSubscriptionsSection" class="modern-panel installation-panel p-4 md:p-5">
+<div class="installation-heading">
+<div class="flex items-center gap-2 min-w-0"><span class="icon-chip" data-icon="wallet"></span><h3 class="text-sm font-bold text-white">Mes abonnements</h3><span id="subscriptionCount" class="installation-count">0</span></div>
+<button type="button" onclick="openSubscriptionForm()" class="app-action app-action-violet px-3 py-2 text-[10px] flex-none"><span class="icon-inline w-3.5 h-3.5" data-icon="plus"></span> Ajouter</button>
+</div>
+<div id="subscriptionEmptyState" class="installation-empty"><span class="icon-inline w-5 h-5" data-icon="wallet"></span><div><p class="text-xs font-semibold text-gray-300">Aucun abonnement</p><p class="text-[10px] text-gray-500">Netflix, Canal+, Disney+, votre box internet…</p></div></div>
+<div id="subscriptionList" class="equipment-list"></div>
+<div id="subscriptionFormHome"></div>
+<div id="subscriptionForm" class="hidden equipment-form">
+<div class="flex items-center justify-between"><h4 id="subscriptionFormTitle" class="text-xs font-bold text-white">Ajouter un abonnement</h4><button type="button" onclick="closeSubscriptionForm()" class="equipment-icon-button" aria-label="Fermer"><span class="icon-inline w-3.5 h-3.5" data-icon="x"></span></button></div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+<div><label class="equipment-label">Catégorie</label><select id="subscriptionCategory" class="w-full glass-input text-white text-xs px-2.5 py-2 rounded-xl"><option class="bg-gray-900">Streaming vidéo</option><option class="bg-gray-900">Streaming musique</option><option class="bg-gray-900">Internet &amp; mobile</option><option class="bg-gray-900">Autre</option></select></div>
+<div><label class="equipment-label">Service *</label><input id="subscriptionName" type="text" placeholder="Netflix, Canal+, Disney+…" class="w-full glass-input text-white text-xs px-2.5 py-2 rounded-xl"></div>
+<div><label class="equipment-label">Formule</label><input id="subscriptionPlan" type="text" placeholder="Premium 4K, Ciné Séries…" class="w-full glass-input text-white text-xs px-2.5 py-2 rounded-xl"></div>
+<div><label class="equipment-label">Prix</label><div class="relative"><input id="subscriptionPrice" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00" class="w-full glass-input text-white text-xs pl-2.5 pr-7 py-2 rounded-xl"><span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-gray-500">€</span></div></div>
+</div>
+<details class="equipment-more">
+<summary><span>Informations complémentaires</span><span class="text-[9px] text-gray-500">facultatif</span></summary>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-3">
+<div><label class="equipment-label">Périodicité</label><select id="subscriptionBillingCycle" class="w-full glass-input text-white text-xs px-2.5 py-2 rounded-xl"><option class="bg-gray-900">Mensuel</option><option class="bg-gray-900">Annuel</option></select></div>
+<div><label class="equipment-label">Prochain prélèvement</label><input id="subscriptionRenewalDate" type="date" class="w-full glass-input text-white text-xs px-2.5 py-2 rounded-xl"></div>
+<div><label class="equipment-label">Moyen de paiement</label><input id="subscriptionPayment" type="text" placeholder="CB, prélèvement auto…" class="w-full glass-input text-white text-xs px-2.5 py-2 rounded-xl"></div>
+<div><label class="equipment-label">Lien de gestion (URL)</label><input id="subscriptionUrl" type="url" placeholder="https://…" class="w-full glass-input text-white text-xs px-2.5 py-2 rounded-xl"></div>
+<div class="sm:col-span-2"><label class="equipment-label">Notes</label><textarea id="subscriptionNotes" rows="1" placeholder="Partage familial, code promo…" class="w-full glass-input text-white text-xs px-2.5 py-2 rounded-xl resize-y"></textarea></div>
+</div>
+</details>
+<div class="flex justify-end gap-2"><button type="button" onclick="closeSubscriptionForm()" class="app-action app-action-slate px-3 py-2 text-xs">Annuler</button><button type="button" onclick="saveSubscription()" class="app-action app-action-violet px-3 py-2 text-xs"><span class="icon-inline w-3.5 h-3.5" data-icon="check"></span> Enregistrer</button></div>
+</div>
+<div class="installation-total"><span><span class="icon-inline w-4 h-4" data-icon="tag"></span> Coût mensuel total</span><strong id="subscriptionMonthlyTotal">0,00 €</strong></div>
 </div>
 
 <button id="mobileOptionsToggle" type="button" class="mobile-installation-toggle" onclick="toggleMobileOptions()" aria-expanded="false" aria-controls="spaceOptionsHeading">
@@ -2265,6 +2328,7 @@ info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/
 package: '<path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v9"/>',
 store: '<path d="M3 9l1-5h16l1 5"/><path d="M4 9v10a1 1 0 001 1h14a1 1 0 001-1V9"/><path d="M9 20v-6h6v6"/><path d="M3 9a2 2 0 004 0 2 2 0 004 0 2 2 0 004 0 2 2 0 004 0"/>',
 tag: '<path d="M20.59 13.41L11 3.83A2 2 0 009.5 3H4a1 1 0 00-1 1v5.5a2 2 0 00.59 1.41l9.58 9.58a2 2 0 002.83 0l5.59-5.59a2 2 0 000-2.83z"/><circle cx="7.5" cy="7.5" r="1.3" fill="currentColor" stroke="none"/>',
+wallet: '<path d="M3 7a2 2 0 012-2h12a2 2 0 012 2v2h-2.5a3 3 0 100 6H19v2a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path d="M16.5 11a1 1 0 100 2 1 1 0 000-2z" fill="currentColor" stroke="none"/>',
 pie: '<path d="M21.21 15.89A10 10 0 118 2.83"/><path d="M22 12A10 10 0 0012 2v10z"/>',
 grid: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/>',
 list: '<path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/>',
@@ -2369,8 +2433,9 @@ let trackedSeriesBundleCloudId = null;
 let trackedSeriesBundleFromCloud = null;
 let profileBundleCloudId = null;
 let profileBundleFromCloud = null;
-let profileData = { equipment: [], projects: [], updatedAt: '' };
+let profileData = { equipment: [], projects: [], subscriptions: [], updatedAt: '' };
 let editingEquipmentId = null;
+let editingSubscriptionId = null;
 let isListView = false;
 let isWishlistListView = false;
 let html5QrcodeScanner = null;
@@ -2533,6 +2598,7 @@ renderTrackedSeries();
 
 // --- MON ESPACE : INSTALLATION ---
 const EQUIPMENT_CATEGORIES = ['Téléviseur', 'Vidéoprojecteur', 'Amplificateur', 'Barre de son', 'Enceintes', 'Lecteur Blu-ray', 'Console de jeux', 'Lecteur multimédia', 'Autre'];
+const SUBSCRIPTION_CATEGORIES = ['Streaming vidéo', 'Streaming musique', 'Internet & mobile', 'Autre'];
 
 function normalizeProfileData(value) {
  const money = input => {
@@ -2561,7 +2627,20 @@ function normalizeProfileData(value) {
   notes: String(item.notes || '').trim(),
   updatedAt: item.updatedAt || new Date().toISOString()
  })).filter(item => item.name) : [];
- return { equipment, projects, updatedAt: value?.updatedAt || '' };
+ const subscriptions = Array.isArray(value?.subscriptions) ? value.subscriptions.filter(Boolean).map(item => ({
+  id: String(item.id || `sub_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`),
+  category: SUBSCRIPTION_CATEGORIES.includes(item.category) ? item.category : 'Autre',
+  name: String(item.name || '').trim(),
+  plan: String(item.plan || '').trim(),
+  price: money(item.price),
+  billingCycle: item.billingCycle === 'Annuel' ? 'Annuel' : 'Mensuel',
+  renewalDate: String(item.renewalDate || '').trim(),
+  payment: String(item.payment || '').trim(),
+  url: String(item.url || '').trim(),
+  notes: String(item.notes || '').trim(),
+  updatedAt: item.updatedAt || new Date().toISOString()
+ })).filter(item => item.name) : [];
+ return { equipment, projects, subscriptions, updatedAt: value?.updatedAt || '' };
 }
 
 function formatInstallationPrice(value) {
@@ -2575,7 +2654,7 @@ function saveProfileLocal() {
 async function saveProfileBundleCloud() {
  if (!db) return false;
  beginCloudWrite();
- const payload = { recordType: 'profile_bundle', equipment: profileData.equipment, projects: profileData.projects, updatedAt: profileData.updatedAt || new Date().toISOString() };
+ const payload = { recordType: 'profile_bundle', equipment: profileData.equipment, projects: profileData.projects, subscriptions: profileData.subscriptions, updatedAt: profileData.updatedAt || new Date().toISOString() };
  try {
   if (profileBundleCloudId) {
    const { error } = await db.from('bluray').update({ data: payload }).eq('id', profileBundleCloudId);
@@ -2702,6 +2781,7 @@ function renderEquipment() {
  const totalNode = equipmentField('installationTotal');
  if (totalNode) totalNode.textContent = formatInstallationPrice(total);
  renderProjects();
+ renderSubscriptions();
  applyStaticIcons();
 }
 
@@ -2830,6 +2910,149 @@ async function deleteProject(projectId) {
   renderProjects();
   showToast('⚠️ Suppression non enregistrée.');
  } else showToast('Projet supprimé.');
+}
+
+function moveSubscriptionFormHome() {
+ const form = equipmentField('subscriptionForm');
+ const home = equipmentField('subscriptionFormHome');
+ if (form && home) home.after(form);
+}
+
+function openSubscriptionForm(subscriptionId = null) {
+ editingSubscriptionId = subscriptionId;
+ const subscription = profileData.subscriptions.find(item => item.id === subscriptionId);
+ const form = equipmentField('subscriptionForm');
+ moveSubscriptionFormHome();
+ equipmentField('subscriptionFormTitle').textContent = subscription ? 'Modifier l’abonnement' : 'Ajouter un abonnement';
+ equipmentField('subscriptionCategory').value = subscription?.category || 'Streaming vidéo';
+ equipmentField('subscriptionName').value = subscription?.name || '';
+ equipmentField('subscriptionPlan').value = subscription?.plan || '';
+ equipmentField('subscriptionPrice').value = subscription?.price || '';
+ equipmentField('subscriptionBillingCycle').value = subscription?.billingCycle || 'Mensuel';
+ equipmentField('subscriptionRenewalDate').value = subscription?.renewalDate || '';
+ equipmentField('subscriptionPayment').value = subscription?.payment || '';
+ equipmentField('subscriptionUrl').value = subscription?.url || '';
+ equipmentField('subscriptionNotes').value = subscription?.notes || '';
+ if (subscription) {
+  const card = Array.from(document.querySelectorAll('[data-subscription-card]')).find(node => node.dataset.subscriptionCard === subscription.id);
+  if (card) {
+   card.after(form);
+   form.classList.add('equipment-inline-form');
+  }
+ } else form.classList.remove('equipment-inline-form');
+ form.classList.remove('hidden');
+ form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+ setTimeout(() => equipmentField('subscriptionName').focus(), 250);
+}
+
+function closeSubscriptionForm() {
+ const form = equipmentField('subscriptionForm');
+ editingSubscriptionId = null;
+ form?.classList.add('hidden');
+ form?.classList.remove('equipment-inline-form');
+ moveSubscriptionFormHome();
+}
+
+function formatSubscriptionRenewal(dateStr) {
+ if (!dateStr) return '';
+ const d = new Date(`${dateStr}T12:00:00`);
+ if (isNaN(d)) return '';
+ return `Prélèvement le ${d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+}
+
+function renderSubscriptions() {
+ const list = equipmentField('subscriptionList');
+ const empty = equipmentField('subscriptionEmptyState');
+ if (!list || !empty) return;
+ moveSubscriptionFormHome();
+ const subscriptions = normalizeProfileData(profileData).subscriptions;
+ const count = equipmentField('subscriptionCount');
+ if (count) count.textContent = subscriptions.length;
+ const mobileCount = equipmentField('mobileSubscriptionCount');
+ if (mobileCount) mobileCount.textContent = subscriptions.length;
+ empty.classList.toggle('hidden', subscriptions.length > 0);
+ list.replaceChildren();
+ subscriptions.forEach(item => {
+  const card = document.createElement('article');
+  card.className = 'equipment-card';
+  card.dataset.subscriptionCard = item.id;
+  const icon = item.category === 'Streaming vidéo' ? 'clapper' : item.category === 'Streaming musique' ? 'disc' : item.category === 'Internet & mobile' ? 'tv' : 'wallet';
+  const visual = `<span class="equipment-visual equipment-visual-placeholder"><span class="icon-inline w-4 h-4" data-icon="${icon}"></span></span>`;
+  const title = item.name || 'Abonnement';
+  const titleHtml = item.url ? `<a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-300 transition">${escapeHtml(title)}</a>` : escapeHtml(title);
+  const metadata = [item.plan, item.billingCycle, formatSubscriptionRenewal(item.renewalDate)].filter(Boolean).join(' · ');
+  card.innerHTML = `${visual}<div class="min-w-0 flex-1"><p class="text-[11px] font-semibold text-white truncate" title="${escapeHtml(title)}">${titleHtml}</p>${metadata ? `<p class="equipment-meta mt-0.5" title="${escapeHtml(metadata)}">${escapeHtml(metadata)}</p>` : ''}${item.notes ? `<p class="equipment-meta mt-0.5" title="${escapeHtml(item.notes)}">${escapeHtml(item.notes)}</p>` : ''}</div>${item.price ? `<span class="equipment-price">${formatInstallationPrice(item.price)}${item.billingCycle === 'Annuel' ? '/an' : '/mois'}</span>` : ''}<div class="equipment-actions"><button type="button" data-subscription-edit="${escapeHtml(item.id)}" class="equipment-icon-button" aria-label="Modifier" title="Modifier"><span class="icon-inline w-3.5 h-3.5" data-icon="settings"></span></button><button type="button" data-subscription-delete="${escapeHtml(item.id)}" class="equipment-icon-button danger" aria-label="Supprimer" title="Supprimer"><span class="icon-inline w-3.5 h-3.5" data-icon="trash"></span></button></div>`;
+  card.querySelector('[data-subscription-edit]')?.addEventListener('click', () => openSubscriptionForm(item.id));
+  card.querySelector('[data-subscription-delete]')?.addEventListener('click', () => deleteSubscription(item.id));
+  list.appendChild(card);
+ });
+ const monthlyTotal = subscriptions.reduce((sum, item) => sum + (item.billingCycle === 'Annuel' ? (Number(item.price) || 0) / 12 : (Number(item.price) || 0)), 0);
+ const totalNode = equipmentField('subscriptionMonthlyTotal');
+ if (totalNode) totalNode.textContent = `${formatInstallationPrice(monthlyTotal)} / mois`;
+ applyStaticIcons();
+}
+
+async function saveSubscription() {
+ const name = equipmentField('subscriptionName').value.trim();
+ if (!name) { equipmentField('subscriptionName').focus(); return showToast('Indiquez le nom du service.'); }
+ const previous = JSON.parse(JSON.stringify(profileData));
+ const item = {
+  id: editingSubscriptionId || `sub_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+  category: equipmentField('subscriptionCategory').value,
+  name,
+  plan: equipmentField('subscriptionPlan').value.trim(),
+  price: Math.max(0, Number(equipmentField('subscriptionPrice').value) || 0),
+  billingCycle: equipmentField('subscriptionBillingCycle').value,
+  renewalDate: equipmentField('subscriptionRenewalDate').value,
+  payment: equipmentField('subscriptionPayment').value.trim(),
+  url: equipmentField('subscriptionUrl').value.trim(),
+  notes: equipmentField('subscriptionNotes').value.trim(),
+  updatedAt: new Date().toISOString()
+ };
+ profileData.subscriptions ||= [];
+ const index = profileData.subscriptions.findIndex(entry => entry.id === item.id);
+ if (index >= 0) profileData.subscriptions[index] = item; else profileData.subscriptions.push(item);
+ profileData.updatedAt = item.updatedAt;
+ saveProfileLocal();
+ closeSubscriptionForm();
+ renderSubscriptions();
+ const saved = await saveProfileBundleCloud();
+ if (!saved) {
+  profileData = previous;
+  saveProfileLocal();
+  renderSubscriptions();
+  showToast('⚠️ Abonnement non enregistré.');
+  return;
+ }
+ showToast(index >= 0 ? 'Abonnement modifié.' : 'Abonnement ajouté.');
+}
+
+async function deleteSubscription(subscriptionId) {
+ const item = profileData.subscriptions.find(entry => entry.id === subscriptionId);
+ if (!item || !confirm(`Supprimer l’abonnement "${item.name}" ?`)) return;
+ const previous = JSON.parse(JSON.stringify(profileData));
+ profileData.subscriptions = profileData.subscriptions.filter(entry => entry.id !== subscriptionId);
+ profileData.updatedAt = new Date().toISOString();
+ saveProfileLocal();
+ closeSubscriptionForm();
+ renderSubscriptions();
+ const saved = await saveProfileBundleCloud();
+ if (!saved) {
+  profileData = previous;
+  saveProfileLocal();
+  renderSubscriptions();
+  showToast('⚠️ Suppression non enregistrée.');
+ } else showToast('Abonnement supprimé.');
+}
+
+function toggleMobileSubscriptions(forceOpen) {
+ const section = document.getElementById('spaceSubscriptionsSection');
+ const button = document.getElementById('mobileSubscriptionsToggle');
+ if (!section || !button) return;
+ const open = typeof forceOpen === 'boolean' ? forceOpen : !section.classList.contains('mobile-expanded');
+ section.classList.toggle('mobile-expanded', open);
+ button.setAttribute('aria-expanded', String(open));
+ if (open) setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
 }
 
 // --- NORMALISATION DES DONNÉES (POUR LES ÉDITIONS MULTIPLES) ---
@@ -3165,21 +3388,25 @@ function toggleMobileOptions(forceOpen) {
 }
 
 function applySpaceSection(section = 'installation') {
- activeSpaceSection = section === 'options' ? 'options' : 'installation';
+ activeSpaceSection = ['options', 'subscriptions'].includes(section) ? section : 'installation';
  const desktop = window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine), (hover: none) and (pointer: coarse) and (min-width: 768px)').matches;
  const installation = document.getElementById('spaceInstallationSection');
+ const subscriptions = document.getElementById('spaceSubscriptionsSection');
  const optionPanels = document.querySelectorAll('#tabSettings .space-options-panel');
  const showInstallation = !desktop || activeSpaceSection === 'installation';
+ const showSubscriptions = !desktop || activeSpaceSection === 'subscriptions';
  const showOptions = !desktop || activeSpaceSection === 'options';
- if (installation) { if (showInstallation) installation.style.removeProperty('display'); else installation.style.setProperty('display', 'none', 'important'); }
- optionPanels.forEach(panel => { if (showOptions) panel.style.removeProperty('display'); else panel.style.setProperty('display', 'none', 'important'); });
+ const applyVisibility = (el, show) => { if (!el) return; if (show) el.style.removeProperty('display'); else el.style.setProperty('display', 'none', 'important'); };
+ applyVisibility(installation, showInstallation);
+ applyVisibility(subscriptions, showSubscriptions);
+ optionPanels.forEach(panel => applyVisibility(panel, showOptions));
  document.querySelectorAll('#spaceSubmenu [data-space-target]').forEach(button => {
   button.classList.toggle('is-active', button.dataset.spaceTarget === activeSpaceSection);
  });
 }
 
 function openSpaceSection(section) {
- activeSpaceSection = section === 'options' ? 'options' : 'installation';
+ activeSpaceSection = ['options', 'subscriptions'].includes(section) ? section : 'installation';
  switchTab('settings');
  applySpaceSection(activeSpaceSection);
  if (window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine), (hover: none) and (pointer: coarse) and (min-width: 768px)').matches) {
