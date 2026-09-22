@@ -821,6 +821,66 @@ body { padding-bottom: 7rem !important; }
   #modalContent .edition-boxset { padding: .55rem !important; }
   #modalContent .edition-disc-composition { padding: .55rem !important; }
 }
+
+/* Fiche film sur iPad (tactile) : exploite mieux la largeur disponible - telephone et PC inchanges */
+@media (hover: none) and (pointer: coarse) and (min-width: 768px) {
+  #detailModal > div {
+    width: calc(100vw - 2rem) !important;
+    max-width: 1100px !important;
+  }
+}
+@media (hover: none) and (pointer: coarse) and (min-width: 768px) and (max-width: 899px) {
+  #modalContent > div { display: flex; flex-direction: column; gap: 1rem; }
+  #modalContent > div > * { width: 100%; min-width: 0; margin-top: 0 !important; }
+  #modalContent .edition-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: .75rem;
+    max-height: none;
+    overflow: visible;
+  }
+  #modalContent .edition-list > * { margin-top: 0 !important; }
+  #modalContent .edition-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "heading heading"
+      "fields extras"
+      "boxset boxset"
+      "discs discs"
+      "tech tech";
+    gap: .55rem 1rem;
+    min-width: 0;
+    align-items: start;
+  }
+  #modalContent .edition-card.has-edition-cover {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 8.75rem;
+    grid-template-areas:
+      "heading heading cover"
+      "fields extras cover"
+      "boxset boxset cover"
+      "discs discs cover"
+      "tech tech tech";
+  }
+  #modalContent .edition-card > * { margin-top: 0 !important; min-width: 0; }
+  #modalContent .edition-card > :first-child { grid-area: heading; }
+  #modalContent .edition-card .edition-form-fields {
+    grid-area: fields;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    align-content: stretch;
+  }
+  #modalContent .edition-card .edition-extra-fields { grid-area: extras; display: grid; grid-template-rows: repeat(3, minmax(0, 1fr)); gap: .5rem; }
+  #modalContent .edition-card .edition-boxset { grid-area: boxset; }
+  #modalContent .edition-card .edition-disc-composition { grid-area: discs; }
+  #modalContent .edition-card .edition-tech-inline { grid-area: tech; }
+  #modalContent .edition-card .edition-cover-mobile { display: none; }
+  #modalContent .edition-card .edition-cover-desktop { grid-area: cover; display: block; }
+  #modalContent .edition-card .edition-cover-desktop .detail-edition-cover {
+    width: 8.75rem !important;
+    height: 13.125rem !important;
+  }
+}
 #incompletePanel {
   background: linear-gradient(145deg, rgba(245,158,11,.16), rgba(120,53,15,.09));
   border-color: rgba(251,191,36,.3);
