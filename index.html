@@ -1494,9 +1494,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <button id="tabSeriesBtn" onclick="switchTab('series')" class="flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent">
 <span class="icon-inline w-3.5 h-3.5" data-icon="tv"></span> <span>Séries</span>
 </button>
-<button id="tabDigitalBtn" onclick="switchTab('digital')" class="flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent">
-<span class="icon-inline w-3.5 h-3.5" data-icon="cloud"></span> <span>Digital</span>
-</button>
+
 <button id="tabStatsBtn" onclick="switchTab('stats')" class="flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent">
 <span class="icon-inline w-3.5 h-3.5" data-icon="barchart"></span> <span>Stats</span>
 </button>
@@ -1624,8 +1622,11 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <div id="tabCollection" class="hidden space-y-4">
 <div class="choice-bar w-full" role="group" aria-label="Affichage de la collection">
 <button type="button" class="choice-option is-active" aria-pressed="true" disabled>Ma collection</button>
-<button type="button" onclick="switchTab('wishlist')" class="choice-option flex items-center justify-center gap-1.5" aria-pressed="false">Wishlist<span id="wishlistBadge" class="hidden bg-pink-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">0</span></button>
+<button type="button" onclick="switchTab('digital')" class="choice-option" aria-pressed="false">Digital</button>
 </div>
+<button type="button" onclick="switchTab('wishlist')" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-2xl border border-pink-400/25 bg-pink-400/10 text-pink-200 hover:text-white hover:bg-pink-400/15 transition min-h-[42px] text-xs font-bold">
+<span class="icon-inline w-4 h-4" data-icon="sparkles"></span> Wishlist <span id="wishlistBadge" class="hidden bg-pink-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">0</span>
+</button>
 <div class="flex items-center justify-between gap-2">
 <button id="collectionFilterToggle" type="button" onclick="toggleCollectionFilters()" aria-expanded="false" aria-controls="collectionFilterPanel" class="glass-pill px-3 py-2 rounded-xl text-[11px] font-semibold text-cyan-300 hover:text-white flex items-center gap-2 min-h-[42px]"><span class="icon-inline w-3.5 h-3.5" data-icon="filter"></span> Filtrer <span id="activeFilterCount" class="hidden bg-cyan-400/20 text-cyan-200 rounded-full px-1.5 py-0.5 text-[9px]"></span></button>
 <button id="bulkToggle" onclick="toggleBulkMode()" class="text-[11px] text-gray-400 hover:text-cyan-300 px-2 py-2 rounded-xl min-h-[42px]" aria-expanded="false" aria-controls="bulkToolbar">Sélectionner</button>
@@ -1851,6 +1852,10 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 
 <!-- ONGLET DIGITAL -->
 <div id="tabDigital" class="hidden space-y-4">
+<div class="choice-bar w-full" role="group" aria-label="Affichage de la collection">
+<button type="button" onclick="switchTab('collection')" class="choice-option" aria-pressed="false">Ma collection</button>
+<button type="button" class="choice-option is-active" aria-pressed="true" disabled>Digital</button>
+</div>
 <div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="cloud"></span><h2 class="font-black text-white relative z-10">Digital</h2></div>
 <div id="digitalEmptyState" class="glass-card p-5 rounded-2xl border border-white/10 text-center space-y-3">
 <span class="icon-chip chip-lg mx-auto" data-icon="cloud"></span>
@@ -2401,10 +2406,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <span class="icon-inline w-8 h-8" data-icon="tv"></span>
 <span class="bottom-nav-label">Séries</span>
 </button>
-<button id="bottomTabDigitalBtn" onclick="switchTab('digital')" class="bottom-nav-btn">
-<span class="icon-inline w-8 h-8" data-icon="cloud"></span>
-<span class="bottom-nav-label">Digital</span>
-</button>
+
 <button id="bottomTabStatsBtn" onclick="switchTab('stats')" class="bottom-nav-btn">
 <span class="icon-inline w-8 h-8" data-icon="barchart"></span>
 <span class="bottom-nav-label">Stats</span>
@@ -3846,14 +3848,14 @@ if (collectionMobileHero) collectionMobileHero.classList.toggle('hidden', tab !=
 const inactiveClass = "flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent";
 const activeClass = "flex-1 py-2 font-bold text-[10px] transition flex items-center justify-center gap-1 text-cyan-400 border-b-[3px] border-cyan-400";
 
-['tabHomeBtn', 'tabCollectionBtn', 'tabDigitalBtn', 'tabSeriesBtn', 'tabStatsBtn', 'tabSettingsBtn'].forEach(id => {
+['tabHomeBtn', 'tabCollectionBtn', 'tabSeriesBtn', 'tabStatsBtn', 'tabSettingsBtn'].forEach(id => {
 const btn = document.getElementById(id);
 if (btn) {
 btn.className = inactiveClass;
 }
 });
 
-['bottomTabHomeBtn', 'bottomTabCollectionBtn', 'bottomTabDigitalBtn', 'bottomTabSeriesBtn', 'bottomTabStatsBtn', 'bottomTabSettingsBtn'].forEach(id => {
+['bottomTabHomeBtn', 'bottomTabCollectionBtn', 'bottomTabSeriesBtn', 'bottomTabStatsBtn', 'bottomTabSettingsBtn'].forEach(id => {
 const btn = document.getElementById(id);
 if (btn) btn.classList.remove('active');
 });
@@ -3875,8 +3877,8 @@ document.getElementById('bottomTabCollectionBtn').classList.add('active');
 if (!renderedTabs.wishlist) renderWishlist();
 } else if (tab === 'digital') {
 document.getElementById('tabDigital').classList.remove('hidden');
-document.getElementById('tabDigitalBtn').className = activeClass;
-document.getElementById('bottomTabDigitalBtn').classList.add('active');
+document.getElementById('tabCollectionBtn').className = activeClass;
+document.getElementById('bottomTabCollectionBtn').classList.add('active');
 if (!renderedTabs.digital) renderDigital();
 } else if (tab === 'series') {
 document.getElementById('tabSeries').classList.remove('hidden');
