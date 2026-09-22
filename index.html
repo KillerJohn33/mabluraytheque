@@ -1448,9 +1448,8 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <button id="tabSeriesBtn" onclick="switchTab('series')" class="flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent">
 <span class="icon-inline w-3.5 h-3.5" data-icon="tv"></span> <span>Séries</span>
 </button>
-<button id="tabWishlistBtn" onclick="switchTab('wishlist')" class="flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent relative">
-<span class="icon-inline w-3.5 h-3.5" data-icon="sparkles"></span> <span>Wishlist</span>
-<span id="wishlistBadge" class="hidden bg-pink-500 text-white text-[9px] font-black px-1.5 py-0.2 rounded-full ml-0.5">0</span>
+<button id="tabDigitalBtn" onclick="switchTab('digital')" class="flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent">
+<span class="icon-inline w-3.5 h-3.5" data-icon="cloud"></span> <span>Digital</span>
 </button>
 <button id="tabStatsBtn" onclick="switchTab('stats')" class="flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent">
 <span class="icon-inline w-3.5 h-3.5" data-icon="barchart"></span> <span>Stats</span>
@@ -1575,6 +1574,10 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 
 <!-- ONGLET COLLECTION AVEC FILTRES AVANCÉS -->
 <div id="tabCollection" class="hidden space-y-4">
+<button id="collectionWishlistBtn" type="button" onclick="switchTab('wishlist')" class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-2xl border border-pink-400/25 bg-pink-400/10 text-pink-200 hover:text-white hover:bg-pink-400/15 transition min-h-[42px]">
+<span class="flex items-center gap-2 text-xs font-bold"><span class="icon-inline w-4 h-4" data-icon="sparkles"></span> Wishlist</span>
+<span class="flex items-center gap-2"><span id="wishlistBadge" class="hidden bg-pink-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">0</span><span class="icon-inline w-3.5 h-3.5" data-icon="chevronright"></span></span>
+</button>
 <div class="flex items-center justify-between gap-2">
 <button id="collectionFilterToggle" type="button" onclick="toggleCollectionFilters()" aria-expanded="false" aria-controls="collectionFilterPanel" class="glass-pill px-3 py-2 rounded-xl text-[11px] font-semibold text-cyan-300 hover:text-white flex items-center gap-2 min-h-[42px]"><span class="icon-inline w-3.5 h-3.5" data-icon="filter"></span> Filtrer <span id="activeFilterCount" class="hidden bg-cyan-400/20 text-cyan-200 rounded-full px-1.5 py-0.5 text-[9px]"></span></button>
 <button id="bulkToggle" onclick="toggleBulkMode()" class="text-[11px] text-gray-400 hover:text-cyan-300 px-2 py-2 rounded-xl min-h-[42px]" aria-expanded="false" aria-controls="bulkToolbar">Sélectionner</button>
@@ -1792,6 +1795,17 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <div class="flex items-center justify-between"><div><h3 class="text-xs font-bold text-white">Prochains épisodes</h3><p class="text-[9px] text-gray-500">Les sorties à venir de vos séries suivies.</p></div><span id="trackedUpcomingCount" class="text-[9px] text-purple-300 font-bold"></span></div>
 <div id="trackedUpcomingList" class="space-y-1.5"></div>
 </div>
+</div>
+
+<!-- ONGLET DIGITAL -->
+<div id="tabDigital" class="hidden space-y-4">
+<div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="cloud"></span><h2 class="font-black text-white relative z-10">Digital</h2></div>
+<div id="digitalEmptyState" class="glass-card p-5 rounded-2xl border border-white/10 text-center space-y-3">
+<span class="icon-chip chip-lg mx-auto" data-icon="cloud"></span>
+<div><p class="text-sm font-bold text-white">Bibliothèque numérique</p><p class="text-[11px] text-gray-400 mt-1">Connectez votre compte Plex depuis Mon espace → Mes abonnements pour importer vos films, séries et concerts numériques ici.</p></div>
+<button type="button" onclick="openSpaceSection('subscriptions')" class="app-action app-action-cyan px-4 py-2.5 text-xs mx-auto"><span class="icon-inline w-3.5 h-3.5" data-icon="wallet"></span> Aller à Mes abonnements</button>
+</div>
+<div id="digitalGrid" class="hidden grid grid-cols-2 gap-3"></div>
 </div>
 
 <!-- ONGLET STATS -->
@@ -2268,10 +2282,9 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <span class="icon-inline w-8 h-8" data-icon="tv"></span>
 <span class="bottom-nav-label">Séries</span>
 </button>
-<button id="bottomTabWishlistBtn" onclick="switchTab('wishlist')" class="bottom-nav-btn">
-<span class="icon-inline w-8 h-8" data-icon="sparkles"></span>
-<span class="bottom-nav-label">Wishlist</span>
-<span id="wishlistBadgeBottom" class="hidden bottom-nav-badge"></span>
+<button id="bottomTabDigitalBtn" onclick="switchTab('digital')" class="bottom-nav-btn">
+<span class="icon-inline w-8 h-8" data-icon="cloud"></span>
+<span class="bottom-nav-label">Digital</span>
 </button>
 <button id="bottomTabStatsBtn" onclick="switchTab('stats')" class="bottom-nav-btn">
 <span class="icon-inline w-8 h-8" data-icon="barchart"></span>
@@ -2435,7 +2448,7 @@ let batchScanQueue = [];
 let batchScanProcessing = false;
 let batchScanAdded = 0;
 let batchScanEntries = [];
-const renderedTabs = { collection: false, wishlist: false, series: false };
+const renderedTabs = { collection: false, wishlist: false, series: false, digital: false };
 let chartInstances = {};
 let statsShowCharts = true;
 let activeSpaceSection = 'installation';
@@ -3404,7 +3417,7 @@ function openSpaceSection(section) {
 }
 
 function switchTab(tab) {
-['tabHome', 'tabCollection', 'tabWishlist', 'tabSeries', 'tabStats', 'tabSettings'].forEach(id => {
+['tabHome', 'tabCollection', 'tabWishlist', 'tabSeries', 'tabDigital', 'tabStats', 'tabSettings'].forEach(id => {
 const el = document.getElementById(id);
 if (el) el.classList.add('hidden');
 });
@@ -3422,14 +3435,14 @@ if (collectionMobileHero) collectionMobileHero.classList.toggle('hidden', tab !=
 const inactiveClass = "flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent";
 const activeClass = "flex-1 py-2 font-bold text-[10px] transition flex items-center justify-center gap-1 text-cyan-400 border-b-[3px] border-cyan-400";
 
-['tabHomeBtn', 'tabCollectionBtn', 'tabWishlistBtn', 'tabSeriesBtn', 'tabStatsBtn', 'tabSettingsBtn'].forEach(id => {
+['tabHomeBtn', 'tabCollectionBtn', 'tabDigitalBtn', 'tabSeriesBtn', 'tabStatsBtn', 'tabSettingsBtn'].forEach(id => {
 const btn = document.getElementById(id);
 if (btn) {
 btn.className = inactiveClass;
 }
 });
 
-['bottomTabHomeBtn', 'bottomTabCollectionBtn', 'bottomTabWishlistBtn', 'bottomTabSeriesBtn', 'bottomTabStatsBtn', 'bottomTabSettingsBtn'].forEach(id => {
+['bottomTabHomeBtn', 'bottomTabCollectionBtn', 'bottomTabDigitalBtn', 'bottomTabSeriesBtn', 'bottomTabStatsBtn', 'bottomTabSettingsBtn'].forEach(id => {
 const btn = document.getElementById(id);
 if (btn) btn.classList.remove('active');
 });
@@ -3446,9 +3459,14 @@ document.getElementById('bottomTabCollectionBtn').classList.add('active');
 if (!renderedTabs.collection) renderCollection();
 } else if (tab === 'wishlist') {
 document.getElementById('tabWishlist').classList.remove('hidden');
-document.getElementById('tabWishlistBtn').className = activeClass;
-document.getElementById('bottomTabWishlistBtn').classList.add('active');
+document.getElementById('tabCollectionBtn').className = activeClass;
+document.getElementById('bottomTabCollectionBtn').classList.add('active');
 if (!renderedTabs.wishlist) renderWishlist();
+} else if (tab === 'digital') {
+document.getElementById('tabDigital').classList.remove('hidden');
+document.getElementById('tabDigitalBtn').className = activeClass;
+document.getElementById('bottomTabDigitalBtn').classList.add('active');
+if (!renderedTabs.digital) renderDigital();
 } else if (tab === 'series') {
 document.getElementById('tabSeries').classList.remove('hidden');
 document.getElementById('tabSeriesBtn').className = activeClass;
@@ -4182,11 +4200,20 @@ document.getElementById('viewModeLabelWishlist').innerText = isWishlistListView 
 renderWishlist();
 }
 
+function renderDigital() {
+ renderedTabs.digital = true;
+ const empty = document.getElementById('digitalEmptyState');
+ const grid = document.getElementById('digitalGrid');
+ if (!empty || !grid) return;
+ const hasItems = Array.isArray(window.digitalLibrary) && window.digitalLibrary.length > 0;
+ empty.classList.toggle('hidden', hasItems);
+ grid.classList.toggle('hidden', !hasItems);
+}
+
 function renderWishlist() {
 renderedTabs.wishlist = true;
 const grid = document.getElementById('wishlistGrid');
 const badge = document.getElementById('wishlistBadge');
-const badgeBottom = document.getElementById('wishlistBadgeBottom');
 const countLabel = document.getElementById('wishlistTotalCount');
 
 grid.innerHTML = '';
@@ -4194,10 +4221,6 @@ if (badge) {
 badge.innerText = wishlist.length;
 if (wishlist.length > 0) badge.classList.remove('hidden');
 else badge.classList.add('hidden');
-}
-if (badgeBottom) {
-if (wishlist.length > 0) badgeBottom.classList.remove('hidden');
-else badgeBottom.classList.add('hidden');
 }
 if (countLabel) countLabel.innerText = `${wishlist.length} film${wishlist.length > 1 ? 's' : ''}`;
 
