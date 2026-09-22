@@ -69,11 +69,15 @@ background: radial-gradient(circle at 50% -20%, #ffffff 0%, #e0f2fe 34%, #f8fafc
 color: #0f172a;
 }
 body.theme-light .glass-card,
-body.theme-light .glass-pill,
 body.theme-light .stat-tile {
-background: rgba(255, 255, 255, 0.78);
+background: rgba(255, 255, 255, 0.82);
 border-color: rgba(15, 23, 42, 0.12);
 box-shadow: 0 8px 28px rgba(15, 23, 42, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+body.theme-light .glass-pill {
+background: rgba(255, 255, 255, 0.58);
+border-color: rgba(15, 23, 42, 0.12);
+box-shadow: 0 8px 28px rgba(15, 23, 42, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 body.theme-light .glass-card::before,
 body.theme-light .glass-pill::before,
@@ -323,11 +327,11 @@ box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 8px 24px rgba(0,184,217,.18);
 }
 .page-hero-icon svg { width: 1.45rem; height: 1.45rem; }
 .modern-panel {
-background: linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.035));
-border: 1px solid rgba(255,255,255,.11);
+background: linear-gradient(145deg, rgba(30,35,48,.78), rgba(15,18,26,.72));
+border: 1px solid rgba(255,255,255,.1);
 border-radius: 1.35rem;
-box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 10px 28px rgba(0,0,0,.18);
-backdrop-filter: blur(16px);
+box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 10px 28px rgba(0,0,0,.18);
+backdrop-filter: blur(10px);
 overflow: hidden;
 position: relative;
 }
@@ -401,10 +405,10 @@ border-color: rgba(220,38,38,.18);
   }
 }
 .glass-card {
-background: rgba(255, 255, 255, 0.05);
-backdrop-filter: blur(16px);
-border: 1px solid rgba(255, 255, 255, 0.12);
-box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+background: rgba(17, 21, 31, 0.72);
+backdrop-filter: blur(10px);
+border: 1px solid rgba(255, 255, 255, 0.1);
+box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 position: relative;
 overflow: hidden;
 }
@@ -412,13 +416,13 @@ overflow: hidden;
 content: "";
 position: absolute;
 inset: 0;
-background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 32%, rgba(255,255,255,0) 55%);
+background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 32%, rgba(255,255,255,0) 55%);
 pointer-events: none;
 }
 .glass-pill {
-background: rgba(255, 255, 255, 0.08);
-backdrop-filter: blur(20px);
-border: 1px solid rgba(255, 255, 255, 0.15);
+background: rgba(255, 255, 255, 0.06);
+backdrop-filter: blur(24px);
+border: 1px solid rgba(255, 255, 255, 0.16);
 box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 4px 14px rgba(0, 0, 0, 0.25);
 position: relative;
 overflow: hidden;
@@ -497,7 +501,7 @@ color: currentColor;
 .icon-inline svg { width: 1em; height: 1em; }
 
 .stat-tile {
-background: rgba(255, 255, 255, 0.06);
+background: rgba(24, 29, 41, 0.68);
 border: 1px solid rgba(255, 255, 255, 0.1);
 border-radius: 1rem;
 padding: 0.85rem 0.6rem;
@@ -516,6 +520,26 @@ pointer-events: none;
 .stat-tile:hover {
 border-color: rgba(255, 255, 255, 0.22);
 transform: translateY(-1px);
+}
+/* Fondu/decalage en cascade a l'ouverture d'un onglet, pour une sensation plus fluide */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes tabFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @keyframes cardCascadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  #tabHome:not(.hidden), #tabCollection:not(.hidden), #tabSeries:not(.hidden), #tabDigital:not(.hidden), #tabStats:not(.hidden), #tabSettings:not(.hidden) {
+    animation: tabFadeIn .35s ease both;
+  }
+  #collectionGrid > *, #wishlistGrid > *, #digitalGrid > *, #recentGrid > *, #trackedSeriesGrid > *, #homeDashboard > * {
+    animation: cardCascadeIn .4s ease both;
+  }
+  #collectionGrid > *:nth-child(1), #wishlistGrid > *:nth-child(1), #digitalGrid > *:nth-child(1), #recentGrid > *:nth-child(1), #trackedSeriesGrid > *:nth-child(1), #homeDashboard > *:nth-child(1) { animation-delay: 0ms; }
+  #collectionGrid > *:nth-child(2), #wishlistGrid > *:nth-child(2), #digitalGrid > *:nth-child(2), #recentGrid > *:nth-child(2), #trackedSeriesGrid > *:nth-child(2), #homeDashboard > *:nth-child(2) { animation-delay: 30ms; }
+  #collectionGrid > *:nth-child(3), #wishlistGrid > *:nth-child(3), #digitalGrid > *:nth-child(3), #recentGrid > *:nth-child(3), #trackedSeriesGrid > *:nth-child(3), #homeDashboard > *:nth-child(3) { animation-delay: 60ms; }
+  #collectionGrid > *:nth-child(4), #wishlistGrid > *:nth-child(4), #digitalGrid > *:nth-child(4), #recentGrid > *:nth-child(4), #trackedSeriesGrid > *:nth-child(4), #homeDashboard > *:nth-child(4) { animation-delay: 90ms; }
+  #collectionGrid > *:nth-child(5), #wishlistGrid > *:nth-child(5), #digitalGrid > *:nth-child(5), #recentGrid > *:nth-child(5), #trackedSeriesGrid > *:nth-child(5), #homeDashboard > *:nth-child(5) { animation-delay: 120ms; }
+  #collectionGrid > *:nth-child(6), #wishlistGrid > *:nth-child(6), #digitalGrid > *:nth-child(6), #recentGrid > *:nth-child(6), #trackedSeriesGrid > *:nth-child(6), #homeDashboard > *:nth-child(6) { animation-delay: 150ms; }
+  #collectionGrid > *:nth-child(7), #wishlistGrid > *:nth-child(7), #digitalGrid > *:nth-child(7), #recentGrid > *:nth-child(7), #trackedSeriesGrid > *:nth-child(7) { animation-delay: 180ms; }
+  #collectionGrid > *:nth-child(8), #wishlistGrid > *:nth-child(8), #digitalGrid > *:nth-child(8), #recentGrid > *:nth-child(8), #trackedSeriesGrid > *:nth-child(8) { animation-delay: 210ms; }
+  #collectionGrid > *:nth-child(n+9), #wishlistGrid > *:nth-child(n+9), #digitalGrid > *:nth-child(n+9), #recentGrid > *:nth-child(n+9), #trackedSeriesGrid > *:nth-child(n+9) { animation-delay: 230ms; }
 }
 .chart-box {
 height: 190px;
@@ -2699,6 +2723,50 @@ const parsed = new URL(url);
 if (parsed.protocol === 'https:') return escapeHtml(parsed.href.replace(/[\s'"()\\]/g, char => encodeURIComponent(char)));
 } catch (_) {}
 return 'https://via.placeholder.com/300x450?text=Pas+d+image';
+}
+
+const posterAccentCache = new Map();
+function extractPosterAccentColor(url) {
+if (!url) return Promise.resolve(null);
+if (posterAccentCache.has(url)) return posterAccentCache.get(url);
+const promise = new Promise(resolve => {
+try {
+const img = new Image();
+img.crossOrigin = 'anonymous';
+img.onload = () => {
+try {
+const size = 16;
+const canvas = document.createElement('canvas');
+canvas.width = size; canvas.height = size;
+const ctx = canvas.getContext('2d');
+ctx.drawImage(img, 0, 0, size, size);
+const data = ctx.getImageData(0, 0, size, size).data;
+let r = 0, g = 0, b = 0, count = 0;
+for (let i = 0; i < data.length; i += 4) {
+if (data[i + 3] < 100) continue;
+r += data[i]; g += data[i + 1]; b += data[i + 2]; count++;
+}
+if (!count) return resolve(null);
+r = Math.round(r / count); g = Math.round(g / count); b = Math.round(b / count);
+const max = Math.max(r, g, b), min = Math.min(r, g, b);
+if (max - min < 12 && max > 200) return resolve(null);
+resolve(`${r}, ${g}, ${b}`);
+} catch (_) { resolve(null); }
+};
+img.onerror = () => resolve(null);
+img.src = url;
+} catch (_) { resolve(null); }
+});
+posterAccentCache.set(url, promise);
+return promise;
+}
+
+async function applyPosterAccent(heroId, posterUrl) {
+const accent = await extractPosterAccentColor(posterUrl);
+if (!accent) return;
+const hero = document.getElementById(heroId);
+if (!hero) return;
+hero.style.backgroundImage = `linear-gradient(90deg, rgba(${accent}, .92), rgba(${accent}, .32)), url('${posterUrl.replace(/['"()\\]/g, char => encodeURIComponent(char))}')`;
 }
 
 function purchaseLocationOptions(value) {
@@ -4959,7 +5027,7 @@ function renderDigitalDetail(item, extra = {}) {
  content.innerHTML = `
 <div class="space-y-4">
 <div class="relative overflow-hidden rounded-3xl border border-white/10 bg-black/30">
-<div class="absolute inset-0 opacity-30 pointer-events-none" style="background-image:linear-gradient(90deg,rgba(0,0,0,.9),rgba(0,0,0,.35)),url('${safeImageUrl(poster)}');background-size:cover;background-position:center;filter:blur(18px);transform:scale(1.08)"></div>
+<div id="digitalDetailHero" class="absolute inset-0 opacity-30 pointer-events-none" style="background-image:linear-gradient(90deg,rgba(0,0,0,.9),rgba(0,0,0,.35)),url('${safeImageUrl(poster)}');background-size:cover;background-position:center;filter:blur(18px);transform:scale(1.08)"></div>
 <div class="relative flex gap-3.5 p-3.5 sm:p-4">
 <div class="flex-shrink-0">
 <img src="${safeImageUrl(poster)}" class="detail-movie-poster w-20 h-30 sm:w-28 sm:h-42 object-cover rounded-2xl shadow-xl border border-white/15">
@@ -5019,6 +5087,7 @@ async function openDigitalDetail(digitalId) {
  modal.classList.remove('hidden');
  if (wasHidden) modal.querySelector(':scope > div').scrollTop = 0;
  lockDetailBackgroundScroll();
+ applyPosterAccent('digitalDetailHero', item.posterData || item.poster);
 
  if (!item.tmdbId) return;
  try {
@@ -5038,7 +5107,10 @@ async function openDigitalDetail(digitalId) {
    director: crew.filter(p => p.job === 'Director').map(p => p.name).join(', ') || (detail.created_by || []).map(c => c.name).join(', '),
    cast: (detail.credits?.cast || []).slice(0, 5).map(p => p.name)
   };
-  if (document.getElementById('modalContent').dataset.digitalId === item.id) renderDigitalDetail(item, extra);
+  if (document.getElementById('modalContent').dataset.digitalId === item.id) {
+   renderDigitalDetail(item, extra);
+   applyPosterAccent('digitalDetailHero', item.posterData || item.poster || extra.poster);
+  }
  } catch (_) {}
 }
 
@@ -6020,7 +6092,7 @@ content.innerHTML = `
 <div class="space-y-4">
 <!-- HERO -->
 <div class="relative overflow-hidden rounded-3xl border border-white/10 bg-black/30">
-<div class="absolute inset-0 opacity-30 pointer-events-none" style="background-image:linear-gradient(90deg,rgba(0,0,0,.9),rgba(0,0,0,.35)),url('${safeImageUrl(movie.poster)}');background-size:cover;background-position:center;filter:blur(18px);transform:scale(1.08)"></div>
+<div id="movieDetailHero" class="absolute inset-0 opacity-30 pointer-events-none" style="background-image:linear-gradient(90deg,rgba(0,0,0,.9),rgba(0,0,0,.35)),url('${safeImageUrl(movie.poster)}');background-size:cover;background-position:center;filter:blur(18px);transform:scale(1.08)"></div>
 <div class="relative flex gap-3.5 p-3.5 sm:p-4">
 <div class="flex-shrink-0">
 <img src="${safeImageUrl(movie.poster)}" class="detail-movie-poster w-20 h-30 sm:w-28 sm:h-42 object-cover rounded-2xl shadow-xl border border-white/15">
@@ -6082,6 +6154,7 @@ ${movie.isWishlist ? `<button onclick="moveWishlistToCollection(${movieIdArg})" 
 modal.classList.remove('hidden');
 if (wasHidden) modal.querySelector(':scope > div').scrollTop = 0;
 lockDetailBackgroundScroll();
+applyPosterAccent('movieDetailHero', movie.poster);
 if (!skipPhysicalLookup) {
  loadPhysicalEditionDetails(movie.id);
  loadMovieFinancials(movie);
