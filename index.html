@@ -5159,7 +5159,7 @@ formatsMap[fmt] = (formatsMap[fmt] || 0) + 1;
 
 const type = ed.editionType || 'Amaray';
 editionsMap[type] = (editionsMap[type] || 0) + 1;
-if (String(type).trim().toLowerCase() === 'coffret collector') collectorBoxCount++;
+if (String(type).trim().toLowerCase() === 'coffret collector' || ed.inBoxSet) collectorBoxCount++;
 
 const loc = ed.purchaseLocation || 'Non spécifié';
 locationsMap[loc] = (locationsMap[loc] || 0) + 1;
