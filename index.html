@@ -444,7 +444,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
   #collectionGrid:not(.coll-list-view),
   #wishlistGrid {
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
     gap: 1rem !important;
   }
   .coll-list-view > div {
@@ -568,7 +568,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
   #searchResults { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
   #collectionGrid:not(.coll-list-view),
   #wishlistGrid {
-    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
   }
   #statsTopGrid { grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)) !important; }
 }
@@ -1402,19 +1402,22 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
   #seriesSidebarLayout { grid-template-columns: 300px minmax(0, 1fr) !important; }
   #trackedSeriesGrid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 
-  /* Mon installation : assez de place pour l'afficher ouverte, sans accordeon */
+  /* Mon installation et Options : assez de place pour les afficher ouverts, sans accordeon */
   #tabSettings .mobile-installation-toggle { display: none !important; }
+  #ipadOptionsTabBtn { display: inline-flex !important; }
   #spaceInstallationSection:not(.mobile-expanded) { display: grid !important; }
   #spaceInstallationSection .equipment-group-items { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
   #spaceInstallationSection .project-list { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  #tabSettings:not(.mobile-options-expanded) .space-options-panel:not(#spaceOptionsHeading) { display: block !important; }
 }
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
 
-<header class="sticky top-0 z-40 p-4 glass-card border-b-0 border-b-[0.5px] border-white/10 text-center font-extrabold text-xl tracking-wide flex items-center justify-center gap-2.5">
+<header class="relative sticky top-0 z-40 p-4 glass-card border-b-0 border-b-[0.5px] border-white/10 text-center font-extrabold text-xl tracking-wide flex items-center justify-center gap-2.5">
 <span class="icon-chip chip-lg" data-icon="disc"></span>
 <span class="bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">Blu-rayth&egrave;que</span>
+<button id="ipadOptionsTabBtn" type="button" onclick="openSpaceSection('options'); toggleMobileOptions(true);" class="hidden absolute right-4 top-1/2 -translate-y-1/2 items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-[11px] font-bold text-gray-200 hover:text-white hover:bg-white/15 transition"><span class="icon-inline w-3.5 h-3.5" data-icon="settings"></span><span>Options</span></button>
 </header>
 
 <main class="p-4 max-w-md mx-auto space-y-5">
