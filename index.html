@@ -1392,6 +1392,9 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 
 /* Interface generale sur iPad (tactile, >= 768px) : mieux repartir l'espace libre - telephone et PC inchanges */
 @media (hover: none) and (pointer: coarse) and (min-width: 768px) {
+  /* Plus de bandes noires sur les cotes : le contenu exploite toute la largeur de l'ecran iPad */
+  main { max-width: min(1400px, calc(100vw - 2rem)) !important; padding-left: 1.25rem !important; padding-right: 1.25rem !important; }
+
   /* Accueil : calendrier recapitulatif et detail des sorties cote a cote */
   #homeCalendarLayout { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 
