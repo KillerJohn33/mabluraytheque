@@ -1624,7 +1624,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <button type="button" class="choice-option is-active" aria-pressed="true" disabled>Ma collection</button>
 <button type="button" onclick="switchTab('digital')" class="choice-option" aria-pressed="false">Digital</button>
 </div>
-<button type="button" onclick="switchTab('wishlist')" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-2xl border border-pink-400/25 bg-pink-400/10 text-pink-200 hover:text-white hover:bg-pink-400/15 transition min-h-[42px] text-xs font-bold">
+<button type="button" onclick="switchTab('wishlist')" class="app-action app-action-pink w-full px-3 py-2.5 text-xs">
 <span class="icon-inline w-4 h-4" data-icon="sparkles"></span> Wishlist <span id="wishlistBadge" class="hidden bg-pink-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">0</span>
 </button>
 <div class="flex items-center justify-center gap-3 text-[11px] text-gray-400">
@@ -1994,25 +1994,9 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 </div>
 </div>
 
-<div class="mt-3">
-<p class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.16em] mb-2">Bibliothèque numérique (Plex)</p>
-<div id="statsDigitalGrid" class="grid grid-cols-3 gap-3">
-<div class="rounded-xl border border-amber-400/20 bg-amber-400/[0.05] px-3 py-2.5 min-w-0 text-center">
-<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Films</p>
-<p id="statDigitalMovies" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-amber-300">0</p>
-</div>
-<div class="rounded-xl border border-amber-400/20 bg-amber-400/[0.05] px-3 py-2.5 min-w-0 text-center">
-<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Séries</p>
-<p id="statDigitalSeries" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-amber-300">0</p>
-</div>
-<div class="rounded-xl border border-amber-400/20 bg-amber-400/[0.05] px-3 py-2.5 min-w-0 text-center">
-<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Concerts / Autres</p>
-<p id="statDigitalOther" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-amber-300">0</p>
-</div>
-</div>
-</div>
-
-<div class="mt-3 grid grid-cols-2 gap-3">
+<div class="mt-4">
+<p class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.16em] mb-2">Collection physique</p>
+<div class="grid grid-cols-2 gap-3">
 <div class="stat-tile">
 <div class="flex items-center justify-between mb-2">
 <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Films</span>
@@ -2026,6 +2010,25 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <span id="statSeriesCount" class="text-lg font-black text-sky-300">0</span>
 </div>
 <div class="h-2 rounded-full bg-white/10 overflow-hidden"><div id="statSeriesBar" class="h-full rounded-full bg-sky-500 transition-all duration-500" style="width:0%"></div></div>
+</div>
+</div>
+</div>
+
+<div class="mt-4">
+<p class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.16em] mb-2">Bibliothèque numérique (Plex)</p>
+<div id="statsDigitalGrid" class="grid grid-cols-3 gap-3">
+<div class="rounded-xl border border-amber-400/10 bg-amber-500/[0.025] px-3 py-2.5 min-w-0 text-center">
+<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Films</p>
+<p id="statDigitalMovies" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-amber-300/90">0</p>
+</div>
+<div class="rounded-xl border border-amber-400/10 bg-amber-500/[0.025] px-3 py-2.5 min-w-0 text-center">
+<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Séries</p>
+<p id="statDigitalSeries" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-amber-300/90">0</p>
+</div>
+<div class="rounded-xl border border-amber-400/10 bg-amber-500/[0.025] px-3 py-2.5 min-w-0 text-center">
+<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Concerts / Autres</p>
+<p id="statDigitalOther" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-amber-300/90">0</p>
+</div>
 </div>
 </div>
 
