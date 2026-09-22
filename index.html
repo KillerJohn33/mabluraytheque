@@ -1389,6 +1389,22 @@ body.theme-light .edition-disc-composition { background: transparent; border-col
 body.theme-light .edition-boxset-details { border-color: rgba(8,145,178,.14); }
 body.theme-light .edition-boxset-card { background: rgba(255,255,255,.72); }
 body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); border-color: rgba(71,85,105,.22); }
+
+/* Interface generale sur iPad (tactile, >= 768px) : mieux repartir l'espace libre - telephone et PC inchanges */
+@media (hover: none) and (pointer: coarse) and (min-width: 768px) {
+  /* Accueil : calendrier recapitulatif et detail des sorties cote a cote */
+  #homeCalendarLayout { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+
+  /* Series : calendrier compact + liste des series suivies cote a cote, series sur 2 colonnes */
+  #seriesSidebarLayout { grid-template-columns: 300px minmax(0, 1fr) !important; }
+  #trackedSeriesGrid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+
+  /* Mon installation : assez de place pour l'afficher ouverte, sans accordeon */
+  #tabSettings .mobile-installation-toggle { display: none !important; }
+  #spaceInstallationSection:not(.mobile-expanded) { display: grid !important; }
+  #spaceInstallationSection .equipment-group-items { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  #spaceInstallationSection .project-list { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -1500,7 +1516,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <div id="recentGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+<div id="homeCalendarLayout" class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
 <div class="glass-card p-3 md:p-4 rounded-2xl border border-white/10 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip chip-sm" data-icon="calendar"></span>
@@ -1727,7 +1743,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <div class="flex items-center justify-between gap-2"><div><h3 class="text-xs font-bold text-white">Ajouter une série à suivre</h3><p class="text-[9px] text-gray-500">Recherchez-la dans le champ TMDB en haut de l'application.</p></div><button onclick="addTrackedSeriesFromCollection()" class="app-action app-action-violet px-3 py-2 text-[10px]">Depuis ma collection</button></div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-[340px_minmax(0,1fr)] gap-4 items-start">
+<div id="seriesSidebarLayout" class="grid grid-cols-1 lg:grid-cols-[340px_minmax(0,1fr)] gap-4 items-start">
 <!-- CALENDRIER + SÉRIES SUIVIES AU-DESSUS DES ÉPISODES À VENIR -->
 <!-- CALENDRIER COMPACT -->
 <div class="glass-card p-3.5 md:p-4 rounded-2xl border border-white/10 space-y-3 lg:sticky lg:top-3">
