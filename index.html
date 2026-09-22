@@ -36,6 +36,8 @@ cyan: {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- LIBRAIRIE EXCEL (SheetJS) -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<!-- LIBRAIRIE EXCELJS (export Excel mis en forme) -->
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <!-- LIBRAIRIE CHART.JS -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -6887,15 +6889,58 @@ showToast(`Code ${barcode} conservé. Film introuvable : saisissez son titre.`);
 }
 
 // --- EXPORTS / IMPORTS ---
-function exportToExcel() {
-if (collection.length === 0 && wishlist.length === 0) return showToast("La collection et la wishlist sont vides.");
-const excelData = [];
+function excelAutoWidth(rows, headers, extra = 2) {
+return headers.map(h => {
+let max = String(h).length;
+rows.forEach(r => { const len = String(r[h] ?? '').length; if (len > max) max = len; });
+return { width: Math.min(60, Math.max(10, max + extra)) };
+});
+}
 
+function styleExcelHeaderRow(sheet, headerFill, headerFont = 'FFFFFFFF') {
+const row = sheet.getRow(1);
+row.eachCell(cell => {
+cell.font = { bold: true, color: { argb: headerFont }, size: 11 };
+cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: headerFill } };
+cell.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
+cell.border = { bottom: { style: 'thin', color: { argb: 'FF334155' } } };
+});
+row.height = 22;
+sheet.views = [{ state: 'frozen', ySplit: 1 }];
+sheet.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: sheet.columnCount } };
+}
+
+function zebraStripeRows(sheet, tintForRow) {
+for (let i = 2; i <= sheet.rowCount; i++) {
+const row = sheet.getRow(i);
+const tint = tintForRow ? tintForRow(i) : null;
+const fill = tint || (i % 2 === 0 ? 'FFF8FAFC' : 'FFFFFFFF');
+row.eachCell({ includeEmpty: true }, cell => {
+if (!cell.fill || !cell.fill.fgColor) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: fill } };
+});
+}
+}
+
+async function downloadExcelWorkbook(workbook, filename) {
+const buffer = await workbook.xlsx.writeBuffer();
+const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url; a.download = filename;
+document.body.appendChild(a); a.click(); a.remove();
+setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+async function exportToExcel() {
+if (collection.length === 0 && wishlist.length === 0 && digitalLibrary.length === 0) return showToast("La collection, la wishlist et la bibliothèque digitale sont vides.");
+showToast("Génération du fichier Excel...");
+
+const collectionRows = [];
 [...collection, ...wishlist].forEach(m => {
 normalizeMovieData(m);
 const genresStr = m.genres ? m.genres.map(g => typeof g === 'object' ? g.name : g).join(', ') : '';
 m.editions.forEach(ed => {
-excelData.push({
+collectionRows.push({
 'Titre': m.title,
 'Statut': m.isWishlist ? 'Wishlist' : 'Collection',
 'TMDB ID': m.tmdb_id || '',
@@ -6907,6 +6952,7 @@ excelData.push({
 'Édition': ed.title || '',
 'Format': ed.format || 'Blu-ray 1080p',
 'Boîtier': ed.editionType || 'Amaray',
+'Coffret': ed.inBoxSet ? (ed.boxSet?.title || 'Oui') : '',
 'Prix d\'achat (€)': ed.purchasePrice ? parseFloat(ed.purchasePrice) : '',
 'Valeur Estimée (€)': ed.estimatedPrice ? parseFloat(ed.estimatedPrice) : '',
 'Lieu d\'achat': ed.purchaseLocation || '',
@@ -6939,10 +6985,68 @@ excelData.push({
 });
 });
 
-const worksheet = XLSX.utils.json_to_sheet(excelData);
-const workbook = XLSX.utils.book_new();
-XLSX.utils.book_append_sheet(workbook, worksheet, "Ma Collection");
-XLSX.writeFile(workbook, "Ma_Collection_Bluray.xlsx");
+const digitalRows = digitalLibrary.map(item => ({
+'Titre': item.title || '',
+'Type': isDigitalConcert(item) ? 'Concert' : (item.type === 'show' ? 'Série' : 'Film'),
+'Bibliothèque': item.sectionTitle || '',
+'Année': item.year || '',
+'Résolution': item.resolution ? String(item.resolution).toUpperCase() : '',
+'Codec vidéo': item.videoCodec ? item.videoCodec.toUpperCase() : '',
+'Codec audio': item.audioCodec ? item.audioCodec.toUpperCase() : '',
+'Canaux audio': item.audioChannels || '',
+'Conteneur': item.container ? item.container.toUpperCase() : '',
+'Taille du fichier (Go)': item.fileSize ? Number((item.fileSize / (1024 ** 3)).toFixed(1)) : '',
+'Durée (minutes)': item.duration || '',
+'Affiche': item.posterData || item.poster || '',
+'Ajouté sur Plex': item.addedAt ? new Date(item.addedAt).toISOString().slice(0, 10) : '',
+'Lien Plex': digitalPlexLink(item) || ''
+}));
+
+const workbook = new ExcelJS.Workbook();
+workbook.creator = 'Ma Bluraythèque';
+workbook.created = new Date();
+
+if (collectionRows.length) {
+const headers = Object.keys(collectionRows[0]);
+const sheet = workbook.addWorksheet('Collection & Wishlist');
+sheet.columns = excelAutoWidth(collectionRows, headers).map((col, i) => ({ header: headers[i], key: headers[i], ...col }));
+collectionRows.forEach(r => sheet.addRow(r));
+styleExcelHeaderRow(sheet, 'FF0F172A');
+zebraStripeRows(sheet, i => collectionRows[i - 2].Statut === 'Wishlist' ? 'FFFDF2F8' : null);
+['Prix d\'achat (€)', 'Valeur Estimée (€)'].forEach(col => {
+sheet.getColumn(col).numFmt = '#,##0.00 "€"';
+});
+sheet.getColumn('Note TMDB').numFmt = '0.0';
+}
+
+if (digitalRows.length) {
+const headers = Object.keys(digitalRows[0]);
+const sheet = workbook.addWorksheet('Digital (Plex)');
+sheet.columns = excelAutoWidth(digitalRows, headers).map((col, i) => ({ header: headers[i], key: headers[i], ...col }));
+digitalRows.forEach(r => sheet.addRow(r));
+styleExcelHeaderRow(sheet, 'FF78350F');
+zebraStripeRows(sheet);
+sheet.getColumn('Taille du fichier (Go)').numFmt = '0.0';
+}
+
+const summarySheet = workbook.addWorksheet('Résumé');
+summarySheet.columns = [{ header: 'Indicateur', key: 'k', width: 34 }, { header: 'Valeur', key: 'v', width: 20 }];
+const collectionOnly = collection;
+const totalValue = collectionOnly.reduce((sum, m) => sum + (m.editions || []).reduce((s, ed) => s + (parseFloat(ed.estimatedPrice) || 0), 0), 0);
+const totalSpent = collectionOnly.reduce((sum, m) => sum + (m.editions || []).reduce((s, ed) => s + (parseFloat(ed.purchasePrice) || 0), 0), 0);
+[
+['Généré le', new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })],
+['Films en collection', collectionOnly.filter(m => !isSeries(m)).length],
+['Séries en collection', collectionOnly.filter(m => isSeries(m)).length],
+['Films/séries en wishlist', wishlist.length],
+['Éléments digitaux (Plex)', digitalLibrary.length],
+['Valeur estimée de la collection (€)', Number(totalValue.toFixed(2))],
+['Total dépensé (€)', Number(totalSpent.toFixed(2))]
+].forEach(r => summarySheet.addRow({ k: r[0], v: r[1] }));
+styleExcelHeaderRow(summarySheet, 'FF164E63');
+zebraStripeRows(summarySheet);
+
+await downloadExcelWorkbook(workbook, 'Ma_Collection_Bluray.xlsx');
 showToast("Exportation Excel terminée ! 📊");
 }
 
