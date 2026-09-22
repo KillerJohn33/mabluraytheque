@@ -1205,9 +1205,9 @@ body.theme-light .projects-section { border-color: rgba(15,23,42,.1); }
 body.theme-light .project-empty { border-color: rgba(15,23,42,.12); }
 body.theme-light .project-type { color: #4338ca; background: rgba(99,102,241,.1); }
 
-/* Mon installation repliable sur téléphone */
+/* Mon installation repliable sur telephone et iPad (tactile) */
 .mobile-installation-toggle { display: none; }
-@media (max-width: 767px), (hover: none) and (pointer: coarse) and (max-width: 1024px) {
+@media (max-width: 767px), (hover: none) and (pointer: coarse) {
   #tabSettings .mobile-installation-toggle {
     display: flex; align-items: center; justify-content: space-between; gap: .75rem;
     width: 100%; min-height: 3.15rem; padding: .7rem .85rem;
@@ -1248,8 +1248,8 @@ body.theme-light .project-type { color: #4338ca; background: rgba(99,102,241,.1)
   }
 }
 
-/* Options repliables et correction de largeur sur téléphone */
-@media (max-width: 767px), (hover: none) and (pointer: coarse) and (max-width: 1024px) {
+/* Options repliables et correction de largeur sur telephone et iPad (tactile) */
+@media (max-width: 767px), (hover: none) and (pointer: coarse) {
   #spaceOptionsHeading { display: none !important; }
   #tabSettings:not(.mobile-options-expanded) .space-options-panel:not(#spaceOptionsHeading) { display: none !important; }
   #tabSettings { min-width: 0; max-width: 100%; overflow-x: hidden; }
