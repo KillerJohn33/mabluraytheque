@@ -577,7 +577,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 /* Navigation ordinateur : onglet actif souligne */
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
-  main { padding-top: 0 !important; }
+  main { padding-top: var(--topnav-h, 3.5rem) !important; }
   body > header {
     min-height: 4.5rem;
     background: #08090d;
@@ -586,12 +586,14 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
   }
   body > header::before { display: none; }
   #topNav {
-    position: sticky;
-    top: 4.5rem;
+    position: fixed;
+    top: var(--header-h, 4.5rem);
+    left: 0;
+    right: 0;
     z-index: 39;
-    width: 100vw;
+    width: auto;
     max-width: none;
-    margin-left: calc(50% - 50vw);
+    margin-left: 0;
     padding: .28rem 1.5rem;
     gap: .35rem;
     border: 0;
@@ -1884,6 +1886,24 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 </div>
 </div>
 
+<div class="mt-3">
+<p class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.16em] mb-2">Bibliothèque numérique (Plex)</p>
+<div id="statsDigitalGrid" class="grid grid-cols-3 gap-3">
+<div class="rounded-xl border border-amber-400/20 bg-amber-400/[0.05] px-3 py-2.5 min-w-0 text-center">
+<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Films</p>
+<p id="statDigitalMovies" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-amber-300">0</p>
+</div>
+<div class="rounded-xl border border-amber-400/20 bg-amber-400/[0.05] px-3 py-2.5 min-w-0 text-center">
+<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Séries</p>
+<p id="statDigitalSeries" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-amber-300">0</p>
+</div>
+<div class="rounded-xl border border-amber-400/20 bg-amber-400/[0.05] px-3 py-2.5 min-w-0 text-center">
+<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Concerts / Autres</p>
+<p id="statDigitalOther" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-amber-300">0</p>
+</div>
+</div>
+</div>
+
 <div class="mt-3 grid grid-cols-2 gap-3">
 <div class="stat-tile">
 <div class="flex items-center justify-between mb-2">
@@ -2536,7 +2556,8 @@ document.getElementById('topNav')?.classList.toggle('hidden', isPhone);
 document.getElementById('bottomNav')?.classList.toggle('hidden', !isPhone);
 };
 updateMobileNavigation();
-window.addEventListener('resize', () => { updateMobileNavigation(); applySpaceSection(activeSpaceSection); });
+updateDesktopNavOffsets();
+window.addEventListener('resize', () => { updateMobileNavigation(); applySpaceSection(activeSpaceSection); updateDesktopNavOffsets(); });
 
 const savedTheme = localStorage.getItem('app_theme') || 'theme-noir';
 changeTheme(savedTheme);
@@ -2577,6 +2598,16 @@ localStorage.setItem('lastAutoRefreshTMDB', todayStr);
 });
 }
 });
+
+function updateDesktopNavOffsets() {
+ const header = document.querySelector('body > header');
+ const nav = document.getElementById('topNav');
+ if (!header || !nav) return;
+ const desktop = window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine)').matches;
+ if (!desktop) return;
+ document.documentElement.style.setProperty('--header-h', `${header.offsetHeight}px`);
+ document.documentElement.style.setProperty('--topnav-h', `${nav.offsetHeight}px`);
+}
 
 function showToast(msg) {
 const container = document.getElementById('toast-container');
@@ -4511,7 +4542,7 @@ ${item.sectionTitle ? `<span class="px-2 py-1 rounded-full bg-white/5 border bor
 </div>
 <h3 class="text-lg sm:text-xl font-extrabold text-white leading-tight">${escapeHtml(item.title)}</h3>
 ${metaParts.length ? `<p class="text-[10px] text-gray-400 mt-1.5">${metaParts.join(' • ')}</p>` : ''}
-${extra.voteAverage ? `<div class="flex items-center gap-1.5 flex-wrap mt-3"><div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-300 text-[10px] font-bold">${ic('star','w-3.5 h-3.5')} TMDB ${extra.voteAverage.toFixed(1)}/10</div></div>` : ''}
+${extra.voteAverage ? `<div class="flex items-center gap-1.5 flex-wrap mt-3"><div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-300 text-[10px] font-bold">${ic('star','w-3.5 h-3.5')} TMDB ${extra.voteAverage.toFixed(1)}/10${extra.voteCount ? ` · ${extra.voteCount.toLocaleString('fr-FR')} votes` : ''}</div></div>` : ''}
 </div>
 </div>
 </div>
@@ -4522,6 +4553,8 @@ ${genreChips ? `<div class="flex flex-wrap gap-1.5 mb-2.5">${genreChips}</div>` 
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-[10px]">
 ${extra.director ? `<div class="text-gray-300"><span class="text-gray-500">${isShow ? 'Créateur' : 'Réalisateur'}</span><br><span class="text-white font-medium">${escapeHtml(extra.director)}</span></div>` : ''}
 ${extra.cast && extra.cast.length ? `<div class="text-gray-300"><span class="text-gray-500">Avec</span><br><span class="text-white font-medium">${escapeHtml(extra.cast.join(', '))}</span></div>` : ''}
+${!isShow && extra.budget ? `<div class="text-gray-300"><span class="text-gray-500">Budget (TMDB)</span><br><span class="text-white font-medium">${formatMovieMoney(extra.budget)}</span></div>` : ''}
+${!isShow && extra.revenue ? `<div class="text-gray-300"><span class="text-gray-500">Box-office mondial (TMDB)</span><br><span class="text-white font-medium">${formatMovieMoney(extra.revenue)}</span></div>` : ''}
 </div>
 ${extra.overview ? `<p class="text-[10px] text-gray-400 mt-2.5 leading-relaxed">${escapeHtml(extra.overview)}</p>` : ''}
 </div>` : ''}
@@ -4567,6 +4600,9 @@ async function openDigitalDetail(digitalId) {
    genres: (detail.genres || []).map(g => g.name),
    overview: detail.overview || '',
    voteAverage: typeof detail.vote_average === 'number' ? detail.vote_average : null,
+   voteCount: typeof detail.vote_count === 'number' ? detail.vote_count : null,
+   budget: typeof detail.budget === 'number' ? detail.budget : null,
+   revenue: typeof detail.revenue === 'number' ? detail.revenue : null,
    runtime: detail.runtime || (Array.isArray(detail.episode_run_time) ? detail.episode_run_time[0] : null),
    poster: (!item.poster && detail.poster_path) ? `https://image.tmdb.org/t/p/w500${detail.poster_path}` : '',
    director: crew.filter(p => p.job === 'Director').map(p => p.name).join(', ') || (detail.created_by || []).map(c => c.name).join(', '),
@@ -5895,7 +5931,15 @@ document.getElementById('statTotalEstimatedValue').innerText = `${totalEstimated
 const estimatedGain = totalEstimatedVal - totalPurchaseVal;
 const gainEl = document.getElementById('statEstimatedGain');
 gainEl.innerText = `${estimatedGain >= 0 ? '+' : ''}${estimatedGain.toFixed(2)} €`;
-gainEl.className = `text-2xl font-black mt-1 ${estimatedGain >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+gainEl.className = `mt-1 text-lg md:text-xl font-black leading-tight break-words ${estimatedGain >= 0 ? 'text-emerald-300' : 'text-rose-400'}`;
+
+const digitalItems = Array.isArray(digitalLibrary) ? digitalLibrary : [];
+const digitalMovies = digitalItems.filter(d => d.type === 'movie' && !/concert/i.test(d.sectionTitle || '')).length;
+const digitalSeries = digitalItems.filter(d => d.type === 'show').length;
+const digitalOther = digitalItems.length - digitalMovies - digitalSeries;
+document.getElementById('statDigitalMovies').innerText = digitalMovies;
+document.getElementById('statDigitalSeries').innerText = digitalSeries;
+document.getElementById('statDigitalOther').innerText = digitalOther;
 
 document.getElementById('statMovieCount').innerText = movieCount;
 document.getElementById('statSeriesCount').innerText = seriesCount;
