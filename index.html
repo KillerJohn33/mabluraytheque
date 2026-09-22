@@ -443,7 +443,8 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
   #searchResults { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 
   #collectionGrid:not(.coll-list-view),
-  #wishlistGrid {
+  #wishlistGrid,
+  #digitalGrid {
     grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
     gap: 1rem !important;
   }
@@ -567,7 +568,8 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
   #recentGrid { grid-template-columns: repeat(7, minmax(0, 1fr)) !important; }
   #searchResults { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
   #collectionGrid:not(.coll-list-view),
-  #wishlistGrid {
+  #wishlistGrid,
+  #digitalGrid {
     grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
   }
   #statsTopGrid { grid-template-columns: repeat(5, minmax(0, 1fr)) !important; }
@@ -1805,7 +1807,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <div><p class="text-sm font-bold text-white">Bibliothèque numérique</p><p class="text-[11px] text-gray-400 mt-1">Connectez votre compte Plex depuis Mon espace → Mes abonnements pour importer vos films, séries et concerts numériques ici.</p></div>
 <button type="button" onclick="openSpaceSection('subscriptions')" class="app-action app-action-cyan px-4 py-2.5 text-xs mx-auto"><span class="icon-inline w-3.5 h-3.5" data-icon="wallet"></span> Aller à Mes abonnements</button>
 </div>
-<div id="digitalGrid" class="hidden grid grid-cols-2 gap-3"></div>
+<div id="digitalGrid" class="hidden grid grid-cols-2 gap-4"></div>
 </div>
 
 <!-- ONGLET STATS -->
@@ -3257,6 +3259,7 @@ async function syncPlexLibrary(silent = false) {
    (itemsData?.MediaContainer?.Metadata || []).forEach(m => {
     const tmdbGuid = (m.Guid || []).find(g => g.id && g.id.startsWith('tmdb://'));
     const media = Array.isArray(m.Media) ? m.Media[0] : null;
+    const part = media && Array.isArray(media.Part) ? media.Part[0] : null;
     items.push({
      id: `plex_${m.ratingKey}`,
      ratingKey: String(m.ratingKey),
@@ -3268,6 +3271,11 @@ async function syncPlexLibrary(silent = false) {
      poster: m.thumb ? `${base}${m.thumb}?X-Plex-Token=${encodeURIComponent(plex.token)}` : '',
      duration: m.duration ? Math.round(m.duration / 60000) : 0,
      resolution: media?.videoResolution || '',
+     videoCodec: media?.videoCodec || '',
+     audioCodec: media?.audioCodec || '',
+     audioChannels: media?.audioChannels || null,
+     container: media?.container || part?.container || '',
+     fileSize: part?.size || null,
      addedAt: m.addedAt ? m.addedAt * 1000 : Date.now(),
      updatedAt: new Date().toISOString()
     });
@@ -4452,7 +4460,7 @@ function renderDigital() {
  if (!hasItems) { grid.innerHTML = ''; return; }
  const sorted = [...digitalLibrary].sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
  grid.innerHTML = sorted.map(item => `
-  <div class="movie-card-item glass-card rounded-2xl overflow-hidden border border-white/10">
+  <div onclick="openDigitalDetail('${item.id}')" class="movie-card-item glass-card rounded-2xl overflow-hidden border border-white/10 cursor-pointer">
    <div class="relative aspect-[2/3] bg-black/40">
     ${item.poster ? `<img src="${escapeHtml(item.poster)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.style.display='none'" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-gray-600"><span class="icon-inline w-8 h-8" data-icon="cloud"></span></div>`}
     <span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-black/70 text-[8px] font-bold text-amber-300 uppercase tracking-wider">${escapeHtml(item.sectionTitle || (item.type === 'show' ? 'Série' : 'Film'))}</span>
@@ -4464,6 +4472,108 @@ function renderDigital() {
    </div>
   </div>
  `).join('');
+}
+
+function digitalPlexLink(item) {
+ const plex = profileData.plex || {};
+ if (!plex.serverClientIdentifier || !item.ratingKey) return '';
+ return `https://app.plex.tv/desktop#!/server/${plex.serverClientIdentifier}/details?key=%2Flibrary%2Fmetadata%2F${item.ratingKey}`;
+}
+
+function formatDigitalSize(bytes) {
+ if (!bytes) return '';
+ const gb = bytes / (1024 ** 3);
+ return `${gb.toFixed(gb >= 10 ? 0 : 1)} Go`;
+}
+
+function renderDigitalDetail(item, extra = {}) {
+ const content = document.getElementById('modalContent');
+ if (!content || content.dataset.digitalId !== item.id) return;
+ const poster = item.poster || extra.poster || '';
+ const isShow = item.type === 'show';
+ const metaParts = [item.year, extra.runtime ? formatRuntime(extra.runtime) : (item.duration ? formatRuntime(item.duration) : '')].filter(Boolean);
+ const genreChips = (extra.genres || []).slice(0, 4).map(g => `<span class="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] text-gray-300">${escapeHtml(g)}</span>`).join('');
+ const plexLink = digitalPlexLink(item);
+
+ content.innerHTML = `
+<div class="space-y-4">
+<div class="relative overflow-hidden rounded-3xl border border-white/10 bg-black/30">
+<div class="absolute inset-0 opacity-30 pointer-events-none" style="background-image:linear-gradient(90deg,rgba(0,0,0,.9),rgba(0,0,0,.35)),url('${safeImageUrl(poster)}');background-size:cover;background-position:center;filter:blur(18px);transform:scale(1.08)"></div>
+<div class="relative flex gap-3.5 p-3.5 sm:p-4">
+<div class="flex-shrink-0">
+<img src="${safeImageUrl(poster)}" class="detail-movie-poster w-20 h-30 sm:w-28 sm:h-42 object-cover rounded-2xl shadow-xl border border-white/15">
+<p class="text-[8px] text-gray-400 text-center mt-1">Affiche</p>
+</div>
+<div class="flex-1 min-w-0 flex flex-col justify-end py-0.5">
+<div class="flex items-center gap-1.5 flex-wrap mb-2">
+<span class="px-2 py-1 rounded-full bg-amber-400/10 border border-amber-400/20 text-amber-300 text-[8px] font-bold uppercase tracking-wider">${isShow ? 'Série' : 'Film'} · Plex</span>
+${item.sectionTitle ? `<span class="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 text-[8px] font-bold uppercase tracking-wider">${escapeHtml(item.sectionTitle)}</span>` : ''}
+</div>
+<h3 class="text-lg sm:text-xl font-extrabold text-white leading-tight">${escapeHtml(item.title)}</h3>
+${metaParts.length ? `<p class="text-[10px] text-gray-400 mt-1.5">${metaParts.join(' • ')}</p>` : ''}
+${extra.voteAverage ? `<div class="flex items-center gap-1.5 flex-wrap mt-3"><div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-300 text-[10px] font-bold">${ic('star','w-3.5 h-3.5')} TMDB ${extra.voteAverage.toFixed(1)}/10</div></div>` : ''}
+</div>
+</div>
+</div>
+
+${extra.overview || genreChips || extra.director || (extra.cast && extra.cast.length) ? `<div class="rounded-2xl border border-white/10 bg-white/[0.025] p-3">
+<h4 class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.16em] mb-2.5">Informations</h4>
+${genreChips ? `<div class="flex flex-wrap gap-1.5 mb-2.5">${genreChips}</div>` : ''}
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-[10px]">
+${extra.director ? `<div class="text-gray-300"><span class="text-gray-500">${isShow ? 'Créateur' : 'Réalisateur'}</span><br><span class="text-white font-medium">${escapeHtml(extra.director)}</span></div>` : ''}
+${extra.cast && extra.cast.length ? `<div class="text-gray-300"><span class="text-gray-500">Avec</span><br><span class="text-white font-medium">${escapeHtml(extra.cast.join(', '))}</span></div>` : ''}
+</div>
+${extra.overview ? `<p class="text-[10px] text-gray-400 mt-2.5 leading-relaxed">${escapeHtml(extra.overview)}</p>` : ''}
+</div>` : ''}
+
+<div class="rounded-2xl border border-amber-400/20 bg-amber-400/[0.04] p-3">
+<h4 class="text-[9px] font-bold text-amber-300/80 uppercase tracking-[0.16em] mb-2.5">Version numérique (Plex)</h4>
+<div class="grid grid-cols-2 gap-x-4 gap-y-2 text-[10px]">
+${item.resolution ? `<div class="text-gray-300"><span class="text-gray-500">Résolution</span><br><span class="text-white font-medium">${escapeHtml(String(item.resolution).toUpperCase())}</span></div>` : ''}
+${item.videoCodec ? `<div class="text-gray-300"><span class="text-gray-500">Codec vidéo</span><br><span class="text-white font-medium">${escapeHtml(item.videoCodec.toUpperCase())}</span></div>` : ''}
+${item.audioCodec ? `<div class="text-gray-300"><span class="text-gray-500">Codec audio</span><br><span class="text-white font-medium">${escapeHtml(item.audioCodec.toUpperCase())}${item.audioChannels ? ` · ${item.audioChannels}.0` : ''}</span></div>` : ''}
+${item.container ? `<div class="text-gray-300"><span class="text-gray-500">Conteneur</span><br><span class="text-white font-medium">${escapeHtml(item.container.toUpperCase())}</span></div>` : ''}
+${item.fileSize ? `<div class="text-gray-300"><span class="text-gray-500">Taille du fichier</span><br><span class="text-white font-medium">${formatDigitalSize(item.fileSize)}</span></div>` : ''}
+${item.duration ? `<div class="text-gray-300"><span class="text-gray-500">Durée</span><br><span class="text-white font-medium">${formatRuntime(item.duration)}</span></div>` : ''}
+<div class="text-gray-300"><span class="text-gray-500">Bibliothèque</span><br><span class="text-white font-medium">${escapeHtml(item.sectionTitle || '-')}</span></div>
+${item.addedAt ? `<div class="text-gray-300"><span class="text-gray-500">Ajouté sur Plex</span><br><span class="text-white font-medium">${new Date(item.addedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}</span></div>` : ''}
+</div>
+</div>
+
+${plexLink ? `<div class="flex gap-2 pt-1"><a href="${escapeHtml(plexLink)}" target="_blank" rel="noopener noreferrer" class="app-action app-action-amber flex-1 px-3 py-2.5 text-[10px] text-center">${ic('cloud','w-3.5 h-3.5')} Ouvrir dans Plex</a></div>` : ''}
+</div>`;
+}
+
+async function openDigitalDetail(digitalId) {
+ const item = digitalLibrary.find(d => d.id === digitalId);
+ if (!item) return;
+ const modal = document.getElementById('detailModal');
+ const content = document.getElementById('modalContent');
+ const wasHidden = modal.classList.contains('hidden');
+ content.dataset.movieId = '';
+ content.dataset.digitalId = item.id;
+ renderDigitalDetail(item, {});
+ modal.classList.remove('hidden');
+ if (wasHidden) modal.querySelector(':scope > div').scrollTop = 0;
+ lockDetailBackgroundScroll();
+
+ if (!item.tmdbId) return;
+ try {
+  const kind = item.type === 'show' ? 'tv' : 'movie';
+  const res = await fetch(`https://api.themoviedb.org/3/${kind}/${item.tmdbId}?api_key=${API_KEY}&language=fr-FR&append_to_response=credits`);
+  const detail = await res.json();
+  const crew = detail.credits?.crew || [];
+  const extra = {
+   genres: (detail.genres || []).map(g => g.name),
+   overview: detail.overview || '',
+   voteAverage: typeof detail.vote_average === 'number' ? detail.vote_average : null,
+   runtime: detail.runtime || (Array.isArray(detail.episode_run_time) ? detail.episode_run_time[0] : null),
+   poster: (!item.poster && detail.poster_path) ? `https://image.tmdb.org/t/p/w500${detail.poster_path}` : '',
+   director: crew.filter(p => p.job === 'Director').map(p => p.name).join(', ') || (detail.created_by || []).map(c => c.name).join(', '),
+   cast: (detail.credits?.cast || []).slice(0, 5).map(p => p.name)
+  };
+  if (document.getElementById('modalContent').dataset.digitalId === item.id) renderDigitalDetail(item, extra);
+ } catch (_) {}
 }
 
 function renderWishlist() {
