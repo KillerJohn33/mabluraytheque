@@ -439,7 +439,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
   }
   #searchInput { padding-top: 0.85rem !important; padding-bottom: 0.85rem !important; }
 
-  #recentGrid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 1rem !important; }
+  #recentGrid { grid-template-columns: repeat(5, minmax(0, 1fr)) !important; gap: 1rem !important; }
   #searchResults { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 
   #collectionGrid:not(.coll-list-view),
@@ -564,7 +564,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
     max-width: 1180px !important;
     padding: 2rem 3rem !important;
   }
-  #recentGrid { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; }
+  #recentGrid { grid-template-columns: repeat(7, minmax(0, 1fr)) !important; }
   #searchResults { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
   #collectionGrid:not(.coll-list-view),
   #wishlistGrid {
@@ -1417,7 +1417,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <header class="relative sticky top-0 z-40 p-4 glass-card border-b-0 border-b-[0.5px] border-white/10 text-center font-extrabold text-xl tracking-wide flex items-center justify-center gap-2.5">
 <span class="icon-chip chip-lg" data-icon="disc"></span>
 <span class="bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">Blu-rayth&egrave;que</span>
-<button id="ipadOptionsTabBtn" type="button" onclick="openSpaceSection('options'); toggleMobileOptions(true);" class="hidden absolute right-4 top-1/2 -translate-y-1/2 items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-[11px] font-bold text-gray-200 hover:text-white hover:bg-white/15 transition"><span class="icon-inline w-3.5 h-3.5" data-icon="settings"></span><span>Options</span></button>
+<button id="ipadOptionsTabBtn" type="button" onclick="openSpaceSection('options')" class="hidden absolute right-4 top-1/2 -translate-y-1/2 items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-[11px] font-bold text-gray-200 hover:text-white hover:bg-white/15 transition"><span class="icon-inline w-3.5 h-3.5" data-icon="settings"></span><span>Options</span></button>
 </header>
 
 <main class="p-4 max-w-md mx-auto space-y-5">
@@ -2225,7 +2225,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <span class="icon-inline w-8 h-8" data-icon="barchart"></span>
 <span class="bottom-nav-label">Stats</span>
 </button>
-<button id="bottomTabSettingsBtn" onclick="switchTab('settings')" class="bottom-nav-btn">
+<button id="bottomTabSettingsBtn" onclick="openSpaceSection('installation')" class="bottom-nav-btn">
 <span class="icon-inline w-8 h-8" data-icon="user"></span>
 <span class="bottom-nav-label">Mon espace</span>
 </button>
@@ -3166,11 +3166,13 @@ function toggleMobileOptions(forceOpen) {
 
 function applySpaceSection(section = 'installation') {
  activeSpaceSection = section === 'options' ? 'options' : 'installation';
- const desktop = window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine)').matches;
+ const desktop = window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine), (hover: none) and (pointer: coarse) and (min-width: 768px)').matches;
  const installation = document.getElementById('spaceInstallationSection');
  const optionPanels = document.querySelectorAll('#tabSettings .space-options-panel');
- if (installation) installation.style.display = !desktop || activeSpaceSection === 'installation' ? '' : 'none';
- optionPanels.forEach(panel => { panel.style.display = !desktop || activeSpaceSection === 'options' ? '' : 'none'; });
+ const showInstallation = !desktop || activeSpaceSection === 'installation';
+ const showOptions = !desktop || activeSpaceSection === 'options';
+ if (installation) { if (showInstallation) installation.style.removeProperty('display'); else installation.style.setProperty('display', 'none', 'important'); }
+ optionPanels.forEach(panel => { if (showOptions) panel.style.removeProperty('display'); else panel.style.setProperty('display', 'none', 'important'); });
  document.querySelectorAll('#spaceSubmenu [data-space-target]').forEach(button => {
   button.classList.toggle('is-active', button.dataset.spaceTarget === activeSpaceSection);
  });
@@ -3180,7 +3182,7 @@ function openSpaceSection(section) {
  activeSpaceSection = section === 'options' ? 'options' : 'installation';
  switchTab('settings');
  applySpaceSection(activeSpaceSection);
- if (window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine)').matches) {
+ if (window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine), (hover: none) and (pointer: coarse) and (min-width: 768px)').matches) {
   document.getElementById('tabSettings')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
  }
 }
