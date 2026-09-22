@@ -141,9 +141,9 @@ border-radius: .7rem;
 .mobile-section-hero .page-hero-icon svg { width: 1.05rem; height: 1.05rem; }
 .mobile-section-hero h2 { font-size: .82rem; line-height: 1rem; letter-spacing: .01em; }
 .hero-filter-btn {
-  width: 2rem; height: 2rem; flex: none;
+  width: 1.6rem; height: 1.6rem; flex: none;
   display: inline-flex; align-items: center; justify-content: center;
-  border-radius: .6rem;
+  border-radius: .5rem;
   background: rgba(255,255,255,.14);
   color: #fff;
   transition: background .15s ease;
@@ -175,8 +175,7 @@ box-shadow: 0 7px 20px rgba(15,23,42,.08), inset 0 1px 0 #fff;
   .tab-wishlist-btn { min-height: 34px !important; padding-top: .4rem !important; padding-bottom: .4rem !important; font-size: .68rem !important; }
 
   /* Filtres : icone dans le bandeau de titre + menu deroulant au lieu du bouton "Filtrer" */
-  #collectionFilterToggle, #digitalFilterToggle { display: none !important; }
-  #tabCollection > .flex.items-center.justify-between.gap-2 { justify-content: flex-end; }
+  #collectionActionRow { display: none !important; }
   #digitalFilterBar > .flex.items-center.justify-between.gap-2 { justify-content: flex-end; }
   #collectionFilterPanel:not(.hidden),
   #digitalFilterPanel:not(.hidden) {
@@ -1575,7 +1574,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 
 <!-- RECHERCHE & SCANNER (visible uniquement sur Accueil et Collection) -->
 <div id="homeMobileHero" class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="home"></span><h2 class="font-black text-white relative z-10">Accueil</h2></div>
-<div id="collectionMobileHero" class="hidden mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="disc"></span><h2 class="font-black text-white relative z-10">Collection</h2><button type="button" onclick="toggleCollectionFilters()" aria-expanded="false" aria-controls="collectionFilterPanel" class="hero-filter-btn ml-auto relative z-10"><span class="icon-inline w-4 h-4" data-icon="filter"></span></button></div>
+<div id="collectionMobileHero" class="hidden mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="disc"></span><h2 class="font-black text-white relative z-10">Collection</h2><button type="button" onclick="toggleCollectionFilters()" aria-expanded="false" aria-controls="collectionFilterPanel" class="hero-filter-btn ml-auto relative z-10"><span class="icon-inline w-3.5 h-3.5" data-icon="filter"></span></button></div>
 <div id="searchSection" class="space-y-4">
 <div class="space-y-4">
 <div class="space-y-2">
@@ -1697,7 +1696,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <span><strong id="collectionSeriesCount" class="text-sky-300 font-black text-xl">0</strong> série<span id="collectionSeriesPlural"></span></span>
 </div>
 </div>
-<div class="flex items-center justify-between gap-2">
+<div id="collectionActionRow" class="flex items-center justify-between gap-2">
 <button id="collectionFilterToggle" type="button" onclick="toggleCollectionFilters()" aria-expanded="false" aria-controls="collectionFilterPanel" class="glass-pill px-3 py-2 rounded-xl text-[11px] font-semibold text-cyan-300 hover:text-white flex items-center gap-2 min-h-[42px]"><span class="icon-inline w-3.5 h-3.5" data-icon="filter"></span> Filtrer <span id="activeFilterCount" class="hidden bg-cyan-400/20 text-cyan-200 rounded-full px-1.5 py-0.5 text-[9px]"></span></button>
 <button id="bulkToggle" onclick="toggleBulkMode()" class="text-[11px] text-gray-400 hover:text-cyan-300 px-2 py-2 rounded-xl min-h-[42px]" aria-expanded="false" aria-controls="bulkToolbar">Sélectionner</button>
 </div>
@@ -1922,7 +1921,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 
 <!-- ONGLET DIGITAL -->
 <div id="tabDigital" class="hidden space-y-4">
-<div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="cloud"></span><h2 class="font-black text-white relative z-10">Digital</h2><button type="button" onclick="toggleDigitalFilters()" aria-expanded="false" aria-controls="digitalFilterPanel" class="hero-filter-btn ml-auto relative z-10"><span class="icon-inline w-4 h-4" data-icon="filter"></span></button></div>
+<div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="cloud"></span><h2 class="font-black text-white relative z-10">Collection</h2><button type="button" onclick="toggleDigitalFilters()" aria-expanded="false" aria-controls="digitalFilterPanel" class="hero-filter-btn ml-auto relative z-10"><span class="icon-inline w-3.5 h-3.5" data-icon="filter"></span></button></div>
 <div class="choice-bar w-full tab-switcher" role="group" aria-label="Affichage de la collection">
 <button type="button" onclick="switchTab('collection')" class="choice-option" aria-pressed="false">Ma collection</button>
 <button type="button" class="choice-option is-active" aria-pressed="true" disabled>Digital</button>
@@ -4661,11 +4660,35 @@ const fragment = document.createDocumentFragment();
 filtered.forEach(m => {
 const totals = calculateMovieTotals(m);
 const card = document.createElement('div');
-card.onclick = () => bulkMode ? toggleBulkMovie(m.id) : openMovieDetail(m.id);
 card.setAttribute('role', 'button');
 card.tabIndex = 0;
 card.setAttribute('aria-label', bulkMode ? `Sélectionner ${m.title}` : `Ouvrir ${m.title}`);
 card.onkeydown = event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); card.click(); } };
+
+let longPressFired = false;
+let longPressTimer = null;
+const startLongPress = () => {
+ longPressFired = false;
+ clearTimeout(longPressTimer);
+ longPressTimer = setTimeout(() => {
+  longPressFired = true;
+  if (navigator.vibrate) navigator.vibrate(15);
+  bulkMode = true;
+  toggleBulkMovie(m.id);
+ }, 900);
+};
+const cancelLongPress = () => clearTimeout(longPressTimer);
+card.addEventListener('touchstart', startLongPress, { passive: true });
+card.addEventListener('touchend', cancelLongPress);
+card.addEventListener('touchmove', cancelLongPress);
+card.addEventListener('touchcancel', cancelLongPress);
+card.addEventListener('mousedown', startLongPress);
+card.addEventListener('mouseup', cancelLongPress);
+card.addEventListener('mouseleave', cancelLongPress);
+card.onclick = event => {
+ if (longPressFired) { event.preventDefault(); return; }
+ bulkMode ? toggleBulkMovie(m.id) : openMovieDetail(m.id);
+};
 
 const statusRow = `
 <div class="flex items-center gap-2 mt-1 text-[10px]">
