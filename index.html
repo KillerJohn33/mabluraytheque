@@ -148,6 +148,22 @@ box-shadow: 0 7px 20px rgba(15,23,42,.08), inset 0 1px 0 #fff;
 @media (min-width: 768px) {
   .mobile-section-hero { display: none !important; }
 }
+@media (max-width: 767px) {
+  .mobile-section-hero {
+    padding: .4rem .65rem;
+    min-height: 2.15rem;
+    gap: .5rem;
+    border-radius: .75rem;
+  }
+  .mobile-section-hero .page-hero-icon { width: 1.5rem; height: 1.5rem; border-radius: .5rem; }
+  .mobile-section-hero .page-hero-icon svg { width: .85rem; height: .85rem; }
+  .mobile-section-hero h2 { font-size: .72rem; }
+  #collectionTopBars { gap: 0; }
+  #collectionTopBars > * + * { margin-top: .4rem !important; }
+  .tab-switcher { padding: .2rem; }
+  .tab-switcher .choice-option { min-height: 32px; padding: .3rem .3rem; font-size: .68rem; }
+  .tab-wishlist-btn { min-height: 34px !important; padding-top: .4rem !important; padding-bottom: .4rem !important; font-size: .68rem !important; }
+}
 /* ===== Pages Stats et Options harmonisees ===== */
 .modern-page {
 gap: 1rem;
@@ -1620,17 +1636,19 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 
 <!-- ONGLET COLLECTION AVEC FILTRES AVANCÉS -->
 <div id="tabCollection" class="hidden space-y-4">
-<div class="choice-bar w-full" role="group" aria-label="Affichage de la collection">
+<div id="collectionTopBars" class="space-y-2">
+<div class="choice-bar w-full tab-switcher" role="group" aria-label="Affichage de la collection">
 <button type="button" class="choice-option is-active" aria-pressed="true" disabled>Ma collection</button>
 <button type="button" onclick="switchTab('digital')" class="choice-option" aria-pressed="false">Digital</button>
 </div>
-<button type="button" onclick="switchTab('wishlist')" class="app-action app-action-pink w-full px-3 py-2.5 text-xs">
+<button type="button" onclick="switchTab('wishlist')" class="app-action app-action-pink w-full px-3 py-2.5 text-xs tab-wishlist-btn">
 <span class="icon-inline w-4 h-4" data-icon="sparkles"></span> Wishlist <span id="wishlistBadge" class="hidden bg-pink-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">0</span>
 </button>
 <div class="flex items-center justify-center gap-3 text-sm text-gray-400">
 <span><strong id="collectionMovieCount" class="text-cyan-300 font-black text-xl">0</strong> film<span id="collectionMoviePlural"></span></span>
 <span class="text-gray-600">•</span>
 <span><strong id="collectionSeriesCount" class="text-sky-300 font-black text-xl">0</strong> série<span id="collectionSeriesPlural"></span></span>
+</div>
 </div>
 <div class="flex items-center justify-between gap-2">
 <button id="collectionFilterToggle" type="button" onclick="toggleCollectionFilters()" aria-expanded="false" aria-controls="collectionFilterPanel" class="glass-pill px-3 py-2 rounded-xl text-[11px] font-semibold text-cyan-300 hover:text-white flex items-center gap-2 min-h-[42px]"><span class="icon-inline w-3.5 h-3.5" data-icon="filter"></span> Filtrer <span id="activeFilterCount" class="hidden bg-cyan-400/20 text-cyan-200 rounded-full px-1.5 py-0.5 text-[9px]"></span></button>
@@ -1721,7 +1739,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <!-- ONGLET WISHLIST -->
 <div id="tabWishlist" class="hidden space-y-4">
 <div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="sparkles"></span><h2 class="font-black text-white relative z-10">Wishlist</h2></div>
-<div class="choice-bar w-full" role="group" aria-label="Affichage de la collection">
+<div class="choice-bar w-full tab-switcher" role="group" aria-label="Affichage de la collection">
 <button type="button" onclick="switchTab('collection')" class="choice-option">Ma collection</button>
 <button type="button" class="choice-option is-active" aria-pressed="true" disabled>Wishlist</button>
 </div>
@@ -1858,7 +1876,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <!-- ONGLET DIGITAL -->
 <div id="tabDigital" class="hidden space-y-4">
 <div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="cloud"></span><h2 class="font-black text-white relative z-10">Digital</h2></div>
-<div class="choice-bar w-full" role="group" aria-label="Affichage de la collection">
+<div class="choice-bar w-full tab-switcher" role="group" aria-label="Affichage de la collection">
 <button type="button" onclick="switchTab('collection')" class="choice-option" aria-pressed="false">Ma collection</button>
 <button type="button" class="choice-option is-active" aria-pressed="true" disabled>Digital</button>
 </div>
