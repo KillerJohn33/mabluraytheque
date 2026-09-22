@@ -3283,21 +3283,24 @@ async function mapWithConcurrency(list, limit, worker) {
  await Promise.all(Array.from({ length: Math.min(limit, list.length) }, next));
 }
 
-async function fetchPlexPosterDataUri(base, token, thumbPath) {
- if (!thumbPath) return '';
+async function fetchAndUploadPlexPoster(base, token, thumbPath, ratingKey) {
+ if (!thumbPath || !db) return '';
  try {
   const sourceUrl = `${base}${thumbPath}?X-Plex-Token=${encodeURIComponent(token)}`;
   const transcodeUrl = `${base}/photo/:/transcode?width=300&height=450&minSize=1&upscale=0&url=${encodeURIComponent(sourceUrl)}&X-Plex-Token=${encodeURIComponent(token)}`;
   const res = await fetch(transcodeUrl);
   if (!res.ok) return '';
   const blob = await res.blob();
-  if (!blob || blob.size > 250000) return '';
-  return await new Promise(resolve => {
-   const reader = new FileReader();
-   reader.onload = () => resolve(String(reader.result || ''));
-   reader.onerror = () => resolve('');
-   reader.readAsDataURL(blob);
+  if (!blob || blob.size > 400000) return '';
+  const path = `plex/${ratingKey}.jpg`;
+  const { error } = await db.storage.from('digital-posters').upload(path, blob, {
+   upsert: true,
+   contentType: blob.type || 'image/jpeg',
+   cacheControl: '2592000'
   });
+  if (error) return '';
+  const { data } = db.storage.from('digital-posters').getPublicUrl(path);
+  return data?.publicUrl || '';
  } catch (_) { return ''; }
 }
 
@@ -3345,7 +3348,7 @@ async function syncPlexLibrary(silent = false) {
   }
 
   // Recupere et met en cache les affiches (en base64) pour un affichage rapide sans dependre de Plex
-  if (!silent) showToast('Téléchargement des affiches…');
+  if (!silent) showToast('Téléchargement des affiches vers le cloud…');
   const previousByKey = new Map(digitalLibrary.map(d => [d.ratingKey, d]));
   await mapWithConcurrency(items, 5, async item => {
    const previous = previousByKey.get(item.ratingKey);
@@ -3353,7 +3356,7 @@ async function syncPlexLibrary(silent = false) {
     item.posterData = previous.posterData;
     return;
    }
-   item.posterData = await fetchPlexPosterDataUri(base, plex.token, item.thumbPath);
+   item.posterData = await fetchAndUploadPlexPoster(base, plex.token, item.thumbPath, item.ratingKey);
   });
 
   digitalLibrary = items;
@@ -3365,7 +3368,7 @@ async function syncPlexLibrary(silent = false) {
   renderPlexCard();
   await saveDigitalLibraryBundleCloud();
   await saveProfileBundleCloud();
-  if (!silent) showToast(`${items.length} élément(s) importé(s) et mis en cache depuis Plex.`);
+  if (!silent) showToast(`${items.length} élément(s) importé(s), affiches mises en cache dans le cloud.`);
   return true;
  } catch (error) {
   console.warn('Synchronisation Plex indisponible :', error);
