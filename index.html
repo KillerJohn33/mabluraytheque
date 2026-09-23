@@ -1211,17 +1211,17 @@ body.theme-light .quick-chip:hover { color: #0f172a; }
 body.theme-light .quick-chip.is-active { color: #062a30; border-color: rgba(15,23,42,.16); }
 body.theme-light .quick-chip.quick-chip-saga.is-active { color: #1e1147; }
 
-/* Vue etagere de la collection : jaquettes serrees cote a cote */
-#collectionGrid.collection-shelf { display: flex; flex-wrap: wrap; gap: .4rem; }
-#collectionGrid.collection-shelf .shelf-item { height: 7.5rem; width: calc(7.5rem * 2 / 3); flex: none; border-radius: .4rem; }
-#collectionGrid.collection-shelf .shelf-item:hover { transform: scale(1.06); z-index: 2; }
+/* Vue etagere (Collection et Digital) : jaquettes serrees cote a cote */
+.collection-shelf { display: flex; flex-wrap: wrap; gap: .4rem; }
+.collection-shelf .shelf-item { height: 7.5rem; width: calc(7.5rem * 2 / 3); flex: none; border-radius: .4rem; }
+.collection-shelf .shelf-item:hover { transform: scale(1.06); z-index: 2; }
 @media (max-width: 767px) {
-  #collectionGrid.collection-shelf {
+  .collection-shelf {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(4.4rem, 1fr));
     gap: .6rem;
   }
-  #collectionGrid.collection-shelf .shelf-item { width: 100%; height: auto; aspect-ratio: 2 / 3; }
+  .collection-shelf .shelf-item { width: 100%; height: auto; aspect-ratio: 2 / 3; }
 }
 .collection-saga-group + .collection-saga-group { margin-top: 1.25rem; }
 
@@ -2038,6 +2038,12 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <button id="digitalTypeConcertBtn" aria-pressed="false" onclick="setDigitalTypeFilter('concert')" class="choice-option">Concerts</button>
 </div>
 <div class="glass-card p-3 rounded-2xl space-y-2 border border-white/10">
+<div class="flex items-center justify-between border-b border-white/10 pb-2">
+<span class="text-[11px] font-bold text-gray-300 flex items-center gap-1.5"><span class="icon-inline w-3.5 h-3.5 text-amber-300" data-icon="filter"></span> Filtres & Tri</span>
+<button onclick="toggleDigitalViewMode()" id="toggleDigitalViewBtn" class="glass-pill px-2.5 py-1 rounded-xl text-[11px] text-amber-300 hover:text-white flex items-center gap-1 transition">
+<span class="icon-inline w-3.5 h-3.5" data-icon="list"></span> <span id="digitalViewModeLabel">Vue Étagère</span>
+</button>
+</div>
 <div class="relative">
 <span class="icon-inline w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" data-icon="search"></span>
 <input id="digitalSearchInput" type="text" oninput="renderDigital()" placeholder="Rechercher dans Digital..." class="w-full pl-9 pr-3 py-2 rounded-xl glass-input text-white text-xs placeholder-gray-400 focus:outline-none">
@@ -3000,6 +3006,7 @@ const savedViewMode = localStorage.getItem('collection_view_mode');
 collectionViewMode = ['grid', 'list', 'shelf'].includes(savedViewMode) ? savedViewMode : (savedDefaultView === 'list' ? 'list' : 'grid');
 document.getElementById('defaultViewSelect').value = savedDefaultView;
 updateCollectionViewModeLabel();
+updateDigitalViewModeLabel();
 
 document.getElementById('settingTmdbKey').value = API_KEY;
 document.getElementById('settingSupaUrl').value = SUPABASE_URL;
@@ -5289,6 +5296,19 @@ renderWishlist();
 }
 
 let digitalTypeFilter = 'all';
+let digitalViewMode = localStorage.getItem('digital_view_mode') === 'shelf' ? 'shelf' : 'grid';
+
+function updateDigitalViewModeLabel() {
+const label = document.getElementById('digitalViewModeLabel');
+if (label) label.innerText = digitalViewMode === 'grid' ? "Vue Étagère" : "Vue Grille";
+}
+
+function toggleDigitalViewMode() {
+digitalViewMode = digitalViewMode === 'grid' ? 'shelf' : 'grid';
+localStorage.setItem('digital_view_mode', digitalViewMode);
+updateDigitalViewModeLabel();
+renderDigital();
+}
 
 function toggleDigitalFilters() {
  const panel = document.getElementById('digitalFilterPanel');
@@ -5387,22 +5407,31 @@ function renderDigital() {
  }
  if (noResults) noResults.classList.add('hidden');
  grid.classList.remove('hidden');
- grid.innerHTML = sorted.map(item => {
-  const poster = item.posterData || item.poster || '';
-  return `
-  <div onclick="openDigitalDetail('${item.id}')" class="movie-card-item glass-card rounded-2xl overflow-hidden border border-white/10 cursor-pointer">
-   <div class="relative aspect-[2/3] bg-black/40">
-    ${poster ? `<img src="${escapeHtml(poster)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.style.display='none'" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-gray-600"><span class="icon-inline w-8 h-8" data-icon="cloud"></span></div>`}
-    <span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-black/70 text-[8px] font-bold text-amber-300 uppercase tracking-wider">${escapeHtml(item.sectionTitle || (item.type === 'show' ? 'Série' : 'Film'))}</span>
-    ${item.resolution ? `<span class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md bg-black/70 text-[8px] font-bold text-cyan-300 uppercase">${escapeHtml(item.resolution)}</span>` : ''}
+ if (digitalViewMode === 'shelf') {
+  grid.className = 'collection-shelf';
+  grid.innerHTML = sorted.map(item => {
+   const poster = item.posterData || item.poster || '';
+   return `<div onclick="openDigitalDetail('${item.id}')" class="relative shelf-item overflow-hidden cursor-pointer shadow-lg transition-transform">${poster ? `<img src="${escapeHtml(poster)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.style.display='none'" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center bg-black/40 text-gray-600"><span class="icon-inline w-6 h-6" data-icon="cloud"></span></div>`}</div>`;
+  }).join('');
+ } else {
+  grid.className = 'grid grid-cols-2 gap-4';
+  grid.innerHTML = sorted.map(item => {
+   const poster = item.posterData || item.poster || '';
+   return `
+   <div onclick="openDigitalDetail('${item.id}')" class="movie-card-item glass-card rounded-2xl overflow-hidden border border-white/10 cursor-pointer">
+    <div class="relative aspect-[2/3] bg-black/40">
+     ${poster ? `<img src="${escapeHtml(poster)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.style.display='none'" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-gray-600"><span class="icon-inline w-8 h-8" data-icon="cloud"></span></div>`}
+     <span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-black/70 text-[8px] font-bold text-amber-300 uppercase tracking-wider">${escapeHtml(item.sectionTitle || (item.type === 'show' ? 'Série' : 'Film'))}</span>
+     ${item.resolution ? `<span class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md bg-black/70 text-[8px] font-bold text-cyan-300 uppercase">${escapeHtml(item.resolution)}</span>` : ''}
+    </div>
+    <div class="p-2">
+     <p class="text-[11px] font-semibold text-white truncate" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</p>
+     <p class="text-[9px] text-gray-500 mt-0.5">${[item.year, item.duration ? formatRuntime(item.duration) : ''].filter(Boolean).join(' · ')}</p>
+    </div>
    </div>
-   <div class="p-2">
-    <p class="text-[11px] font-semibold text-white truncate" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</p>
-    <p class="text-[9px] text-gray-500 mt-0.5">${[item.year, item.duration ? formatRuntime(item.duration) : ''].filter(Boolean).join(' · ')}</p>
-   </div>
-  </div>
- `;
- }).join('');
+  `;
+  }).join('');
+ }
 }
 
 function digitalPlexLink(item) {
