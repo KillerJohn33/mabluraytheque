@@ -241,33 +241,7 @@ box-shadow: 0 7px 20px rgba(15,23,42,.08), inset 0 1px 0 #fff;
   .tab-switcher { padding: .2rem; }
   .tab-switcher .choice-option { min-height: 32px; padding: .3rem .3rem; font-size: .68rem; }
 
-  /* Filtres Digital : menu deroulant flottant au-dessus de l'icone du bandeau de titre */
-  #digitalFilterPanel:not(.hidden) {
-    position: fixed;
-    top: calc(env(safe-area-inset-top) + 3.6rem);
-    left: .75rem;
-    right: .75rem;
-    z-index: 65;
-    max-height: 70vh;
-    overflow-y: auto;
-    background: #0b0d12;
-    border: 1px solid rgba(255,255,255,.14);
-    border-radius: 1rem;
-    padding: .85rem;
-    box-shadow: 0 20px 45px rgba(0,0,0,.55);
-  }
-  body.theme-light #digitalFilterPanel:not(.hidden) {
-    background: #f8fafc;
-    border-color: rgba(15,23,42,.12);
-  }
-  #filterDropdownBackdrop:not(.hidden) {
-    display: block;
-    position: fixed;
-    inset: 0;
-    z-index: 60;
-    background: rgba(0,0,0,.5);
-  }
-  /* Filtres Collection : boutons visibles sur la page, panneau integre au flux (plus de flottant) */
+  /* Filtres Digital et Collection : panneau integre au flux de la page (plus de flottant, evite les problemes de clic) */
   #collectionActionRow { min-height: 42px; }
 
   /* Espaces plus resserres sur les onglets Collection et Digital */
@@ -5315,7 +5289,6 @@ function toggleDigitalFilters() {
  const button = document.getElementById('digitalFilterToggle');
  const open = panel.classList.toggle('hidden') === false;
  button?.setAttribute('aria-expanded', String(open));
- document.getElementById('filterDropdownBackdrop')?.classList.toggle('hidden', !open);
 }
 
 function setDigitalTypeFilter(type) {
