@@ -279,17 +279,28 @@ box-shadow: 0 7px 20px rgba(15,23,42,.08), inset 0 1px 0 #fff;
   /* Meme ecart entre la barre de titre et le contenu sur Collection et Digital (evite le decalage au changement d'onglet) */
   #tabCollection { margin-top: .75rem !important; }
 
-  /* Barre de titre de l'application plus fine */
-  body > header { padding: .55rem .75rem !important; min-height: 0 !important; }
+  /* Barre de titre de l'application plus fine, sans flou (backdrop-filter) */
+  body > header {
+    padding: .55rem .75rem !important;
+    min-height: 0 !important;
+    background: rgba(9, 11, 16, .96) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  body.theme-light > header {
+    background: rgba(255, 255, 255, .96) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
   body > header .icon-chip.chip-lg { width: 1.8rem !important; height: 1.8rem !important; }
   body > header .icon-chip.chip-lg svg { width: 1.25rem !important; height: 1.25rem !important; }
   body > header span.bg-clip-text { font-size: .95rem !important; }
 
   /* Tableau de bord de l'accueil plus compact */
   #homeDashboard { gap: .4rem !important; }
-  #homeDashboard > div { padding: .5rem .6rem !important; }
+  #homeDashboard > div { padding: .4rem .6rem !important; }
   #homeDashboard > div p:first-child { font-size: 8px !important; }
-  #homeDashboard > div p:last-child { font-size: .85rem !important; margin-top: .15rem !important; }
+  #homeDashboard > div p:last-child { font-size: .78rem !important; margin-top: .1rem !important; }
 }
 #filterDropdownBackdrop { display: none; }
 /* ===== Pages Stats et Options harmonisees ===== */
@@ -1109,8 +1120,8 @@ body.theme-light #incompletePanel {
 body.theme-light #incompletePanel .icon-chip { color: #b45309; }
 /* Actions cohérentes avec les boutons des fiches */
 .app-action {
-  --action-rgb: 34, 211, 238;
-  --action-text: #062a30;
+  --action-rgb: 6, 182, 212;
+  --action-text: #ffffff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1128,13 +1139,14 @@ body.theme-light #incompletePanel .icon-chip { color: #b45309; }
 .app-action:active { transform: scale(.98); filter: brightness(.95); }
 .app-action:focus-visible { outline: 2px solid rgba(var(--action-rgb), .9); outline-offset: 2px; }
 .app-action:disabled { opacity: .5; cursor: not-allowed; transform: none; filter: none; }
-.app-action-cyan { --action-rgb: 34, 211, 238; --action-text: #062a30; }
-.app-action-pink { --action-rgb: 244, 114, 182; --action-text: #3d0a22; }
-.app-action-violet { --action-rgb: 167, 139, 250; --action-text: #1e1147; }
-.app-action-green { --action-rgb: 52, 211, 153; --action-text: #042e22; }
-.app-action-amber { --action-rgb: 251, 191, 36; --action-text: #3d2a00; }
-.app-action-red { --action-rgb: 248, 113, 113; --action-text: #ffffff; }
-.app-action-slate { --action-rgb: 148, 163, 184; --action-text: #1e293b; }
+.app-action .icon-chip { color: currentColor; filter: none; }
+.app-action-cyan { --action-rgb: 6, 182, 212; --action-text: #ffffff; }
+.app-action-pink { --action-rgb: 236, 72, 153; --action-text: #ffffff; }
+.app-action-violet { --action-rgb: 139, 92, 246; --action-text: #ffffff; }
+.app-action-green { --action-rgb: 16, 185, 129; --action-text: #ffffff; }
+.app-action-amber { --action-rgb: 245, 158, 11; --action-text: #2a1900; }
+.app-action-red { --action-rgb: 239, 68, 68; --action-text: #ffffff; }
+.app-action-slate { --action-rgb: 100, 116, 139; --action-text: #ffffff; }
 /* Barres de choix : même finition sobre que les actions */
 .choice-bar {
   display: flex;
