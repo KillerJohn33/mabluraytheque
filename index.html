@@ -1216,8 +1216,12 @@ body.theme-light .quick-chip.quick-chip-saga.is-active { color: #1e1147; }
 #collectionGrid.collection-shelf .shelf-item { height: 7.5rem; width: calc(7.5rem * 2 / 3); flex: none; border-radius: .4rem; }
 #collectionGrid.collection-shelf .shelf-item:hover { transform: scale(1.06); z-index: 2; }
 @media (max-width: 767px) {
-  #collectionGrid.collection-shelf { justify-content: center; }
-  #collectionGrid.collection-shelf .shelf-item { height: 5.5rem; width: calc(5.5rem * 2 / 3); }
+  #collectionGrid.collection-shelf {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(4.4rem, 1fr));
+    gap: .6rem;
+  }
+  #collectionGrid.collection-shelf .shelf-item { width: 100%; height: auto; aspect-ratio: 2 / 3; }
 }
 .collection-saga-group + .collection-saga-group { margin-top: 1.25rem; }
 
