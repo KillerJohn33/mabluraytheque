@@ -1189,6 +1189,44 @@ body.theme-light .choice-option.choice-option-pink { --choice-text: #be185d; }
 body.theme-light .choice-option:hover { color: var(--choice-text); }
 @media (max-width: 380px) { .choice-bar-violet .choice-option { font-size: 10px; padding-inline: .2rem; } }
 
+/* Pastilles de filtre rapide (Collection) */
+.quick-chip {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  padding: .4rem .75rem;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.05);
+  color: #9ca3af;
+  transition: background .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease;
+}
+.quick-chip:hover { color: #fff; border-color: rgba(34,211,238,.4); }
+.quick-chip.is-active {
+  background: #22d3ee;
+  color: #062a30;
+  border-color: rgba(255,255,255,.3);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5), inset 0 -2px 4px rgba(0,0,0,.15);
+}
+.quick-chip.quick-chip-saga.is-active { background: #a78bfa; color: #1e1147; }
+body.theme-light .quick-chip { background: rgba(255,255,255,.7); border-color: rgba(15,23,42,.12); color: #64748b; }
+body.theme-light .quick-chip:hover { color: #0f172a; }
+body.theme-light .quick-chip.is-active { color: #062a30; border-color: rgba(15,23,42,.16); }
+body.theme-light .quick-chip.quick-chip-saga.is-active { color: #1e1147; }
+
+/* Vue etagere de la collection : jaquettes serrees cote a cote */
+#collectionGrid.collection-shelf { display: flex; flex-wrap: wrap; gap: .4rem; }
+#collectionGrid.collection-shelf .shelf-item { height: 7.5rem; width: calc(7.5rem * 2 / 3); flex: none; border-radius: .4rem; }
+#collectionGrid.collection-shelf .shelf-item:hover { transform: scale(1.06); z-index: 2; }
+@media (max-width: 767px) {
+  #collectionGrid.collection-shelf .shelf-item { height: 5.5rem; width: calc(5.5rem * 2 / 3); }
+}
+.collection-saga-group + .collection-saga-group { margin-top: 1.25rem; }
+
 /* Contrastes du thème clair après l'harmonisation des composants */
 body.theme-light .text-cyan-200,
 body.theme-light .text-cyan-300,
@@ -1822,6 +1860,24 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <span><strong id="collectionSeriesCount" class="text-sky-300 font-black text-xl">0</strong> série<span id="collectionSeriesPlural"></span></span>
 </div>
 </div>
+
+<div id="collectionOverviewBar" class="glass-card rounded-2xl border border-white/10 p-3 space-y-2">
+<div class="flex items-center justify-between text-[10px] text-gray-400 font-semibold uppercase tracking-wide">
+<span>Répartition des formats</span>
+<span id="collectionOverviewValue" class="text-cyan-300 normal-case font-black text-xs">0,00 €</span>
+</div>
+<div id="collectionOverviewBarTrack" class="flex h-2.5 rounded-full overflow-hidden bg-white/5"></div>
+<div id="collectionOverviewLegend" class="flex flex-wrap gap-x-3 gap-y-1 text-[9px] text-gray-400"></div>
+</div>
+
+<div id="collectionQuickChips" class="flex items-center gap-1.5 overflow-x-auto pb-0.5">
+<button type="button" onclick="setQuickFormatFilter('all')" data-quick-format="all" class="quick-chip is-active">Tous</button>
+<button type="button" onclick="setQuickFormatFilter('4K UHD')" data-quick-format="4K UHD" class="quick-chip">4K UHD</button>
+<button type="button" onclick="setQuickFormatFilter('Blu-ray 1080p')" data-quick-format="Blu-ray 1080p" class="quick-chip">Blu-ray</button>
+<button type="button" onclick="setQuickFormatFilter('DVD')" data-quick-format="DVD" class="quick-chip">DVD</button>
+<button type="button" id="collectionSagaToggle" onclick="toggleCollectionGrouping()" aria-pressed="false" class="quick-chip quick-chip-saga ml-auto"><span class="icon-inline w-3 h-3" data-icon="clapper"></span> Sagas</button>
+</div>
+
 <div id="collectionActionRow" class="flex items-center justify-between gap-2">
 <button id="collectionFilterToggle" type="button" onclick="toggleCollectionFilters()" aria-expanded="false" aria-controls="collectionFilterPanel" class="glass-pill px-3 py-2 rounded-xl text-[11px] font-semibold text-cyan-300 hover:text-white flex items-center gap-2 min-h-[42px]"><span class="icon-inline w-3.5 h-3.5" data-icon="filter"></span> Filtrer <span id="activeFilterCount" class="hidden bg-cyan-400/20 text-cyan-200 rounded-full px-1.5 py-0.5 text-[9px]"></span></button>
 <button id="bulkToggle" onclick="toggleBulkMode()" class="text-[11px] text-gray-400 hover:text-cyan-300 px-2 py-2 rounded-xl min-h-[42px]" aria-expanded="false" aria-controls="bulkToolbar">Sélectionner</button>
@@ -1877,6 +1933,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <option class="bg-gray-900" value="estimated_desc">Estimation (Élevée)</option>
 <option class="bg-gray-900" value="year_desc">Année (Récentes)</option>
 <option class="bg-gray-900" value="rating_desc">Note TMDB (Élevée)</option>
+<option class="bg-gray-900" value="color">Couleur de l'affiche</option>
 </select>
 </div>
 <div>
@@ -2817,7 +2874,8 @@ let profileBundleFromCloud = null;
 let profileData = { equipment: [], projects: [], subscriptions: [], plex: {}, updatedAt: '' };
 let editingEquipmentId = null;
 let editingSubscriptionId = null;
-let isListView = false;
+let collectionViewMode = 'grid';
+let collectionGroupBySaga = false;
 let isWishlistListView = false;
 let html5QrcodeScanner = null;
 let barcodeScanBusy = false;
@@ -2907,9 +2965,9 @@ const savedTheme = localStorage.getItem('app_theme') || 'theme-noir';
 changeTheme(savedTheme);
 
 const savedDefaultView = localStorage.getItem('default_view') || 'grid';
-isListView = (savedDefaultView === 'list');
+collectionViewMode = (savedDefaultView === 'list') ? 'list' : 'grid';
 document.getElementById('defaultViewSelect').value = savedDefaultView;
-document.getElementById('viewModeLabel').innerText = isListView ? "Vue Grille" : "Vue Liste";
+updateCollectionViewModeLabel();
 
 document.getElementById('settingTmdbKey').value = API_KEY;
 document.getElementById('settingSupaUrl').value = SUPABASE_URL;
@@ -4161,10 +4219,43 @@ renderIncompletePanel();
 if (window.innerWidth < 768) window.scrollTo(0, 0);
 }
 
+function updateCollectionViewModeLabel() {
+const label = document.getElementById('viewModeLabel');
+if (!label) return;
+label.innerText = collectionViewMode === 'grid' ? "Vue Liste" : collectionViewMode === 'list' ? "Vue Étagère" : "Vue Grille";
+}
+
 function toggleViewMode() {
-isListView = !isListView;
-document.getElementById('viewModeLabel').innerText = isListView ? "Vue Grille" : "Vue Liste";
+collectionViewMode = collectionViewMode === 'grid' ? 'list' : collectionViewMode === 'list' ? 'shelf' : 'grid';
+updateCollectionViewModeLabel();
 renderCollection();
+}
+
+function setQuickFormatFilter(value) {
+const select = document.getElementById('filterFormat');
+if (select) select.value = value;
+renderCollection();
+}
+
+function toggleCollectionGrouping() {
+collectionGroupBySaga = !collectionGroupBySaga;
+renderCollection();
+}
+
+function rgbStringToHue(rgbStr) {
+const parts = String(rgbStr || '').split(',').map(v => parseInt(v.trim(), 10) / 255);
+if (parts.length < 3 || parts.some(Number.isNaN)) return null;
+const [r, g, b] = parts;
+const max = Math.max(r, g, b), min = Math.min(r, g, b);
+const d = max - min;
+if (d === 0) return null;
+let h;
+if (max === r) h = ((g - b) / d) % 6;
+else if (max === g) h = (b - r) / d + 2;
+else h = (r - g) / d + 4;
+h *= 60;
+if (h < 0) h += 360;
+return h;
 }
 
 // --- RECHERCHE TMDB ---
@@ -4350,6 +4441,7 @@ let genres = [], runtime = null, director = '', cast = [], imdbId = null, voteAv
 let numberOfSeasons = null, numberOfEpisodes = null, creators = [];
 let blurayDateFR = null;
 let budget = null, revenue = null;
+let collectionId = null, collectionName = '';
 
 try {
 const endpoint = isTv ? `tv/${tmdbData.id}` : `movie/${tmdbData.id}`;
@@ -4365,6 +4457,10 @@ voteCount = typeof detail.vote_count === 'number' ? detail.vote_count : null;
 if (!isTv) {
  budget = typeof detail.budget === 'number' ? detail.budget : null;
  revenue = typeof detail.revenue === 'number' ? detail.revenue : null;
+ if (detail.belongs_to_collection) {
+  collectionId = detail.belongs_to_collection.id;
+  collectionName = detail.belongs_to_collection.name || '';
+ }
 }
 
 if (isTv) {
@@ -4407,6 +4503,8 @@ voteAverage,
 voteCount,
 budget,
 revenue,
+collectionId,
+collectionName,
 seen: false,
 isWishlist: isWishlist,
 addedAt: new Date().toISOString(),
@@ -4451,6 +4549,7 @@ let imdbId = null;
 let voteAverage = null;
 let voteCount = null;
 let budget = null, revenue = null;
+let collectionId = null, collectionName = '';
 
 try {
 const detailRes = await fetch(`https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${API_KEY}&language=fr-FR&append_to_response=credits`);
@@ -4463,6 +4562,10 @@ voteAverage = typeof detail.vote_average === 'number' ? detail.vote_average : nu
 voteCount = typeof detail.vote_count === 'number' ? detail.vote_count : null;
 budget = typeof detail.budget === 'number' ? detail.budget : null;
 revenue = typeof detail.revenue === 'number' ? detail.revenue : null;
+if (detail.belongs_to_collection) {
+collectionId = detail.belongs_to_collection.id;
+collectionName = detail.belongs_to_collection.name || '';
+}
 
 if (detail.credits) {
 const crew = detail.credits.crew || [];
@@ -4476,7 +4579,7 @@ cast = castList.slice(0, 5).map(p => p.name);
 
 const blurayDateFR = await fetchBlurayReleaseDateFR(tmdbId);
 
-return { genres, runtime, director, cast, imdbId, voteAverage, voteCount, budget, revenue, blurayDateFR };
+return { genres, runtime, director, cast, imdbId, voteAverage, voteCount, budget, revenue, collectionId, collectionName, blurayDateFR };
 }
 
 async function refreshAllTMDBInfo(silent = false) {
@@ -4509,6 +4612,8 @@ movie.voteCount = info.voteCount !== null ? info.voteCount : (movie.voteCount ??
 if (!isSeries(movie)) {
  movie.budget = info.budget !== null ? info.budget : (movie.budget ?? null);
  movie.revenue = info.revenue !== null ? info.revenue : (movie.revenue ?? null);
+ movie.collectionId = info.collectionId ?? movie.collectionId ?? null;
+ movie.collectionName = info.collectionName || movie.collectionName || '';
 }
 if (!movie.blurayReleaseDateManual) {
 movie.blurayReleaseDateFR = info.blurayDateFR || movie.blurayReleaseDateFR || null;
@@ -4753,87 +4858,51 @@ button.setAttribute('aria-expanded', String(open));
 document.getElementById('filterDropdownBackdrop')?.classList.toggle('hidden', !open);
 }
 
-function renderCollection() {
-renderedTabs.collection = true;
-const grid = document.getElementById('collectionGrid');
-grid.innerHTML = '';
-updateBulkToolbar();
-
-const collMovieCount = collection.filter(m => !isSeries(m)).length;
-const collSeriesCount = collection.filter(m => isSeries(m)).length;
-const collMovieCountEl = document.getElementById('collectionMovieCount');
-if (collMovieCountEl) collMovieCountEl.textContent = collMovieCount;
-const collMoviePluralEl = document.getElementById('collectionMoviePlural');
-if (collMoviePluralEl) collMoviePluralEl.textContent = collMovieCount > 1 ? 's' : '';
-const collSeriesCountEl = document.getElementById('collectionSeriesCount');
-if (collSeriesCountEl) collSeriesCountEl.textContent = collSeriesCount;
-const collSeriesPluralEl = document.getElementById('collectionSeriesPlural');
-if (collSeriesPluralEl) collSeriesPluralEl.textContent = collSeriesCount > 1 ? 's' : '';
-
-if (isListView) {
-grid.className = "flex flex-col gap-3 coll-list-view";
-} else {
-grid.className = "grid grid-cols-2 gap-4";
-}
-
-let filtered = [...collection];
-const mediaTypeFilter = document.getElementById('filterMediaType')?.value || 'all';
-const formatFilter = document.getElementById('filterFormat').value;
-const seenFilter = document.getElementById('filterSeen').value;
-
-if (mediaTypeFilter === 'series') {
-filtered = filtered.filter(m => isSeries(m));
-} else if (mediaTypeFilter === 'movie') {
-filtered = filtered.filter(m => !isSeries(m));
-}
-const sortVal = document.getElementById('sortSelect').value;
-const textFilter = document.getElementById('filterText').value.toLowerCase().trim();
-const activeFilterCount = [mediaTypeFilter !== 'all', formatFilter !== 'all', seenFilter !== 'all', !!textFilter, sortVal !== 'added_desc'].filter(Boolean).length;
-const activeFilterBadge = document.getElementById('activeFilterCount');
-activeFilterBadge.textContent = activeFilterCount ? String(activeFilterCount) : '';
-activeFilterBadge.classList.toggle('hidden', !activeFilterCount);
-
-if (formatFilter !== 'all') {
-filtered = filtered.filter(m => m.editions && m.editions.some(e => e.format === formatFilter));
-}
-
-if (seenFilter === 'seen') filtered = filtered.filter(m => m.seen);
-if (seenFilter === 'unseen') filtered = filtered.filter(m => !m.seen);
-
-if (textFilter) {
-const normalizeSearch = value => String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-const query = normalizeSearch(textFilter);
-filtered = filtered.filter(m => {
-const editionText = (m.editions || []).flatMap(e => [e.title, e.format, e.editionType, e.purchaseLocation, e.barcode]).join(' ');
-const haystack = [m.title, m.director, m.creators?.join(' '), m.cast?.join(' '), m.genres?.join(' '), editionText, isSeries(m) ? 'serie series' : 'film'].join(' ');
-return normalizeSearch(haystack).includes(query);
+function renderCollectionOverview() {
+const track = document.getElementById('collectionOverviewBarTrack');
+const legend = document.getElementById('collectionOverviewLegend');
+const valueEl = document.getElementById('collectionOverviewValue');
+if (!track || !legend) return;
+const counts = { '4K UHD': 0, 'Blu-ray 1080p': 0, 'DVD': 0, autres: 0 };
+let totalValue = 0;
+collection.forEach(m => {
+(m.editions || []).forEach(ed => {
+const fmt = ed.format || 'Blu-ray 1080p';
+if (counts[fmt] !== undefined) counts[fmt]++; else counts.autres++;
+totalValue += parseFloat(ed.estimatedPrice) || 0;
 });
-}
-
-// Tri
-filtered.sort((a, b) => {
-if (sortVal === 'added_desc') return new Date(b.addedAt || 0) - new Date(a.addedAt || 0);
-if (sortVal === 'added_asc') return new Date(a.addedAt || 0) - new Date(b.addedAt || 0);
-if (sortVal === 'title_asc') return a.title.localeCompare(b.title);
-if (sortVal === 'title_desc') return b.title.localeCompare(a.title);
-if (sortVal === 'price_desc') return calculateMovieTotals(b).totalPurchase - calculateMovieTotals(a).totalPurchase;
-if (sortVal === 'estimated_desc') return calculateMovieTotals(b).totalEstimated - calculateMovieTotals(a).totalEstimated;
-if (sortVal === 'year_desc') return new Date(b.releaseDate || 0) - new Date(a.releaseDate || 0);
-if (sortVal === 'rating_desc') return (b.voteAverage || 0) - (a.voteAverage || 0);
-return 0;
 });
-
-bulkVisibleIds = filtered.map(movie => String(movie.id));
-for (const id of [...bulkSelected]) if (!collection.some(movie => String(movie.id) === id)) bulkSelected.delete(id);
-updateBulkToolbar();
-
-if (filtered.length === 0) {
-grid.innerHTML = `<p class="text-xs text-gray-400 col-span-2 text-center p-6">Aucun film ne correspond.</p>`;
+if (valueEl) valueEl.textContent = `${totalValue.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
+const total = counts['4K UHD'] + counts['Blu-ray 1080p'] + counts['DVD'] + counts.autres;
+if (!total) {
+track.innerHTML = '';
+legend.innerHTML = '<span class="text-gray-500">Aucune édition enregistrée.</span>';
 return;
 }
+const segments = [
+{ key: '4K UHD', label: '4K UHD', color: '#22d3ee' },
+{ key: 'Blu-ray 1080p', label: 'Blu-ray', color: '#a78bfa' },
+{ key: 'DVD', label: 'DVD', color: '#fbbf24' },
+{ key: 'autres', label: 'Autres', color: '#64748b' }
+].filter(s => counts[s.key] > 0);
+track.innerHTML = segments.map(s => `<span style="width:${(counts[s.key] / total * 100).toFixed(1)}%; background:${s.color};" class="h-full"></span>`).join('');
+legend.innerHTML = segments.map(s => `<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full inline-block" style="background:${s.color}"></span>${s.label} · ${counts[s.key]}</span>`).join('');
+}
 
+function syncCollectionQuickChips(formatFilter) {
+document.querySelectorAll('#collectionQuickChips [data-quick-format]').forEach(btn => {
+btn.classList.toggle('is-active', btn.dataset.quickFormat === formatFilter);
+});
+const sagaBtn = document.getElementById('collectionSagaToggle');
+if (sagaBtn) {
+sagaBtn.classList.toggle('is-active', collectionGroupBySaga);
+sagaBtn.setAttribute('aria-pressed', String(collectionGroupBySaga));
+}
+}
+
+function buildCollectionCardsFragment(list) {
 const fragment = document.createDocumentFragment();
-filtered.forEach(m => {
+list.forEach(m => {
 const totals = calculateMovieTotals(m);
 const card = document.createElement('div');
 card.onclick = () => bulkMode ? toggleBulkMovie(m.id) : openMovieDetail(m.id);
@@ -4848,7 +4917,10 @@ ${m.seen ? `<span class="text-emerald-400 flex items-center gap-1">${ic('check',
 ${imdbBadge(m)}
 </div>`;
 
-if (isListView) {
+if (collectionViewMode === 'shelf') {
+card.className = "relative shelf-item overflow-hidden cursor-pointer shadow-lg transition-transform";
+card.innerHTML = `<img src="${safeImageUrl(m.poster)}" loading="lazy" decoding="async" class="w-full h-full object-cover" alt="${escapeHtml(m.title)}">`;
+} else if (collectionViewMode === 'list') {
 card.className = "relative rounded-2xl overflow-hidden cursor-pointer bg-black h-28 border border-white/10 hover:border-cyan-500/50 transition";
 card.innerHTML = `
 <img src="${safeImageUrl(m.poster)}" loading="lazy" decoding="async" class="absolute left-0 top-0 h-full w-auto">
@@ -4888,7 +4960,163 @@ if (bulkMode) {
 }
 fragment.appendChild(card);
 });
-grid.appendChild(fragment);
+return fragment;
+}
+
+function collectionViewModeClass() {
+if (collectionViewMode === 'shelf') return 'collection-shelf';
+if (collectionViewMode === 'list') return 'flex flex-col gap-3 coll-list-view';
+return 'grid grid-cols-2 gap-4';
+}
+
+function renderCollectionGrid(filtered, opts = {}) {
+const grid = document.getElementById('collectionGrid');
+bulkVisibleIds = filtered.map(movie => String(movie.id));
+for (const id of [...bulkSelected]) if (!collection.some(movie => String(movie.id) === id)) bulkSelected.delete(id);
+updateBulkToolbar();
+
+if (filtered.length === 0) {
+grid.className = 'grid grid-cols-2 gap-4';
+grid.innerHTML = `<p class="text-xs text-gray-400 col-span-2 text-center p-6">Aucun film ne correspond.</p>`;
+return;
+}
+
+const useGrouping = collectionGroupBySaga && collectionViewMode === 'grid' && !opts.disableGrouping;
+
+if (!useGrouping) {
+grid.className = collectionViewModeClass();
+grid.innerHTML = '';
+grid.appendChild(buildCollectionCardsFragment(filtered));
+return;
+}
+
+const groups = new Map();
+const solo = [];
+filtered.forEach(m => {
+if (!isSeries(m) && m.collectionId && m.collectionName) {
+if (!groups.has(m.collectionId)) groups.set(m.collectionId, { name: m.collectionName, items: [] });
+groups.get(m.collectionId).items.push(m);
+} else {
+solo.push(m);
+}
+});
+const realGroups = [];
+groups.forEach(g => { if (g.items.length >= 2) realGroups.push(g); else solo.push(...g.items); });
+realGroups.sort((a, b) => a.name.localeCompare(b.name));
+
+grid.className = 'space-y-5';
+grid.innerHTML = '';
+realGroups.forEach(g => {
+const section = document.createElement('div');
+section.className = 'collection-saga-group';
+const header = document.createElement('div');
+header.className = 'flex items-center gap-2 mb-2 px-0.5';
+header.innerHTML = `<span class="icon-inline w-3.5 h-3.5 text-violet-300" data-icon="clapper"></span><h3 class="text-[11px] font-bold text-violet-200 uppercase tracking-wide">${escapeHtml(g.name)}</h3><span class="text-[9px] text-gray-500">${g.items.length} film${g.items.length > 1 ? 's' : ''}</span>`;
+const subGrid = document.createElement('div');
+subGrid.className = 'grid grid-cols-2 gap-4';
+subGrid.appendChild(buildCollectionCardsFragment(g.items));
+section.appendChild(header);
+section.appendChild(subGrid);
+grid.appendChild(section);
+});
+if (solo.length) {
+const section = document.createElement('div');
+section.className = 'collection-saga-group';
+const header = document.createElement('div');
+header.className = 'flex items-center gap-2 mb-2 px-0.5';
+header.innerHTML = `<h3 class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">${realGroups.length ? 'Autres films' : 'Films'}</h3>`;
+const subGrid = document.createElement('div');
+subGrid.className = 'grid grid-cols-2 gap-4';
+subGrid.appendChild(buildCollectionCardsFragment(solo));
+section.appendChild(header);
+section.appendChild(subGrid);
+grid.appendChild(section);
+}
+}
+
+async function renderCollectionColorSorted(filtered) {
+showToast("Analyse des couleurs des affiches...");
+const withHue = await Promise.all(filtered.map(async m => {
+const accent = await extractPosterAccentColor(m.poster);
+const hue = accent ? rgbStringToHue(accent) : null;
+return { m, hue: hue === null ? 999 : hue };
+}));
+withHue.sort((a, b) => a.hue - b.hue);
+if (document.getElementById('sortSelect')?.value !== 'color') return;
+renderCollectionGrid(withHue.map(x => x.m), { disableGrouping: true });
+}
+
+function renderCollection() {
+renderedTabs.collection = true;
+updateBulkToolbar();
+
+const collMovieCount = collection.filter(m => !isSeries(m)).length;
+const collSeriesCount = collection.filter(m => isSeries(m)).length;
+const collMovieCountEl = document.getElementById('collectionMovieCount');
+if (collMovieCountEl) collMovieCountEl.textContent = collMovieCount;
+const collMoviePluralEl = document.getElementById('collectionMoviePlural');
+if (collMoviePluralEl) collMoviePluralEl.textContent = collMovieCount > 1 ? 's' : '';
+const collSeriesCountEl = document.getElementById('collectionSeriesCount');
+if (collSeriesCountEl) collSeriesCountEl.textContent = collSeriesCount;
+const collSeriesPluralEl = document.getElementById('collectionSeriesPlural');
+if (collSeriesPluralEl) collSeriesPluralEl.textContent = collSeriesCount > 1 ? 's' : '';
+
+renderCollectionOverview();
+
+let filtered = [...collection];
+const mediaTypeFilter = document.getElementById('filterMediaType')?.value || 'all';
+const formatFilter = document.getElementById('filterFormat').value;
+const seenFilter = document.getElementById('filterSeen').value;
+syncCollectionQuickChips(formatFilter);
+
+if (mediaTypeFilter === 'series') {
+filtered = filtered.filter(m => isSeries(m));
+} else if (mediaTypeFilter === 'movie') {
+filtered = filtered.filter(m => !isSeries(m));
+}
+const sortVal = document.getElementById('sortSelect').value;
+const textFilter = document.getElementById('filterText').value.toLowerCase().trim();
+const activeFilterCount = [mediaTypeFilter !== 'all', formatFilter !== 'all', seenFilter !== 'all', !!textFilter, sortVal !== 'added_desc'].filter(Boolean).length;
+const activeFilterBadge = document.getElementById('activeFilterCount');
+activeFilterBadge.textContent = activeFilterCount ? String(activeFilterCount) : '';
+activeFilterBadge.classList.toggle('hidden', !activeFilterCount);
+
+if (formatFilter !== 'all') {
+filtered = filtered.filter(m => m.editions && m.editions.some(e => e.format === formatFilter));
+}
+
+if (seenFilter === 'seen') filtered = filtered.filter(m => m.seen);
+if (seenFilter === 'unseen') filtered = filtered.filter(m => !m.seen);
+
+if (textFilter) {
+const normalizeSearch = value => String(value || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+const query = normalizeSearch(textFilter);
+filtered = filtered.filter(m => {
+const editionText = (m.editions || []).flatMap(e => [e.title, e.format, e.editionType, e.purchaseLocation, e.barcode]).join(' ');
+const haystack = [m.title, m.director, m.creators?.join(' '), m.cast?.join(' '), m.genres?.join(' '), editionText, isSeries(m) ? 'serie series' : 'film'].join(' ');
+return normalizeSearch(haystack).includes(query);
+});
+}
+
+if (sortVal === 'color') {
+renderCollectionColorSorted(filtered);
+return;
+}
+
+// Tri
+filtered.sort((a, b) => {
+if (sortVal === 'added_desc') return new Date(b.addedAt || 0) - new Date(a.addedAt || 0);
+if (sortVal === 'added_asc') return new Date(a.addedAt || 0) - new Date(b.addedAt || 0);
+if (sortVal === 'title_asc') return a.title.localeCompare(b.title);
+if (sortVal === 'title_desc') return b.title.localeCompare(a.title);
+if (sortVal === 'price_desc') return calculateMovieTotals(b).totalPurchase - calculateMovieTotals(a).totalPurchase;
+if (sortVal === 'estimated_desc') return calculateMovieTotals(b).totalEstimated - calculateMovieTotals(a).totalEstimated;
+if (sortVal === 'year_desc') return new Date(b.releaseDate || 0) - new Date(a.releaseDate || 0);
+if (sortVal === 'rating_desc') return (b.voteAverage || 0) - (a.voteAverage || 0);
+return 0;
+});
+
+renderCollectionGrid(filtered);
 }
 
 function toggleWishlistViewMode() {
