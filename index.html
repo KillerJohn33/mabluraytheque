@@ -241,9 +241,7 @@ box-shadow: 0 7px 20px rgba(15,23,42,.08), inset 0 1px 0 #fff;
   .tab-switcher { padding: .2rem; }
   .tab-switcher .choice-option { min-height: 32px; padding: .3rem .3rem; font-size: .68rem; }
 
-  /* Filtres : icone dans le bandeau de titre + menu deroulant au lieu du bouton "Filtrer" */
-  #collectionActionRow { display: none !important; }
-  #collectionFilterPanel:not(.hidden),
+  /* Filtres Digital : menu deroulant flottant au-dessus de l'icone du bandeau de titre */
   #digitalFilterPanel:not(.hidden) {
     position: fixed;
     top: calc(env(safe-area-inset-top) + 3.6rem);
@@ -258,7 +256,6 @@ box-shadow: 0 7px 20px rgba(15,23,42,.08), inset 0 1px 0 #fff;
     padding: .85rem;
     box-shadow: 0 20px 45px rgba(0,0,0,.55);
   }
-  body.theme-light #collectionFilterPanel:not(.hidden),
   body.theme-light #digitalFilterPanel:not(.hidden) {
     background: #f8fafc;
     border-color: rgba(15,23,42,.12);
@@ -270,6 +267,8 @@ box-shadow: 0 7px 20px rgba(15,23,42,.08), inset 0 1px 0 #fff;
     z-index: 60;
     background: rgba(0,0,0,.5);
   }
+  /* Filtres Collection : boutons visibles sur la page, panneau integre au flux (plus de flottant) */
+  #collectionActionRow { min-height: 42px; }
 
   /* Espaces plus resserres sur les onglets Collection et Digital */
   #tabCollection, #tabDigital { row-gap: .75rem !important; }
@@ -1100,23 +1099,8 @@ body { padding-bottom: 7rem !important; }
     height: 13.125rem !important;
   }
 }
-#incompletePanel {
-  background: linear-gradient(145deg, rgba(245,158,11,.16), rgba(120,53,15,.09));
-  border-color: rgba(251,191,36,.3);
-  box-shadow: inset 0 1px 0 rgba(255,237,179,.14), 0 10px 28px rgba(0,0,0,.16);
-}
-#incompletePanel::before { background: linear-gradient(90deg, transparent, rgba(251,191,36,.62), transparent); }
-#incompletePanel .icon-chip {
-  color: #fbbf24;
-  background: rgba(245,158,11,.14);
-  border-color: rgba(251,191,36,.28);
-}
-body.theme-light #incompletePanel {
-  background: linear-gradient(145deg, rgba(255,237,199,.9), rgba(254,243,221,.82));
-  border-color: rgba(217,119,6,.28);
-  box-shadow: 0 10px 28px rgba(120,53,15,.08), inset 0 1px 0 rgba(255,255,255,.8);
-}
-body.theme-light #incompletePanel .icon-chip { color: #b45309; }
+body.theme-light #incompletePanel summary { color: rgba(180,83,9,.75); }
+body.theme-light #incompletePanel summary:hover { color: #b45309; }
 /* Actions cohérentes avec les boutons des fiches */
 .app-action {
   --action-rgb: 34, 211, 238;
@@ -1283,10 +1267,6 @@ body.theme-light .modern-panel::before {
 body.theme-light #syncStatus {
   background: linear-gradient(135deg, rgba(224,242,254,.92), rgba(248,250,252,.9));
   border-color: rgba(2,132,199,.24) !important;
-}
-body.theme-light #incompletePanel {
-  background: linear-gradient(145deg, rgba(255,237,199,.96), rgba(254,243,221,.92));
-  border-color: rgba(180,83,9,.42);
 }
 body.theme-light main .bg-clip-text.text-transparent {
   background-image: linear-gradient(90deg, #075985, #1d4ed8) !important;
@@ -1740,7 +1720,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 
 <!-- RECHERCHE & SCANNER (visible uniquement sur Accueil et Collection) -->
 <div id="homeMobileHero" class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="home"></span><h2 class="font-black text-white relative z-10">Accueil</h2></div>
-<div id="collectionMobileHero" class="hidden mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="disc"></span><h2 class="font-black text-white relative z-10">Collection</h2><button id="collectionSelectHeroBtn" type="button" onclick="toggleBulkMode()" aria-expanded="false" aria-controls="bulkToolbar" class="hero-select-btn ml-auto relative z-10">Sélectionner</button><button type="button" onclick="toggleCollectionFilters()" aria-expanded="false" aria-controls="collectionFilterPanel" class="hero-filter-btn relative z-10"><span class="icon-inline w-3.5 h-3.5" data-icon="filter"></span></button></div>
+<div id="collectionMobileHero" class="hidden mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="disc"></span><h2 class="font-black text-white relative z-10">Collection</h2></div>
 <div id="searchSection" class="space-y-4">
 <div class="space-y-4">
 <div class="space-y-2">
@@ -1944,13 +1924,15 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 
 </div>
 
-<details id="incompletePanel" class="hidden modern-panel px-3 py-0.5 md:px-4">
-<summary class="cursor-pointer list-none flex items-center justify-between gap-3 min-h-[34px]">
-<span class="flex items-center gap-2"><span class="icon-chip chip-sm" data-icon="alert"></span><span class="text-xs font-bold text-white">Films à compléter</span></span>
-<span class="flex items-center gap-2"><span id="incompleteCount" class="text-[11px] font-bold text-amber-300 rounded-full bg-amber-400/10 px-2 py-1">0</span><span class="text-gray-400 text-xs">⌄</span></span>
+<details id="incompletePanel" class="hidden px-1">
+<summary class="cursor-pointer list-none flex items-center gap-1.5 min-h-[28px] text-[11px] text-amber-300/70 hover:text-amber-300 transition">
+<span class="icon-inline w-3 h-3" data-icon="alert"></span>
+<span class="font-semibold">Films à compléter</span>
+<span id="incompleteCount" class="text-[9px] font-bold text-amber-300 rounded-full bg-amber-400/10 px-1.5 py-0.5">0</span>
+<span class="text-gray-500 ml-auto text-[9px]">⌄</span>
 </summary>
-<p class="text-[9px] text-gray-400 mt-0.5">Nom, format ou boîtier manquant, ou jaquette d’édition absente.</p>
-<div id="incompleteList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-3"></div>
+<p class="text-[9px] text-gray-500 mt-0.5 px-0.5">Nom, format ou boîtier manquant, ou jaquette d’édition absente.</p>
+<div id="incompleteList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-2"></div>
 </details>
 <div id="bulkToolbar" class="hidden glass-card rounded-2xl border border-cyan-400/20 p-2.5 space-y-2">
 <div class="flex items-center justify-between gap-2"><span id="bulkCount" class="text-[11px] font-semibold text-cyan-200">0 sélectionné</span><div class="flex gap-1"><button onclick="selectVisibleMovies()" class="text-[10px] text-gray-300 px-2 py-2 rounded-lg hover:bg-white/10">Tout sélectionner</button><button onclick="toggleBulkMode()" class="text-[10px] text-gray-400 px-2 py-2 rounded-lg hover:bg-white/10">Annuler</button></div></div>
@@ -4853,8 +4835,7 @@ function toggleCollectionFilters() {
 const panel = document.getElementById('collectionFilterPanel');
 const button = document.getElementById('collectionFilterToggle');
 const open = panel.classList.toggle('hidden') === false;
-button.setAttribute('aria-expanded', String(open));
-document.getElementById('filterDropdownBackdrop')?.classList.toggle('hidden', !open);
+button?.setAttribute('aria-expanded', String(open));
 }
 
 function renderCollectionOverview() {
