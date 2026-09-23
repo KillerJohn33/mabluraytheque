@@ -240,7 +240,6 @@ box-shadow: 0 7px 20px rgba(15,23,42,.08), inset 0 1px 0 #fff;
   #collectionTopBars > * + * { margin-top: .4rem !important; }
   .tab-switcher { padding: .2rem; }
   .tab-switcher .choice-option { min-height: 32px; padding: .3rem .3rem; font-size: .68rem; }
-  .tab-wishlist-btn { min-height: 34px !important; padding-top: .4rem !important; padding-bottom: .4rem !important; font-size: .68rem !important; }
 
   /* Filtres : icone dans le bandeau de titre + menu deroulant au lieu du bouton "Filtrer" */
   #collectionActionRow { display: none !important; }
@@ -1129,13 +1128,13 @@ body.theme-light #incompletePanel .icon-chip { color: #b45309; }
   min-height: 40px;
   border: 1px solid rgba(var(--action-rgb), .32);
   border-radius: .75rem;
-  background: rgba(var(--action-rgb), .22);
+  background: linear-gradient(135deg, rgba(var(--action-rgb), .4), rgba(var(--action-rgb), .16));
   color: var(--action-text);
   font-weight: 600;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
   transition: background .18s ease, border-color .18s ease, transform .18s ease;
 }
-.app-action:hover { background: rgba(var(--action-rgb), .32); border-color: rgba(var(--action-rgb), .5); transform: translateY(-1px); }
+.app-action:hover { background: linear-gradient(135deg, rgba(var(--action-rgb), .55), rgba(var(--action-rgb), .26)); border-color: rgba(var(--action-rgb), .5); transform: translateY(-1px); }
 .app-action:active { transform: scale(.98); }
 .app-action:focus-visible { outline: 2px solid rgba(var(--action-rgb), .8); outline-offset: 2px; }
 .app-action:disabled { opacity: .45; cursor: not-allowed; transform: none; }
@@ -1188,9 +1187,11 @@ body.theme-light .app-action-slate { --action-text: #334155; }
 }
 .choice-option:focus-visible { outline: 2px solid rgba(var(--choice-rgb), .8); outline-offset: 2px; }
 .choice-bar-violet .choice-option { --choice-rgb: 167, 139, 250; --choice-text: #ddd6fe; }
+.choice-option.choice-option-pink { --choice-rgb: 244, 114, 182; --choice-text: #fbcfe8; }
 body.theme-light .choice-bar { background: rgba(255,255,255,.6); border-color: rgba(15,23,42,.13); }
 body.theme-light .choice-option { color: #64748b; --choice-text: #0e7490; }
 body.theme-light .choice-bar-violet .choice-option { --choice-text: #6d28d9; }
+body.theme-light .choice-option.choice-option-pink { --choice-text: #be185d; }
 body.theme-light .choice-option:hover, body.theme-light .choice-option.is-active { color: var(--choice-text); }
 @media (max-width: 380px) { .choice-bar-violet .choice-option { font-size: 10px; padding-inline: .2rem; } }
 
@@ -1214,14 +1215,14 @@ body.theme-light .text-red-300,
 body.theme-light .text-red-400 { color: #b91c1c !important; }
 body.theme-light .text-gray-500 { color: #475569 !important; }
 body.theme-light .app-action {
-  background: rgba(var(--action-rgb), .28);
+  background: linear-gradient(135deg, rgba(var(--action-rgb), .42), rgba(var(--action-rgb), .18));
   border-color: rgba(var(--action-rgb), .55);
   color: var(--action-text) !important;
   font-weight: 700;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.75), 0 2px 8px rgba(15,23,42,.06);
 }
 body.theme-light .app-action:hover {
-  background: rgba(var(--action-rgb), .4);
+  background: linear-gradient(135deg, rgba(var(--action-rgb), .58), rgba(var(--action-rgb), .28));
   border-color: rgba(var(--action-rgb), .8);
 }
 body.theme-light .app-action:disabled { opacity: .55; }
@@ -1771,98 +1772,6 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 
 <!-- ONGLET ACCUEIL -->
 <div id="tabHome" class="space-y-6">
-<div class="space-y-2">
-<button type="button" onclick="toggleHomeWishlist()" id="homeWishlistToggleBtn" aria-expanded="false" aria-controls="homeWishlistSection" class="app-action app-action-pink w-full px-3 py-2.5 text-xs tab-wishlist-btn">
-<span class="icon-inline w-4 h-4" data-icon="sparkles"></span> Wishlist <span id="wishlistBadge" class="hidden bg-pink-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">0</span>
-<span class="icon-inline w-3.5 h-3.5 ml-auto" id="homeWishlistToggleIcon" data-icon="chevrondown"></span>
-</button>
-<div id="homeWishlistSection" class="hidden space-y-4">
-<div class="glass-card p-3 rounded-2xl border border-pink-500/30 flex items-center justify-between">
-<div class="flex items-center gap-2.5">
-<span class="icon-chip chip-sm" data-icon="sparkles"></span>
-<div>
-<h2 class="text-xs font-bold text-pink-300">Ma Liste de Souhaits</h2>
-<p class="text-[10px] text-gray-400">Les films que vous prévoyez d'acheter.</p>
-</div>
-</div>
-<span id="wishlistTotalCount" class="bg-pink-500/20 text-pink-300 font-black text-xs px-2.5 py-1 rounded-xl border border-pink-500/30">0 film</span>
-</div>
-
-<div id="wishlistLayout" class="space-y-4 md:space-y-0 md:grid md:grid-cols-2 md:gap-5 md:items-start">
-
-<div class="glass-card p-2.5 md:p-6 rounded-2xl space-y-1.5 md:space-y-4 border border-white/10 w-full">
-<div class="flex items-center gap-2 pb-0.5">
-<span class="icon-chip chip-sm" data-icon="calendar"></span>
-<div>
-<h3 class="text-xs font-bold text-white">Calendrier des Sorties</h3>
-<p class="text-[9px] text-gray-400">Sorties cinéma de votre wishlist.</p>
-</div>
-</div>
-
-<div class="flex items-center justify-between px-0.5 pt-0.5">
-<button onclick="changeWishlistCalendarMonth(-1)" class="glass-pill w-6 h-6 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center text-gray-300 hover:text-white transition">
-<span class="icon-inline w-3 h-3 md:w-4 md:h-4" data-icon="chevronleft"></span>
-</button>
-<span id="wishlistCalMonthLabel" class="text-[11px] md:text-xl font-bold text-white"></span>
-<button onclick="changeWishlistCalendarMonth(1)" class="glass-pill w-6 h-6 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center text-gray-300 hover:text-white transition">
-<span class="icon-inline w-3 h-3 md:w-4 md:h-4" data-icon="chevronright"></span>
-</button>
-</div>
-
-<div class="grid grid-cols-7 gap-0.5 md:gap-2 text-center text-[8px] md:text-xs text-gray-500 font-bold uppercase pt-0.5">
-<div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div><div>D</div>
-</div>
-<div id="wishlistCalendarGrid" class="grid grid-cols-7 gap-0.5 md:gap-2"></div>
-
-<div id="wishlistCalendarDayDetail" class="hidden"></div>
-</div>
-
-<div class="space-y-4">
-<div class="glass-card p-3 rounded-2xl space-y-2 border border-white/10">
-<div class="flex items-center justify-between border-b border-white/10 pb-2">
-<span class="text-[11px] font-bold text-gray-300 flex items-center gap-1.5"><span class="icon-inline w-3.5 h-3.5 text-pink-300" data-icon="filter"></span> Filtres & Tri</span>
-<button onclick="toggleWishlistViewMode()" id="toggleViewBtnWishlist" class="glass-pill px-2.5 py-1 rounded-xl text-[11px] text-pink-300 hover:text-white flex items-center gap-1 transition">
-<span class="icon-inline w-3.5 h-3.5" data-icon="list"></span> <span id="viewModeLabelWishlist">Vue Liste</span>
-</button>
-</div>
-
-<div class="grid grid-cols-2 gap-2">
-<div>
-<label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Format</label>
-<select id="filterFormatWishlist" onchange="renderWishlist()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
-<option class="bg-gray-900" value="all">Tous les formats</option>
-<option class="bg-gray-900" value="4K UHD">4K UHD</option>
-<option class="bg-gray-900" value="Blu-ray 1080p">Blu-ray 1080p</option>
-<option class="bg-gray-900" value="DVD">DVD</option>
-</select>
-</div>
-<div>
-<label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Trier par</label>
-<select id="sortSelectWishlist" onchange="renderWishlist()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
-<option class="bg-gray-900" value="added_desc">Date d'ajout (Récents)</option>
-<option class="bg-gray-900" value="added_asc">Date d'ajout (Anciens)</option>
-<option class="bg-gray-900" value="title_asc">Titre (A ➔ Z)</option>
-<option class="bg-gray-900" value="title_desc">Titre (Z ➔ A)</option>
-<option class="bg-gray-900" value="estimated_desc">Estimation (Élevée)</option>
-<option class="bg-gray-900" value="year_desc">Année (Récentes)</option>
-<option class="bg-gray-900" value="rating_desc">Note TMDB (Élevée)</option>
-</select>
-</div>
-</div>
-<div>
-<label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Filtrer par nom</label>
-<input id="filterTextWishlist" type="text" placeholder="Mot clé..." oninput="renderWishlist()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
-</div>
-</div>
-
-<div id="wishlistGrid" class="grid grid-cols-2 gap-4"></div>
-</div>
-
-</div>
-</div>
-</div>
-
-
 <div class="glass-card rounded-2xl border border-white/10 p-3 md:p-4">
 <div class="flex items-center justify-between gap-3 mb-3"><div class="flex items-center gap-2"><span class="icon-chip chip-sm" data-icon="notebook"></span><h2 class="text-xs font-bold text-white">Tableau de bord</h2></div><button onclick="switchTab('stats')" class="text-[10px] font-semibold text-cyan-300 hover:text-white">Toutes les stats →</button></div>
 <div id="homeDashboard" class="grid grid-cols-2 md:grid-cols-4 gap-2"></div>
@@ -1915,6 +1824,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <div class="choice-bar w-full tab-switcher" role="group" aria-label="Affichage de la collection">
 <button type="button" class="choice-option is-active" aria-pressed="true" disabled>Ma collection</button>
 <button type="button" onclick="switchTab('digital')" class="choice-option" aria-pressed="false">Digital</button>
+<button type="button" onclick="switchTab('wishlist')" class="choice-option choice-option-pink" aria-pressed="false">Wishlist <span id="wishlistBadge" class="hidden bg-pink-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full ml-1">0</span></button>
 </div>
 
 <div class="flex items-center justify-center gap-3 text-sm text-gray-400">
@@ -2061,6 +1971,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <div class="choice-bar w-full tab-switcher" role="group" aria-label="Affichage de la collection">
 <button type="button" onclick="switchTab('collection')" class="choice-option" aria-pressed="false">Ma collection</button>
 <button type="button" class="choice-option is-active" aria-pressed="true" disabled>Digital</button>
+<button type="button" onclick="switchTab('wishlist')" class="choice-option choice-option-pink" aria-pressed="false">Wishlist</button>
 </div>
 <div class="flex items-center justify-center gap-3 text-sm text-gray-400">
 <span><strong id="digitalMovieCountTop" class="text-amber-300 font-black text-xl">0</strong> film<span id="digitalMoviePlural"></span></span>
@@ -2106,6 +2017,99 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <div id="digitalNoResults" class="hidden glass-card p-5 rounded-2xl border border-white/10 text-center"><p class="text-xs font-semibold text-gray-300">Aucun résultat</p><p class="text-[10px] text-gray-500 mt-1">Modifiez vos filtres ou votre recherche.</p></div>
 <div id="digitalGrid" class="hidden grid grid-cols-2 gap-4"></div>
 </div>
+
+<!-- ONGLET WISHLIST -->
+<div id="tabWishlist" class="hidden space-y-4">
+<div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="sparkles"></span><h2 class="font-black text-white relative z-10">Collection</h2></div>
+<div class="choice-bar w-full tab-switcher" role="group" aria-label="Affichage de la collection">
+<button type="button" onclick="switchTab('collection')" class="choice-option" aria-pressed="false">Ma collection</button>
+<button type="button" onclick="switchTab('digital')" class="choice-option" aria-pressed="false">Digital</button>
+<button type="button" class="choice-option choice-option-pink is-active" aria-pressed="true" disabled>Wishlist</button>
+</div>
+<div class="glass-card p-3 rounded-2xl border border-pink-500/30 flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="icon-chip chip-sm" data-icon="sparkles"></span>
+<div>
+<h2 class="text-xs font-bold text-pink-300">Ma Liste de Souhaits</h2>
+<p class="text-[10px] text-gray-400">Les films que vous prévoyez d'acheter.</p>
+</div>
+</div>
+<span id="wishlistTotalCount" class="bg-pink-500/20 text-pink-300 font-black text-xs px-2.5 py-1 rounded-xl border border-pink-500/30">0 film</span>
+</div>
+
+<div id="wishlistLayout" class="space-y-4 md:space-y-0 md:grid md:grid-cols-2 md:gap-5 md:items-start">
+
+<div class="glass-card p-2.5 md:p-6 rounded-2xl space-y-1.5 md:space-y-4 border border-white/10 w-full">
+<div class="flex items-center gap-2 pb-0.5">
+<span class="icon-chip chip-sm" data-icon="calendar"></span>
+<div>
+<h3 class="text-xs font-bold text-white">Calendrier des Sorties</h3>
+<p class="text-[9px] text-gray-400">Sorties cinéma de votre wishlist.</p>
+</div>
+</div>
+
+<div class="flex items-center justify-between px-0.5 pt-0.5">
+<button onclick="changeWishlistCalendarMonth(-1)" class="glass-pill w-6 h-6 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center text-gray-300 hover:text-white transition">
+<span class="icon-inline w-3 h-3 md:w-4 md:h-4" data-icon="chevronleft"></span>
+</button>
+<span id="wishlistCalMonthLabel" class="text-[11px] md:text-xl font-bold text-white"></span>
+<button onclick="changeWishlistCalendarMonth(1)" class="glass-pill w-6 h-6 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center text-gray-300 hover:text-white transition">
+<span class="icon-inline w-3 h-3 md:w-4 md:h-4" data-icon="chevronright"></span>
+</button>
+</div>
+
+<div class="grid grid-cols-7 gap-0.5 md:gap-2 text-center text-[8px] md:text-xs text-gray-500 font-bold uppercase pt-0.5">
+<div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div><div>D</div>
+</div>
+<div id="wishlistCalendarGrid" class="grid grid-cols-7 gap-0.5 md:gap-2"></div>
+
+<div id="wishlistCalendarDayDetail" class="hidden"></div>
+</div>
+
+<div class="space-y-4">
+<div class="glass-card p-3 rounded-2xl space-y-2 border border-white/10">
+<div class="flex items-center justify-between border-b border-white/10 pb-2">
+<span class="text-[11px] font-bold text-gray-300 flex items-center gap-1.5"><span class="icon-inline w-3.5 h-3.5 text-pink-300" data-icon="filter"></span> Filtres & Tri</span>
+<button onclick="toggleWishlistViewMode()" id="toggleViewBtnWishlist" class="glass-pill px-2.5 py-1 rounded-xl text-[11px] text-pink-300 hover:text-white flex items-center gap-1 transition">
+<span class="icon-inline w-3.5 h-3.5" data-icon="list"></span> <span id="viewModeLabelWishlist">Vue Liste</span>
+</button>
+</div>
+
+<div class="grid grid-cols-2 gap-2">
+<div>
+<label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Format</label>
+<select id="filterFormatWishlist" onchange="renderWishlist()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
+<option class="bg-gray-900" value="all">Tous les formats</option>
+<option class="bg-gray-900" value="4K UHD">4K UHD</option>
+<option class="bg-gray-900" value="Blu-ray 1080p">Blu-ray 1080p</option>
+<option class="bg-gray-900" value="DVD">DVD</option>
+</select>
+</div>
+<div>
+<label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Trier par</label>
+<select id="sortSelectWishlist" onchange="renderWishlist()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
+<option class="bg-gray-900" value="added_desc">Date d'ajout (Récents)</option>
+<option class="bg-gray-900" value="added_asc">Date d'ajout (Anciens)</option>
+<option class="bg-gray-900" value="title_asc">Titre (A ➔ Z)</option>
+<option class="bg-gray-900" value="title_desc">Titre (Z ➔ A)</option>
+<option class="bg-gray-900" value="estimated_desc">Estimation (Élevée)</option>
+<option class="bg-gray-900" value="year_desc">Année (Récentes)</option>
+<option class="bg-gray-900" value="rating_desc">Note TMDB (Élevée)</option>
+</select>
+</div>
+</div>
+<div>
+<label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Filtrer par nom</label>
+<input id="filterTextWishlist" type="text" placeholder="Mot clé..." oninput="renderWishlist()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
+</div>
+</div>
+
+<div id="wishlistGrid" class="grid grid-cols-2 gap-4"></div>
+</div>
+
+</div>
+</div>
+
 
 <!-- ONGLET STATS -->
 <div id="tabStats" class="hidden modern-page">
@@ -4096,7 +4100,7 @@ function openSpaceSection(section) {
 }
 
 function switchTab(tab) {
-['tabHome', 'tabCollection', 'tabSeries', 'tabDigital', 'tabStats', 'tabSettings'].forEach(id => {
+['tabHome', 'tabCollection', 'tabWishlist', 'tabSeries', 'tabDigital', 'tabStats', 'tabSettings'].forEach(id => {
 const el = document.getElementById(id);
 if (el) el.classList.add('hidden');
 });
@@ -4141,6 +4145,11 @@ document.getElementById('tabDigital').classList.remove('hidden');
 document.getElementById('tabCollectionBtn').className = activeClass;
 document.getElementById('bottomTabCollectionBtn').classList.add('active');
 if (!renderedTabs.digital) renderDigital();
+} else if (tab === 'wishlist') {
+document.getElementById('tabWishlist').classList.remove('hidden');
+document.getElementById('tabCollectionBtn').className = activeClass;
+document.getElementById('bottomTabCollectionBtn').classList.add('active');
+if (!renderedTabs.wishlist) renderWishlist();
 } else if (tab === 'series') {
 document.getElementById('tabSeries').classList.remove('hidden');
 document.getElementById('tabSeriesBtn').className = activeClass;
@@ -4161,17 +4170,6 @@ updateSettingsCounters();
 }
 renderIncompletePanel();
 if (window.innerWidth < 768) window.scrollTo(0, 0);
-}
-
-function toggleHomeWishlist() {
-const section = document.getElementById('homeWishlistSection');
-const btn = document.getElementById('homeWishlistToggleBtn');
-const icon = document.getElementById('homeWishlistToggleIcon');
-const open = section.classList.contains('hidden');
-section.classList.toggle('hidden', !open);
-if (btn) btn.setAttribute('aria-expanded', String(open));
-if (icon) icon.style.transform = open ? 'rotate(180deg)' : '';
-if (open && !renderedTabs.wishlist) renderWishlist();
 }
 
 function toggleViewMode() {
