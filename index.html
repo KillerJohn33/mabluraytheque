@@ -752,7 +752,7 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
   main {
     padding-top: var(--topnav-h, 3.5rem) !important;
-    max-width: min(1600px, calc(100vw - 3rem)) !important;
+    max-width: min(1320px, calc(100vw - 3rem)) !important;
     padding-left: 1.5rem !important;
     padding-right: 1.5rem !important;
   }
@@ -1714,6 +1714,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <div id="spaceMenuWrapper" class="flex-1 relative flex">
 <button id="tabSettingsBtn" onclick="openSpaceSection('installation')" class="w-full py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent" aria-haspopup="true">
 <span class="icon-inline w-3.5 h-3.5" data-icon="user"></span> <span>Mon espace</span>
+<span id="navProfileAvatar" class="hidden w-4 h-4 rounded-full overflow-hidden border border-white/25 flex-none"><img id="navProfileAvatarImg" src="" alt="" class="w-full h-full object-cover"></span>
 </button>
 <div id="spaceSubmenu" class="space-submenu" role="menu" aria-label="Mon espace">
 <button type="button" data-space-target="installation" onclick="openSpaceSection('installation')" role="menuitem"><span class="icon-inline w-4 h-4" data-icon="tv"></span><span><strong>Mon installation</strong><small>Équipements et compatibilités</small></span></button>
@@ -3232,6 +3233,16 @@ function renderProfileCard() {
   } else {
    preview.classList.add('hidden');
    placeholder.classList.remove('hidden');
+  }
+ }
+ const navAvatar = document.getElementById('navProfileAvatar');
+ const navAvatarImg = document.getElementById('navProfileAvatarImg');
+ if (navAvatar && navAvatarImg) {
+  if (profile.photo) {
+   navAvatarImg.src = profile.photo;
+   navAvatar.classList.remove('hidden');
+  } else {
+   navAvatar.classList.add('hidden');
   }
  }
  const nameInput = document.getElementById('profileDisplayName');
