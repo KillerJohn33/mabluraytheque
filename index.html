@@ -801,15 +801,19 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
     background: transparent;
     font-weight: 700;
   }
-  #topNav button.text-cyan-400::after {
-    content: "";
+  #topNavIndicator {
     position: absolute;
-    left: 1rem;
-    right: 1rem;
+    left: 0;
     bottom: 0;
     height: 2px;
+    width: 0;
     border-radius: 2px;
-    background: rgba(34, 211, 238, .58);
+    background: linear-gradient(90deg, #22d3ee, #67e8f9);
+    box-shadow: 0 0 10px rgba(34,211,238,.6);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform .38s cubic-bezier(.65,0,.35,1), width .38s cubic-bezier(.65,0,.35,1), opacity .2s ease;
+    will-change: transform, width;
   }
   body.theme-light > header,
   body.theme-light #topNav {
@@ -1701,6 +1705,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <main class="p-4 max-w-md mx-auto space-y-5">
 <!-- NAVIGATION BAR -->
 <nav id="topNav" class="glass-pill p-1.5 rounded-2xl flex justify-between items-center shadow-lg gap-1">
+<span id="topNavIndicator"></span>
 <button id="tabHomeBtn" onclick="switchTab('home')" class="flex-1 py-2 font-bold text-[10px] transition flex items-center justify-center gap-1 text-cyan-400 border-b-[3px] border-cyan-400">
 <span class="icon-inline w-3.5 h-3.5" data-icon="home"></span> <span>Accueil</span>
 </button>
@@ -2980,7 +2985,8 @@ document.getElementById('bottomNav')?.classList.toggle('hidden', !isPhone);
 };
 updateMobileNavigation();
 updateDesktopNavOffsets();
-window.addEventListener('resize', () => { updateMobileNavigation(); applySpaceSection(activeSpaceSection); updateDesktopNavOffsets(); });
+updateTopNavIndicator();
+window.addEventListener('resize', () => { updateMobileNavigation(); applySpaceSection(activeSpaceSection); updateDesktopNavOffsets(); updateTopNavIndicator(); });
 
 const savedTheme = localStorage.getItem('app_theme') || 'theme-noir';
 changeTheme(savedTheme);
@@ -4349,6 +4355,27 @@ updateSettingsCounters();
 }
 renderIncompletePanel();
 if (window.innerWidth < 768) window.scrollTo(0, 0);
+updateTopNavIndicator();
+}
+
+function updateTopNavIndicator() {
+const nav = document.getElementById('topNav');
+const indicator = document.getElementById('topNavIndicator');
+if (!nav || !indicator) return;
+if (!window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine)').matches) {
+indicator.style.opacity = '0';
+return;
+}
+const activeBtn = nav.querySelector('button.text-cyan-400');
+if (!activeBtn) { indicator.style.opacity = '0'; return; }
+const navRect = nav.getBoundingClientRect();
+const btnRect = activeBtn.getBoundingClientRect();
+const inset = 16;
+const left = btnRect.left - navRect.left + inset;
+const width = Math.max(0, btnRect.width - inset * 2);
+indicator.style.transform = `translateX(${left}px)`;
+indicator.style.width = `${width}px`;
+indicator.style.opacity = '1';
 }
 
 function updateCollectionViewModeLabel() {
