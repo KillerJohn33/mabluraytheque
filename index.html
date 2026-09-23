@@ -750,7 +750,12 @@ background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px soli
 
 /* Navigation ordinateur : onglet actif souligne */
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
-  main { padding-top: var(--topnav-h, 3.5rem) !important; }
+  main {
+    padding-top: var(--topnav-h, 3.5rem) !important;
+    max-width: min(1600px, calc(100vw - 3rem)) !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
   body > header {
     min-height: 4.5rem;
     background: #08090d;
@@ -2390,6 +2395,32 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <!-- PARAMETRES -->
 <div id="tabSettings" class="hidden modern-page">
 <div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="user"></span><h2 class="font-black text-white relative z-10">Mon espace</h2></div>
+
+<div id="spaceProfileSection" class="modern-panel p-4 md:p-5 space-y-3">
+<div class="flex items-center gap-3">
+<button type="button" onclick="document.getElementById('profilePhotoInput').click()" class="relative w-16 h-16 rounded-full overflow-hidden border border-white/15 flex-none group" title="Changer la photo de profil">
+<img id="profilePhotoPreview" src="" alt="Photo de profil" class="hidden w-full h-full object-cover">
+<span id="profilePhotoPlaceholder" class="w-full h-full flex items-center justify-center bg-white/5 text-gray-400"><span class="icon-inline w-6 h-6" data-icon="user"></span></span>
+<span class="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-[8px] font-bold text-white text-center px-1">Modifier</span>
+</button>
+<input id="profilePhotoInput" type="file" accept="image/*" class="hidden" onchange="handleProfilePhotoUpload(event)">
+<div class="min-w-0 flex-1">
+<input id="profileDisplayName" type="text" placeholder="Votre nom ou pseudo" oninput="saveProfileIdentity()" class="w-full bg-transparent text-base font-black text-white placeholder-gray-500 focus:outline-none border-b border-transparent focus:border-cyan-400/40 pb-0.5">
+<p id="profileMemberSince" class="text-[10px] text-gray-500 mt-0.5">Bienvenue !</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2 pt-1">
+<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 text-center min-w-0">
+<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold">Genre favori</p>
+<p id="profileFavoriteGenre" class="mt-1 text-xs font-black text-cyan-300 truncate">—</p>
+</div>
+<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 text-center min-w-0">
+<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold">Réalisateur favori</p>
+<p id="profileFavoriteDirector" class="mt-1 text-xs font-black text-violet-300 truncate">—</p>
+</div>
+</div>
+</div>
+
 <button id="mobileInstallationToggle" type="button" class="mobile-installation-toggle" onclick="toggleMobileInstallation()" aria-expanded="false" aria-controls="spaceInstallationSection">
 <span class="flex items-center gap-2 min-w-0"><span class="icon-inline w-4 h-4" data-icon="tv"></span><span class="font-bold">Mon installation</span><span id="mobileEquipmentCount" class="installation-count">0</span></span>
 <span class="mobile-installation-chevron icon-inline w-4 h-4" data-icon="chevronright"></span>
@@ -2852,7 +2883,7 @@ let trackedSeriesBundleCloudId = null;
 let trackedSeriesBundleFromCloud = null;
 let profileBundleCloudId = null;
 let profileBundleFromCloud = null;
-let profileData = { equipment: [], projects: [], subscriptions: [], plex: {}, updatedAt: '' };
+let profileData = { equipment: [], projects: [], subscriptions: [], plex: {}, profile: {}, updatedAt: '' };
 let editingEquipmentId = null;
 let editingSubscriptionId = null;
 let collectionViewMode = 'grid';
@@ -3084,7 +3115,13 @@ function normalizeProfileData(value) {
   connectedAt: String(plexRaw.connectedAt || '').trim(),
   lastSyncAt: String(plexRaw.lastSyncAt || '').trim()
  };
- return { equipment, projects, subscriptions, plex, updatedAt: value?.updatedAt || '' };
+ const profileRaw = value?.profile && typeof value.profile === 'object' ? value.profile : {};
+ const profile = {
+  photo: String(profileRaw.photo || '').trim(),
+  displayName: String(profileRaw.displayName || '').trim(),
+  createdAt: String(profileRaw.createdAt || '').trim()
+ };
+ return { equipment, projects, subscriptions, plex, profile, updatedAt: value?.updatedAt || '' };
 }
 
 function formatInstallationPrice(value) {
@@ -3098,7 +3135,7 @@ function saveProfileLocal() {
 async function saveProfileBundleCloud() {
  if (!db) return false;
  beginCloudWrite();
- const payload = { recordType: 'profile_bundle', equipment: profileData.equipment, projects: profileData.projects, subscriptions: profileData.subscriptions, plex: profileData.plex, updatedAt: profileData.updatedAt || new Date().toISOString() };
+ const payload = { recordType: 'profile_bundle', equipment: profileData.equipment, projects: profileData.projects, subscriptions: profileData.subscriptions, plex: profileData.plex, profile: profileData.profile, updatedAt: profileData.updatedAt || new Date().toISOString() };
  try {
   if (profileBundleCloudId) {
    const { error } = await db.from('bluray').update({ data: payload }).eq('id', profileBundleCloudId);
@@ -3183,6 +3220,86 @@ function closeEquipmentForm() {
  moveEquipmentFormHome();
 }
 
+function renderProfileCard() {
+ const profile = normalizeProfileData(profileData).profile;
+ const preview = document.getElementById('profilePhotoPreview');
+ const placeholder = document.getElementById('profilePhotoPlaceholder');
+ if (preview && placeholder) {
+  if (profile.photo) {
+   preview.src = profile.photo;
+   preview.classList.remove('hidden');
+   placeholder.classList.add('hidden');
+  } else {
+   preview.classList.add('hidden');
+   placeholder.classList.remove('hidden');
+  }
+ }
+ const nameInput = document.getElementById('profileDisplayName');
+ if (nameInput && document.activeElement !== nameInput) nameInput.value = profile.displayName || '';
+ const memberSince = document.getElementById('profileMemberSince');
+ if (memberSince) {
+  memberSince.textContent = profile.createdAt
+   ? `Membre depuis ${new Date(profile.createdAt).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}`
+   : 'Bienvenue !';
+ }
+ const genreCounts = {};
+ const directorCounts = {};
+ collection.forEach(m => {
+  (m.genres || []).forEach(g => { const name = typeof g === 'object' ? g.name : g; if (name) genreCounts[name] = (genreCounts[name] || 0) + 1; });
+  if (m.director) String(m.director).split(',').map(d => d.trim()).filter(Boolean).forEach(d => { directorCounts[d] = (directorCounts[d] || 0) + 1; });
+ });
+ const topEntry = counts => Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || '—';
+ const favGenreEl = document.getElementById('profileFavoriteGenre');
+ if (favGenreEl) favGenreEl.textContent = topEntry(genreCounts);
+ const favDirectorEl = document.getElementById('profileFavoriteDirector');
+ if (favDirectorEl) favDirectorEl.textContent = topEntry(directorCounts);
+}
+
+let profileNameSaveTimer = null;
+function saveProfileIdentity() {
+ const nameInput = document.getElementById('profileDisplayName');
+ if (!nameInput) return;
+ profileData.profile ||= {};
+ profileData.profile.displayName = nameInput.value.trim();
+ if (!profileData.profile.createdAt) profileData.profile.createdAt = new Date().toISOString();
+ profileData.updatedAt = new Date().toISOString();
+ saveProfileLocal();
+ clearTimeout(profileNameSaveTimer);
+ profileNameSaveTimer = setTimeout(() => saveProfileBundleCloud(), 800);
+}
+
+function handleProfilePhotoUpload(event) {
+ const file = event.target.files?.[0];
+ if (!file) return;
+ if (!file.type.startsWith('image/')) { showToast('Choisissez un fichier image.'); return; }
+ const reader = new FileReader();
+ reader.onload = () => {
+  const img = new Image();
+  img.onload = async () => {
+   const size = 240;
+   const canvas = document.createElement('canvas');
+   canvas.width = size; canvas.height = size;
+   const ctx = canvas.getContext('2d');
+   const scale = Math.max(size / img.width, size / img.height);
+   const sw = size / scale, sh = size / scale;
+   const sx = (img.width - sw) / 2, sy = (img.height - sh) / 2;
+   ctx.drawImage(img, sx, sy, sw, sh, 0, 0, size, size);
+   const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+   profileData.profile ||= {};
+   profileData.profile.photo = dataUrl;
+   if (!profileData.profile.createdAt) profileData.profile.createdAt = new Date().toISOString();
+   profileData.updatedAt = new Date().toISOString();
+   saveProfileLocal();
+   renderProfileCard();
+   const saved = await saveProfileBundleCloud();
+   showToast(saved ? 'Photo de profil mise à jour ✅' : '⚠️ Photo enregistrée localement uniquement.');
+  };
+  img.src = reader.result;
+ };
+ reader.readAsDataURL(file);
+ event.target.value = '';
+}
+
 function renderEquipment() {
  const list = equipmentField('equipmentList');
  const empty = equipmentField('equipmentEmptyState');
@@ -3227,6 +3344,7 @@ function renderEquipment() {
  renderProjects();
  renderSubscriptions();
  renderPlexCard();
+ renderProfileCard();
  applyStaticIcons();
 }
 
