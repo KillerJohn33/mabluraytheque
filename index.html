@@ -1468,6 +1468,8 @@ body.theme-light .project-type { color: #4338ca; background: rgba(99,102,241,.1)
     border-radius: 1rem; margin-top: -.15rem;
   }
   #spaceSubscriptionsSection.mobile-expanded { gap: .9rem; }
+  #spaceProfileSection:not(.mobile-expanded) { display: none !important; }
+  #spaceProfileSection.mobile-expanded { display: block !important; margin-top: -.15rem; }
   #spaceInstallationSection > .installation-heading,
   #spaceSubscriptionsSection > .installation-heading { justify-content: flex-end; }
   #spaceInstallationSection > .installation-heading > div:first-child,
@@ -1717,6 +1719,7 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <span id="navProfileAvatar" class="hidden w-4 h-4 rounded-full overflow-hidden border border-white/25 flex-none"><img id="navProfileAvatarImg" src="" alt="" class="w-full h-full object-cover"></span>
 </button>
 <div id="spaceSubmenu" class="space-submenu" role="menu" aria-label="Mon espace">
+<button type="button" data-space-target="profile" onclick="openSpaceSection('profile')" role="menuitem"><span class="icon-inline w-4 h-4" data-icon="user"></span><span><strong>Mon profil</strong><small>Photo, nom et statistiques</small></span></button>
 <button type="button" data-space-target="installation" onclick="openSpaceSection('installation')" role="menuitem"><span class="icon-inline w-4 h-4" data-icon="tv"></span><span><strong>Mon installation</strong><small>Équipements et compatibilités</small></span></button>
 <button type="button" data-space-target="subscriptions" onclick="openSpaceSection('subscriptions')" role="menuitem"><span class="icon-inline w-4 h-4" data-icon="wallet"></span><span><strong>Mes abonnements</strong><small>Streaming, internet, mobile</small></span></button>
 <button type="button" data-space-target="options" onclick="openSpaceSection('options')" role="menuitem"><span class="icon-inline w-4 h-4" data-icon="settings"></span><span><strong>Options</strong><small>Préférences, données et services</small></span></button>
@@ -2397,6 +2400,10 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 <div id="tabSettings" class="hidden modern-page">
 <div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="user"></span><h2 class="font-black text-white relative z-10">Mon espace</h2></div>
 
+<button id="mobileProfileToggle" type="button" class="mobile-installation-toggle" onclick="toggleMobileProfile()" aria-expanded="false" aria-controls="spaceProfileSection">
+<span class="flex items-center gap-2 min-w-0"><span class="icon-inline w-4 h-4" data-icon="user"></span><span class="font-bold">Mon profil</span></span>
+<span class="mobile-installation-chevron icon-inline w-4 h-4" data-icon="chevronright"></span>
+</button>
 <div id="spaceProfileSection" class="modern-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-3">
 <button type="button" onclick="document.getElementById('profilePhotoInput').click()" class="relative w-16 h-16 rounded-full overflow-hidden border border-white/15 flex-none group" title="Changer la photo de profil">
@@ -4209,6 +4216,16 @@ applyStaticIcons();
 }
 
 // --- NAVIGATION ET TABS ---
+function toggleMobileProfile(forceOpen) {
+ const section = document.getElementById('spaceProfileSection');
+ const button = document.getElementById('mobileProfileToggle');
+ if (!section || !button) return;
+ const open = typeof forceOpen === 'boolean' ? forceOpen : !section.classList.contains('mobile-expanded');
+ section.classList.toggle('mobile-expanded', open);
+ button.setAttribute('aria-expanded', String(open));
+ if (open) setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
+}
+
 function toggleMobileInstallation(forceOpen) {
  const section = document.getElementById('spaceInstallationSection');
  const button = document.getElementById('mobileInstallationToggle');
@@ -4230,15 +4247,18 @@ function toggleMobileOptions(forceOpen) {
 }
 
 function applySpaceSection(section = 'installation') {
- activeSpaceSection = ['options', 'subscriptions'].includes(section) ? section : 'installation';
+ activeSpaceSection = ['options', 'subscriptions', 'profile'].includes(section) ? section : 'installation';
  const desktop = window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine)').matches;
+ const profile = document.getElementById('spaceProfileSection');
  const installation = document.getElementById('spaceInstallationSection');
  const subscriptions = document.getElementById('spaceSubscriptionsSection');
  const optionPanels = document.querySelectorAll('#tabSettings .space-options-panel');
+ const showProfile = !desktop || activeSpaceSection === 'profile';
  const showInstallation = !desktop || activeSpaceSection === 'installation';
  const showSubscriptions = !desktop || activeSpaceSection === 'subscriptions';
  const showOptions = !desktop || activeSpaceSection === 'options';
  const applyVisibility = (el, show) => { if (!el) return; if (show) el.style.removeProperty('display'); else el.style.setProperty('display', 'none', 'important'); };
+ applyVisibility(profile, showProfile);
  applyVisibility(installation, showInstallation);
  applyVisibility(subscriptions, showSubscriptions);
  optionPanels.forEach(panel => applyVisibility(panel, showOptions));
@@ -4248,7 +4268,7 @@ function applySpaceSection(section = 'installation') {
 }
 
 function openSpaceSection(section) {
- activeSpaceSection = ['options', 'subscriptions'].includes(section) ? section : 'installation';
+ activeSpaceSection = ['options', 'subscriptions', 'profile'].includes(section) ? section : 'installation';
  switchTab('settings');
  applySpaceSection(activeSpaceSection);
  if (window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine)').matches) {
