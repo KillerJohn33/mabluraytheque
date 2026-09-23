@@ -1120,33 +1120,40 @@ body.theme-light #incompletePanel {
 body.theme-light #incompletePanel .icon-chip { color: #b45309; }
 /* Actions cohérentes avec les boutons des fiches */
 .app-action {
-  --action-rgb: 6, 182, 212;
-  --action-text: #ffffff;
+  --action-rgb: 34, 211, 238;
+  --action-text: #a5f3fc;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: .375rem;
   min-height: 40px;
-  border: 1px solid rgba(255,255,255,.2);
+  border: 1px solid rgba(var(--action-rgb), .32);
   border-radius: .75rem;
-  background: rgb(var(--action-rgb));
+  background: rgba(var(--action-rgb), .22);
   color: var(--action-text);
-  font-weight: 700;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 4px 14px rgba(var(--action-rgb), .32);
-  transition: filter .18s ease, transform .18s ease, box-shadow .18s ease;
+  font-weight: 600;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+  transition: background .18s ease, border-color .18s ease, transform .18s ease;
 }
-.app-action:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 6px 18px rgba(var(--action-rgb), .42); }
-.app-action:active { transform: scale(.98); filter: brightness(.95); }
-.app-action:focus-visible { outline: 2px solid rgba(var(--action-rgb), .9); outline-offset: 2px; }
-.app-action:disabled { opacity: .5; cursor: not-allowed; transform: none; filter: none; }
+.app-action:hover { background: rgba(var(--action-rgb), .32); border-color: rgba(var(--action-rgb), .5); transform: translateY(-1px); }
+.app-action:active { transform: scale(.98); }
+.app-action:focus-visible { outline: 2px solid rgba(var(--action-rgb), .8); outline-offset: 2px; }
+.app-action:disabled { opacity: .45; cursor: not-allowed; transform: none; }
 .app-action .icon-chip { color: currentColor; filter: none; }
-.app-action-cyan { --action-rgb: 6, 182, 212; --action-text: #ffffff; }
-.app-action-pink { --action-rgb: 236, 72, 153; --action-text: #ffffff; }
-.app-action-violet { --action-rgb: 139, 92, 246; --action-text: #ffffff; }
-.app-action-green { --action-rgb: 16, 185, 129; --action-text: #ffffff; }
-.app-action-amber { --action-rgb: 245, 158, 11; --action-text: #2a1900; }
-.app-action-red { --action-rgb: 239, 68, 68; --action-text: #ffffff; }
-.app-action-slate { --action-rgb: 100, 116, 139; --action-text: #ffffff; }
+.app-action-cyan { --action-rgb: 34, 211, 238; --action-text: #a5f3fc; }
+.app-action-pink { --action-rgb: 244, 114, 182; --action-text: #fbcfe8; }
+.app-action-violet { --action-rgb: 167, 139, 250; --action-text: #ddd6fe; }
+.app-action-green { --action-rgb: 52, 211, 153; --action-text: #a7f3d0; }
+.app-action-amber { --action-rgb: 251, 191, 36; --action-text: #fde68a; }
+.app-action-red { --action-rgb: 248, 113, 113; --action-text: #fca5a5; }
+.app-action-slate { --action-rgb: 148, 163, 184; --action-text: #cbd5e1; }
+body.theme-light .app-action-cyan { --action-text: #0e7490; }
+body.theme-light .app-action-pink { --action-text: #be185d; }
+body.theme-light .app-action-violet { --action-text: #6d28d9; }
+body.theme-light .app-action-green { --action-text: #047857; }
+body.theme-light .app-action-amber { --action-text: #92400e; }
+body.theme-light .app-action-red { --action-text: #b91c1c; }
+body.theme-light .app-action-slate { --action-text: #334155; }
 /* Barres de choix : même finition sobre que les actions */
 .choice-bar {
   display: flex;
@@ -1207,8 +1214,15 @@ body.theme-light .text-red-300,
 body.theme-light .text-red-400 { color: #b91c1c !important; }
 body.theme-light .text-gray-500 { color: #475569 !important; }
 body.theme-light .app-action {
-  border-color: rgba(15,23,42,.12);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 4px 12px rgba(var(--action-rgb), .28);
+  background: rgba(var(--action-rgb), .28);
+  border-color: rgba(var(--action-rgb), .55);
+  color: var(--action-text) !important;
+  font-weight: 700;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.75), 0 2px 8px rgba(15,23,42,.06);
+}
+body.theme-light .app-action:hover {
+  background: rgba(var(--action-rgb), .4);
+  border-color: rgba(var(--action-rgb), .8);
 }
 body.theme-light .app-action:disabled { opacity: .55; }
 body.theme-light .choice-bar {
