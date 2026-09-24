@@ -1723,11 +1723,6 @@ body.global-search-open { overflow:hidden; }
 .edition-more-summary::after { content:'›'; margin-left:auto; color:#64748b; font-size:1rem; transform:rotate(90deg); transition:transform .18s ease; }
 .edition-more-details[open] > .edition-more-summary::after { transform:rotate(-90deg); }
 .edition-more-content { padding:0 .7rem .7rem; }
-@media (min-width:768px) {
-  #modalContent .edition-card > .edition-more-details,
-  #modalContent .edition-card > .edition-more-details > .edition-more-content { display:contents; }
-  #modalContent .edition-card > .edition-more-details > .edition-more-summary { display:none; }
-}
 .app-empty-state { min-height:11rem; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.7rem; padding:1.25rem; text-align:center; border:1px dashed rgba(148,163,184,.22); border-radius:1.25rem; background:rgba(255,255,255,.025); }
 .empty-state-icon { width:2.5rem; height:2.5rem; display:inline-flex; align-items:center; justify-content:center; border-radius:.85rem; color:#67e8f9; background:rgba(34,211,238,.1); }
 .toast { display:flex; align-items:center; gap:.55rem; border-radius:.9rem; min-width:min(22rem,calc(100vw - 2rem)); justify-content:center; }
@@ -6708,9 +6703,7 @@ ${ed.image ? `<figure class="edition-cover-desktop">
 <img src="${safeImageUrl(ed.image)}" alt="Jaquette de ${escapeHtml(ed.title || movie.title)}" loading="lazy" onerror="this.closest('.edition-card').classList.remove('has-edition-cover');this.closest('figure').style.display='none'" class="detail-edition-cover object-contain bg-black/40 rounded-xl shadow-lg border border-cyan-400/20">
 <figcaption class="mt-1 text-center text-[9px] text-gray-500">Boîtier de l’édition</figcaption>
 </figure>` : ''}
-<details class="edition-more-details rounded-xl border border-white/10 bg-black/10" ${(editionTechDesktopQuery.matches || detailEditing) ? "open" : ""}>
-<summary class="edition-more-summary">Détails de l’édition <span class="text-gray-500 font-normal">· achat, support et technique</span></summary>
-<div class="edition-more-content space-y-2.5">
+${editionTechDesktopQuery.matches ? '' : '<details class="edition-more-details rounded-xl border border-white/10 bg-black/10"' + (detailEditing ? ' open' : '') + '><summary class="edition-more-summary">Détails de l’édition <span class="text-gray-500 font-normal">· achat, support et technique</span></summary><div class="edition-more-content space-y-2.5">'}
 <div class="edition-form-fields grid grid-cols-2 gap-2">
 <div>
 <label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">Nom</label>
@@ -6802,8 +6795,7 @@ ${editionDiscEditorHtml(ed, movieIdArg, idx)}
 <div><label class="block text-[9px] text-gray-400 mb-1">Sous-titres</label>
 <textarea rows="2" onchange="updateEditionField(${movieIdArg}, ${idx}, 'subtitles', this.value)" placeholder="Français, anglais, français SDH..." class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl resize-y">${escapeHtml(ed.subtitles || '')}</textarea></div>
 </div></div>
-</div>
-</details>
+${editionTechDesktopQuery.matches ? '' : '</div></details>'}
 </div>`).join('');
 
 const ratingHtml = imdbRating !== null ? `<div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-300 text-[10px] font-bold">${ic('star','w-3.5 h-3.5')} IMDb ${imdbRating}/10</div>` : '';
