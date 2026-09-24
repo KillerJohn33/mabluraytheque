@@ -1792,6 +1792,16 @@ body.global-search-open { overflow:hidden; }
   }
 }
 
+.movie-detail-primary-actions { min-width:0; flex-wrap:nowrap; }
+.movie-detail-primary-actions .movie-seen-toggle,
+.movie-detail-primary-actions .movie-imdb-rating,
+.movie-detail-primary-actions .movie-edit-toggle {
+  min-height:1.9rem; padding:.3rem .6rem !important; font-size:.66rem !important; white-space:nowrap;
+}
+.movie-detail-primary-actions .movie-seen-toggle .icon-inline,
+.movie-detail-primary-actions .movie-imdb-rating .icon-inline,
+.movie-detail-primary-actions .movie-edit-toggle .icon-inline { width:.75rem; height:.75rem; }
+
 /* Fiche film plus visuelle sur telephone */
 @media (max-width: 767px) {
   #modalContent .movie-detail-hero-layout { gap:.8rem; padding:.75rem; align-items:stretch; }
@@ -1802,16 +1812,20 @@ body.global-search-open { overflow:hidden; }
   }
   #modalContent .movie-detail-hero-info { justify-content:center; padding:.15rem 0; }
   #modalContent .movie-detail-hero-info h3 { font-size:1.05rem !important; line-height:1.18; }
-  #modalContent .movie-detail-hero-info .movie-seen-toggle {
-    min-height:1.8rem !important; padding:.28rem .52rem !important; font-size:.62rem !important;
+  #modalContent .movie-detail-primary-actions { gap:.35rem; }
+  #modalContent .movie-detail-primary-actions .movie-seen-toggle,
+  #modalContent .movie-detail-primary-actions .movie-imdb-rating {
+    min-height:1.8rem !important; padding:.26rem .45rem !important; font-size:.6rem !important;
   }
-  #modalContent .movie-detail-hero-info .movie-seen-toggle .icon-inline,
-  #modalContent .movie-detail-hero-info .movie-seen-toggle svg { width:.72rem; height:.72rem; }
-  #modalContent .movie-detail-hero-info .movie-edit-toggle { min-height:1.85rem; padding:.3rem .55rem; }
+  #modalContent .movie-detail-primary-actions .movie-edit-toggle {
+    width:1.85rem; min-width:1.85rem; min-height:1.85rem !important; padding:0 !important;
+    justify-content:center; border-radius:.6rem;
+  }
+  #modalContent .movie-detail-primary-actions .movie-edit-label { display:none; }
 }
 
 /* Sur iPad tactile : résumé compact, détails dépliables sur toute la largeur */
-@media (min-width: 768px) and (hover: none) and (pointer: coarse) {
+@media (min-width: 768px) and (pointer: coarse) {
   #modalContent .edition-list { max-height:none; overflow:visible; }
   #modalContent .edition-card,
   #modalContent .edition-card.has-edition-cover { display:block !important; width:100%; min-width:0; }
@@ -1820,15 +1834,15 @@ body.global-search-open { overflow:hidden; }
   #modalContent .edition-card .edition-cover-mobile { display:block !important; }
   #modalContent .edition-card .edition-more-details { display:block; width:100%; min-width:0; }
   #modalContent .edition-card .edition-more-content {
-    display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.7rem 1rem;
-    width:100%; padding:0 .8rem .8rem;
+    display:block !important; width:100%; min-width:0; padding:0 .8rem .8rem;
   }
-  #modalContent .edition-card .edition-form-fields { grid-column:1; }
-  #modalContent .edition-card .edition-extra-fields { grid-column:2; }
-  #modalContent .edition-card .edition-boxset,
-  #modalContent .edition-card .edition-disc-composition,
-  #modalContent .edition-card .edition-tech-inline,
-  #modalContent .edition-card .edition-tech-details { grid-column:1 / -1; }
+  #modalContent .edition-card .edition-more-content > * { width:100%; min-width:0; }
+  #modalContent .edition-card .edition-more-content > * + * { margin-top:.7rem !important; }
+  #modalContent .edition-card .edition-form-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.6rem; }
+  #modalContent .edition-card .edition-extra-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.6rem; }
+  #modalContent .edition-card input,
+  #modalContent .edition-card select,
+  #modalContent .edition-card textarea { max-width:100%; min-width:0; }
 }
 </style>
 </head>
@@ -3193,7 +3207,7 @@ function updateDesktopNavOffsets() {
  const nav = document.getElementById('topNav');
  if (!header || !nav) return;
  const desktop = window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine)').matches;
- const tablet = window.matchMedia('(min-width: 768px) and (hover: none) and (pointer: coarse)').matches;
+ const tablet = window.matchMedia('(min-width: 768px) and (pointer: coarse)').matches;
  if (!desktop && !tablet) return;
  document.documentElement.style.setProperty('--header-h', `${header.offsetHeight}px`);
  document.documentElement.style.setProperty('--topnav-h', `${nav.offsetHeight}px`);
@@ -3229,8 +3243,10 @@ function toggleMovieDetailEdit(button) {
  movieDetailEditMode = editing;
  movieDetailEditMovieId = document.getElementById('modalContent')?.dataset.movieId || null;
  button.setAttribute('aria-pressed', String(editing));
- const label = button.querySelector('span:last-child');
+ const label = button.querySelector('.movie-edit-label');
  if (label) label.textContent = editing ? 'Terminer' : 'Modifier';
+ button.setAttribute('aria-label', editing ? 'Terminer les modifications' : 'Modifier la fiche');
+ button.setAttribute('title', editing ? 'Terminer' : 'Modifier');
  if (editing) shell.querySelectorAll('.edition-more-details').forEach(details => details.open = true);
  showToast(editing ? 'Mode modification activé' : 'Modifications enregistrées');
 }
@@ -6734,7 +6750,7 @@ const content = document.getElementById('modalContent');
 const openingDifferentMovie = movieDetailEditMovieId === null || String(movieDetailEditMovieId) !== String(movie.id);
 if (openingDifferentMovie) {
  const hasEditionCover = movie.editions.some(edition => hasDisplayedThumbnail(edition.image));
- const touchTablet = window.matchMedia('(min-width: 768px) and (hover: none) and (pointer: coarse)').matches;
+ const touchTablet = window.matchMedia('(min-width: 768px) and (pointer: coarse)').matches;
  const incompleteOnTablet = touchTablet && getIncompleteReasons(movie).length > 0;
  movieDetailEditMode = !hasEditionCover || incompleteOnTablet;
 }
@@ -6878,7 +6894,7 @@ ${editionDiscEditorHtml(ed, movieIdArg, idx)}
 ${editionTechDesktopQuery.matches ? '' : '</div></details>'}
 </div>`).join('');
 
-const ratingHtml = imdbRating !== null ? `<div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-300 text-[10px] font-bold">${ic('star','w-3.5 h-3.5')} IMDb ${imdbRating}/10</div>` : '';
+const ratingHtml = imdbRating !== null ? `<div class="movie-imdb-rating flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-300 text-[10px] font-bold">${ic('star','w-3.5 h-3.5')} IMDb ${imdbRating}/10</div>` : '';
 const seenHtml = `<button onclick="toggleMovieSeen(${movieIdArg})" class="movie-seen-toggle app-action ${movie.seen ? 'app-action-green' : 'app-action-slate'} px-2.5 py-1.5 text-[10px]">${movie.seen ? ic('check','w-3.5 h-3.5') + ' Vu' : ic('eye','w-3.5 h-3.5') + ' Non vu'}</button>`;
 
 content.innerHTML = `
@@ -6898,9 +6914,9 @@ ${movie.isWishlist ? '<span class="px-2 py-1 rounded-full bg-pink-400/10 border 
 </div>
 <h3 class="text-lg sm:text-xl font-extrabold text-white leading-tight">${escapeHtml(movie.title)}</h3>
 ${metaParts.length ? `<p class="text-[10px] text-gray-400 mt-1.5">${metaParts.join(' • ')}</p>` : ''}
-<div class="flex items-center gap-1.5 flex-wrap mt-3">${seenHtml}${ratingHtml}</div>
-<div class="flex justify-end mt-2">
-<button type="button" onclick="toggleMovieDetailEdit(this)" class="movie-edit-toggle" aria-pressed="${detailEditing ? 'true' : 'false'}">${ic('settings','w-3 h-3')} <span>${detailEditing ? 'Terminer' : 'Modifier'}</span></button>
+<div class="movie-detail-primary-actions flex items-center gap-1.5 mt-3">
+${seenHtml}${ratingHtml}
+<button type="button" onclick="toggleMovieDetailEdit(this)" class="movie-edit-toggle ml-auto" aria-label="${detailEditing ? 'Terminer les modifications' : 'Modifier la fiche'}" title="${detailEditing ? 'Terminer' : 'Modifier'}" aria-pressed="${detailEditing ? 'true' : 'false'}">${ic('settings','w-3 h-3')} <span class="movie-edit-label">${detailEditing ? 'Terminer' : 'Modifier'}</span></button>
 </div>
 </div>
 </div>
