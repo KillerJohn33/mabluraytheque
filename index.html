@@ -1687,13 +1687,12 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 .global-search-trigger {
   position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
   display: inline-flex; align-items: center; gap: .45rem; min-height: 2.25rem;
-  width: min(15rem, 24vw); padding: .45rem .6rem; border-radius: .7rem; color: #cbd5e1;
+  width: min(10rem, 18vw); padding: .4rem .75rem; border-radius: 999px; color: #cbd5e1;
   background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.1);
   transition: color .18s ease, background .18s ease, border-color .18s ease;
 }
 .global-search-trigger:hover { color:#fff; background:rgba(0,0,0,.48); border-color:rgba(34,211,238,.28); }
 .global-search-placeholder { flex:1; text-align:left; font-size:.72rem; font-weight:500; color:#94a3b8; }
-.global-search-shortcut { font-size:.58rem; color:#64748b; border:1px solid rgba(255,255,255,.12); border-radius:.35rem; padding:.12rem .3rem; }
 .global-search-panel { background:rgba(10,13,20,.98); backdrop-filter:none; }
 .global-search-close { width:2.5rem; height:2.5rem; display:inline-flex; align-items:center; justify-content:center; border-radius:.75rem; color:#94a3b8; }
 .global-search-close:hover { color:#fff; background:rgba(255,255,255,.08); }
@@ -1759,9 +1758,9 @@ body.global-search-open { overflow:hidden; }
 /* Decalage discret du bandeau superieur sur telephone */
 @media (max-width: 767px) {
   @supports (padding-top: env(safe-area-inset-top)) {
-    body { padding-top: calc(env(safe-area-inset-top) + .35rem); }
-    body::after { height: calc(env(safe-area-inset-top) + .35rem); }
-    body > header { top: calc(env(safe-area-inset-top) + .35rem); }
+    body { padding-top: calc(env(safe-area-inset-top) + .65rem); }
+    body::after { height: calc(env(safe-area-inset-top) + .65rem); }
+    body > header { top: calc(env(safe-area-inset-top) + .65rem); }
   }
 }
 </style>
@@ -1771,7 +1770,7 @@ body.global-search-open { overflow:hidden; }
 <header class="relative sticky top-0 z-40 p-4 glass-card border-b-0 border-b-[0.5px] border-white/10 text-center font-extrabold text-xl tracking-wide flex items-center justify-center gap-2.5">
 <span class="icon-chip chip-lg" data-icon="disc"></span>
 <span class="bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">Blu-rayth&egrave;que</span>
-<button type="button" onclick="openGlobalSearch()" class="global-search-trigger" aria-label="Rechercher dans toute l’application" title="Recherche globale (Ctrl + K)"><span class="icon-inline w-4 h-4" data-icon="search"></span><span class="global-search-placeholder">Rechercher</span><span class="global-search-shortcut">Ctrl K</span></button>
+<button type="button" onclick="openGlobalSearch()" class="global-search-trigger" aria-label="Rechercher dans toute l’application" title="Recherche globale"><span class="icon-inline w-4 h-4" data-icon="search"></span><span class="global-search-placeholder">Rechercher</span></button>
 </header>
 
 <main class="p-4 max-w-md mx-auto space-y-5">
