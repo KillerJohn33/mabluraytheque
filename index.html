@@ -1760,6 +1760,15 @@ body.global-search-open { overflow:hidden; }
   .app-action { font-size:.72rem !important; }
   .detail-modal-close { width:2.75rem !important; height:2.75rem !important; top:.7rem !important; right:.7rem !important; }
 }
+
+/* Decalage discret du bandeau superieur sur telephone */
+@media (max-width: 767px) {
+  @supports (padding-top: env(safe-area-inset-top)) {
+    body { padding-top: calc(env(safe-area-inset-top) + .35rem); }
+    body::after { height: calc(env(safe-area-inset-top) + .35rem); }
+    body > header { top: calc(env(safe-area-inset-top) + .35rem); }
+  }
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
