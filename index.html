@@ -3074,6 +3074,25 @@ renderTrackedSeries();
 // --- MON ESPACE : INSTALLATION ---
 const EQUIPMENT_CATEGORIES = ['Téléviseur', 'Vidéoprojecteur', 'Amplificateur', 'Barre de son', 'Enceintes', 'Lecteur Blu-ray', 'Console de jeux', 'Lecteur multimédia', 'Autre'];
 const SUBSCRIPTION_CATEGORIES = ['Streaming vidéo', 'Streaming musique', 'Internet & mobile', 'Autre'];
+const PLEX_TOKEN_STORAGE_KEY = 'plex_device_token_v1';
+
+function getDevicePlexToken() {
+ return String(localStorage.getItem(PLEX_TOKEN_STORAGE_KEY) || '').trim();
+}
+
+function setDevicePlexToken(token) {
+ const value = String(token || '').trim();
+ if (value) localStorage.setItem(PLEX_TOKEN_STORAGE_KEY, value);
+ else localStorage.removeItem(PLEX_TOKEN_STORAGE_KEY);
+}
+
+function cloudSafePlex(value = {}) {
+ return {
+  serverName: String(value.serverName || '').trim(),
+  connectedAt: String(value.connectedAt || '').trim(),
+  lastSyncAt: String(value.lastSyncAt || '').trim()
+ };
+}
 
 function normalizeProfileData(value) {
  const money = input => {
@@ -3139,13 +3158,17 @@ function formatInstallationPrice(value) {
 }
 
 function saveProfileLocal() {
- localStorage.setItem('profile_bundle_v1', JSON.stringify(profileData));
+ const localProfile = JSON.parse(JSON.stringify(profileData || {}));
+ const token = String(localProfile?.plex?.token || getDevicePlexToken()).trim();
+ setDevicePlexToken(token);
+ if (localProfile.plex) delete localProfile.plex.token;
+ localStorage.setItem('profile_bundle_v1', JSON.stringify(localProfile));
 }
 
 async function saveProfileBundleCloud() {
  if (!db) return false;
  beginCloudWrite();
- const payload = { recordType: 'profile_bundle', equipment: profileData.equipment, projects: profileData.projects, subscriptions: profileData.subscriptions, plex: profileData.plex, profile: profileData.profile, updatedAt: profileData.updatedAt || new Date().toISOString() };
+ const payload = { recordType: 'profile_bundle', equipment: profileData.equipment, projects: profileData.projects, subscriptions: profileData.subscriptions, plex: cloudSafePlex(profileData.plex), profile: profileData.profile, updatedAt: profileData.updatedAt || new Date().toISOString() };
  try {
   if (profileBundleCloudId) {
    const { error } = await db.from('bluray').update({ data: payload }).eq('id', profileBundleCloudId);
@@ -3167,16 +3190,30 @@ async function saveProfileBundleCloud() {
 }
 
 async function loadProfileFromCloud() {
- let localProfile;
- try { localProfile = normalizeProfileData(JSON.parse(localStorage.getItem('profile_bundle_v1') || '{}')); }
- catch (_) { localProfile = normalizeProfileData({}); }
- const cloudProfile = normalizeProfileData(profileBundleFromCloud || {});
+ let localRaw;
+ try { localRaw = JSON.parse(localStorage.getItem('profile_bundle_v1') || '{}'); }
+ catch (_) { localRaw = {}; }
+ const cloudRaw = profileBundleFromCloud && typeof profileBundleFromCloud === 'object' ? profileBundleFromCloud : {};
+ const localProfile = normalizeProfileData(localRaw);
+ const cloudProfile = normalizeProfileData(cloudRaw);
  const localDate = Date.parse(localProfile.updatedAt || '') || 0;
  const cloudDate = Date.parse(cloudProfile.updatedAt || '') || 0;
+ const deviceToken = getDevicePlexToken() || String(localRaw?.plex?.token || cloudRaw?.plex?.token || '').trim();
+ const devicePlex = localProfile.plex || {};
  profileData = localDate > cloudDate ? localProfile : cloudProfile;
+ profileData.plex = {
+  ...(profileData.plex || {}),
+  clientId: devicePlex.clientId || '',
+  serverUri: devicePlex.serverUri || '',
+  serverClientIdentifier: devicePlex.serverClientIdentifier || '',
+  token: deviceToken
+ };
+ setDevicePlexToken(deviceToken);
  saveProfileLocal();
  renderEquipment();
- if (!profileBundleCloudId || localDate > cloudDate) {
+ const cloudPlex = cloudRaw?.plex || {};
+ const cloudContainedSecret = Boolean(cloudPlex.token || cloudPlex.clientId || cloudPlex.serverUri || cloudPlex.serverClientIdentifier);
+ if (!profileBundleCloudId || localDate > cloudDate || cloudContainedSecret) {
   const saved = await saveProfileBundleCloud();
   if (!saved && profileData.equipment.length) showToast('⚠️ Votre installation reste uniquement sur cet appareil.');
   return saved || profileData.equipment.length === 0;
@@ -3650,13 +3687,23 @@ function getPlexClientId() {
  return id;
 }
 
+function sanitizeDigitalLibrary(items) {
+ return (Array.isArray(items) ? items : []).map(item => {
+  const clean = { ...item };
+  if (/X-Plex-Token=/i.test(String(clean.poster || ''))) clean.poster = '';
+  return clean;
+ });
+}
+
 function saveDigitalLibraryLocal() {
+ digitalLibrary = sanitizeDigitalLibrary(digitalLibrary);
  localStorage.setItem('digital_library_v1', JSON.stringify(digitalLibrary));
 }
 
 async function saveDigitalLibraryBundleCloud() {
  if (!db) return false;
  beginCloudWrite();
+ digitalLibrary = sanitizeDigitalLibrary(digitalLibrary);
  const payload = { recordType: 'digital_library_bundle', items: digitalLibrary, updatedAt: new Date().toISOString() };
  try {
   if (digitalLibraryBundleCloudId) {
@@ -3682,9 +3729,11 @@ async function loadDigitalLibraryFromCloud() {
  let local;
  try { local = JSON.parse(localStorage.getItem('digital_library_v1') || '[]'); } catch (_) { local = []; }
  const cloud = Array.isArray(digitalLibraryBundleFromCloud) ? digitalLibraryBundleFromCloud : [];
- digitalLibrary = cloud.length >= local.length ? cloud : local;
+ const source = cloud.length >= local.length ? cloud : local;
+ const containedPlexToken = source.some(item => /X-Plex-Token=/i.test(String(item?.poster || '')));
+ digitalLibrary = sanitizeDigitalLibrary(source);
  saveDigitalLibraryLocal();
- if (!digitalLibraryBundleCloudId && digitalLibrary.length) {
+ if ((!digitalLibraryBundleCloudId && digitalLibrary.length) || containedPlexToken) {
   const saved = await saveDigitalLibraryBundleCloud();
   if (!saved) showToast('⚠️ Votre bibliothèque numérique reste uniquement sur cet appareil.');
   return saved;
@@ -3712,10 +3761,20 @@ function renderPlexCard() {
  }
 }
 
+async function callPlexApi(action, payload = {}) {
+ const response = await fetch('/api/plex', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  cache: 'no-store',
+  body: JSON.stringify({ action, ...payload })
+ });
+ return response;
+}
+
 async function startPlexLink() {
  const clientId = getPlexClientId();
  try {
-  const res = await fetch(`/api/plex?action=pin&clientId=${encodeURIComponent(clientId)}`);
+  const res = await callPlexApi('pin', { clientId });
   if (!res.ok) throw new Error('pin');
   const data = await res.json();
   if (!data?.id || !data?.code) throw new Error('pin');
@@ -3728,7 +3787,7 @@ async function startPlexLink() {
    attempts++;
    if (attempts > 60) { clearInterval(plexPinPollTimer); return; }
    try {
-    const checkRes = await fetch(`/api/plex?action=check&id=${encodeURIComponent(data.id)}&clientId=${encodeURIComponent(clientId)}`);
+    const checkRes = await callPlexApi('check', { id: data.id, clientId });
     if (!checkRes.ok) return;
     const checkData = await checkRes.json();
     if (checkData?.authToken) {
@@ -3744,12 +3803,13 @@ async function startPlexLink() {
 
 async function finishPlexLink(token, clientId) {
  try {
-  const res = await fetch(`/api/plex?action=resources&token=${encodeURIComponent(token)}&clientId=${encodeURIComponent(clientId)}`);
+  const res = await callPlexApi('resources', { token, clientId });
   if (!res.ok) throw new Error('resources');
   const servers = await res.json();
   if (!Array.isArray(servers) || !servers.length) { showToast('⚠️ Aucun serveur Plex trouvé sur ce compte.'); return; }
   const server = servers[0];
   const previous = JSON.parse(JSON.stringify(profileData));
+  setDevicePlexToken(token);
   profileData.plex = {
    token, clientId,
    serverName: server.name || 'Serveur Plex',
@@ -3780,6 +3840,7 @@ async function disconnectPlex() {
  if (!confirm('Déconnecter votre compte Plex ? Les éléments déjà importés resteront dans Digital.')) return;
  const previous = JSON.parse(JSON.stringify(profileData));
  profileData.plex = {};
+ setDevicePlexToken('');
  profileData.updatedAt = new Date().toISOString();
  saveProfileLocal();
  renderPlexCard();
@@ -3853,7 +3914,7 @@ async function syncPlexLibrary(silent = false) {
      type: section.type,
      sectionTitle: section.title,
      tmdbId: tmdbGuid ? tmdbGuid.id.replace('tmdb://', '') : '',
-     poster: m.thumb ? `${base}${m.thumb}?X-Plex-Token=${encodeURIComponent(plex.token)}` : '',
+     poster: '',
      thumbPath: m.thumb || '',
      posterData: '',
      duration: m.duration ? Math.round(m.duration / 60000) : 0,
