@@ -3203,9 +3203,9 @@ async function loadProfileFromCloud() {
  profileData = localDate > cloudDate ? localProfile : cloudProfile;
  profileData.plex = {
   ...(profileData.plex || {}),
-  clientId: devicePlex.clientId || '',
-  serverUri: devicePlex.serverUri || '',
-  serverClientIdentifier: devicePlex.serverClientIdentifier || '',
+  clientId: devicePlex.clientId || cloudProfile.plex.clientId || '',
+  serverUri: devicePlex.serverUri || cloudProfile.plex.serverUri || '',
+  serverClientIdentifier: devicePlex.serverClientIdentifier || cloudProfile.plex.serverClientIdentifier || '',
   token: deviceToken
  };
  setDevicePlexToken(deviceToken);
