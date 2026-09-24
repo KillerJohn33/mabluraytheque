@@ -6622,7 +6622,7 @@ async function attachBlurayEdition(movieId, index) {
  }
 }
 
-const editionTechDesktopQuery = window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine)');
+const editionTechDesktopQuery = window.matchMedia('(min-width: 768px)');
 editionTechDesktopQuery.addEventListener?.('change', event => {
  document.querySelectorAll('.edition-tech-details').forEach(details => { details.open = event.matches; });
 });
@@ -6848,7 +6848,6 @@ content.innerHTML = `
 <div class="relative flex gap-3.5 p-3.5 sm:p-4">
 <div class="flex-shrink-0">
 <img src="${safeImageUrl(movie.poster)}" class="detail-movie-poster w-20 h-30 sm:w-28 sm:h-42 object-cover rounded-2xl shadow-xl border border-white/15">
-<p class="text-[8px] text-gray-400 text-center mt-1">Affiche du film</p>
 </div>
 <div class="flex-1 min-w-0 flex flex-col justify-end py-0.5">
 <div class="flex items-center gap-1.5 flex-wrap mb-2">
