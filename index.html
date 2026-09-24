@@ -3950,6 +3950,8 @@ function inferDiscComposition(label = '', fallbackFormat = '') {
   else if (/dvd/.test(format)) result.dvd = 1;
   else result.bluray = 1;
  }
+ // Une edition 4K UHD est toujours livree avec son disque Blu-ray 1080p compagnon
+ if (result.bluray4k && !result.bluray) result.bluray = 1;
  return result;
 }
 
@@ -6555,8 +6557,8 @@ ${!isSeriesMovie ? `<div class="text-gray-300"><span class="text-gray-500">Budge
 </div>
 <div class="edition-list space-y-2 max-h-64 overflow-y-auto pr-0.5">${editionsHtml}</div>
 <div class="grid grid-cols-2 gap-2 pt-2 border-t border-white/5">
-<div class="rounded-xl bg-white/[0.035] px-3 py-2"><p class="text-[8px] text-gray-500 uppercase">Achat</p><p class="text-sm font-bold text-emerald-300 mt-0.5">${totals.totalPurchase.toFixed(2)} €</p></div>
-<div class="rounded-xl bg-white/[0.035] px-3 py-2"><p class="text-[8px] text-gray-500 uppercase">Valeur estimée</p><p class="text-sm font-bold text-cyan-300 mt-0.5">${totals.totalEstimated.toFixed(2)} €</p></div>
+<div class="rounded-xl bg-white/[0.035] px-3 py-2"><p class="text-[8px] text-gray-500 uppercase">Achat</p><p id="editionTotalPurchase" class="text-sm font-bold text-emerald-300 mt-0.5">${totals.totalPurchase.toFixed(2)} €</p></div>
+<div class="rounded-xl bg-white/[0.035] px-3 py-2"><p class="text-[8px] text-gray-500 uppercase">Valeur estimée</p><p id="editionTotalEstimated" class="text-sm font-bold text-cyan-300 mt-0.5">${totals.totalEstimated.toFixed(2)} €</p></div>
 </div>
 </div>
 
@@ -6669,7 +6671,19 @@ return;
 }
 const result = await updateMovieInCloud(movie);
 if (!result.success) { edition[field] = previous; edition.discComposition = previousDiscComposition; openMovieDetail(movieId); }
-else { renderCollection(); renderWishlist(); if (!document.getElementById('tabCollection').classList.contains('hidden')) renderIncompletePanel(); if (!['videoCodec', 'audioTracks', 'subtitles'].includes(field)) openMovieDetail(movieId); }
+else {
+renderCollection(); renderWishlist();
+if (!document.getElementById('tabCollection').classList.contains('hidden')) renderIncompletePanel();
+if (field === 'purchasePrice' || field === 'estimatedPrice') {
+const totals = calculateMovieTotals(movie);
+const purchaseEl = document.getElementById('editionTotalPurchase');
+const estimatedEl = document.getElementById('editionTotalEstimated');
+if (purchaseEl) purchaseEl.textContent = `${totals.totalPurchase.toFixed(2)} €`;
+if (estimatedEl) estimatedEl.textContent = `${totals.totalEstimated.toFixed(2)} €`;
+} else if (!['videoCodec', 'audioTracks', 'subtitles'].includes(field)) {
+openMovieDetail(movieId);
+}
+}
 }
 
 async function moveWishlistToCollection(movieId) {
