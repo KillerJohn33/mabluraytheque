@@ -1687,11 +1687,12 @@ body.theme-light .edition-boxset-switch { background: rgba(100,116,139,.18); bor
 .global-search-trigger {
   position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
   display: inline-flex; align-items: center; gap: .45rem; min-height: 2.25rem;
-  padding: .45rem .65rem; border-radius: .75rem; color: #cbd5e1;
-  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+  width: min(15rem, 24vw); padding: .45rem .6rem; border-radius: .7rem; color: #cbd5e1;
+  background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.1);
   transition: color .18s ease, background .18s ease, border-color .18s ease;
 }
-.global-search-trigger:hover { color:#fff; background:rgba(255,255,255,.1); border-color:rgba(34,211,238,.3); }
+.global-search-trigger:hover { color:#fff; background:rgba(0,0,0,.48); border-color:rgba(34,211,238,.28); }
+.global-search-placeholder { flex:1; text-align:left; font-size:.72rem; font-weight:500; color:#94a3b8; }
 .global-search-shortcut { font-size:.58rem; color:#64748b; border:1px solid rgba(255,255,255,.12); border-radius:.35rem; padding:.12rem .3rem; }
 .global-search-panel { background:rgba(10,13,20,.98); backdrop-filter:none; }
 .global-search-close { width:2.5rem; height:2.5rem; display:inline-flex; align-items:center; justify-content:center; border-radius:.75rem; color:#94a3b8; }
@@ -1722,6 +1723,11 @@ body.global-search-open { overflow:hidden; }
 .edition-more-summary::after { content:'›'; margin-left:auto; color:#64748b; font-size:1rem; transform:rotate(90deg); transition:transform .18s ease; }
 .edition-more-details[open] > .edition-more-summary::after { transform:rotate(-90deg); }
 .edition-more-content { padding:0 .7rem .7rem; }
+@media (min-width:768px) {
+  #modalContent .edition-card > .edition-more-details,
+  #modalContent .edition-card > .edition-more-details > .edition-more-content { display:contents; }
+  #modalContent .edition-card > .edition-more-details > .edition-more-summary { display:none; }
+}
 .app-empty-state { min-height:11rem; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.7rem; padding:1.25rem; text-align:center; border:1px dashed rgba(148,163,184,.22); border-radius:1.25rem; background:rgba(255,255,255,.025); }
 .empty-state-icon { width:2.5rem; height:2.5rem; display:inline-flex; align-items:center; justify-content:center; border-radius:.85rem; color:#67e8f9; background:rgba(34,211,238,.1); }
 .toast { display:flex; align-items:center; gap:.55rem; border-radius:.9rem; min-width:min(22rem,calc(100vw - 2rem)); justify-content:center; }
@@ -1732,8 +1738,8 @@ body.global-search-open { overflow:hidden; }
 
 :where(button, a, input, select, textarea, summary):focus-visible { outline:2px solid #22d3ee !important; outline-offset:2px; }
 @media (max-width:767px) {
-  .global-search-trigger { right:.65rem; padding:.4rem; min-height:2.25rem; width:2.25rem; justify-content:center; }
-  .global-search-shortcut { display:none; }
+  .global-search-trigger { right:.65rem; padding:.4rem; min-height:2.25rem; width:2.25rem; justify-content:center; background:rgba(0,0,0,.24); }
+  .global-search-placeholder, .global-search-shortcut { display:none; }
   .movie-detail-shell { font-size:.8rem; }
   .movie-detail-shell label { font-size:.7rem !important; }
   .movie-detail-shell input, .movie-detail-shell select, .movie-detail-shell textarea { font-size:.8rem !important; min-height:2.6rem; }
@@ -1761,7 +1767,7 @@ body.global-search-open { overflow:hidden; }
 <header class="relative sticky top-0 z-40 p-4 glass-card border-b-0 border-b-[0.5px] border-white/10 text-center font-extrabold text-xl tracking-wide flex items-center justify-center gap-2.5">
 <span class="icon-chip chip-lg" data-icon="disc"></span>
 <span class="bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">Blu-rayth&egrave;que</span>
-<button type="button" onclick="openGlobalSearch()" class="global-search-trigger" aria-label="Rechercher dans toute l’application" title="Recherche globale (Ctrl + K)"><span class="icon-inline w-4 h-4" data-icon="search"></span><span class="global-search-shortcut">Ctrl K</span></button>
+<button type="button" onclick="openGlobalSearch()" class="global-search-trigger" aria-label="Rechercher dans toute l’application" title="Recherche globale (Ctrl + K)"><span class="icon-inline w-4 h-4" data-icon="search"></span><span class="global-search-placeholder">Rechercher</span><span class="global-search-shortcut">Ctrl K</span></button>
 </header>
 
 <main class="p-4 max-w-md mx-auto space-y-5">
@@ -3142,11 +3148,16 @@ container.appendChild(toast);
 setTimeout(() => toast.remove(), inferred === 'error' ? 4200 : 3000);
 }
 
+let movieDetailEditMode = false;
+let movieDetailEditMovieId = null;
+
 function toggleMovieDetailEdit(button) {
  const shell = button?.closest('.movie-detail-shell');
  if (!shell) return;
  const editing = shell.classList.toggle('movie-detail-editing');
  shell.classList.toggle('movie-detail-view', !editing);
+ movieDetailEditMode = editing;
+ movieDetailEditMovieId = document.getElementById('modalContent')?.dataset.movieId || null;
  button.setAttribute('aria-pressed', String(editing));
  const label = button.querySelector('span:last-child');
  if (label) label.textContent = editing ? 'Terminer' : 'Modifier';
@@ -6642,7 +6653,10 @@ movie = normalizeMovieData(movie);
 const modal = document.getElementById('detailModal');
 const wasHidden = modal.classList.contains('hidden');
 const content = document.getElementById('modalContent');
+if (movieDetailEditMovieId !== null && String(movieDetailEditMovieId) !== String(movie.id)) movieDetailEditMode = false;
+movieDetailEditMovieId = String(movie.id);
 content.dataset.movieId = String(movie.id);
+const detailEditing = movieDetailEditMode;
 
 const totals = calculateMovieTotals(movie);
 const infoYear = movie.releaseDate ? movie.releaseDate.split('-')[0] : '';
@@ -6685,7 +6699,7 @@ ${ed.image ? `<figure class="edition-cover-desktop">
 <img src="${safeImageUrl(ed.image)}" alt="Jaquette de ${escapeHtml(ed.title || movie.title)}" loading="lazy" onerror="this.closest('.edition-card').classList.remove('has-edition-cover');this.closest('figure').style.display='none'" class="detail-edition-cover object-contain bg-black/40 rounded-xl shadow-lg border border-cyan-400/20">
 <figcaption class="mt-1 text-center text-[9px] text-gray-500">Boîtier de l’édition</figcaption>
 </figure>` : ''}
-<details class="edition-more-details rounded-xl border border-white/10 bg-black/10" ${editionTechDesktopQuery.matches ? "open" : ""}>
+<details class="edition-more-details rounded-xl border border-white/10 bg-black/10" ${(editionTechDesktopQuery.matches || detailEditing) ? "open" : ""}>
 <summary class="edition-more-summary">Détails de l’édition <span class="text-gray-500 font-normal">· achat, support et technique</span></summary>
 <div class="edition-more-content space-y-2.5">
 <div class="edition-form-fields grid grid-cols-2 gap-2">
@@ -6742,7 +6756,7 @@ ${ed.image ? `<figure class="edition-cover-desktop">
 </details>
 ${ed.barcode ? `<button onclick="refreshPhysicalEdition(${movieIdArg}, ${idx})" class="detail-edit-only text-[9px] text-cyan-300 hover:text-white text-left">Actualiser les informations de cette édition</button>` : ''}
 </div>
-<details class="edition-tech-details rounded-xl border border-white/10 bg-white/[0.025] p-2.5 mt-2" ${editionTechDesktopQuery.matches ? "open" : ""}>
+<details class="edition-tech-details rounded-xl border border-white/10 bg-white/[0.025] p-2.5 mt-2" ${(editionTechDesktopQuery.matches || detailEditing) ? "open" : ""}>
 <summary class="cursor-pointer text-[10px] font-semibold text-cyan-300">Vidéo, audio et sous-titres</summary>
 <div class="space-y-2 mt-2">
 <div><label class="block text-[9px] text-gray-400 mb-1">Codec vidéo</label>
@@ -6787,7 +6801,7 @@ const ratingHtml = imdbRating !== null ? `<div class="flex items-center gap-1.5 
 const seenHtml = `<button onclick="toggleMovieSeen(${movieIdArg})" class="app-action ${movie.seen ? 'app-action-green' : 'app-action-slate'} px-2.5 py-1.5 text-[10px]">${movie.seen ? ic('check','w-3.5 h-3.5') + ' Vu' : ic('eye','w-3.5 h-3.5') + ' Non vu'}</button>`;
 
 content.innerHTML = `
-<div class="movie-detail-shell movie-detail-view space-y-4">
+<div class="movie-detail-shell ${detailEditing ? 'movie-detail-editing' : 'movie-detail-view'} space-y-4">
 <!-- HERO -->
 <div class="relative overflow-hidden rounded-3xl border border-white/10 bg-black/30">
 <div id="movieDetailHero" class="absolute inset-0 opacity-30 pointer-events-none" style="background-image:linear-gradient(90deg,rgba(0,0,0,.9),rgba(0,0,0,.35)),url('${safeImageUrl(movie.poster)}');background-size:cover;background-position:center;filter:blur(18px);transform:scale(1.08)"></div>
@@ -6800,7 +6814,7 @@ content.innerHTML = `
 <div class="flex items-center gap-1.5 flex-wrap mb-2">
 <span class="px-2 py-1 rounded-full bg-cyan-400/10 border border-cyan-400/20 text-cyan-300 text-[8px] font-bold uppercase tracking-wider">${isSeriesMovie ? 'Série' : 'Film'}</span>
 ${movie.isWishlist ? '<span class="px-2 py-1 rounded-full bg-pink-400/10 border border-pink-400/20 text-pink-300 text-[8px] font-bold uppercase tracking-wider">Wishlist</span>' : '<span class="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 text-[8px] font-bold uppercase tracking-wider">Collection</span>'}
-<button type="button" onclick="toggleMovieDetailEdit(this)" class="movie-edit-toggle ml-auto" aria-pressed="false">${ic('settings','w-3 h-3')} <span>Modifier</span></button>
+<button type="button" onclick="toggleMovieDetailEdit(this)" class="movie-edit-toggle ml-auto" aria-pressed="${detailEditing ? 'true' : 'false'}">${ic('settings','w-3 h-3')} <span>${detailEditing ? 'Terminer' : 'Modifier'}</span></button>
 </div>
 <h3 class="text-lg sm:text-xl font-extrabold text-white leading-tight">${escapeHtml(movie.title)}</h3>
 ${metaParts.length ? `<p class="text-[10px] text-gray-400 mt-1.5">${metaParts.join(' • ')}</p>` : ''}
@@ -6873,6 +6887,8 @@ if (!skipPhysicalLookup) {
 
 function closeModal() {
 document.getElementById('detailModal').classList.add('hidden');
+movieDetailEditMode = false;
+movieDetailEditMovieId = null;
 unlockDetailBackgroundScroll();
 }
 
