@@ -3,6 +3,20 @@ const BNF = 'https://catalogue.bnf.fr/api/SRU';
 const COVER = 'https://openapi.bnf.fr/couverture/image/image/recupererImage';
 const GO_UPC = 'https://go-upc.com/api/v1/code/';
 
+const rateBuckets = new Map();
+
+function allowRequest(req, limit = 90, windowMs = 60000) {
+  const ip = String(req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
+  const now = Date.now();
+  const current = rateBuckets.get(ip);
+  if (!current || current.resetAt <= now) {
+    rateBuckets.set(ip, { count: 1, resetAt: now + windowMs });
+    return true;
+  }
+  current.count += 1;
+  return current.count <= limit;
+}
+
 async function timedFetch(url, ms = 4500, headers = {}) {
  const controller = new AbortController();
  const timer = setTimeout(() => controller.abort(), ms);
@@ -51,6 +65,7 @@ async function bnfCover(code) {
  return '';
 }
 export default async function handler(req, res) {
+  if (!allowRequest(req)) { res.setHeader('Cache-Control', 'no-store'); return res.status(429).json({ error: 'Trop de requêtes. Réessayez dans une minute.' }); }
  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
  const code = String(req.query.code || '').replace(/\D/g, '');
  if (!/^\d{8,14}$/.test(code)) return res.status(400).json({ error: 'Invalid barcode' });
