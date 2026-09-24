@@ -1704,6 +1704,34 @@ body.theme-light .global-search-trigger { color:#334155; background:rgba(15,23,4
 body.theme-light .global-search-item:hover, body.theme-light .global-search-item:focus-visible, body.theme-light .global-search-item.is-selected { background:rgba(2,132,199,.1); }
 body.global-search-open { overflow:hidden; }
 
+@keyframes globalSearchDrop {
+  from { opacity:0; transform:translateY(-8px) scale(.985); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  body.global-search-open { overflow:auto; }
+  #globalSearchModal {
+    padding:0 !important;
+    background:transparent !important;
+    align-items:initial;
+    justify-content:initial;
+    pointer-events:none;
+  }
+  #globalSearchModal .global-search-panel {
+    position:fixed;
+    top:calc(var(--header-h, 4.5rem) - .1rem);
+    right:1rem;
+    width:min(24rem, calc(100vw - 2rem));
+    max-width:24rem;
+    pointer-events:auto;
+    border-radius:1rem;
+    box-shadow:0 18px 48px rgba(0,0,0,.48), 0 0 0 1px rgba(255,255,255,.04);
+    transform-origin:top right;
+    animation:globalSearchDrop .18s ease-out both;
+  }
+  #globalSearchResults { max-height:min(28rem, calc(100vh - var(--header-h, 4.5rem) - 2rem)); }
+}
+
 .movie-detail-shell { font-size:.75rem; }
 .movie-detail-shell label { font-size:.65rem !important; line-height:1.25; }
 .movie-detail-shell input, .movie-detail-shell select, .movie-detail-shell textarea { font-size:.75rem !important; }
@@ -2798,7 +2826,7 @@ body.global-search-open { overflow:hidden; }
 <button type="button" onclick="closeGlobalSearch()" class="global-search-close" aria-label="Fermer"><span class="icon-inline w-4 h-4" data-icon="x"></span></button>
 </div>
 <div id="globalSearchResults" class="max-h-[65vh] overflow-y-auto p-2"></div>
-<p class="hidden sm:block px-3 py-2 border-t border-white/10 text-[10px] text-gray-500">Entrée pour ouvrir · Échap pour fermer · Ctrl + K pour rechercher</p>
+<p class="hidden sm:block px-3 py-2 border-t border-white/10 text-[10px] text-gray-500">Entrée pour ouvrir · Échap pour fermer</p>
 </div>
 </div>
 
@@ -3248,6 +3276,14 @@ function openGlobalSearchResult(index) {
  else if(item.type==='space') openSpaceSection(item.section);
  else if(item.type==='tab') switchTab(item.section);
 }
+
+document.addEventListener('pointerdown', event => {
+ const modal=document.getElementById('globalSearchModal');
+ if (!modal || modal.classList.contains('hidden')) return;
+ if (!window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine)').matches) return;
+ if (event.target.closest('.global-search-panel') || event.target.closest('.global-search-trigger')) return;
+ closeGlobalSearch();
+});
 
 document.addEventListener('keydown', event => {
  const modal=document.getElementById('globalSearchModal');
