@@ -1,5 +1,19 @@
 const SITE = 'https://www.blu-ray.com';
 
+const rateBuckets = new Map();
+
+function allowRequest(req, limit = 45, windowMs = 60000) {
+  const ip = String(req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
+  const now = Date.now();
+  const current = rateBuckets.get(ip);
+  if (!current || current.resetAt <= now) {
+    rateBuckets.set(ip, { count: 1, resetAt: now + windowMs });
+    return true;
+  }
+  current.count += 1;
+  return current.count <= limit;
+}
+
 function decode(value = '') {
   return value.replace(/<[^>]*>/g, ' ').replace(/&nbsp;|&#160;/gi, ' ')
     .replace(/&amp;/gi, '&').replace(/&quot;/gi, '"').replace(/&#39;|&apos;/gi, "'")
@@ -37,6 +51,7 @@ function parseEdition(html, url, id) {
 }
 
 export default async function handler(req, res) {
+  if (!allowRequest(req)) { res.setHeader('Cache-Control', 'no-store'); return res.status(429).json({ error: 'Trop de requêtes. Réessayez dans une minute.' }); }
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
   let target;
   try {
