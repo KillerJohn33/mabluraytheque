@@ -1791,6 +1791,45 @@ body.global-search-open { overflow:hidden; }
     body > header { top: calc(env(safe-area-inset-top) + .65rem); }
   }
 }
+
+/* Fiche film plus visuelle sur telephone */
+@media (max-width: 767px) {
+  #modalContent .movie-detail-hero-layout { gap:.8rem; padding:.75rem; align-items:stretch; }
+  #modalContent .movie-detail-poster-wrap { width:7rem; }
+  #modalContent .movie-detail-hero .detail-movie-poster {
+    width:7rem !important; height:10.5rem !important; border-radius:1rem;
+    box-shadow:0 14px 30px rgba(0,0,0,.48);
+  }
+  #modalContent .movie-detail-hero-info { justify-content:center; padding:.15rem 0; }
+  #modalContent .movie-detail-hero-info h3 { font-size:1.05rem !important; line-height:1.18; }
+  #modalContent .movie-detail-hero-info .movie-seen-toggle {
+    min-height:1.8rem !important; padding:.28rem .52rem !important; font-size:.62rem !important;
+  }
+  #modalContent .movie-detail-hero-info .movie-seen-toggle .icon-inline,
+  #modalContent .movie-detail-hero-info .movie-seen-toggle svg { width:.72rem; height:.72rem; }
+  #modalContent .movie-detail-hero-info .movie-edit-toggle { min-height:1.85rem; padding:.3rem .55rem; }
+}
+
+/* Sur iPad tactile : résumé compact, détails dépliables sur toute la largeur */
+@media (min-width: 768px) and (hover: none) and (pointer: coarse) {
+  #modalContent .edition-list { max-height:none; overflow:visible; }
+  #modalContent .edition-card,
+  #modalContent .edition-card.has-edition-cover { display:block !important; width:100%; min-width:0; }
+  #modalContent .edition-card > * + * { margin-top:.65rem !important; }
+  #modalContent .edition-card .edition-cover-desktop { display:none !important; }
+  #modalContent .edition-card .edition-cover-mobile { display:block !important; }
+  #modalContent .edition-card .edition-more-details { display:block; width:100%; min-width:0; }
+  #modalContent .edition-card .edition-more-content {
+    display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.7rem 1rem;
+    width:100%; padding:0 .8rem .8rem;
+  }
+  #modalContent .edition-card .edition-form-fields { grid-column:1; }
+  #modalContent .edition-card .edition-extra-fields { grid-column:2; }
+  #modalContent .edition-card .edition-boxset,
+  #modalContent .edition-card .edition-disc-composition,
+  #modalContent .edition-card .edition-tech-inline,
+  #modalContent .edition-card .edition-tech-details { grid-column:1 / -1; }
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -6622,7 +6661,7 @@ async function attachBlurayEdition(movieId, index) {
  }
 }
 
-const editionTechDesktopQuery = window.matchMedia('(min-width: 768px)');
+const editionTechDesktopQuery = window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine)');
 editionTechDesktopQuery.addEventListener?.('change', event => {
  document.querySelectorAll('.edition-tech-details').forEach(details => { details.open = event.matches; });
 });
@@ -6695,7 +6734,9 @@ const content = document.getElementById('modalContent');
 const openingDifferentMovie = movieDetailEditMovieId === null || String(movieDetailEditMovieId) !== String(movie.id);
 if (openingDifferentMovie) {
  const hasEditionCover = movie.editions.some(edition => hasDisplayedThumbnail(edition.image));
- movieDetailEditMode = !hasEditionCover;
+ const touchTablet = window.matchMedia('(min-width: 768px) and (hover: none) and (pointer: coarse)').matches;
+ const incompleteOnTablet = touchTablet && getIncompleteReasons(movie).length > 0;
+ movieDetailEditMode = !hasEditionCover || incompleteOnTablet;
 }
 movieDetailEditMovieId = String(movie.id);
 content.dataset.movieId = String(movie.id);
@@ -6838,18 +6879,18 @@ ${editionTechDesktopQuery.matches ? '' : '</div></details>'}
 </div>`).join('');
 
 const ratingHtml = imdbRating !== null ? `<div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-300 text-[10px] font-bold">${ic('star','w-3.5 h-3.5')} IMDb ${imdbRating}/10</div>` : '';
-const seenHtml = `<button onclick="toggleMovieSeen(${movieIdArg})" class="app-action ${movie.seen ? 'app-action-green' : 'app-action-slate'} px-2.5 py-1.5 text-[10px]">${movie.seen ? ic('check','w-3.5 h-3.5') + ' Vu' : ic('eye','w-3.5 h-3.5') + ' Non vu'}</button>`;
+const seenHtml = `<button onclick="toggleMovieSeen(${movieIdArg})" class="movie-seen-toggle app-action ${movie.seen ? 'app-action-green' : 'app-action-slate'} px-2.5 py-1.5 text-[10px]">${movie.seen ? ic('check','w-3.5 h-3.5') + ' Vu' : ic('eye','w-3.5 h-3.5') + ' Non vu'}</button>`;
 
 content.innerHTML = `
 <div class="movie-detail-shell ${detailEditing ? 'movie-detail-editing' : 'movie-detail-view'} space-y-4">
 <!-- HERO -->
-<div class="relative overflow-hidden rounded-3xl border border-white/10 bg-black/30">
+<div class="movie-detail-hero relative overflow-hidden rounded-3xl border border-white/10 bg-black/30">
 <div id="movieDetailHero" class="absolute inset-0 opacity-30 pointer-events-none" style="background-image:linear-gradient(90deg,rgba(0,0,0,.9),rgba(0,0,0,.35)),url('${safeImageUrl(movie.poster)}');background-size:cover;background-position:center;filter:blur(18px);transform:scale(1.08)"></div>
-<div class="relative flex gap-3.5 p-3.5 sm:p-4">
-<div class="flex-shrink-0">
+<div class="movie-detail-hero-layout relative flex gap-3.5 p-3.5 sm:p-4">
+<div class="movie-detail-poster-wrap flex-shrink-0">
 <img src="${safeImageUrl(movie.poster)}" class="detail-movie-poster w-20 h-30 sm:w-28 sm:h-42 object-cover rounded-2xl shadow-xl border border-white/15">
 </div>
-<div class="flex-1 min-w-0 flex flex-col justify-end py-0.5">
+<div class="movie-detail-hero-info flex-1 min-w-0 flex flex-col justify-end py-0.5">
 <div class="flex items-center gap-1.5 flex-wrap mb-2">
 <span class="px-2 py-1 rounded-full bg-cyan-400/10 border border-cyan-400/20 text-cyan-300 text-[8px] font-bold uppercase tracking-wider">${isSeriesMovie ? 'Série' : 'Film'}</span>
 ${movie.isWishlist ? '<span class="px-2 py-1 rounded-full bg-pink-400/10 border border-pink-400/20 text-pink-300 text-[8px] font-bold uppercase tracking-wider">Wishlist</span>' : '<span class="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 text-[8px] font-bold uppercase tracking-wider">Collection</span>'}
