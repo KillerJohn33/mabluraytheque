@@ -1,5 +1,18 @@
 const PLEX_API = 'https://plex.tv/api/v2';
 const PRODUCT = 'Ma Bluraythèque';
+const rateBuckets = new Map();
+
+function allowRequest(req, limit = 45, windowMs = 60000) {
+  const ip = String(req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
+  const now = Date.now();
+  const current = rateBuckets.get(ip);
+  if (!current || current.resetAt <= now) {
+    rateBuckets.set(ip, { count: 1, resetAt: now + windowMs });
+    return true;
+  }
+  current.count += 1;
+  return current.count <= limit;
+}
 
 async function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
   const controller = new AbortController();
@@ -68,35 +81,45 @@ async function listResources(token, clientId) {
   return servers;
 }
 
+function requestBody(req) {
+  if (req.body && typeof req.body === 'object') return req.body;
+  if (typeof req.body === 'string' && req.body.length <= 4096) {
+    try { return JSON.parse(req.body); } catch (_) {}
+  }
+  return {};
+}
+
 export default async function handler(req, res) {
-  if (req.method !== 'GET') return res.status(405).json({ error: 'Méthode non autorisée.' });
-  const action = String(req.query.action || '');
-  const clientId = String(req.query.clientId || '').trim();
-  if (!clientId) return res.status(400).json({ error: 'Identifiant client manquant.' });
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST');
+    return res.status(405).json({ error: 'Méthode non autorisée.' });
+  }
+  if (!allowRequest(req)) return res.status(429).json({ error: 'Trop de requêtes. Réessayez dans une minute.' });
+
+  const body = requestBody(req);
+  const action = String(body.action || '');
+  const clientId = String(body.clientId || '').trim();
+  if (!/^[a-z0-9._-]{8,160}$/i.test(clientId)) return res.status(400).json({ error: 'Identifiant client invalide.' });
 
   try {
     if (action === 'pin') {
       const pin = await createPin(clientId);
-      res.setHeader('Cache-Control', 'no-store');
       return res.status(200).json(pin);
     }
     if (action === 'check') {
-      const id = String(req.query.id || '').trim();
-      if (!id) return res.status(400).json({ error: 'Identifiant de code manquant.' });
-      const result = await checkPin(id, clientId);
-      res.setHeader('Cache-Control', 'no-store');
-      return res.status(200).json(result);
+      const id = String(body.id || '').trim();
+      if (!/^\d{1,20}$/.test(id)) return res.status(400).json({ error: 'Identifiant de code invalide.' });
+      return res.status(200).json(await checkPin(id, clientId));
     }
     if (action === 'resources') {
-      const token = String(req.query.token || '').trim();
-      if (!token) return res.status(400).json({ error: 'Jeton Plex manquant.' });
-      const servers = await listResources(token, clientId);
-      res.setHeader('Cache-Control', 'no-store');
-      return res.status(200).json(servers);
+      const token = String(body.token || '').trim();
+      if (!token || token.length > 512) return res.status(400).json({ error: 'Jeton Plex invalide.' });
+      return res.status(200).json(await listResources(token, clientId));
     }
     return res.status(400).json({ error: 'Action inconnue.' });
-  } catch (error) {
-    res.setHeader('Cache-Control', 'no-store');
+  } catch (_) {
     return res.status(502).json({ error: 'Service Plex indisponible.' });
   }
 }
