@@ -2,6 +2,20 @@ const UPC_ENDPOINT = 'https://api.upcitemdb.com/prod/trial/lookup';
 const BNF_ENDPOINT = 'https://catalogue.bnf.fr/api/SRU';
 const GO_UPC_ENDPOINT = 'https://go-upc.com/api/v1/code/';
 
+const rateBuckets = new Map();
+
+function allowRequest(req, limit = 120, windowMs = 60000) {
+  const ip = String(req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
+  const now = Date.now();
+  const current = rateBuckets.get(ip);
+  if (!current || current.resetAt <= now) {
+    rateBuckets.set(ip, { count: 1, resetAt: now + windowMs });
+    return true;
+  }
+  current.count += 1;
+  return current.count <= limit;
+}
+
 async function fetchWithTimeout(url, options = {}, timeoutMs = 4500) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -58,7 +72,7 @@ async function lookupBnf(code) {
   if (!recordCount || !title) return null;
   const publisher = decodeXml((xml.match(/<dc:publisher[^>]*>([\s\S]*?)<\/dc:publisher>/i) || [])[1] || '').replace(/<[^>]+>/g, '').trim();
   const format = decodeXml((xml.match(/<dc:format[^>]*>([\s\S]*?)<\/dc:format>/i) || [])[1] || '').replace(/<[^>]+>/g, '').trim();
-  return { title, description: format, brand: publisher, category: 'VidÃ©o', offerTitles: [], source: 'BnF' };
+  return { title, description: format, brand: publisher, category: 'Vidéo', offerTitles: [], source: 'BnF' };
 }
 
 async function lookupGoUpc(code) {
@@ -82,7 +96,8 @@ async function lookupGoUpc(code) {
 }
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') return res.status(405).json({ error: 'MÃ©thode non autorisÃ©e.' });
+  if (!allowRequest(req)) { res.setHeader('Cache-Control', 'no-store'); return res.status(429).json({ error: 'Trop de requêtes. Réessayez dans une minute.' }); }
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Méthode non autorisée.' });
   const code = String(req.query.code || '').replace(/\D/g, '');
   if (!/^\d{8,14}$/.test(code)) return res.status(400).json({ error: 'Code-barres invalide.' });
 
