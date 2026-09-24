@@ -6656,7 +6656,11 @@ movie = normalizeMovieData(movie);
 const modal = document.getElementById('detailModal');
 const wasHidden = modal.classList.contains('hidden');
 const content = document.getElementById('modalContent');
-if (movieDetailEditMovieId !== null && String(movieDetailEditMovieId) !== String(movie.id)) movieDetailEditMode = false;
+const openingDifferentMovie = movieDetailEditMovieId === null || String(movieDetailEditMovieId) !== String(movie.id);
+if (openingDifferentMovie) {
+ const hasEditionCover = movie.editions.some(edition => hasDisplayedThumbnail(edition.image));
+ movieDetailEditMode = !hasEditionCover;
+}
 movieDetailEditMovieId = String(movie.id);
 content.dataset.movieId = String(movie.id);
 const detailEditing = movieDetailEditMode;
@@ -6814,11 +6818,14 @@ content.innerHTML = `
 <div class="flex items-center gap-1.5 flex-wrap mb-2">
 <span class="px-2 py-1 rounded-full bg-cyan-400/10 border border-cyan-400/20 text-cyan-300 text-[8px] font-bold uppercase tracking-wider">${isSeriesMovie ? 'Série' : 'Film'}</span>
 ${movie.isWishlist ? '<span class="px-2 py-1 rounded-full bg-pink-400/10 border border-pink-400/20 text-pink-300 text-[8px] font-bold uppercase tracking-wider">Wishlist</span>' : '<span class="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 text-[8px] font-bold uppercase tracking-wider">Collection</span>'}
-<button type="button" onclick="toggleMovieDetailEdit(this)" class="movie-edit-toggle ml-auto" aria-pressed="${detailEditing ? 'true' : 'false'}">${ic('settings','w-3 h-3')} <span>${detailEditing ? 'Terminer' : 'Modifier'}</span></button>
+
 </div>
 <h3 class="text-lg sm:text-xl font-extrabold text-white leading-tight">${escapeHtml(movie.title)}</h3>
 ${metaParts.length ? `<p class="text-[10px] text-gray-400 mt-1.5">${metaParts.join(' • ')}</p>` : ''}
 <div class="flex items-center gap-1.5 flex-wrap mt-3">${seenHtml}${ratingHtml}</div>
+<div class="flex justify-end mt-2">
+<button type="button" onclick="toggleMovieDetailEdit(this)" class="movie-edit-toggle" aria-pressed="${detailEditing ? 'true' : 'false'}">${ic('settings','w-3 h-3')} <span>${detailEditing ? 'Terminer' : 'Modifier'}</span></button>
+</div>
 </div>
 </div>
 </div>
