@@ -1942,6 +1942,63 @@ body.global-search-open { overflow:hidden; }
   }
   body.theme-light #bottomNav .bottom-nav-badge { box-shadow:0 0 0 2px #fff; }
 }
+
+/* ===== Fluidite, chargements et retours visuels ===== */
+@keyframes tabPanelEnter {
+  from { opacity:0; transform:translateY(7px); }
+  to { opacity:1; transform:translateY(0); }
+}
+.tab-panel-enter { animation:tabPanelEnter .16s ease-out both; }
+
+@keyframes detailPanelEnter {
+  from { opacity:0; transform:translateY(18px) scale(.985); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+@keyframes detailBackdropEnter { from { opacity:0; } to { opacity:1; } }
+@keyframes detailPanelLeave {
+  from { opacity:1; transform:translateY(0) scale(1); }
+  to { opacity:0; transform:translateY(12px) scale(.985); }
+}
+#detailModal:not(.hidden) { animation:detailBackdropEnter .15s ease-out both; }
+#detailModal:not(.hidden) > div { animation:detailPanelEnter .2s cubic-bezier(.2,.8,.2,1) both; }
+#detailModal.detail-modal-closing { animation:fadeOut .14s ease-in both; pointer-events:none; }
+#detailModal.detail-modal-closing > div { animation:detailPanelLeave .14s ease-in both; }
+
+.skeleton-card {
+  min-height:7rem; border-radius:1rem; border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.035); padding:.75rem; display:flex; gap:.75rem; overflow:hidden;
+}
+.skeleton-block {
+  position:relative; overflow:hidden; border-radius:.65rem; background:rgba(148,163,184,.12);
+}
+.skeleton-block::after {
+  content:""; position:absolute; inset:0; transform:translateX(-100%);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.13),transparent);
+  animation:skeletonSweep 1.15s ease-in-out infinite;
+}
+@keyframes skeletonSweep { to { transform:translateX(100%); } }
+body.theme-light .skeleton-card { background:rgba(255,255,255,.7); border-color:rgba(15,23,42,.1); }
+body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
+
+#bottomNav .bottom-nav-btn.active .icon-inline { animation:activeNavIcon .22s cubic-bezier(.2,.8,.2,1); }
+@keyframes activeNavIcon {
+  0% { transform:scale(.82); opacity:.6; }
+  70% { transform:scale(1.1); }
+  100% { transform:scale(1); opacity:1; }
+}
+#bottomNav .bottom-nav-badge { animation:badgeIn .2s ease-out both; }
+@keyframes badgeIn { from { opacity:0; transform:scale(.5); } to { opacity:1; transform:scale(1); } }
+
+.offline-queue-note {
+  display:flex; align-items:center; gap:.45rem; padding:.5rem .7rem; border-radius:.7rem;
+  color:#fbbf24; background:rgba(245,158,11,.09); border:1px solid rgba(245,158,11,.16);
+  font-size:.68rem; font-weight:600;
+}
+.edition-quick-summary { line-height:1.35; }
+
+@media (max-width:767px) {
+  #detailModal:not(.hidden) > div { transform-origin:bottom center; }
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -1972,6 +2029,7 @@ body.global-search-open { overflow:hidden; }
 <div id="spaceMenuWrapper" class="flex-1 relative flex">
 <button id="tabSettingsBtn" onclick="openSpaceSection('installation')" class="w-full py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent" aria-haspopup="true">
 <span class="icon-inline w-3.5 h-3.5" data-icon="user"></span> <span>Mon espace</span>
+<span id="topOfflineBadge" class="hidden absolute top-1 right-2 w-2 h-2 rounded-full bg-amber-400 ring-2 ring-[#08090d]" title="Modifications en attente"></span>
 <span id="navProfileAvatar" class="hidden w-8 h-8 rounded-full overflow-hidden border border-white/25 flex-none"><img id="navProfileAvatarImg" src="" alt="" class="w-full h-full object-cover"></span>
 </button>
 <div id="spaceSubmenu" class="space-submenu" role="menu" aria-label="Mon espace">
@@ -2826,6 +2884,10 @@ body.global-search-open { overflow:hidden; }
 <option class="bg-gray-900" value="theme-light">☀️ Clair</option>
 </select>
 </div>
+<label class="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.025] px-3 py-2.5">
+<span><span class="block text-xs font-semibold text-gray-300">Retours tactiles</span><span class="block text-[10px] text-gray-500 mt-0.5">Vibration légère pour les actions importantes</span></span>
+<input id="hapticsToggle" type="checkbox" onchange="setHapticsEnabled(this.checked)" class="w-4 h-4 accent-cyan-400">
+</label>
 </div>
 
 <div class="modern-panel space-options-panel p-4 md:p-5 space-y-3">
@@ -2954,6 +3016,7 @@ body.global-search-open { overflow:hidden; }
 <span class="bottom-nav-label">Collection</span>
 </button>
 <button id="bottomTabSeriesBtn" onclick="switchTab('series')" class="bottom-nav-btn">
+<span id="bottomSeriesBadge" class="hidden bottom-nav-badge" title="Épisodes à venir"></span>
 <span class="icon-inline w-8 h-8" data-icon="tv"></span>
 <span class="bottom-nav-label">Séries</span>
 </button>
@@ -2963,6 +3026,7 @@ body.global-search-open { overflow:hidden; }
 <span class="bottom-nav-label">Stats</span>
 </button>
 <button id="bottomTabSettingsBtn" onclick="openSpaceSection('installation')" class="bottom-nav-btn">
+<span id="bottomOfflineBadge" class="hidden bottom-nav-badge bg-amber-400" title="Modifications en attente"></span>
 <span class="icon-inline w-8 h-8" data-icon="user"></span>
 <span class="bottom-nav-label">Mon espace</span>
 </button>
@@ -3184,6 +3248,7 @@ const renderedTabs = { collection: false, wishlist: false, series: false, digita
 let chartInstances = {};
 let statsShowCharts = true;
 let activeSpaceSection = 'installation';
+let activeAppTab = 'home';
 
 // Recherche TMDB
 let currentSearchQuery = '';
@@ -3211,6 +3276,9 @@ const lastSync = localStorage.getItem('last_cloud_sync');
 settingsLabel.textContent = state === 'synced' && lastSync ? `${label} · ${new Date(lastSync).toLocaleString('fr-FR')}` : label;
 settingsLabel.className = `font-bold flex items-center gap-1.5 ${config.text}`;
 }
+const pendingCount = getPendingMovieUpdates().length;
+const showPending = state === 'offline' || pendingCount > 0;
+['topOfflineBadge','bottomOfflineBadge'].forEach(id => document.getElementById(id)?.classList.toggle('hidden', !showPending));
 }
 
 async function syncAllData(silent = false) {
@@ -3247,21 +3315,22 @@ setSyncStatus('synced');
 document.addEventListener('DOMContentLoaded', async () => {
 applyStaticIcons();
 
+const detailModalElement = document.getElementById('detailModal');
+detailModalElement?.addEventListener('pointerdown', event => {
+ if (event.target === detailModalElement) closeModal();
+});
+
 const immediateMobileActions = {
- bottomTabHomeBtn: () => switchTab('home'),
- bottomTabCollectionBtn: () => switchTab('collection'),
- bottomTabSeriesBtn: () => switchTab('series'),
- bottomTabStatsBtn: () => switchTab('stats'),
- bottomTabSettingsBtn: () => openSpaceSection('installation')
+ bottomTabHomeBtn: { tab:'home', action:() => switchTab('home') },
+ bottomTabCollectionBtn: { tab:'collection', action:() => switchTab('collection') },
+ bottomTabSeriesBtn: { tab:'series', action:() => switchTab('series') },
+ bottomTabStatsBtn: { tab:'stats', action:() => switchTab('stats') },
+ bottomTabSettingsBtn: { tab:'settings', action:() => openSpaceSection('installation') }
 };
-const resetMobileTabScroll = () => {
+const mobileTabScrollPositions = { home:0, collection:0, series:0, stats:0, settings:0 };
+const setMobileTabScroll = position => {
  const main = document.querySelector('body > main');
- if (main && window.innerWidth < 768) main.scrollTop = 0;
- const scrollingElement = document.scrollingElement || document.documentElement;
- scrollingElement.scrollTop = 0;
- document.documentElement.scrollTop = 0;
- document.body.scrollTop = 0;
- window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+ if (main && window.innerWidth < 768) main.scrollTop = Math.max(0, Number(position) || 0);
 };
 
 const updateMobileScrollShell = () => {
@@ -3280,7 +3349,7 @@ const updateMobileScrollShell = () => {
  document.documentElement.style.setProperty('--mobile-nav-height', navHeight + 'px');
 };
 
-Object.entries(immediateMobileActions).forEach(([id, action]) => {
+Object.entries(immediateMobileActions).forEach(([id, config]) => {
  const button = document.getElementById(id);
  if (!button) return;
  button.addEventListener('touchstart', event => {
@@ -3288,11 +3357,14 @@ Object.entries(immediateMobileActions).forEach(([id, action]) => {
   event.preventDefault();
   event.stopPropagation();
 
-  action();
-  resetMobileTabScroll();
-  queueMicrotask(resetMobileTabScroll);
-  requestAnimationFrame(resetMobileTabScroll);
-  setTimeout(resetMobileTabScroll, 50);
+  const main = document.querySelector('body > main');
+  if (main) mobileTabScrollPositions[activeAppTab] = main.scrollTop;
+  const repeatedTap = activeAppTab === config.tab;
+  const targetPosition = repeatedTap ? 0 : (mobileTabScrollPositions[config.tab] || 0);
+  config.action();
+  setMobileTabScroll(targetPosition);
+  requestAnimationFrame(() => setMobileTabScroll(targetPosition));
+  appHaptic('light');
  }, { passive: false, capture: true });
 });
 
@@ -3310,6 +3382,12 @@ window.visualViewport?.addEventListener('resize', updateMobileScrollShell);
 
 const savedTheme = localStorage.getItem('app_theme') || 'theme-noir';
 changeTheme(savedTheme);
+const hapticsToggle = document.getElementById('hapticsToggle');
+if (hapticsToggle) hapticsToggle.checked = localStorage.getItem('haptics_enabled') !== '0';
+if (getPendingMovieUpdates().length) {
+ setSyncStatus(navigator.onLine ? 'syncing' : 'offline');
+ if (navigator.onLine) setTimeout(flushPendingMovieUpdates, 600);
+}
 
 const savedDefaultView = localStorage.getItem('default_view') || 'grid';
 const savedViewMode = localStorage.getItem('collection_view_mode');
@@ -3504,6 +3582,35 @@ document.addEventListener('keydown', event => {
  }
  if(event.key==='Enter' && document.activeElement?.id==='globalSearchInput') { event.preventDefault(); openGlobalSearchResult(globalSearchSelection); }
 });
+
+function setHapticsEnabled(enabled) {
+ localStorage.setItem('haptics_enabled', enabled ? '1' : '0');
+ showToast(enabled ? 'Retours tactiles activés' : 'Retours tactiles désactivés');
+}
+function appHaptic(kind = 'light') {
+ if (localStorage.getItem('haptics_enabled') === '0' || !navigator.vibrate) return;
+ const patterns = { light: 10, success: [12, 25, 18], warning: [25, 35, 25] };
+ try { navigator.vibrate(patterns[kind] || patterns.light); } catch (_) {}
+}
+
+function showSearchSkeleton(count = 4) {
+ const container = document.getElementById('searchResults');
+ const box = document.getElementById('searchResultsContainer');
+ const pagination = document.getElementById('searchPagination');
+ if (!container || !box) return;
+ box.classList.remove('hidden');
+ if (pagination) pagination.classList.add('hidden');
+ container.innerHTML = Array.from({ length: count }, () => `<div class="skeleton-card" aria-hidden="true"><div class="skeleton-block w-14 h-20 flex-none"></div><div class="flex-1 space-y-2 pt-1"><div class="skeleton-block h-3 w-2/3"></div><div class="skeleton-block h-4 w-full"></div><div class="skeleton-block h-3 w-1/3"></div></div></div>`).join('');
+}
+
+function animateActiveTabPanel(tab) {
+ const ids = { home:'tabHome', collection:'tabCollection', wishlist:'tabWishlist', series:'tabSeries', digital:'tabDigital', stats:'tabStats', settings:'tabSettings' };
+ const panel = document.getElementById(ids[tab]);
+ if (!panel || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+ panel.classList.remove('tab-panel-enter');
+ void panel.offsetWidth;
+ panel.classList.add('tab-panel-enter');
+}
 
 function changeTheme(themeClass) {
 const selectedTheme = themeClass === 'theme-light' ? 'theme-light' : 'theme-noir';
@@ -4647,10 +4754,48 @@ return { success: false, error };
 }
 }
 
+const PENDING_MOVIE_UPDATES_KEY = 'pending_movie_updates_v1';
+function getPendingMovieUpdates() {
+ try { return JSON.parse(localStorage.getItem(PENDING_MOVIE_UPDATES_KEY) || '[]').filter(item => item?.cloudId && item?.data); }
+ catch (_) { return []; }
+}
+function queuePendingMovieUpdate(cloudId, data) {
+ const pending = getPendingMovieUpdates().filter(item => String(item.cloudId) !== String(cloudId));
+ pending.push({ cloudId, data, queuedAt:new Date().toISOString() });
+ localStorage.setItem(PENDING_MOVIE_UPDATES_KEY, JSON.stringify(pending));
+ setSyncStatus('offline', `${pending.length} modification${pending.length > 1 ? 's' : ''} en attente`);
+}
+async function flushPendingMovieUpdates() {
+ const pending = getPendingMovieUpdates();
+ if (!pending.length || !navigator.onLine || !db) return;
+ setSyncStatus('syncing', `Envoi de ${pending.length} modification${pending.length > 1 ? 's' : ''}…`);
+ const remaining = [];
+ for (const item of pending) {
+  try {
+   const { error } = await db.from('bluray').update({ data:item.data }).eq('id', item.cloudId);
+   if (error) remaining.push(item);
+  } catch (_) { remaining.push(item); }
+ }
+ localStorage.setItem(PENDING_MOVIE_UPDATES_KEY, JSON.stringify(remaining));
+ if (remaining.length) setSyncStatus('error', `${remaining.length} modification${remaining.length > 1 ? 's' : ''} à réessayer`);
+ else {
+  localStorage.setItem('last_cloud_sync', new Date().toISOString());
+  setSyncStatus('synced');
+  showToast('Modifications hors ligne synchronisées');
+  await fetchCollectionFromCloud();
+ }
+}
+window.addEventListener('online', () => { setSyncStatus('syncing'); flushPendingMovieUpdates(); });
+window.addEventListener('offline', () => setSyncStatus('offline'));
+
 async function updateMovieInCloud(movie) {
 if (!movie?.cloud_id) return { success: true, skipped: true };
 normalizeMovieData(movie);
 const { cloud_id, ...cleanMovie } = movie;
+if (!navigator.onLine) {
+ queuePendingMovieUpdate(cloud_id, cleanMovie);
+ return { success:true, queued:true };
+}
 beginCloudWrite();
 try {
 const { error } = await db.from('bluray').update({ data: cleanMovie }).eq('id', cloud_id);
@@ -4665,9 +4810,10 @@ if (!document.getElementById('tabCollection').classList.contains('hidden')) rend
 return { success: true };
 } catch (error) {
 console.error("Update exception:", error);
-showToast("⚠️ Erreur de connexion cloud.");
+queuePendingMovieUpdate(cloud_id, cleanMovie);
+showToast("Modification conservée hors ligne");
 finishCloudWrite(false);
-return { success: false, error };
+return { success: true, queued: true };
 }
 }
 
@@ -4804,6 +4950,7 @@ function openSpaceSection(section) {
 }
 
 function switchTab(tab) {
+activeAppTab = tab;
 ['tabHome', 'tabCollection', 'tabWishlist', 'tabSeries', 'tabDigital', 'tabStats', 'tabSettings'].forEach(id => {
 const el = document.getElementById(id);
 if (el) el.classList.add('hidden');
@@ -4873,7 +5020,7 @@ document.getElementById('bottomTabSettingsBtn').classList.add('active');
 updateSettingsCounters();
 }
 renderIncompletePanel();
-if (window.innerWidth < 768) window.scrollTo(0, 0);
+animateActiveTabPanel(tab);
 updateTopNavIndicator();
 }
 
@@ -4961,6 +5108,7 @@ searchTMDB();
 
 async function searchTMDB() {
 if (!currentSearchQuery) return;
+showSearchSkeleton();
 showToast("Recherche en cours...");
 try {
 const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(currentSearchQuery)}&language=fr-FR&page=${currentSearchPage}`);
@@ -6579,6 +6727,11 @@ setTrackedSeriesFilterVisual();
 const upcoming = [];
 trackedSeries.forEach(s => seriesEpisodes(s).forEach(e => { if (e.air_date && new Date(e.air_date) >= new Date(new Date().setHours(0,0,0,0)) && !e.watched) upcoming.push({...e, seriesTitle:s.title, poster:s.poster, tmdb_id:s.tmdb_id}); }));
 upcoming.sort((a,b) => new Date(a.air_date)-new Date(b.air_date));
+const seriesBadge = document.getElementById('bottomSeriesBadge');
+if (seriesBadge) {
+ seriesBadge.classList.toggle('hidden', upcoming.length === 0);
+ seriesBadge.title = upcoming.length ? `${upcoming.length} épisode${upcoming.length > 1 ? 's' : ''} à venir` : '';
+}
 const upList = document.getElementById('trackedUpcomingList');
 if (upList) { document.getElementById('trackedUpcomingCount').textContent = `${upcoming.length} à venir`; upList.innerHTML = upcoming.slice(0,6).map(e => `<div class="flex items-center gap-2 p-2 rounded-xl bg-white/[0.025] border border-white/5"><img src="${safeImageUrl(e.poster)}" class="w-7 h-10 rounded-lg object-cover"><div class="min-w-0 flex-1"><p class="text-[10px] font-bold text-white truncate">${escapeHtml(e.seriesTitle)}</p><p class="text-[9px] text-gray-400">S${String(e.season_number).padStart(2,'0')}E${String(e.episode_number).padStart(2,'0')} · ${escapeHtml(e.name || 'Épisode')}</p></div><span class="text-[9px] font-bold text-purple-300 whitespace-nowrap">${formatSeriesDate(e.air_date)}</span></div>`).join('') || '<p class="text-[10px] text-gray-500 py-2">Aucun épisode à venir.</p>'; }
 const filtered = trackedSeries.filter(s => trackedSeriesFilter === 'all' || seriesStatus(s) === trackedSeriesFilter);
@@ -6611,7 +6764,7 @@ async function openTrackedSeriesDetail(tmdbId, uiState = null) {
 const series = getTrackedSeries(tmdbId); if (!series) return;
 const modal = document.getElementById('detailModal'), content = document.getElementById('modalContent');
 modal.classList.remove('hidden');
-content.innerHTML = `<div class="py-12 text-center text-xs text-gray-400">Chargement de la série…</div>`;
+content.innerHTML = `<div class="space-y-3" aria-label="Chargement de la série"><div class="skeleton-card min-h-[11rem]"><div class="skeleton-block w-24 h-36 flex-none"></div><div class="flex-1 space-y-3 pt-2"><div class="skeleton-block h-5 w-3/4"></div><div class="skeleton-block h-3 w-1/2"></div><div class="skeleton-block h-3 w-full"></div><div class="skeleton-block h-3 w-5/6"></div></div></div><div class="skeleton-card min-h-[6rem]"><div class="flex-1 space-y-2"><div class="skeleton-block h-3 w-1/3"></div><div class="skeleton-block h-4 w-full"></div><div class="skeleton-block h-4 w-4/5"></div></div></div></div>`;
 let detail = null, credits = null;
 try {
  const [dr, cr] = await Promise.all([
@@ -6956,6 +7109,7 @@ const editionsHtml = movie.editions.map((ed, idx) => `
 ${editionDiscSummaryHtml(ed)}
 </div>
 ${ed.barcode ? `<p class="mt-1.5 text-[9px] text-gray-500">EAN ${escapeHtml(ed.barcode)}</p>` : ''}
+${[ed.purchaseLocation, (parseFloat(ed.purchasePrice) > 0 ? Number(ed.purchasePrice).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €' : ''), ed.videoCodec].filter(Boolean).length ? `<p class="edition-quick-summary mt-1.5 text-[9px] text-gray-400">${[ed.purchaseLocation, (parseFloat(ed.purchasePrice) > 0 ? Number(ed.purchasePrice).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €' : ''), ed.videoCodec].filter(Boolean).map(escapeHtml).join(' · ')}</p>` : ''}
 </div>
 </div>
 <div class="flex flex-shrink-0 items-start gap-1.5">
@@ -7153,10 +7307,20 @@ if (!skipPhysicalLookup) {
 }
 
 function closeModal() {
-document.getElementById('detailModal').classList.add('hidden');
-movieDetailEditMode = false;
-movieDetailEditMovieId = null;
-unlockDetailBackgroundScroll();
+ const modal = document.getElementById('detailModal');
+ if (!modal || modal.classList.contains('hidden') || modal.classList.contains('detail-modal-closing')) return;
+ const finish = () => {
+  modal.classList.add('hidden');
+  modal.classList.remove('detail-modal-closing');
+  movieDetailEditMode = false;
+  movieDetailEditMovieId = null;
+  unlockDetailBackgroundScroll();
+ };
+ if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) finish();
+ else {
+  modal.classList.add('detail-modal-closing');
+  setTimeout(finish, 150);
+ }
 }
 
 async function toggleMovieSeen(movieId) {
@@ -7164,11 +7328,17 @@ let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id ==
 if (!movie) return;
 const previous = !!movie.seen;
 movie.seen = !previous;
-const result = await updateMovieInCloud(movie);
-if (!result.success) { movie.seen = previous; return; }
-openMovieDetail(movieId);
+openMovieDetail(movieId, true);
 renderCollection();
 renderWishlist();
+appHaptic('success');
+const result = await updateMovieInCloud(movie);
+if (!result.success) {
+ movie.seen = previous;
+ openMovieDetail(movieId, true);
+ renderCollection();
+ renderWishlist();
+}
 }
 
 async function updateBlurayDate(movieId, value) {
@@ -7192,9 +7362,10 @@ if (!movie) return;
 const previous = movie.preordered;
 movie.preordered = checked;
 if (checked && !movie.preorderLocation) movie.preorderLocation = 'Fnac';
+openMovieDetail(movieId, true);
+appHaptic('light');
 const result = await updateMovieInCloud(movie);
-if (!result.success) { movie.preordered = previous; }
-openMovieDetail(movieId);
+if (!result.success) { movie.preordered = previous; openMovieDetail(movieId, true); }
 }
 
 async function updateWishlistPreorderLocation(movieId, location) {
