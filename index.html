@@ -1853,6 +1853,13 @@ body.global-search-open { overflow:hidden; }
   #modalContent .edition-card select,
   #modalContent .edition-card textarea { max-width:100%; min-width:0; }
 }
+
+html.mobile-tab-switching,
+body.mobile-tab-switching {
+  overflow: hidden !important;
+  scroll-behavior: auto !important;
+  overscroll-behavior: none;
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -3165,6 +3172,14 @@ const immediateMobileActions = {
  bottomTabStatsBtn: () => switchTab('stats'),
  bottomTabSettingsBtn: () => openSpaceSection('installation')
 };
+const resetMobileTabScroll = () => {
+ const scrollingElement = document.scrollingElement || document.documentElement;
+ scrollingElement.scrollTop = 0;
+ document.documentElement.scrollTop = 0;
+ document.body.scrollTop = 0;
+ window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+};
+
 Object.entries(immediateMobileActions).forEach(([id, action]) => {
  const button = document.getElementById(id);
  if (!button) return;
@@ -3172,10 +3187,21 @@ Object.entries(immediateMobileActions).forEach(([id, action]) => {
   if (event.touches.length !== 1) return;
   event.preventDefault();
   event.stopPropagation();
-  const currentY = window.scrollY;
-  window.scrollTo(0, currentY);
+
+  document.documentElement.classList.add('mobile-tab-switching');
+  document.body.classList.add('mobile-tab-switching');
   action();
-  requestAnimationFrame(() => window.scrollTo(0, 0));
+  resetMobileTabScroll();
+
+  requestAnimationFrame(() => {
+   resetMobileTabScroll();
+   requestAnimationFrame(() => {
+    document.documentElement.classList.remove('mobile-tab-switching');
+    document.body.classList.remove('mobile-tab-switching');
+    resetMobileTabScroll();
+    setTimeout(resetMobileTabScroll, 80);
+   });
+  });
  }, { passive: false, capture: true });
 });
 
