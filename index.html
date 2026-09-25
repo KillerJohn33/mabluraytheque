@@ -3248,7 +3248,6 @@ const renderedTabs = { collection: false, wishlist: false, series: false, digita
 let chartInstances = {};
 let statsShowCharts = true;
 let activeSpaceSection = 'installation';
-let activeAppTab = 'home';
 
 // Recherche TMDB
 let currentSearchQuery = '';
@@ -3327,10 +3326,9 @@ const immediateMobileActions = {
  bottomTabStatsBtn: { tab:'stats', action:() => switchTab('stats') },
  bottomTabSettingsBtn: { tab:'settings', action:() => openSpaceSection('installation') }
 };
-const mobileTabScrollPositions = { home:0, collection:0, series:0, stats:0, settings:0 };
-const setMobileTabScroll = position => {
+const resetMobileTabScroll = () => {
  const main = document.querySelector('body > main');
- if (main && window.innerWidth < 768) main.scrollTop = Math.max(0, Number(position) || 0);
+ if (main && window.innerWidth < 768) main.scrollTop = 0;
 };
 
 const updateMobileScrollShell = () => {
@@ -3357,13 +3355,9 @@ Object.entries(immediateMobileActions).forEach(([id, config]) => {
   event.preventDefault();
   event.stopPropagation();
 
-  const main = document.querySelector('body > main');
-  if (main) mobileTabScrollPositions[activeAppTab] = main.scrollTop;
-  const repeatedTap = activeAppTab === config.tab;
-  const targetPosition = repeatedTap ? 0 : (mobileTabScrollPositions[config.tab] || 0);
   config.action();
-  setMobileTabScroll(targetPosition);
-  requestAnimationFrame(() => setMobileTabScroll(targetPosition));
+  resetMobileTabScroll();
+  requestAnimationFrame(resetMobileTabScroll);
   appHaptic('light');
  }, { passive: false, capture: true });
 });
@@ -4950,7 +4944,6 @@ function openSpaceSection(section) {
 }
 
 function switchTab(tab) {
-activeAppTab = tab;
 ['tabHome', 'tabCollection', 'tabWishlist', 'tabSeries', 'tabDigital', 'tabStats', 'tabSettings'].forEach(id => {
 const el = document.getElementById(id);
 if (el) el.classList.add('hidden');
