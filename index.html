@@ -1854,12 +1854,6 @@ body.global-search-open { overflow:hidden; }
   #modalContent .edition-card textarea { max-width:100%; min-width:0; }
 }
 
-html.mobile-tab-switching,
-body.mobile-tab-switching {
-  overflow: hidden !important;
-  scroll-behavior: auto !important;
-  overscroll-behavior: none;
-}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -3188,20 +3182,11 @@ Object.entries(immediateMobileActions).forEach(([id, action]) => {
   event.preventDefault();
   event.stopPropagation();
 
-  document.documentElement.classList.add('mobile-tab-switching');
-  document.body.classList.add('mobile-tab-switching');
   action();
   resetMobileTabScroll();
-
-  requestAnimationFrame(() => {
-   resetMobileTabScroll();
-   requestAnimationFrame(() => {
-    document.documentElement.classList.remove('mobile-tab-switching');
-    document.body.classList.remove('mobile-tab-switching');
-    resetMobileTabScroll();
-    setTimeout(resetMobileTabScroll, 80);
-   });
-  });
+  queueMicrotask(resetMobileTabScroll);
+  requestAnimationFrame(resetMobileTabScroll);
+  setTimeout(resetMobileTabScroll, 50);
  }, { passive: false, capture: true });
 });
 
