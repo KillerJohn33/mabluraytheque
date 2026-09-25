@@ -3326,9 +3326,28 @@ const immediateMobileActions = {
  bottomTabStatsBtn: { tab:'stats', action:() => switchTab('stats') },
  bottomTabSettingsBtn: { tab:'settings', action:() => openSpaceSection('installation') }
 };
-const resetMobileTabScroll = () => {
+const cancelMobileScrollMomentum = () => {
  const main = document.querySelector('body > main');
- if (main && window.innerWidth < 768) main.scrollTop = 0;
+ if (!main || window.innerWidth >= 768) return null;
+
+ // iOS conserve l'inertie sur le conteneur, même après le changement de section.
+ // Changer momentanément son mode de défilement coupe cette inertie sans figer l'interface.
+ main.style.webkitOverflowScrolling = 'auto';
+ main.style.scrollBehavior = 'auto';
+ main.scrollTop = main.scrollTop;
+ void main.offsetHeight;
+ main.scrollTop = 0;
+ return main;
+};
+
+const finishMobileTabSwitch = main => {
+ if (!main) return;
+ main.scrollTop = 0;
+ requestAnimationFrame(() => {
+  main.scrollTop = 0;
+  main.style.webkitOverflowScrolling = '';
+  main.style.scrollBehavior = '';
+ });
 };
 
 const updateMobileScrollShell = () => {
@@ -3355,9 +3374,9 @@ Object.entries(immediateMobileActions).forEach(([id, config]) => {
   event.preventDefault();
   event.stopPropagation();
 
+  const scrollContainer = cancelMobileScrollMomentum();
   config.action();
-  resetMobileTabScroll();
-  requestAnimationFrame(resetMobileTabScroll);
+  finishMobileTabSwitch(scrollContainer);
   appHaptic('light');
  }, { passive: false, capture: true });
 });
