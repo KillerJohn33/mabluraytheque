@@ -1861,11 +1861,13 @@ body.global-search-open { overflow:hidden; }
   body > main {
     position:fixed !important;
     top:var(--mobile-main-top, 4.5rem);
-    bottom:var(--mobile-nav-height, 5.25rem);
+    bottom:0;
     left:0; right:0;
     width:100% !important;
     max-width:none !important;
     margin:0 !important;
+    padding-bottom:calc(var(--mobile-nav-height, 5.25rem) + 1rem) !important;
+    scroll-padding-bottom:calc(var(--mobile-nav-height, 5.25rem) + 1rem);
     overflow-y:auto !important;
     overflow-x:hidden !important;
     overscroll-behavior-y:contain;
