@@ -903,13 +903,18 @@ body { padding-bottom: 7rem !important; }
   max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 2rem) !important;
 }
 }
+#detailModal { z-index: 70; }
 .mobile-bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 50;
+  z-index: 65;
   display: flex;
+  isolation: isolate;
+  transform: translate3d(0,0,0);
+  -webkit-transform: translate3d(0,0,0);
+  will-change: transform;
   justify-content: space-around;
   align-items: flex-start;
   gap: 0;
@@ -951,6 +956,10 @@ body { padding-bottom: 7rem !important; }
   color: #9ca3af;
   transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
   position: relative;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .mobile-bottom-nav .bottom-nav-btn:active { transform: scale(0.94); }
 .mobile-bottom-nav .bottom-nav-btn .bottom-nav-label {
@@ -3148,6 +3157,27 @@ setSyncStatus('synced');
 
 document.addEventListener('DOMContentLoaded', async () => {
 applyStaticIcons();
+
+const immediateMobileActions = {
+ bottomTabHomeBtn: () => switchTab('home'),
+ bottomTabCollectionBtn: () => switchTab('collection'),
+ bottomTabSeriesBtn: () => switchTab('series'),
+ bottomTabStatsBtn: () => switchTab('stats'),
+ bottomTabSettingsBtn: () => openSpaceSection('installation')
+};
+Object.entries(immediateMobileActions).forEach(([id, action]) => {
+ const button = document.getElementById(id);
+ if (!button) return;
+ button.addEventListener('touchstart', event => {
+  if (event.touches.length !== 1) return;
+  event.preventDefault();
+  event.stopPropagation();
+  const currentY = window.scrollY;
+  window.scrollTo(0, currentY);
+  action();
+  requestAnimationFrame(() => window.scrollTo(0, 0));
+ }, { passive: false, capture: true });
+});
 
 const updateMobileNavigation = () => {
 const isPhone = window.innerWidth < 768 || (window.matchMedia('(hover: none) and (pointer: coarse)').matches && window.innerWidth <= 1024);
