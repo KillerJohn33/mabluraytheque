@@ -1013,11 +1013,16 @@ body { padding-bottom: 7rem !important; }
 
 /* Fiche film sur telephone : la fenetre utilise toute la largeur de l'ecran (HERO et INFOS inchanges) */
 @media (max-width: 767px) {
-  #detailModal { padding-left: .4rem !important; padding-right: .4rem !important; padding-bottom: .4rem !important; }
+  #detailModal {
+    padding-left:.4rem !important;
+    padding-right:.4rem !important;
+    padding-bottom:calc(env(safe-area-inset-bottom) + 5.15rem) !important;
+  }
   #detailModal > div {
-    max-width: 100% !important;
-    width: 100% !important;
-    border-radius: 1.1rem !important;
+    max-width:100% !important;
+    width:100% !important;
+    max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 6.15rem) !important;
+    border-radius:1.1rem !important;
   }
 
   /* Editions (3e bloc) et actions (4e bloc) : espacement resserre */
