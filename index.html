@@ -1040,6 +1040,133 @@ body { padding-bottom: 7rem !important; }
   #modalContent .edition-disc-composition { padding: .55rem !important; }
 }
 
+/* Fiche film sur telephone : vue continue, sans cartes imbriquees */
+@media (max-width: 767px) {
+  #modalContent .movie-detail-shell {
+    gap:0 !important;
+  }
+
+  /* Le hero reste le seul bloc visuel. Les autres sections suivent sur un fond continu. */
+  #modalContent .movie-detail-shell > :nth-child(2),
+  #modalContent .movie-detail-shell > :nth-child(3) {
+    margin-top:0 !important;
+    padding:1rem 0 !important;
+    border:0 !important;
+    border-top:1px solid rgba(148,163,184,.16) !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+  #modalContent .movie-detail-shell > :nth-child(4) {
+    margin-top:0 !important;
+    padding-top:.8rem !important;
+    border-top:1px solid rgba(148,163,184,.16);
+  }
+
+  #modalContent .edition-list {
+    padding:0 !important;
+  }
+  #modalContent .edition-list > * + * {
+    margin-top:0 !important;
+  }
+  #modalContent .edition-card,
+  #modalContent .edition-card.has-edition-cover {
+    width:100% !important;
+    min-width:0 !important;
+    margin:0 !important;
+    padding:.9rem 0 !important;
+    border:0 !important;
+    border-top:1px solid rgba(34,211,238,.15) !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+  #modalContent .edition-card > * + * {
+    margin-top:.65rem !important;
+  }
+
+  /* Les volets se deplient dans le flux, sans creer une sous-fenetre plus etroite. */
+  #modalContent .edition-more-details,
+  #modalContent .edition-tech-details,
+  #modalContent .edition-extra-fields details {
+    width:100% !important;
+    min-width:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:visible !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+  #modalContent .edition-more-summary {
+    padding:.8rem 0 !important;
+    border-top:1px solid rgba(148,163,184,.14);
+  }
+  #modalContent .edition-more-details[open] > .edition-more-summary {
+    border-bottom:1px solid rgba(148,163,184,.1);
+  }
+  #modalContent .edition-more-content {
+    width:100% !important;
+    min-width:0 !important;
+    padding:.8rem 0 0 !important;
+  }
+  #modalContent .edition-tech-details {
+    padding:.75rem 0 !important;
+    border-top:1px solid rgba(148,163,184,.12) !important;
+  }
+  #modalContent .edition-extra-fields details {
+    padding:.65rem 0 !important;
+    border-top:1px solid rgba(148,163,184,.12) !important;
+  }
+
+  #modalContent .edition-boxset,
+  #modalContent .edition-disc-composition,
+  #modalContent .edition-boxset-card {
+    width:100% !important;
+    min-width:0 !important;
+    padding:.75rem 0 !important;
+    border-left:0 !important;
+    border-right:0 !important;
+    border-bottom:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+
+  /* Les champs conservent deux colonnes utiles, puis occupent toute la largeur sur petit ecran. */
+  #modalContent .edition-form-fields,
+  #modalContent .edition-extra-fields {
+    width:100% !important;
+    min-width:0 !important;
+    gap:.65rem !important;
+  }
+  #modalContent .edition-list + .grid {
+    border-top:1px solid rgba(148,163,184,.14) !important;
+  }
+  #modalContent .edition-list + .grid > div {
+    padding:.7rem 0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+  }
+}
+@media (max-width: 390px) {
+  #modalContent .edition-form-fields,
+  #modalContent .edition-extra-fields {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+}
+body.theme-light #modalContent .movie-detail-shell > :nth-child(2),
+body.theme-light #modalContent .movie-detail-shell > :nth-child(3),
+body.theme-light #modalContent .movie-detail-shell > :nth-child(4),
+body.theme-light #modalContent .edition-card,
+body.theme-light #modalContent .edition-more-summary,
+body.theme-light #modalContent .edition-tech-details,
+body.theme-light #modalContent .edition-extra-fields details,
+body.theme-light #modalContent .edition-list + .grid {
+  border-color:rgba(15,23,42,.12) !important;
+}
+
 /* Fiche film sur iPad (tactile) : exploite mieux la largeur disponible - telephone et PC inchanges */
 @media (hover: none) and (pointer: coarse) and (min-width: 768px) {
   #detailModal > div {
