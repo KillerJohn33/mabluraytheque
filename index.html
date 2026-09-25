@@ -1040,8 +1040,8 @@ body { padding-bottom: 7rem !important; }
   #modalContent .edition-disc-composition { padding: .55rem !important; }
 }
 
-/* Fiche film sur telephone : vue continue, sans cartes imbriquees */
-@media (max-width: 767px) {
+/* Fiches film : vue continue et sans cartes imbriquees sur tous les ecrans */
+@media (min-width: 0px) {
   #modalContent .movie-detail-shell {
     gap:0 !important;
   }
@@ -1167,7 +1167,7 @@ body.theme-light #modalContent .edition-list + .grid {
   border-color:rgba(15,23,42,.12) !important;
 }
 
-/* Fiche film sur iPad (tactile) : exploite mieux la largeur disponible - telephone et PC inchanges */
+/* Fiche film sur iPad tactile : conserve une organisation adaptee a sa largeur */
 @media (hover: none) and (pointer: coarse) and (min-width: 768px) {
   #detailModal > div {
     width: calc(100vw - 2rem) !important;
