@@ -1854,6 +1854,26 @@ body.global-search-open { overflow:hidden; }
   #modalContent .edition-card textarea { max-width:100%; min-width:0; }
 }
 
+
+/* Sur telephone, le contenu defile independamment de la navigation fixe */
+@media (max-width: 767px) {
+  html, body { height:100%; overflow:hidden !important; }
+  body > main {
+    position:fixed !important;
+    top:var(--mobile-main-top, 4.5rem);
+    bottom:var(--mobile-nav-height, 5.25rem);
+    left:0; right:0;
+    width:100% !important;
+    max-width:none !important;
+    margin:0 !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    overscroll-behavior-y:contain;
+    -webkit-overflow-scrolling:touch;
+    scroll-behavior:auto;
+  }
+  #bottomNav { touch-action:none; }
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -3167,11 +3187,27 @@ const immediateMobileActions = {
  bottomTabSettingsBtn: () => openSpaceSection('installation')
 };
 const resetMobileTabScroll = () => {
+ const main = document.querySelector('body > main');
+ if (main && window.innerWidth < 768) main.scrollTop = 0;
  const scrollingElement = document.scrollingElement || document.documentElement;
  scrollingElement.scrollTop = 0;
  document.documentElement.scrollTop = 0;
  document.body.scrollTop = 0;
  window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+};
+
+const updateMobileScrollShell = () => {
+ if (window.innerWidth >= 768) {
+  document.documentElement.style.removeProperty('--mobile-main-top');
+  document.documentElement.style.removeProperty('--mobile-nav-height');
+  return;
+ }
+ const header = document.querySelector('body > header');
+ const bottomNav = document.getElementById('bottomNav');
+ const headerBottom = header ? Math.max(0, header.getBoundingClientRect().bottom) : 0;
+ const navHeight = bottomNav && !bottomNav.classList.contains('hidden') ? bottomNav.getBoundingClientRect().height : 0;
+ document.documentElement.style.setProperty('--mobile-main-top', headerBottom + 'px');
+ document.documentElement.style.setProperty('--mobile-nav-height', navHeight + 'px');
 };
 
 Object.entries(immediateMobileActions).forEach(([id, action]) => {
@@ -3196,9 +3232,11 @@ document.getElementById('topNav')?.classList.toggle('hidden', isPhone);
 document.getElementById('bottomNav')?.classList.toggle('hidden', !isPhone);
 };
 updateMobileNavigation();
+updateMobileScrollShell();
 updateDesktopNavOffsets();
 updateTopNavIndicator();
-window.addEventListener('resize', () => { updateMobileNavigation(); applySpaceSection(activeSpaceSection); updateDesktopNavOffsets(); updateTopNavIndicator(); });
+window.addEventListener('resize', () => { updateMobileNavigation(); updateMobileScrollShell(); applySpaceSection(activeSpaceSection); updateDesktopNavOffsets(); updateTopNavIndicator(); });
+window.visualViewport?.addEventListener('resize', updateMobileScrollShell);
 
 const savedTheme = localStorage.getItem('app_theme') || 'theme-noir';
 changeTheme(savedTheme);
@@ -6758,8 +6796,17 @@ async function loadMovieFinancials(movie) {
 }
 
 let detailModalScrollY = null;
+let detailModalUsesMainScroll = false;
 function lockDetailBackgroundScroll() {
  if (detailModalScrollY !== null || !window.matchMedia('(max-width: 767px), (hover: none) and (pointer: coarse) and (max-width: 1024px)').matches) return;
+ const main = document.querySelector('body > main');
+ if (window.innerWidth < 768 && main) {
+  detailModalScrollY = main.scrollTop;
+  detailModalUsesMainScroll = true;
+  main.style.overflowY = 'hidden';
+  main.style.touchAction = 'none';
+  return;
+ }
  detailModalScrollY = window.scrollY;
  document.body.style.position = 'fixed';
  document.body.style.top = `-${detailModalScrollY}px`;
@@ -6771,6 +6818,16 @@ function unlockDetailBackgroundScroll() {
  if (detailModalScrollY === null) return;
  const scrollY = detailModalScrollY;
  detailModalScrollY = null;
+ if (detailModalUsesMainScroll) {
+  const main = document.querySelector('body > main');
+  detailModalUsesMainScroll = false;
+  if (main) {
+   main.style.overflowY = '';
+   main.style.touchAction = '';
+   main.scrollTop = scrollY;
+  }
+  return;
+ }
  document.body.style.position = '';
  document.body.style.top = '';
  document.body.style.left = '';
