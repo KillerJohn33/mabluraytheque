@@ -3332,23 +3332,29 @@ const cancelMobileScrollMomentum = () => {
  const main = document.querySelector('body > main');
  if (!main || window.innerWidth >= 768) return null;
 
- // iOS conserve l'inertie sur le conteneur, même après le changement de section.
- // Changer momentanément son mode de défilement coupe cette inertie sans figer l'interface.
- main.style.webkitOverflowScrolling = 'auto';
- main.style.scrollBehavior = 'auto';
- main.scrollTop = main.scrollTop;
- void main.offsetHeight;
+ // Couper réellement l'inertie iOS avant de remplacer le contenu de l'onglet.
+ main.style.setProperty('overflow-y', 'hidden', 'important');
+ main.style.setProperty('-webkit-overflow-scrolling', 'auto');
+ main.style.setProperty('scroll-behavior', 'auto');
  main.scrollTop = 0;
+ window.scrollTo(0, 0);
+ void main.offsetHeight;
  return main;
 };
 
 const finishMobileTabSwitch = main => {
  if (!main) return;
  main.scrollTop = 0;
+ window.scrollTo(0, 0);
  requestAnimationFrame(() => {
   main.scrollTop = 0;
-  main.style.webkitOverflowScrolling = '';
-  main.style.scrollBehavior = '';
+  main.style.removeProperty('overflow-y');
+  main.style.removeProperty('-webkit-overflow-scrolling');
+  main.style.removeProperty('scroll-behavior');
+  requestAnimationFrame(() => {
+   main.scrollTop = 0;
+   window.scrollTo(0, 0);
+  });
  });
 };
 
