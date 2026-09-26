@@ -4427,6 +4427,64 @@ body.theme-light .home-layout-tools>button{color:#075985;background:rgba(14,165,
  .home-layout-tools{align-items:stretch}
  .home-layout-tools>button{flex:1 1 auto;justify-content:center}
 }
+
+/* Fiche film : exactement trois panneaux principaux */
+#modalContent .movie-detail-hero{
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 10px 28px rgba(0,0,0,.2)!important;
+}
+#modalContent .movie-detail-info,
+#modalContent .movie-detail-editions{
+ border-color:rgba(34,211,238,.13)!important;
+ border-radius:1rem!important;
+ background:linear-gradient(145deg,rgba(27,32,43,.84),rgba(13,17,24,.78))!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.075),0 9px 26px rgba(0,0,0,.18)!important;
+}
+#modalContent .movie-detail-actions{
+ padding:.2rem 0 0!important;
+ border:0!important;
+ border-radius:0!important;
+ background:transparent!important;
+ box-shadow:none!important;
+}
+body.theme-light #modalContent .movie-detail-actions{
+ border:0!important;
+ background:transparent!important;
+ box-shadow:none!important;
+}
+@media(max-width:767px){
+ /* Les éditions restent dans le troisième panneau, sans sous-cartes. */
+ #modalContent .movie-detail-editions{padding:.8rem!important}
+ #modalContent .movie-detail-editions .edition-list{gap:0!important;padding:0!important}
+ #modalContent .movie-detail-editions .edition-list>.edition-card,
+ #modalContent .movie-detail-editions .edition-card,
+ #modalContent .movie-detail-editions .edition-card.has-edition-cover{
+  margin:0!important;
+  padding:.8rem 0!important;
+  border:0!important;
+  border-top:1px solid rgba(34,211,238,.14)!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+ }
+ #modalContent .movie-detail-editions .edition-list>.edition-card:first-child{border-top:0!important}
+ #modalContent .movie-detail-editions>.grid{
+  gap:0!important;
+  margin-top:.35rem!important;
+  padding-top:.65rem!important;
+ }
+ #modalContent .movie-detail-editions>.grid>div{
+  padding:.55rem .35rem!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+ }
+ #modalContent .movie-detail-editions>.grid>div+div{border-left:1px solid rgba(148,163,184,.12)!important}
+ #modalContent .movie-detail-actions{padding:.15rem 0 0!important}
+ body.theme-light #modalContent .movie-detail-editions .edition-list>.edition-card,
+ body.theme-light #modalContent .movie-detail-editions .edition-card,
+ body.theme-light #modalContent .movie-detail-editions .edition-card.has-edition-cover{border-color:rgba(2,132,199,.13)!important;background:transparent!important}
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
