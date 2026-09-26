@@ -4269,6 +4269,36 @@ body.theme-light .home-resize-handle::before,body.theme-light .home-resize-handl
  column-gap:1.35rem!important;
  row-gap:1.35rem!important;
 }
+
+/* Hauteur libre, poignées par axe et densité des panneaux */
+.home-resize-handle{background:transparent!important}
+.home-resize-width{right:-.18rem!important;top:32%!important;bottom:auto!important;width:.8rem!important;height:36%!important;cursor:ew-resize!important;border-radius:.5rem!important}
+.home-resize-width::before{right:.16rem!important;top:35%!important;bottom:auto!important;width:2px!important;height:30%!important;border:0!important;background:rgba(103,232,249,.82)!important}
+.home-resize-width::after{display:none!important}
+.home-resize-height{left:32%!important;right:auto!important;bottom:-.18rem!important;width:36%!important;height:.8rem!important;cursor:ns-resize!important;border-radius:.5rem!important}
+.home-resize-height::before{left:35%!important;right:auto!important;bottom:.16rem!important;width:30%!important;height:2px!important;border:0!important;background:rgba(103,232,249,.82)!important}
+.home-resize-height::after{display:none!important}
+.home-resize-both{right:-.12rem!important;bottom:-.12rem!important;top:auto!important;width:1.35rem!important;height:1.35rem!important;cursor:nwse-resize!important}
+.home-widget.has-custom-height{overflow:auto!important;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(34,211,238,.42) transparent}
+.home-widget.has-custom-height::-webkit-scrollbar{width:6px}
+.home-widget.has-custom-height::-webkit-scrollbar-thumb{background:rgba(34,211,238,.36);border-radius:999px}
+.home-option-reset{margin-left:auto;color:#fca5a5!important;border-color:rgba(248,113,113,.22)!important;background:rgba(248,113,113,.07)!important}
+.home-widget[data-home-density="compact"]{padding:.65rem!important}
+.home-widget[data-home-density="compact"] .home-media-grid,
+.home-widget[data-home-density="compact"] .home-series-widget-list,
+.home-widget[data-home-density="compact"] #recentGrid{gap:.4rem!important}
+.home-widget[data-home-density="compact"] .home-series-widget-card,
+.home-widget[data-home-density="compact"] .home-watch-next-row{padding:.3rem!important;gap:.4rem!important}
+.home-widget[data-home-density="compact"] .home-media-copy{inset:auto .4rem .4rem}
+.home-widget[data-home-density="airy"]{padding:1.25rem!important}
+.home-widget[data-home-density="airy"] .home-media-grid,
+.home-widget[data-home-density="airy"] .home-series-widget-list,
+.home-widget[data-home-density="airy"] #recentGrid{gap:1rem!important}
+.home-widget[data-home-density="airy"] .home-series-widget-card,
+.home-widget[data-home-density="airy"] .home-watch-next-row{padding:.7rem!important;gap:.8rem!important}
+.home-customizing .home-widget[data-home-density="compact"],
+.home-customizing .home-widget[data-home-density="airy"]{padding-top:3.15rem!important}
+body.theme-light .home-resize-width::before,body.theme-light .home-resize-height::before{background:rgba(2,132,199,.82)!important}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -4373,7 +4403,7 @@ body.theme-light .home-resize-handle::before,body.theme-light .home-resize-handl
 <!-- ONGLET ACCUEIL -->
 <div id="tabHome" class="space-y-6">
 <div id="homeCustomizeBar" class="home-customize-bar">
-<div><p class="text-[11px] font-bold text-white">Mon accueil</p><p class="text-[9px] text-gray-500">Déplacez les panneaux et étirez leur coin inférieur droit pour composer votre page.</p></div>
+<div><p class="text-[11px] font-bold text-white">Mon accueil</p><p class="text-[9px] text-gray-500">Déplacez les panneaux, puis étirez leur bord droit, leur bord inférieur ou leur coin.</p></div>
 <button id="homeCustomizeToggle" type="button" onclick="toggleHomeCustomization()" aria-expanded="false" class="glass-pill px-3 py-2 rounded-xl text-[10px] font-semibold text-cyan-300 hover:text-white flex items-center gap-1.5"><span class="icon-inline w-3.5 h-3.5" data-icon="settings"></span><span>Personnaliser</span></button>
 <div id="homeHiddenWidgets" class="hidden home-hidden-widgets"></div>
 </div>
@@ -7855,12 +7885,15 @@ function normalizedHomeLayout() {
  });
  const sizes = {};
  const columns = {};
+ const heights = {};
  HOME_WIDGET_IDS.forEach(id => {
   const size = raw.sizes?.[id];
   sizes[id] = ['small','wide','large'].includes(size) ? size : HOME_WIDGET_DEFS[id].defaultSize;
   const fallbackColumns = { small:4, wide:8, large:12 }[sizes[id]];
   const storedColumns = parseInt(raw.columns?.[id],10);
   columns[id] = Number.isFinite(storedColumns) ? Math.max(3,Math.min(12,storedColumns)) : fallbackColumns;
+  const storedHeight = parseInt(raw.heights?.[id],10);
+  heights[id] = Number.isFinite(storedHeight) && storedHeight >= 120 ? Math.min(1000,storedHeight) : 0;
  });
  const sourceOptions = raw.options && typeof raw.options === 'object' ? raw.options : {};
  const metrics = Array.isArray(sourceOptions.dashboardMetrics) ? sourceOptions.dashboardMetrics.filter(key => HOME_METRIC_DEFS[key]) : HOME_DEFAULT_METRICS;
@@ -7869,9 +7902,17 @@ function normalizedHomeLayout() {
   recentCount: [4,6,8,10].includes(Number(sourceOptions.recentCount)) ? Number(sourceOptions.recentCount) : 6,
   dashboardMetrics: metrics.length ? metrics : [...HOME_DEFAULT_METRICS],
   topRatedCount: [3,4,6,8].includes(Number(sourceOptions.topRatedCount)) ? Number(sourceOptions.topRatedCount) : 4,
-  seriesCount: [2,3,4,6].includes(Number(sourceOptions.seriesCount)) ? Number(sourceOptions.seriesCount) : 3
+  seriesCount: [2,3,4,6].includes(Number(sourceOptions.seriesCount)) ? Number(sourceOptions.seriesCount) : 3,
+  releasesCount: [4,8,12].includes(Number(sourceOptions.releasesCount)) ? Number(sourceOptions.releasesCount) : 8,
+  releasesType: ['all','wishlist','series'].includes(sourceOptions.releasesType) ? sourceOptions.releasesType : 'all',
+  watchNextCount: [3,4,6].includes(Number(sourceOptions.watchNextCount)) ? Number(sourceOptions.watchNextCount) : 4,
+  wishlistCount: [4,6,8].includes(Number(sourceOptions.wishlistCount)) ? Number(sourceOptions.wishlistCount) : 6,
+  formatCount: [3,5,8].includes(Number(sourceOptions.formatCount)) ? Number(sourceOptions.formatCount) : 5,
+  topRatingSource: ['mixed','personal','imdb'].includes(sourceOptions.topRatingSource) ? sourceOptions.topRatingSource : 'mixed',
+  randomDefault: ['all','unseen','4k'].includes(sourceOptions.randomDefault) ? sourceOptions.randomDefault : 'all',
+  densities: sourceOptions.densities && typeof sourceOptions.densities === 'object' ? {...sourceOptions.densities} : {}
  };
- return { order, hidden, sizes, columns, options };
+ return { order, hidden, sizes, columns, heights, options };
 }
 
 function persistHomeLayout(layout) {
@@ -7892,7 +7933,7 @@ function homeWidgetControls(id, size, columns) {
   <button type="button" onclick="moveHomeWidget('${id}',-1)" title="Déplacer avant" aria-label="Déplacer avant">${ic('chevronleft','w-3 h-3')}</button>
   <button type="button" onclick="cycleHomeWidgetSize('${id}')" title="Changer la taille" class="home-widget-size"><span>${sizeLabel}</span></button>
   <button type="button" onclick="moveHomeWidget('${id}',1)" title="Déplacer après" aria-label="Déplacer après">${ic('chevronright','w-3 h-3')}</button>
-  ${['dashboard','recent','topRated','watchingSeries'].includes(id) ? `<button type="button" onclick="toggleHomeWidgetOptions('${id}')" title="Personnaliser le contenu" aria-label="Personnaliser le contenu">${ic('settings','w-3 h-3')}</button>` : ''}
+  <button type="button" onclick="toggleHomeWidgetOptions('${id}')" title="Personnaliser le contenu" aria-label="Personnaliser le contenu">${ic('settings','w-3 h-3')}</button>
   <button type="button" onclick="hideHomeWidget('${id}')" title="Masquer ce panneau" aria-label="Masquer ce panneau">${ic('x','w-3 h-3')}</button>
  </div>`;
 }
@@ -7908,7 +7949,7 @@ function refreshHomeMasonry() {
  homeMasonryFrame=requestAnimationFrame(()=>{
   const row=8, breathing=22;
   tab.querySelectorAll(':scope > .home-customize-bar, :scope > .home-widget:not(.hidden)').forEach(item=>{
-   const height=Math.max(item.scrollHeight,item.getBoundingClientRect().height);
+   const height=item.dataset.homeHeight ? item.getBoundingClientRect().height : Math.max(item.scrollHeight,item.getBoundingClientRect().height);
    item.style.gridRowEnd=`span ${Math.max(1,Math.ceil((height+breathing)/row))}`;
   });
  });
@@ -7935,34 +7976,54 @@ function applyHomeWidgetColumns(widget, columns) {
  widget.dataset.homeColumns=String(value);
 }
 
+function applyHomeWidgetHeight(widget, height) {
+ const value=parseInt(height,10);
+ if(Number.isFinite(value) && value>=120){
+  const limited=Math.max(120,Math.min(1000,value));
+  widget.style.setProperty('height',`${limited}px`,'important');
+  widget.dataset.homeHeight=String(limited);
+  widget.classList.add('has-custom-height');
+ }else{
+  widget.style.removeProperty('height');
+  delete widget.dataset.homeHeight;
+  widget.classList.remove('has-custom-height');
+ }
+}
+
 function initHomeWidgetResize(widget,id) {
- const handle=widget.querySelector('.home-resize-handle'); if(!handle)return;
- handle.onpointerdown=event=>{
-  if(!homeCustomizationActive)return;
-  event.preventDefault();event.stopPropagation();
-  const tab=document.getElementById('tabHome'), rect=widget.getBoundingClientRect(), tabRect=tab.getBoundingClientRect();
-  const gap=parseFloat(getComputedStyle(tab).columnGap)||0;
-  const unit=(tabRect.width-gap*11)/12;
-  const startX=event.clientX,startWidth=rect.width;
-  widget.draggable=false;widget.classList.add('is-resizing');handle.setPointerCapture(event.pointerId);
-  const move=moveEvent=>{
-   const minimum=homeLayoutDeviceKey()==='mobile'?6:3;
-   const wanted=Math.max(unit*minimum,startWidth+moveEvent.clientX-startX);
-   const columns=Math.max(minimum,Math.min(12,Math.round((wanted+gap)/(unit+gap))));
-   applyHomeWidgetColumns(widget,columns);
-   refreshHomeMasonry();
+ widget.querySelectorAll('.home-resize-handle').forEach(handle=>{
+  handle.onpointerdown=event=>{
+   if(!homeCustomizationActive)return;
+   event.preventDefault();event.stopPropagation();
+   const mode=handle.dataset.resizeMode||'both';
+   const tab=document.getElementById('tabHome'), rect=widget.getBoundingClientRect(), tabRect=tab.getBoundingClientRect();
+   const gap=parseFloat(getComputedStyle(tab).columnGap)||0;
+   const unit=(tabRect.width-gap*11)/12;
+   const startX=event.clientX,startY=event.clientY,startWidth=rect.width,startHeight=rect.height;
+   widget.draggable=false;widget.classList.add('is-resizing');handle.setPointerCapture(event.pointerId);
+   const move=moveEvent=>{
+    if(mode!=='height'){
+     const minimum=homeLayoutDeviceKey()==='mobile'?6:3;
+     const wanted=Math.max(unit*minimum,startWidth+moveEvent.clientX-startX);
+     const columns=Math.max(minimum,Math.min(12,Math.round((wanted+gap)/(unit+gap))));
+     applyHomeWidgetColumns(widget,columns);
+    }
+    if(mode!=='width')applyHomeWidgetHeight(widget,Math.max(120,startHeight+moveEvent.clientY-startY));
+    refreshHomeMasonry();
+   };
+   const end=endEvent=>{
+    handle.releasePointerCapture?.(endEvent.pointerId);handle.removeEventListener('pointermove',move);handle.removeEventListener('pointerup',end);handle.removeEventListener('pointercancel',end);
+    widget.classList.remove('is-resizing');widget.draggable=homeCustomizationActive;
+    const layout=normalizedHomeLayout();
+    layout.columns[id]=parseInt(widget.dataset.homeColumns,10)||layout.columns[id];
+    layout.heights[id]=parseInt(widget.dataset.homeHeight,10)||0;
+    const preset={4:'small',8:'wide',12:'large'}[layout.columns[id]];
+    if(preset)layout.sizes[id]=preset;
+    persistHomeLayout(layout);applyHomeLayout();
+   };
+   handle.addEventListener('pointermove',move);handle.addEventListener('pointerup',end);handle.addEventListener('pointercancel',end);
   };
-  const end=endEvent=>{
-   handle.releasePointerCapture?.(endEvent.pointerId);handle.removeEventListener('pointermove',move);handle.removeEventListener('pointerup',end);handle.removeEventListener('pointercancel',end);
-   widget.classList.remove('is-resizing');widget.draggable=homeCustomizationActive;
-   const layout=normalizedHomeLayout();
-   layout.columns[id]=parseInt(widget.dataset.homeColumns,10)||layout.columns[id];
-   const preset={4:'small',8:'wide',12:'large'}[layout.columns[id]];
-   if(preset)layout.sizes[id]=preset;
-   persistHomeLayout(layout);applyHomeLayout();
-  };
-  handle.addEventListener('pointermove',move);handle.addEventListener('pointerup',end);handle.addEventListener('pointercancel',end);
- };
+ });
 }
 function renderHomeCustomizationControls(layout) {
  HOME_WIDGET_IDS.forEach(id => {
@@ -7970,9 +8031,9 @@ function renderHomeCustomizationControls(layout) {
   if (!widget) return;
   widget.querySelector('.home-widget-controls')?.remove();
   widget.querySelector('.home-widget-options')?.remove();
-  widget.querySelector('.home-resize-handle')?.remove();
+  widget.querySelectorAll('.home-resize-handle').forEach(handle => handle.remove());
   widget.insertAdjacentHTML('afterbegin', homeWidgetControls(id, layout.sizes[id], layout.columns[id]));
-  widget.insertAdjacentHTML('beforeend', `<button type="button" class="home-resize-handle" aria-label="Redimensionner ${escapeHtml(HOME_WIDGET_DEFS[id].label)}" title="Faire glisser pour redimensionner"></button>`);
+  widget.insertAdjacentHTML('beforeend', `<button type="button" class="home-resize-handle home-resize-width" data-resize-mode="width" aria-label="Modifier la largeur de ${escapeHtml(HOME_WIDGET_DEFS[id].label)}" title="Étirer la largeur"></button><button type="button" class="home-resize-handle home-resize-height" data-resize-mode="height" aria-label="Modifier la hauteur de ${escapeHtml(HOME_WIDGET_DEFS[id].label)}" title="Étirer la hauteur"></button><button type="button" class="home-resize-handle home-resize-both" data-resize-mode="both" aria-label="Redimensionner ${escapeHtml(HOME_WIDGET_DEFS[id].label)}" title="Étirer la largeur et la hauteur"></button>`);
   initHomeWidgetResize(widget,id);
   const optionsHtml = homeWidgetOptionsHtml(id, layout);
   if (optionsHtml) widget.querySelector('.home-widget-controls')?.insertAdjacentHTML('afterend', optionsHtml);
@@ -8014,14 +8075,34 @@ function homeOptionButton(active, label, action) {
 }
 
 function homeWidgetOptionsHtml(id, layout) {
- const o = layout.options;
- if (id === 'recent') return `<div class="home-widget-options hidden" data-home-options="recent"><span>Affiches</span>${['small','medium','large'].map(size => homeOptionButton(o.recentPosterSize === size, ({small:'Petites',medium:'Moyennes',large:'Grandes'})[size], `updateHomeWidgetOption('recent','recentPosterSize','${size}')`)).join('')}<span>Nombre</span>${[4,6,8,10].map(count => homeOptionButton(o.recentCount === count, String(count), `updateHomeWidgetOption('recent','recentCount',${count})`)).join('')}</div>`;
- if (id === 'dashboard') return `<div class="home-widget-options hidden" data-home-options="dashboard"><span>Indicateurs</span>${Object.entries(HOME_METRIC_DEFS).map(([key,def]) => homeOptionButton(o.dashboardMetrics.includes(key), def.label, `toggleHomeMetric('${key}')`)).join('')}</div>`;
- if (id === 'topRated') return `<div class="home-widget-options hidden" data-home-options="topRated"><span>Nombre de films</span>${[3,4,6,8].map(count => homeOptionButton(o.topRatedCount === count, String(count), `updateHomeWidgetOption('topRated','topRatedCount',${count})`)).join('')}</div>`;
- if (id === 'watchingSeries') return `<div class="home-widget-options hidden" data-home-options="watchingSeries"><span>Nombre de séries</span>${[2,3,4,6].map(count => homeOptionButton(o.seriesCount === count, String(count), `updateHomeWidgetOption('watchingSeries','seriesCount',${count})`)).join('')}</div>`;
- return '';
+ const o=layout.options;
+ let specific='';
+ if(id==='recent') specific=`<span>Affiches</span>${['small','medium','large'].map(size=>homeOptionButton(o.recentPosterSize===size,({small:'Petites',medium:'Moyennes',large:'Grandes'})[size],`updateHomeWidgetOption('recent','recentPosterSize','${size}')`)).join('')}<span>Nombre</span>${[4,6,8,10].map(count=>homeOptionButton(o.recentCount===count,String(count),`updateHomeWidgetOption('recent','recentCount',${count})`)).join('')}`;
+ if(id==='dashboard') specific=`<span>Indicateurs</span>${Object.entries(HOME_METRIC_DEFS).map(([key,def])=>homeOptionButton(o.dashboardMetrics.includes(key),def.label,`toggleHomeMetric('${key}')`)).join('')}`;
+ if(id==='topRated') specific=`<span>Films</span>${[3,4,6,8].map(count=>homeOptionButton(o.topRatedCount===count,String(count),`updateHomeWidgetOption('topRated','topRatedCount',${count})`)).join('')}<span>Notes</span>${[['mixed','Meilleure'],['personal','Personnelle'],['imdb','IMDb']].map(([key,label])=>homeOptionButton(o.topRatingSource===key,label,`updateHomeWidgetOption('topRated','topRatingSource','${key}')`)).join('')}`;
+ if(id==='watchingSeries') specific=`<span>Séries</span>${[2,3,4,6].map(count=>homeOptionButton(o.seriesCount===count,String(count),`updateHomeWidgetOption('watchingSeries','seriesCount',${count})`)).join('')}`;
+ if(id==='releases') specific=`<span>Sorties</span>${[4,8,12].map(count=>homeOptionButton(o.releasesCount===count,String(count),`updateHomeWidgetOption('releases','releasesCount',${count})`)).join('')}<span>Contenu</span>${[['all','Tout'],['wishlist','Wishlist'],['series','Séries']].map(([key,label])=>homeOptionButton(o.releasesType===key,label,`updateHomeWidgetOption('releases','releasesType','${key}')`)).join('')}`;
+ if(id==='watchNext') specific=`<span>Films</span>${[3,4,6].map(count=>homeOptionButton(o.watchNextCount===count,String(count),`updateHomeWidgetOption('watchNext','watchNextCount',${count})`)).join('')}`;
+ if(id==='wishlistFocus') specific=`<span>Affiches</span>${[4,6,8].map(count=>homeOptionButton(o.wishlistCount===count,String(count),`updateHomeWidgetOption('wishlistFocus','wishlistCount',${count})`)).join('')}`;
+ if(id==='formatMix') specific=`<span>Formats</span>${[3,5,8].map(count=>homeOptionButton(o.formatCount===count,String(count),`updateHomeWidgetOption('formatMix','formatCount',${count})`)).join('')}`;
+ if(id==='random') specific=`<span>Filtre initial</span>${[['all','Tous'],['unseen','Non vus'],['4k','4K']].map(([key,label])=>homeOptionButton(o.randomDefault===key,label,`updateHomeWidgetOption('random','randomDefault','${key}')`)).join('')}`;
+ const density=o.densities?.[id]||'normal';
+ const common=`<span>Densité</span>${[['compact','Compacte'],['normal','Normale'],['airy','Aérée']].map(([key,label])=>homeOptionButton(density===key,label,`updateHomeWidgetDensity('${id}','${key}')`)).join('')}${layout.heights[id]?`<button type="button" class="home-option-chip home-option-reset" onclick="resetHomeWidgetHeight('${id}')">Hauteur automatique</button>`:''}`;
+ return `<div class="home-widget-options hidden" data-home-options="${id}">${specific}${common}</div>`;
 }
 
+function updateHomeWidgetDensity(id, density) {
+ const layout=normalizedHomeLayout();
+ layout.options.densities={...(layout.options.densities||{}),[id]:density};
+ persistHomeLayout(layout);applyHomeLayout();renderHomeWidgetsContent();
+ requestAnimationFrame(()=>document.querySelector(`[data-home-options="${id}"]`)?.classList.remove('hidden'));
+}
+
+function resetHomeWidgetHeight(id) {
+ const layout=normalizedHomeLayout();layout.heights[id]=0;
+ persistHomeLayout(layout);applyHomeLayout();
+ requestAnimationFrame(()=>document.querySelector(`[data-home-options="${id}"]`)?.classList.remove('hidden'));
+}
 function toggleHomeWidgetOptions(id) {
  const panel = document.querySelector(`[data-home-options="${id}"]`);
  if (panel) panel.classList.toggle('hidden');
@@ -8050,6 +8131,7 @@ function toggleHomeMetric(key) {
 }
 
 function renderHomeWidgetsContent() {
+ const randomFilter=document.getElementById('randomFilter');if(randomFilter)randomFilter.value=normalizedHomeLayout().options.randomDefault;
  renderHomeDashboard();
  renderHomeRecent();
  renderHomeTopRated();
@@ -8069,6 +8151,8 @@ function applyHomeLayout() {
   widget.dataset.homeSize = layout.sizes[id];
   widget.classList.toggle('hidden', layout.hidden.includes(id));
   applyHomeWidgetColumns(widget,layout.columns[id]);
+  applyHomeWidgetHeight(widget,layout.heights[id]);
+  widget.dataset.homeDensity = ['compact','normal','airy'].includes(layout.options.densities?.[id]) ? layout.options.densities[id] : 'normal';
   tab.appendChild(widget);
  });
  tab.classList.toggle('home-customizing', homeCustomizationActive);
@@ -8134,7 +8218,7 @@ function showHomeWidget(id) {
 }
 
 function resetHomeLayout() {
- const layout = { order:[...HOME_WIDGET_IDS], hidden:HOME_WIDGET_IDS.filter(id => HOME_WIDGET_DEFS[id].defaultHidden), sizes:Object.fromEntries(HOME_WIDGET_IDS.map(id => [id,HOME_WIDGET_DEFS[id].defaultSize])), columns:Object.fromEntries(HOME_WIDGET_IDS.map(id => [id,({small:4,wide:8,large:12})[HOME_WIDGET_DEFS[id].defaultSize]])), options:{} };
+ const layout = { order:[...HOME_WIDGET_IDS], hidden:HOME_WIDGET_IDS.filter(id => HOME_WIDGET_DEFS[id].defaultHidden), sizes:Object.fromEntries(HOME_WIDGET_IDS.map(id => [id,HOME_WIDGET_DEFS[id].defaultSize])), columns:Object.fromEntries(HOME_WIDGET_IDS.map(id => [id,({small:4,wide:8,large:12})[HOME_WIDGET_DEFS[id].defaultSize]])), heights:{}, options:{} };
  persistHomeLayout(layout);
  applyHomeLayout();
  showToast("Disposition de l'accueil réinitialisée.");
@@ -8232,8 +8316,9 @@ function homeMovieRating(movie) {
 
 function renderHomeTopRated() {
  const grid=document.getElementById('homeTopRatedGrid'); if(!grid)return;
- const count=normalizedHomeLayout().options.topRatedCount;
- const movies=[...collection].map(movie=>({movie,rating:homeMovieRating(movie)})).filter(item=>item.rating.value>0).sort((a,b)=>b.rating.value-a.rating.value).slice(0,count);
+ const options=normalizedHomeLayout().options, count=options.topRatedCount;
+ const ratingFor=movie=>{if(options.topRatingSource==='personal'){const value=Number(movie.personalRating??movie.userRating??movie.myRating);return {value:Number.isFinite(value)?value:0,label:'Ma note',color:'text-amber-300'};}if(options.topRatingSource==='imdb'){const value=Number(movie.imdbRating??movie.voteAverage);return {value:Number.isFinite(value)?value:0,label:'IMDb',color:'text-blue-300'};}return homeMovieRating(movie);};
+ const movies=[...collection].map(movie=>({movie,rating:ratingFor(movie)})).filter(item=>item.rating.value>0).sort((a,b)=>b.rating.value-a.rating.value).slice(0,count);
  grid.innerHTML=movies.length ? movies.map(({movie,rating})=>`<button type="button" onclick='openMovieDetail(${JSON.stringify(movie.id)})' class="home-media-card"><img src="${safeImageUrl(movie.poster)}" loading="lazy" decoding="async"><span class="home-media-gradient"></span><span class="home-media-copy"><strong>${escapeHtml(movie.title)}</strong><small class="${rating.color}">★ ${rating.value.toFixed(1)} · ${rating.label}</small></span></button>`).join('') : '<p class="home-widget-empty">Ajoutez vos notes pour faire apparaître vos films préférés.</p>';
 }
 
@@ -8248,12 +8333,12 @@ function renderHomeWatchNext() {
  const box=document.getElementById('homeWatchNextList'), count=document.getElementById('homeUnseenCount'); if(!box)return;
  const unseen=collection.filter(movie=>!movie.seen).sort((a,b)=>new Date(b.addedAt||0)-new Date(a.addedAt||0));
  if(count)count.textContent=`${unseen.length} à voir`;
- box.innerHTML=unseen.length ? unseen.slice(0,4).map(movie=>`<button type="button" onclick='openMovieDetail(${JSON.stringify(movie.id)})' class="home-watch-next-row"><img src="${safeImageUrl(movie.poster)}" loading="lazy" decoding="async"><span><strong>${escapeHtml(movie.title)}</strong><small>${movie.releaseDate ? String(movie.releaseDate).slice(0,4) : 'Dans votre collection'}</small></span><span class="icon-inline w-3 h-3" data-icon="chevronright"></span></button>`).join('') : '<p class="home-widget-empty">Tous les films de votre collection sont vus.</p>';
+ box.innerHTML=unseen.length ? unseen.slice(0,normalizedHomeLayout().options.watchNextCount).map(movie=>`<button type="button" onclick='openMovieDetail(${JSON.stringify(movie.id)})' class="home-watch-next-row"><img src="${safeImageUrl(movie.poster)}" loading="lazy" decoding="async"><span><strong>${escapeHtml(movie.title)}</strong><small>${movie.releaseDate ? String(movie.releaseDate).slice(0,4) : 'Dans votre collection'}</small></span><span class="icon-inline w-3 h-3" data-icon="chevronright"></span></button>`).join('') : '<p class="home-widget-empty">Tous les films de votre collection sont vus.</p>';
  applyStaticIcons();
 }
 function renderHomeWishlistFocus() {
  const grid=document.getElementById('homeWishlistFocusGrid'); if(!grid)return;
- const items=[...wishlist].sort((a,b)=>Number(b.preordered)-Number(a.preordered)||new Date(b.addedAt||0)-new Date(a.addedAt||0)).slice(0,6);
+ const items=[...wishlist].sort((a,b)=>Number(b.preordered)-Number(a.preordered)||new Date(b.addedAt||0)-new Date(a.addedAt||0)).slice(0,normalizedHomeLayout().options.wishlistCount);
  grid.innerHTML=items.length ? items.map(movie=>`<button type="button" onclick='openMovieDetail(${JSON.stringify(movie.id)})' class="home-media-card home-media-card-pink"><img src="${safeImageUrl(movie.poster)}" loading="lazy" decoding="async"><span class="home-media-gradient"></span><span class="home-media-copy"><strong>${escapeHtml(movie.title)}</strong><small class="text-pink-300">${movie.preordered ? 'Précommandé' : 'Dans ma wishlist'}</small></span></button>`).join('') : '<p class="home-widget-empty">Votre wishlist est vide.</p>';
 }
 
@@ -8261,7 +8346,7 @@ function renderHomeFormatMix() {
  const box=document.getElementById('homeFormatMix'); if(!box)return;
  const formats={};
  collection.forEach(movie=>(movie.editions||[]).forEach(edition=>{const key=edition.format||'Non précisé';formats[key]=(formats[key]||0)+1;}));
- const rows=Object.entries(formats).sort((a,b)=>b[1]-a[1]).slice(0,5), max=Math.max(1,...rows.map(row=>row[1]));
+ const rows=Object.entries(formats).sort((a,b)=>b[1]-a[1]).slice(0,normalizedHomeLayout().options.formatCount), max=Math.max(1,...rows.map(row=>row[1]));
  box.innerHTML=rows.length ? rows.map(([label,value])=>`<div class="home-format-row"><span><b>${escapeHtml(label)}</b><small>${value}</small></span><i><b style="width:${value/max*100}%"></b></i></div>`).join('') : '<p class="home-widget-empty">Ajoutez une édition pour voir vos formats.</p>';
 }
 
@@ -9119,9 +9204,11 @@ function selectHomeCalendarDay(key){ homeCalSelected=homeCalSelected===key?null:
 
 function renderHomeCalendarDetail(allEvents, byDay) {
   const box=document.getElementById('homeCalendarDetail'), sub=document.getElementById('homeCalendarDetailSubtitle'), count=document.getElementById('homeCalendarEventCount'); if(!box)return;
+  const options=normalizedHomeLayout().options;
+  const filterEvents=list=>options.releasesType==='all'?list:list.filter(event=>event.type===options.releasesType);
   let events;
-  if(homeCalSelected){ events=(byDay[homeCalSelected]||[]); const d=new Date(homeCalSelected+'T12:00:00'); if(sub)sub.textContent=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}); }
-  else { const today=new Date();today.setHours(0,0,0,0); events=allEvents.filter(e=>new Date(e.date+'T12:00:00')>=today).slice(0,8); if(sub)sub.textContent='Prochaines dates de votre calendrier.'; }
+  if(homeCalSelected){ events=filterEvents(byDay[homeCalSelected]||[]); const d=new Date(homeCalSelected+'T12:00:00'); if(sub)sub.textContent=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}); }
+  else { const today=new Date();today.setHours(0,0,0,0); events=filterEvents(allEvents.filter(e=>new Date(e.date+'T12:00:00')>=today)).slice(0,options.releasesCount); if(sub)sub.textContent='Prochaines dates de votre calendrier.'; }
   if(count)count.textContent=`${events.length} événement${events.length>1?'s':''}`;
   if(!events.length){box.innerHTML='<p class="text-[10px] text-gray-500 py-3">Aucune sortie prévue.</p>';return;}
   box.innerHTML=events.map(e=>{const d=new Date(e.date+'T12:00:00'); const date=d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}); const idArg=escapeHtml(JSON.stringify(String(e.type==='wishlist'?e.movieId:e.tmdbId))); const click=e.type==='wishlist'?`openMovieDetail(${idArg})`:`openTrackedSeriesDetail(${idArg})`; return `<div onclick="${click}" class="flex items-center gap-2.5 p-2 rounded-xl bg-white/[0.025] border border-white/5 cursor-pointer hover:bg-white/[0.05] transition"><img src="${safeImageUrl(e.poster)}" class="w-8 h-12 object-cover rounded-lg"><div class="min-w-0 flex-1"><div class="flex items-center gap-1.5"><span class="text-[8px] font-bold px-1.5 py-0.5 rounded-full ${e.type==='wishlist'?'bg-pink-500/10 text-pink-300':'bg-purple-500/10 text-purple-300'}">${escapeHtml(e.label)}</span><span class="text-[9px] text-gray-500">${date}</span></div><p class="text-[10px] font-bold text-white truncate mt-1">${escapeHtml(e.title)}</p><p class="text-[9px] text-gray-400 truncate">${escapeHtml(e.detail)}</p></div></div>`;}).join('');
