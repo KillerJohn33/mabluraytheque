@@ -3034,6 +3034,224 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
   }
 
 }
+
+/* INTERFACE UNIFIEE TACTILE — version ordinateur adaptée au téléphone et à l'iPad */
+@media (max-width: 767px), (hover: none) and (pointer: coarse) and (max-width: 1024px) {
+  #tabHome,
+  #tabCollection,
+  #tabDigital,
+  #tabWishlist,
+  #tabStats,
+  #tabSettings { --touch-accent:34,211,238; }
+  #tabSeries { --touch-accent:167,139,250; }
+
+  #tabHome > .glass-card,
+  #homeCalendarLayout > .glass-card,
+  #tabCollection > #collectionOverviewBar,
+  #collectionFilterPanel > .glass-card,
+  #tabSeries > .glass-card,
+  #seriesSidebarLayout > .glass-card,
+  #seriesSidebarLayout > div > .glass-card,
+  #tabWishlist > .glass-card,
+  #wishlistLayout > .glass-card,
+  #tabDigital > .glass-card,
+  #digitalFilterPanel > .glass-card,
+  #tabStats > .modern-panel,
+  #tabSettings > .modern-panel:not(#dangerZonePanel) {
+    position:relative;
+    width:100%;
+    margin:0 !important;
+    padding:clamp(.85rem,2.4vw,1.15rem) .8rem !important;
+    overflow:visible !important;
+    border:0 !important;
+    border-top:1px solid rgba(var(--touch-accent),.38) !important;
+    border-radius:.35rem !important;
+    background:linear-gradient(110deg,rgba(var(--touch-accent),.08),rgba(var(--touch-accent),.022) 34%,transparent 70%) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.03) !important;
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+  }
+  #tabHome > .glass-card::before,
+  #homeCalendarLayout > .glass-card::before,
+  #tabCollection > #collectionOverviewBar::before,
+  #collectionFilterPanel > .glass-card::before,
+  #tabSeries > .glass-card::before,
+  #seriesSidebarLayout > .glass-card::before,
+  #seriesSidebarLayout > div > .glass-card::before,
+  #tabWishlist > .glass-card::before,
+  #wishlistLayout > .glass-card::before,
+  #tabDigital > .glass-card::before,
+  #digitalFilterPanel > .glass-card::before,
+  #tabStats > .modern-panel::before,
+  #tabSettings > .modern-panel:not(#dangerZonePanel)::before {
+    content:"";
+    display:block !important;
+    position:absolute;
+    z-index:0;
+    inset:auto !important;
+    top:-1px !important;
+    left:0 !important;
+    width:min(11rem,48%) !important;
+    height:2px !important;
+    border-radius:999px;
+    background:linear-gradient(90deg,rgba(var(--touch-accent),.92),rgba(var(--touch-accent),.28),transparent) !important;
+    box-shadow:0 0 10px rgba(var(--touch-accent),.18) !important;
+    pointer-events:none;
+  }
+  #tabHome > .glass-card > *,
+  #homeCalendarLayout > .glass-card > *,
+  #tabCollection > #collectionOverviewBar > *,
+  #collectionFilterPanel > .glass-card > *,
+  #tabSeries > .glass-card > *,
+  #seriesSidebarLayout > .glass-card > *,
+  #seriesSidebarLayout > div > .glass-card > *,
+  #tabWishlist > .glass-card > *,
+  #wishlistLayout > .glass-card > *,
+  #tabDigital > .glass-card > *,
+  #digitalFilterPanel > .glass-card > *,
+  #tabStats > .modern-panel > *,
+  #tabSettings > .modern-panel:not(#dangerZonePanel) > * {
+    position:relative;
+    z-index:1;
+  }
+
+  #trackedSeriesGrid > .glass-card,
+  #tabStats #statsCountGrid > div,
+  #tabStats #statsValueGrid > div,
+  #tabSettings .equipment-card,
+  #tabSettings .project-card,
+  #tabHome #homeDashboard > div {
+    border:1px solid rgba(148,163,184,.15) !important;
+    border-radius:.75rem !important;
+    background:rgba(255,255,255,.028) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.03),0 5px 14px rgba(0,0,0,.07) !important;
+  }
+  #trackedSeriesGrid > .glass-card::before { display:none !important; }
+
+  #tabStats #statsCountGrid > div,
+  #tabStats #statsValueGrid > div {
+    min-height:4.8rem;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center !important;
+    padding:.7rem .55rem !important;
+  }
+  #tabStats #statsCountGrid > div::after,
+  #tabStats #statsValueGrid > div::after { display:none !important; }
+
+  #tabStats .chart-box {
+    height:clamp(185px,34vw,220px);
+    margin-top:.65rem;
+    padding:.7rem;
+    border:1px solid rgba(var(--touch-accent),.14);
+    border-radius:.75rem;
+    background:rgba(5,15,20,.38);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+  }
+
+  #trackedUpcomingList > div,
+  #tabStats [id^="stat"][id$="List"] > div {
+    padding:.58rem .25rem !important;
+    border:0 !important;
+    border-bottom:1px solid rgba(var(--touch-accent),.12) !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+  #trackedUpcomingList > div:last-child,
+  #tabStats [id^="stat"][id$="List"] > div:last-child {
+    border-bottom:0 !important;
+  }
+
+  #tabSettings .equipment-form,
+  #tabSettings .projects-section {
+    border:1px solid rgba(var(--touch-accent),.13) !important;
+    border-radius:.75rem !important;
+    background:rgba(var(--touch-accent),.022) !important;
+  }
+
+  /* Fiches détaillées tactiles : mêmes sections, avec des marges plus compactes. */
+  #modalContent .movie-detail-shell { --touch-detail-accent:34,211,238; }
+  #modalContent .series-detail-shell { --touch-detail-accent:167,139,250; }
+  #modalContent .movie-detail-shell > :nth-child(2),
+  #modalContent .movie-detail-shell > :nth-child(3),
+  #modalContent .movie-detail-shell > :nth-child(4),
+  #modalContent .series-detail-info,
+  #modalContent .series-detail-seasons {
+    position:relative;
+    margin-top:.8rem !important;
+    padding:.95rem .55rem !important;
+    border:0 !important;
+    border-top:1px solid rgba(var(--touch-detail-accent),.36) !important;
+    border-radius:.35rem !important;
+    background:linear-gradient(110deg,rgba(var(--touch-detail-accent),.075),rgba(var(--touch-detail-accent),.02) 36%,transparent 72%) !important;
+    box-shadow:none !important;
+  }
+  #modalContent .movie-detail-shell > :nth-child(2)::before,
+  #modalContent .movie-detail-shell > :nth-child(3)::before,
+  #modalContent .movie-detail-shell > :nth-child(4)::before,
+  #modalContent .series-detail-info::before,
+  #modalContent .series-detail-seasons::before {
+    content:"";
+    position:absolute;
+    top:-1px;
+    left:0;
+    width:min(10rem,48%);
+    height:2px;
+    border-radius:999px;
+    background:linear-gradient(90deg,rgba(var(--touch-detail-accent),.9),transparent);
+    pointer-events:none;
+  }
+  #modalContent .edition-card,
+  #modalContent .edition-card.has-edition-cover,
+  #modalContent .series-season-panel {
+    border:0 !important;
+    border-top:1px solid rgba(148,163,184,.14) !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+
+  body.theme-light #tabHome > .glass-card,
+  body.theme-light #homeCalendarLayout > .glass-card,
+  body.theme-light #tabCollection > #collectionOverviewBar,
+  body.theme-light #collectionFilterPanel > .glass-card,
+  body.theme-light #tabSeries > .glass-card,
+  body.theme-light #seriesSidebarLayout > .glass-card,
+  body.theme-light #seriesSidebarLayout > div > .glass-card,
+  body.theme-light #tabWishlist > .glass-card,
+  body.theme-light #wishlistLayout > .glass-card,
+  body.theme-light #tabDigital > .glass-card,
+  body.theme-light #digitalFilterPanel > .glass-card,
+  body.theme-light #tabStats > .modern-panel,
+  body.theme-light #tabSettings > .modern-panel:not(#dangerZonePanel) {
+    background:linear-gradient(110deg,rgba(var(--touch-accent),.09),rgba(255,255,255,.62) 40%,rgba(255,255,255,.2)) !important;
+    border-top-color:rgba(var(--touch-accent),.33) !important;
+  }
+  body.theme-light #trackedSeriesGrid > .glass-card,
+  body.theme-light #tabStats #statsCountGrid > div,
+  body.theme-light #tabStats #statsValueGrid > div,
+  body.theme-light #tabSettings .equipment-card,
+  body.theme-light #tabSettings .project-card,
+  body.theme-light #tabHome #homeDashboard > div {
+    border-color:rgba(15,23,42,.11) !important;
+    background:rgba(255,255,255,.7) !important;
+    box-shadow:inset 0 1px 0 #fff,0 4px 12px rgba(15,23,42,.05) !important;
+  }
+  body.theme-light #tabStats .chart-box {
+    background:rgba(255,255,255,.58);
+    border-color:rgba(var(--touch-accent),.15);
+  }
+  body.theme-light #modalContent .movie-detail-shell > :nth-child(2),
+  body.theme-light #modalContent .movie-detail-shell > :nth-child(3),
+  body.theme-light #modalContent .movie-detail-shell > :nth-child(4),
+  body.theme-light #modalContent .series-detail-info,
+  body.theme-light #modalContent .series-detail-seasons {
+    background:linear-gradient(110deg,rgba(var(--touch-detail-accent),.09),rgba(255,255,255,.64) 42%,rgba(255,255,255,.2)) !important;
+  }
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
