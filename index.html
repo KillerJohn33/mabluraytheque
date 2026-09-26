@@ -3710,6 +3710,101 @@ body.theme-light #wishlistFilterToggle[aria-expanded="true"]{
   #wishlistFilterToggle{min-height:38px !important;padding:.45rem .7rem !important}
   #wishlistFilterPanel .wishlist-filter-card{padding:.7rem !important}
 }
+
+/* Ordinateur : même départ pour Ma collection, Digital et Wishlist */
+@media (min-width:768px) and (hover:hover) and (pointer:fine){
+  #tabDigital > .mobile-section-hero + .tab-switcher,
+  #tabWishlist > .mobile-section-hero + .tab-switcher{
+    margin-top:0 !important;
+  }
+}
+
+/* Fiche Digital : même interface continue que les fiches de collection */
+#modalContent .digital-detail-shell{
+  --digital-detail-accent:251,191,36;
+  display:flex;
+  flex-direction:column;
+  gap:0 !important;
+  width:100%;
+  min-width:0;
+}
+#modalContent .digital-detail-hero{
+  width:100%;
+  border-color:rgba(var(--digital-detail-accent),.24) !important;
+  box-shadow:0 16px 36px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.07);
+}
+#modalContent .digital-detail-info,
+#modalContent .digital-detail-media,
+#modalContent .digital-detail-actions{
+  position:relative;
+  width:100%;
+  min-width:0;
+  margin-top:1rem !important;
+  padding:1rem .75rem !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:linear-gradient(110deg,rgba(var(--digital-detail-accent),.075),rgba(var(--digital-detail-accent),.02) 36%,transparent 72%) !important;
+  box-shadow:none !important;
+}
+#modalContent .digital-detail-info::before,
+#modalContent .digital-detail-media::before,
+#modalContent .digital-detail-actions::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:1px;
+  border-radius:0;
+  background:rgba(var(--digital-detail-accent),.34);
+  pointer-events:none;
+}
+#modalContent .digital-detail-info::after,
+#modalContent .digital-detail-media::after,
+#modalContent .digital-detail-actions::after{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  width:min(13rem,42%);
+  height:2px;
+  border-radius:0;
+  background:linear-gradient(90deg,rgba(var(--digital-detail-accent),.92),rgba(var(--digital-detail-accent),.28),transparent);
+  box-shadow:0 0 12px rgba(var(--digital-detail-accent),.2);
+  pointer-events:none;
+}
+#modalContent .digital-detail-media > .grid{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+#modalContent .digital-detail-actions{
+  padding-bottom:.25rem !important;
+  background:transparent !important;
+}
+body.theme-light #modalContent .digital-detail-info,
+body.theme-light #modalContent .digital-detail-media{
+  background:linear-gradient(110deg,rgba(251,191,36,.12),rgba(255,255,255,.66) 40%,rgba(255,255,255,.2)) !important;
+}
+body.theme-light #modalContent .digital-detail-hero{
+  border-color:rgba(180,83,9,.2) !important;
+}
+@media (min-width:768px){
+  #modalContent .digital-detail-info,
+  #modalContent .digital-detail-media,
+  #modalContent .digital-detail-actions{
+    padding:1.2rem 1rem !important;
+  }
+  #modalContent .digital-detail-media > .grid{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+}
+@media (max-width:420px){
+  #modalContent .digital-detail-info,
+  #modalContent .digital-detail-media,
+  #modalContent .digital-detail-actions{
+    margin-top:.7rem !important;
+    padding:.85rem .45rem !important;
+  }
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -7856,13 +7951,12 @@ function renderDigitalDetail(item, extra = {}) {
  const plexLink = digitalPlexLink(item);
 
  content.innerHTML = `
-<div class="space-y-4">
-<div class="relative overflow-hidden rounded-3xl border border-white/10 bg-black/30">
+<div class="digital-detail-shell">
+<div class="digital-detail-hero relative overflow-hidden rounded-3xl border border-white/10 bg-black/30">
 <div id="digitalDetailHero" class="absolute inset-0 opacity-30 pointer-events-none" style="background-image:linear-gradient(90deg,rgba(0,0,0,.9),rgba(0,0,0,.35)),url('${safeImageUrl(poster)}');background-size:cover;background-position:center;filter:blur(18px);transform:scale(1.08)"></div>
 <div class="relative flex gap-3.5 p-3.5 sm:p-4">
 <div class="flex-shrink-0">
 <img src="${safeImageUrl(poster)}" class="detail-movie-poster w-20 h-30 sm:w-28 sm:h-42 object-cover rounded-2xl shadow-xl border border-white/15">
-<p class="text-[8px] text-gray-400 text-center mt-1">Affiche</p>
 </div>
 <div class="flex-1 min-w-0 flex flex-col justify-end py-0.5">
 <div class="flex items-center gap-1.5 flex-wrap mb-2">
@@ -7876,7 +7970,7 @@ ${extra.voteAverage ? `<div class="flex items-center gap-1.5 flex-wrap mt-3"><di
 </div>
 </div>
 
-${extra.overview || genreChips || extra.director || (extra.cast && extra.cast.length) ? `<div class="rounded-2xl border border-white/10 bg-white/[0.025] p-3">
+${extra.overview || genreChips || extra.director || (extra.cast && extra.cast.length) ? `<div class="digital-detail-info">
 <h4 class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.16em] mb-2.5">Informations</h4>
 ${genreChips ? `<div class="flex flex-wrap gap-1.5 mb-2.5">${genreChips}</div>` : ''}
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-[10px]">
@@ -7888,7 +7982,7 @@ ${!isShow && extra.revenue ? `<div class="text-gray-300"><span class="text-gray-
 ${extra.overview ? `<p class="text-[10px] text-gray-400 mt-2.5 leading-relaxed">${escapeHtml(extra.overview)}</p>` : ''}
 </div>` : ''}
 
-<div class="rounded-2xl border border-amber-400/20 bg-amber-400/[0.04] p-3">
+<div class="digital-detail-media">
 <h4 class="text-[9px] font-bold text-amber-300/80 uppercase tracking-[0.16em] mb-2.5">Version numérique (Plex)</h4>
 <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-[10px]">
 ${item.resolution ? `<div class="text-gray-300"><span class="text-gray-500">Résolution</span><br><span class="text-white font-medium">${escapeHtml(String(item.resolution).toUpperCase())}</span></div>` : ''}
@@ -7902,7 +7996,7 @@ ${item.addedAt ? `<div class="text-gray-300"><span class="text-gray-500">Ajouté
 </div>
 </div>
 
-${plexLink ? `<div class="flex gap-2 pt-1"><a href="${escapeHtml(plexLink)}" target="_blank" rel="noopener noreferrer" class="app-action app-action-amber flex-1 px-3 py-2.5 text-[10px] text-center">${ic('cloud','w-3.5 h-3.5')} Ouvrir dans Plex</a></div>` : ''}
+${plexLink ? `<div class="digital-detail-actions flex gap-2"><a href="${escapeHtml(plexLink)}" target="_blank" rel="noopener noreferrer" class="app-action app-action-amber flex-1 px-3 py-2.5 text-[10px] text-center">${ic('cloud','w-3.5 h-3.5')} Ouvrir dans Plex</a></div>` : ''}
 </div>`;
 }
 
