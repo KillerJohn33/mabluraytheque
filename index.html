@@ -4411,6 +4411,22 @@ body.theme-light #modalContent .movie-detail-actions{background:rgba(248,250,252
  #modalContent .edition-list>.edition-card,#modalContent .edition-card,#modalContent .edition-card.has-edition-cover{padding:.7rem!important;border-radius:.8rem!important}
  #modalContent .movie-detail-actions{padding:.6rem!important}
 }
+
+/* Outils de réduction des espaces de l'accueil */
+#tabHome[data-home-gap="tight"]:not(.hidden){column-gap:.5rem!important}
+#tabHome[data-home-gap="compact"]:not(.hidden){column-gap:.85rem!important}
+#tabHome[data-home-gap="normal"]:not(.hidden){column-gap:1.35rem!important}
+.home-layout-tools,.home-widget-library{display:flex;align-items:center;flex-wrap:wrap;gap:.4rem}
+.home-layout-tools{flex:1 0 100%;padding-top:.5rem;border-top:1px solid rgba(255,255,255,.07)}
+.home-layout-tools>span,.home-widget-library>span{font-size:.55rem;text-transform:uppercase;letter-spacing:.08em;color:#64748b;font-weight:800;margin-right:.15rem}
+.home-layout-tools>button{display:inline-flex;align-items:center;min-height:1.8rem;padding:.32rem .55rem;border:1px solid rgba(34,211,238,.16);border-radius:.6rem;background:rgba(34,211,238,.055);color:#a5f3fc;font-size:.58rem;font-weight:750}
+.home-layout-tools>.home-option-chip.is-active{background:rgba(6,182,212,.2);border-color:rgba(34,211,238,.38);color:#ecfeff}
+body.theme-light .home-layout-tools{border-top-color:rgba(15,23,42,.09)}
+body.theme-light .home-layout-tools>button{color:#075985;background:rgba(14,165,233,.08);border-color:rgba(2,132,199,.16)}
+@media(max-width:767px){
+ .home-layout-tools{align-items:stretch}
+ .home-layout-tools>button{flex:1 1 auto;justify-content:center}
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -8022,7 +8038,8 @@ function normalizedHomeLayout() {
   formatCount: [3,5,8].includes(Number(sourceOptions.formatCount)) ? Number(sourceOptions.formatCount) : 5,
   topRatingSource: ['mixed','personal','imdb'].includes(sourceOptions.topRatingSource) ? sourceOptions.topRatingSource : 'mixed',
   randomDefault: ['all','unseen','4k'].includes(sourceOptions.randomDefault) ? sourceOptions.randomDefault : 'all',
-  densities: sourceOptions.densities && typeof sourceOptions.densities === 'object' ? {...sourceOptions.densities} : {}
+  densities: sourceOptions.densities && typeof sourceOptions.densities === 'object' ? {...sourceOptions.densities} : {},
+  gridGap: ['tight','compact','normal'].includes(sourceOptions.gridGap) ? sourceOptions.gridGap : 'normal'
  };
  return { order, hidden, sizes, columns, heights, options };
 }
@@ -8059,7 +8076,7 @@ function refreshHomeMasonry() {
  if(!tab || tab.classList.contains('hidden')) return;
  cancelAnimationFrame(homeMasonryFrame);
  homeMasonryFrame=requestAnimationFrame(()=>{
-  const row=8, breathing=22;
+  const row=8, breathing=({tight:8,compact:14,normal:22})[tab.dataset.homeGap]||22;
   tab.querySelectorAll(':scope > .home-customize-bar, :scope > .home-widget:not(.hidden)').forEach(item=>{
    const height=item.dataset.homeHeight ? item.getBoundingClientRect().height : Math.max(item.scrollHeight,item.getBoundingClientRect().height);
    item.style.gridRowEnd=`span ${Math.max(1,Math.ceil((height+breathing)/row))}`;
@@ -8177,11 +8194,50 @@ function renderHomeCustomizationControls(layout) {
  const hiddenBox = document.getElementById('homeHiddenWidgets');
  if (!hiddenBox) return;
  const hiddenItems = layout.hidden.map(id => `<button type="button" onclick="showHomeWidget('${id}')"><span class="icon-inline w-3 h-3" data-icon="plus"></span>${escapeHtml(HOME_WIDGET_DEFS[id].label)}</button>`).join('');
- hiddenBox.innerHTML = (hiddenItems || '<span>Tous les panneaux sont visibles.</span>') + '<button type="button" class="home-layout-reset" onclick="resetHomeLayout()">Réinitialiser</button>';
+ const gapTools = ['tight','compact','normal'].map(key => homeOptionButton(layout.options.gridGap===key,({tight:'Très serré',compact:'Compact',normal:'Normal'})[key],`setHomeGridGap('${key}')`)).join('');
+ const layoutTools = `<div class="home-layout-tools"><span>Espacement</span>${gapTools}<button type="button" onclick="optimizeHomeWidths()">Optimiser les largeurs</button><button type="button" onclick="resetAllHomeHeights()">Hauteurs automatiques</button></div>`;
+ hiddenBox.innerHTML = (hiddenItems ? `<div class="home-widget-library"><span>Panneaux masqués</span>${hiddenItems}</div>` : '<span>Tous les panneaux sont visibles.</span>') + layoutTools + '<button type="button" class="home-layout-reset" onclick="resetHomeLayout()">Réinitialiser</button>';
  hiddenBox.classList.toggle('hidden', !homeCustomizationActive);
  applyStaticIcons();
 }
 
+function setHomeGridGap(value) {
+ const layout=normalizedHomeLayout();layout.options.gridGap=value;
+ persistHomeLayout(layout);applyHomeLayout();
+}
+
+function resetAllHomeHeights() {
+ const layout=normalizedHomeLayout();layout.heights={};
+ persistHomeLayout(layout);applyHomeLayout();
+ showToast('Toutes les hauteurs sont de nouveau automatiques.');
+}
+
+function setHomeWidgetHeightPreset(id, height) {
+ const layout=normalizedHomeLayout();layout.heights[id]=Math.max(0,Number(height)||0);
+ persistHomeLayout(layout);applyHomeLayout();
+ requestAnimationFrame(()=>document.querySelector(`[data-home-options="${id}"]`)?.classList.remove('hidden'));
+}
+
+function optimizeHomeWidths() {
+ const layout=normalizedHomeLayout();
+ const visible=layout.order.filter(id=>!layout.hidden.includes(id));
+ const minimum=homeLayoutDeviceKey()==='mobile'?6:3;
+ let used=0,lastId='';
+ visible.forEach(id=>{
+  let width=Math.max(minimum,Math.min(12,Number(layout.columns[id])||12));
+  let remaining=12-used;
+  if(used>0 && width>remaining){
+   if(remaining>=minimum) width=remaining;
+   else{layout.columns[lastId]=Math.min(12,(layout.columns[lastId]||0)+remaining);used=0;lastId='';remaining=12;}
+  }
+  layout.columns[id]=width;
+  used+=width;lastId=id;
+  if(used>=12){used=0;lastId='';}
+ });
+ if(lastId&&used>0&&used<12)layout.columns[lastId]=Math.min(12,(layout.columns[lastId]||0)+(12-used));
+ persistHomeLayout(layout);applyHomeLayout();
+ showToast('Les largeurs ont été ajustées pour combler les lignes.');
+}
 function homeOptionButton(active, label, action) {
  return `<button type="button" class="home-option-chip ${active ? 'is-active' : ''}" onclick="${action}">${escapeHtml(label)}</button>`;
 }
@@ -8199,7 +8255,8 @@ function homeWidgetOptionsHtml(id, layout) {
  if(id==='formatMix') specific=`<span>Formats</span>${[3,5,8].map(count=>homeOptionButton(o.formatCount===count,String(count),`updateHomeWidgetOption('formatMix','formatCount',${count})`)).join('')}`;
  if(id==='random') specific=`<span>Filtre initial</span>${[['all','Tous'],['unseen','Non vus'],['4k','4K']].map(([key,label])=>homeOptionButton(o.randomDefault===key,label,`updateHomeWidgetOption('random','randomDefault','${key}')`)).join('')}`;
  const density=o.densities?.[id]||'normal';
- const common=`<span>Densité</span>${[['compact','Compacte'],['normal','Normale'],['airy','Aérée']].map(([key,label])=>homeOptionButton(density===key,label,`updateHomeWidgetDensity('${id}','${key}')`)).join('')}${layout.heights[id]?`<button type="button" class="home-option-chip home-option-reset" onclick="resetHomeWidgetHeight('${id}')">Hauteur automatique</button>`:''}`;
+ const currentHeight=layout.heights[id]||0;
+ const common=`<span>Densité</span>${[['compact','Compacte'],['normal','Normale'],['airy','Aérée']].map(([key,label])=>homeOptionButton(density===key,label,`updateHomeWidgetDensity('${id}','${key}')`)).join('')}<span>Hauteur</span>${[[0,'Auto'],[180,'Courte'],[280,'Moyenne'],[420,'Haute']].map(([height,label])=>homeOptionButton(currentHeight===height,label,`setHomeWidgetHeightPreset('${id}',${height})`)).join('')}`;
  return `<div class="home-widget-options hidden" data-home-options="${id}">${specific}${common}</div>`;
 }
 
@@ -8257,6 +8314,7 @@ function applyHomeLayout() {
  const tab = document.getElementById('tabHome');
  if (!tab) return;
  const layout = normalizedHomeLayout();
+ tab.dataset.homeGap = layout.options.gridGap;
  layout.order.forEach(id => {
   const widget = document.querySelector(`[data-home-widget="${id}"]`);
   if (!widget) return;
