@@ -4485,6 +4485,32 @@ body.theme-light #modalContent .movie-detail-actions{
  body.theme-light #modalContent .movie-detail-editions .edition-card,
  body.theme-light #modalContent .movie-detail-editions .edition-card.has-edition-cover{border-color:rgba(2,132,199,.13)!important;background:transparent!important}
 }
+
+/* Téléphone : accueil classique fixe, sans personnalisation */
+@media(max-width:767px){
+ #tabHome:not(.hidden){
+  display:flex!important;
+  flex-direction:column!important;
+  gap:1rem!important;
+ }
+ #tabHome>#homeCustomizeBar{display:none!important}
+ #tabHome>.home-widget:not(.hidden){
+  width:100%!important;
+  grid-column:auto!important;
+  grid-row:auto!important;
+  margin:0!important;
+  height:auto!important;
+  min-height:0!important;
+  overflow:visible!important;
+ }
+ #tabHome>.home-widget .home-widget-controls,
+ #tabHome>.home-widget .home-widget-options,
+ #tabHome>.home-widget .home-resize-handle{display:none!important}
+ #tabHome #homeDashboard{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #tabHome #homeWidgetRecent #recentGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #tabHome #homeCalendarLayout,
+ #tabHome #homeWidgetReleases{width:100%!important}
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -8099,6 +8125,18 @@ function normalizedHomeLayout() {
   densities: sourceOptions.densities && typeof sourceOptions.densities === 'object' ? {...sourceOptions.densities} : {},
   gridGap: ['tight','compact','normal'].includes(sourceOptions.gridGap) ? sourceOptions.gridGap : 'normal'
  };
+ if(deviceKey==='mobile'){
+  const classicOrder=['dashboard','recent','calendar','releases','random',...HOME_WIDGET_IDS.filter(id=>!['dashboard','recent','calendar','releases','random'].includes(id))];
+  const classicHidden=HOME_WIDGET_IDS.filter(id=>!['dashboard','recent','calendar','releases','random'].includes(id));
+  const classicSizes=Object.fromEntries(HOME_WIDGET_IDS.map(id=>[id,'large']));
+  const classicColumns=Object.fromEntries(HOME_WIDGET_IDS.map(id=>[id,12]));
+  const classicHeights=Object.fromEntries(HOME_WIDGET_IDS.map(id=>[id,0]));
+  return {order:classicOrder,hidden:classicHidden,sizes:classicSizes,columns:classicColumns,heights:classicHeights,options:{
+   recentPosterSize:'medium',recentCount:6,dashboardMetrics:[...HOME_DEFAULT_METRICS],
+   topRatedCount:4,seriesCount:3,releasesCount:8,releasesType:'all',watchNextCount:4,
+   wishlistCount:6,formatCount:5,topRatingSource:'mixed',randomDefault:'all',densities:{},gridGap:'normal'
+  }};
+ }
  return { order, hidden, sizes, columns, heights, options };
 }
 
@@ -8383,6 +8421,25 @@ function applyHomeLayout() {
   widget.dataset.homeDensity = ['compact','normal','airy'].includes(layout.options.densities?.[id]) ? layout.options.densities[id] : 'normal';
   tab.appendChild(widget);
  });
+ if(homeLayoutDeviceKey()==='mobile'){
+  homeCustomizationActive=false;
+  tab.classList.remove('home-customizing');
+  document.getElementById('homeCustomizeBar')?.classList.add('hidden');
+  tab.querySelectorAll('.home-widget').forEach(widget=>{
+   widget.style.removeProperty('grid-row-end');
+   widget.querySelector('.home-widget-controls')?.remove();
+   widget.querySelector('.home-widget-options')?.remove();
+   widget.querySelectorAll('.home-resize-handle').forEach(handle=>handle.remove());
+   widget.draggable=false;
+  });
+  renderHomeWidgetsContent();
+  if(!homeResizeListening){
+   homeResizeListening=true;
+   window.addEventListener('resize',()=>{applyHomeLayout();refreshHomeMasonry();},{passive:true});
+  }
+  return;
+ }
+ document.getElementById('homeCustomizeBar')?.classList.remove('hidden');
  tab.classList.toggle('home-customizing', homeCustomizationActive);
  renderHomeCustomizationControls(layout);
  observeHomeMasonry();
