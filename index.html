@@ -2545,6 +2545,163 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
     color:var(--choice-active-text) !important;
   }
 
+  /* Retour temporaire aux vignettes d'origine : Séries, Statistiques et Mon espace. */
+  #tabSeries > .glass-card,
+  #seriesSidebarLayout > .glass-card,
+  #seriesSidebarLayout > div > .glass-card {
+    padding:1rem !important;
+    overflow:hidden !important;
+    border:1px solid rgba(255,255,255,.1) !important;
+    border-radius:1rem !important;
+    background:rgba(17,21,31,.72) !important;
+    box-shadow:0 8px 32px rgba(0,0,0,.37),inset 0 1px 0 rgba(255,255,255,.1) !important;
+    backdrop-filter:blur(10px) !important;
+    -webkit-backdrop-filter:blur(10px) !important;
+  }
+  #tabSeries > .glass-card::before,
+  #seriesSidebarLayout > .glass-card::before,
+  #seriesSidebarLayout > div > .glass-card::before {
+    content:"";
+    display:block !important;
+    position:absolute;
+    inset:0 !important;
+    width:auto !important;
+    height:auto !important;
+    border-radius:inherit;
+    background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02) 32%,transparent 55%) !important;
+    box-shadow:none !important;
+    pointer-events:none;
+  }
+  #seriesSidebarLayout { gap:1rem !important; }
+
+  #tabStats > .modern-panel,
+  #tabSettings > .modern-panel:not(#dangerZonePanel) {
+    padding:1.25rem !important;
+    overflow:hidden !important;
+    border:1px solid rgba(255,255,255,.1) !important;
+    border-radius:1.35rem !important;
+    background:linear-gradient(145deg,rgba(30,35,48,.78),rgba(15,18,26,.72)) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 10px 28px rgba(0,0,0,.18) !important;
+    backdrop-filter:blur(10px) !important;
+    -webkit-backdrop-filter:blur(10px) !important;
+  }
+  #tabStats > .modern-panel::before,
+  #tabSettings > .modern-panel:not(#dangerZonePanel)::before {
+    content:"";
+    display:block !important;
+    position:absolute;
+    left:1rem !important;
+    right:1rem !important;
+    top:0 !important;
+    bottom:auto !important;
+    width:auto !important;
+    height:1px !important;
+    border-radius:0;
+    background:linear-gradient(90deg,transparent,rgba(0,217,255,.45),transparent) !important;
+    box-shadow:none !important;
+  }
+  #tabStats.modern-page:not(.hidden),
+  #tabSettings.modern-page:not(.hidden) { gap:1rem !important; }
+
+  #trackedSeriesGrid > .glass-card {
+    border:1px solid rgba(255,255,255,.1) !important;
+    border-radius:1rem !important;
+    background:rgba(17,21,31,.72) !important;
+    box-shadow:0 8px 32px rgba(0,0,0,.37),inset 0 1px 0 rgba(255,255,255,.1) !important;
+    transform:none !important;
+  }
+  #trackedSeriesGrid > .glass-card::before {
+    display:block !important;
+    inset:0 !important;
+    width:auto !important;
+    height:auto !important;
+    background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02) 32%,transparent 55%) !important;
+  }
+  #trackedSeriesGrid > .glass-card:hover {
+    border-color:rgba(167,139,250,.3) !important;
+    background:rgba(255,255,255,.04) !important;
+  }
+  #trackedUpcomingList > div {
+    padding:.5rem !important;
+    border:1px solid rgba(255,255,255,.05) !important;
+    border-radius:.75rem !important;
+    background:rgba(255,255,255,.025) !important;
+  }
+
+  #tabStats #statsCountGrid > div,
+  #tabStats #statsValueGrid > div {
+    min-height:0;
+    display:block;
+    text-align:center !important;
+    padding:.625rem .75rem !important;
+    border:1px solid rgba(255,255,255,.1) !important;
+    border-radius:.75rem !important;
+    background:rgba(255,255,255,.035) !important;
+    box-shadow:none !important;
+  }
+  #tabStats #statsCountGrid > div::after,
+  #tabStats #statsValueGrid > div::after { display:none !important; }
+  #tabStats #statsCountGrid > div p:last-child,
+  #tabStats #statsValueGrid > div p:last-child {
+    margin-top:.25rem !important;
+    font-size:1.25rem !important;
+    line-height:1.25;
+  }
+  #tabStats .chart-box {
+    height:190px;
+    margin-top:0;
+    padding:.5rem 0 !important;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
+  }
+
+  #tabSettings .equipment-card {
+    padding:.55rem .65rem !important;
+    border:1px solid rgba(255,255,255,.075) !important;
+    border-radius:.75rem !important;
+    background:rgba(255,255,255,.025) !important;
+    box-shadow:none !important;
+  }
+  #tabSettings .equipment-card:hover {
+    border-color:rgba(255,255,255,.12) !important;
+    background:rgba(255,255,255,.045) !important;
+  }
+  #tabSettings .project-card {
+    padding:.55rem .65rem !important;
+    border:1px solid rgba(255,255,255,.07) !important;
+    border-radius:.7rem !important;
+    background:rgba(255,255,255,.025) !important;
+    box-shadow:none !important;
+  }
+
+  body.theme-light #tabSeries > .glass-card,
+  body.theme-light #seriesSidebarLayout > .glass-card,
+  body.theme-light #seriesSidebarLayout > div > .glass-card,
+  body.theme-light #trackedSeriesGrid > .glass-card {
+    background:rgba(255,255,255,.82) !important;
+    border-color:rgba(15,23,42,.12) !important;
+    box-shadow:0 8px 28px rgba(15,23,42,.12),inset 0 1px 0 rgba(255,255,255,.9) !important;
+  }
+  body.theme-light #tabStats > .modern-panel,
+  body.theme-light #tabSettings > .modern-panel:not(#dangerZonePanel) {
+    background:rgba(255,255,255,.78) !important;
+    border-color:rgba(15,23,42,.1) !important;
+    box-shadow:0 10px 28px rgba(15,23,42,.09),inset 0 1px 0 #fff !important;
+  }
+  body.theme-light #tabStats #statsCountGrid > div,
+  body.theme-light #tabStats #statsValueGrid > div {
+    background:rgba(255,255,255,.82) !important;
+    border-color:rgba(15,23,42,.12) !important;
+  }
+  body.theme-light #trackedUpcomingList > div,
+  body.theme-light #tabSettings .equipment-card,
+  body.theme-light #tabSettings .project-card {
+    background:rgba(255,255,255,.7) !important;
+    border-color:rgba(15,23,42,.1) !important;
+  }
+
 }
 </style>
 </head>
