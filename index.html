@@ -2702,6 +2702,206 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
     border-color:rgba(15,23,42,.1) !important;
   }
 
+  /* SYSTEME UNIFIE — même présentation que l'Accueil sur tout le site ordinateur. */
+  #tabHome,
+  #tabCollection,
+  #tabDigital,
+  #tabWishlist,
+  #tabStats,
+  #tabSettings { --unified-accent:34,211,238; }
+  #tabSeries { --unified-accent:167,139,250; }
+
+  #tabHome > .glass-card,
+  #homeCalendarLayout > .glass-card,
+  #tabCollection > #collectionOverviewBar,
+  #collectionFilterPanel > .glass-card,
+  #tabSeries > .glass-card,
+  #seriesSidebarLayout > .glass-card,
+  #seriesSidebarLayout > div > .glass-card,
+  #tabWishlist > .glass-card,
+  #wishlistLayout > .glass-card,
+  #tabDigital > .glass-card,
+  #digitalFilterPanel > .glass-card,
+  #tabStats > .modern-panel,
+  #tabSettings > .modern-panel:not(#dangerZonePanel) {
+    position:relative;
+    width:100%;
+    margin:0 !important;
+    padding:1.35rem 1rem !important;
+    overflow:visible !important;
+    border:0 !important;
+    border-top:1px solid rgba(var(--unified-accent),.4) !important;
+    border-radius:.4rem !important;
+    background:linear-gradient(110deg,rgba(var(--unified-accent),.085),rgba(var(--unified-accent),.025) 30%,transparent 66%) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.035) !important;
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+  }
+  #tabHome > .glass-card::before,
+  #homeCalendarLayout > .glass-card::before,
+  #tabCollection > #collectionOverviewBar::before,
+  #collectionFilterPanel > .glass-card::before,
+  #tabSeries > .glass-card::before,
+  #seriesSidebarLayout > .glass-card::before,
+  #seriesSidebarLayout > div > .glass-card::before,
+  #tabWishlist > .glass-card::before,
+  #wishlistLayout > .glass-card::before,
+  #tabDigital > .glass-card::before,
+  #digitalFilterPanel > .glass-card::before,
+  #tabStats > .modern-panel::before,
+  #tabSettings > .modern-panel:not(#dangerZonePanel)::before {
+    content:"";
+    display:block !important;
+    position:absolute;
+    z-index:0;
+    inset:auto !important;
+    top:-1px !important;
+    left:0 !important;
+    width:min(15rem,42%) !important;
+    height:2px !important;
+    border-radius:999px;
+    background:linear-gradient(90deg,rgba(var(--unified-accent),.95),rgba(var(--unified-accent),.32),transparent) !important;
+    box-shadow:0 0 13px rgba(var(--unified-accent),.22) !important;
+    pointer-events:none;
+  }
+  #tabHome > .glass-card > *,
+  #homeCalendarLayout > .glass-card > *,
+  #tabCollection > #collectionOverviewBar > *,
+  #collectionFilterPanel > .glass-card > *,
+  #tabSeries > .glass-card > *,
+  #seriesSidebarLayout > .glass-card > *,
+  #seriesSidebarLayout > div > .glass-card > *,
+  #tabWishlist > .glass-card > *,
+  #wishlistLayout > .glass-card > *,
+  #tabDigital > .glass-card > *,
+  #digitalFilterPanel > .glass-card > *,
+  #tabStats > .modern-panel > *,
+  #tabSettings > .modern-panel:not(#dangerZonePanel) > * {
+    position:relative;
+    z-index:1;
+  }
+
+  #homeCalendarLayout,
+  #wishlistLayout,
+  #seriesSidebarLayout { gap:1.6rem !important; }
+  #tabStats.modern-page:not(.hidden),
+  #tabSettings.modern-page:not(.hidden) { gap:1.35rem !important; }
+
+  /* Cartes interactives : même forme et même contraste sur toutes les rubriques. */
+  #trackedSeriesGrid > .glass-card,
+  #tabStats #statsCountGrid > div,
+  #tabStats #statsValueGrid > div,
+  #tabSettings .equipment-card,
+  #tabSettings .project-card,
+  #tabHome #homeDashboard > div {
+    position:relative;
+    border:1px solid rgba(var(--unified-accent),.18) !important;
+    border-top:2px solid rgba(var(--unified-accent),.48) !important;
+    border-radius:.85rem !important;
+    background:linear-gradient(145deg,rgba(var(--unified-accent),.07),rgba(255,255,255,.025)) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 8px 20px rgba(0,0,0,.11) !important;
+    transition:transform .18s ease,border-color .18s ease,background .18s ease;
+  }
+  #trackedSeriesGrid > .glass-card:hover,
+  #tabStats #statsCountGrid > div:hover,
+  #tabStats #statsValueGrid > div:hover,
+  #tabSettings .equipment-card:hover,
+  #tabSettings .project-card:hover {
+    transform:translateY(-1px) !important;
+    border-color:rgba(var(--unified-accent),.34) !important;
+    background:linear-gradient(145deg,rgba(var(--unified-accent),.105),rgba(255,255,255,.035)) !important;
+  }
+  #trackedSeriesGrid > .glass-card::before { display:none !important; }
+
+  #tabStats #statsCountGrid > div,
+  #tabStats #statsValueGrid > div {
+    min-height:5.4rem;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center !important;
+    padding:.85rem .7rem !important;
+  }
+  #tabStats #statsCountGrid > div::after,
+  #tabStats #statsValueGrid > div::after { display:none !important; }
+  #tabStats #statsCountGrid > div p:last-child,
+  #tabStats #statsValueGrid > div p:last-child {
+    margin-top:.25rem !important;
+    font-size:1.3rem !important;
+  }
+
+  /* Graphiques : une surface claire mais liée à la section par la même couleur. */
+  #tabStats .chart-box {
+    height:220px;
+    margin-top:.8rem;
+    padding:1rem;
+    border:1px solid rgba(var(--unified-accent),.15);
+    border-radius:.85rem;
+    background:rgba(5,15,20,.42);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
+  }
+
+  /* Lignes secondaires : lecture continue sans multiplier les fenêtres. */
+  #trackedUpcomingList > div,
+  #tabStats [id^="stat"][id$="List"] > div {
+    padding:.62rem .35rem !important;
+    border:0 !important;
+    border-bottom:1px solid rgba(var(--unified-accent),.13) !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+  #trackedUpcomingList > div:last-child,
+  #tabStats [id^="stat"][id$="List"] > div:last-child {
+    border-bottom:0 !important;
+  }
+
+  #tabSettings .equipment-form,
+  #tabSettings .projects-section {
+    border:1px solid rgba(var(--unified-accent),.14) !important;
+    border-radius:.85rem !important;
+    background:rgba(var(--unified-accent),.025) !important;
+  }
+
+  body.theme-light #tabHome > .glass-card,
+  body.theme-light #homeCalendarLayout > .glass-card,
+  body.theme-light #tabCollection > #collectionOverviewBar,
+  body.theme-light #collectionFilterPanel > .glass-card,
+  body.theme-light #tabSeries > .glass-card,
+  body.theme-light #seriesSidebarLayout > .glass-card,
+  body.theme-light #seriesSidebarLayout > div > .glass-card,
+  body.theme-light #tabWishlist > .glass-card,
+  body.theme-light #wishlistLayout > .glass-card,
+  body.theme-light #tabDigital > .glass-card,
+  body.theme-light #digitalFilterPanel > .glass-card,
+  body.theme-light #tabStats > .modern-panel,
+  body.theme-light #tabSettings > .modern-panel:not(#dangerZonePanel) {
+    background:linear-gradient(110deg,rgba(var(--unified-accent),.1),rgba(255,255,255,.62) 36%,rgba(255,255,255,.2)) !important;
+    border-top-color:rgba(var(--unified-accent),.36) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.82) !important;
+  }
+  body.theme-light #trackedSeriesGrid > .glass-card,
+  body.theme-light #tabStats #statsCountGrid > div,
+  body.theme-light #tabStats #statsValueGrid > div,
+  body.theme-light #tabSettings .equipment-card,
+  body.theme-light #tabSettings .project-card,
+  body.theme-light #tabHome #homeDashboard > div {
+    background:linear-gradient(145deg,rgba(var(--unified-accent),.11),rgba(255,255,255,.74)) !important;
+    border-color:rgba(var(--unified-accent),.19) !important;
+    border-top-color:rgba(var(--unified-accent),.42) !important;
+    box-shadow:inset 0 1px 0 #fff,0 7px 18px rgba(15,23,42,.07) !important;
+  }
+  body.theme-light #tabStats .chart-box {
+    background:rgba(255,255,255,.62);
+    border-color:rgba(var(--unified-accent),.17);
+    box-shadow:inset 0 1px 0 #fff;
+  }
+  body.theme-light #trackedUpcomingList > div,
+  body.theme-light #tabStats [id^="stat"][id$="List"] > div {
+    border-bottom-color:rgba(var(--unified-accent),.13) !important;
+  }
+
 }
 </style>
 </head>
