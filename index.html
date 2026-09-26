@@ -4174,6 +4174,34 @@ body.theme-light .home-series-widget-card,body.theme-light .home-watch-next-row{
  .home-media-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
  .home-series-widget-list{grid-template-columns:1fr}
 }
+
+/* Espacement homogène des panneaux Séries */
+#tabSeries{gap:1.35rem!important}
+#tabSeries>*,#tabSeries>.mobile-section-hero+*{margin-top:0!important}
+#seriesSidebarLayout{gap:1.35rem!important}
+#seriesSidebarLayout>.min-w-0{display:flex!important;flex-direction:column;gap:1.35rem!important}
+#seriesSidebarLayout>.min-w-0>*{margin-top:0!important}
+#trackedSeriesGrid{row-gap:1.35rem!important}
+
+/* Nouveaux panneaux personnalisables */
+.home-media-card-pink:hover{border-color:rgba(244,114,182,.42)}
+.home-format-row>span{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.3rem}
+.home-format-row>span b{font-size:.61rem;color:#cbd5e1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.home-format-row>span small{font-size:.58rem;color:#67e8f9;font-weight:800}
+.home-format-row>i,.home-progress-track{display:block;height:.34rem;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.home-format-row>i>b{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#0891b2,#38bdf8)}
+.home-progress-value{display:flex;align-items:flex-end;justify-content:space-between;gap:.65rem}
+.home-progress-value strong{font-size:2rem;line-height:1;color:#67e8f9}
+.home-progress-value span{font-size:.62rem;color:#94a3b8}
+.home-progress-track{height:.5rem;margin-top:.8rem}
+.home-progress-track i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#0891b2,#22d3ee)}
+#homeWatchProgress>p{margin-top:.55rem;font-size:.58rem;color:#64748b;text-align:right}
+body.theme-light .home-format-row>span b{color:#334155}
+body.theme-light .home-format-row>i,body.theme-light .home-progress-track{background:rgba(15,23,42,.09)}
+@media(max-width:767px){
+ #tabSeries{gap:1.35rem!important}
+ #trackedSeriesGrid{row-gap:1.35rem!important}
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -4294,8 +4322,7 @@ body.theme-light .home-series-widget-card,body.theme-light .home-watch-next-row{
 <div id="recentGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
 </div>
 
-<div id="homeCalendarLayout" data-home-widget="calendar" data-home-size="large" class="home-widget grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
-<div class="glass-card p-3 md:p-4 rounded-2xl border border-white/10 space-y-3">
+<div id="homeCalendarLayout" data-home-widget="calendar" data-home-size="wide" class="home-widget glass-card p-3 md:p-4 rounded-2xl border border-white/10 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip chip-sm" data-icon="calendar"></span>
 <div><h3 class="text-xs font-bold text-white">Calendrier récapitulatif</h3><p class="text-[10px] text-gray-400">Wishlist et épisodes des séries en cours.</p></div>
@@ -4304,12 +4331,11 @@ body.theme-light .home-series-widget-card,body.theme-light .home-watch-next-row{
 <div class="grid grid-cols-7 gap-1 text-center text-[8px] md:text-[9px] text-gray-500 font-bold uppercase"><div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div><div>D</div></div>
 <div id="homeCalendarGrid" class="grid grid-cols-7 gap-1 md:gap-1.5"></div>
 </div>
-<div class="glass-card p-3 md:p-4 rounded-2xl border border-white/10 space-y-2 min-h-full">
-<div class="flex items-center justify-between gap-2"><div><h3 class="text-xs font-bold text-white">Détail des sorties</h3><p id="homeCalendarDetailSubtitle" class="text-[10px] text-gray-400">Prochaines dates de votre calendrier.</p></div><span id="homeCalendarEventCount" class="text-[9px] font-bold text-cyan-300"></span></div>
+
+<div id="homeWidgetReleases" data-home-widget="releases" data-home-size="wide" class="home-widget glass-card p-3 md:p-4 rounded-2xl border border-white/10 space-y-2">
+<div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2"><span class="icon-chip chip-sm" data-icon="calendar"></span><div><h3 class="text-xs font-bold text-white">Détail des sorties</h3><p id="homeCalendarDetailSubtitle" class="text-[10px] text-gray-400">Prochaines dates de votre calendrier.</p></div></div><span id="homeCalendarEventCount" class="text-[9px] font-bold text-cyan-300"></span></div>
 <div id="homeCalendarDetail" class="space-y-1.5"></div>
 </div>
-</div>
-
 <div id="homeWidgetRandom" data-home-widget="random" data-home-size="small" class="home-widget glass-card p-4 rounded-2xl space-y-3 border border-white/10">
 <div class="flex items-center gap-2">
 <span class="icon-chip chip-sm" data-icon="dice"></span>
@@ -4340,6 +4366,21 @@ body.theme-light .home-series-widget-card,body.theme-light .home-watch-next-row{
 <div id="homeWidgetWatchNext" data-home-widget="watchNext" data-home-size="small" class="home-widget glass-card p-4 rounded-2xl border border-white/10">
 <div class="flex items-center justify-between gap-2 mb-3"><div class="flex items-center gap-2"><span class="icon-chip chip-sm" data-icon="play"></span><h2 class="text-xs font-bold text-white">À voir ensuite</h2></div><span id="homeUnseenCount" class="text-[9px] font-bold text-orange-300"></span></div>
 <div id="homeWatchNextList" class="space-y-1.5"></div>
+</div>
+
+<div id="homeWidgetWishlistFocus" data-home-widget="wishlistFocus" data-home-size="wide" class="home-widget home-widget-panel">
+<div class="flex items-center justify-between mb-3 px-1"><div class="flex items-center gap-2"><span class="icon-chip chip-sm" data-icon="star"></span><h2 class="text-xs font-bold text-white">Ma wishlist</h2></div><button onclick="switchTab('wishlist')" class="text-[10px] font-semibold text-pink-300 hover:text-white">Tout voir →</button></div>
+<div id="homeWishlistFocusGrid" class="home-media-grid"></div>
+</div>
+
+<div id="homeWidgetFormatMix" data-home-widget="formatMix" data-home-size="small" class="home-widget glass-card p-4 rounded-2xl border border-white/10">
+<div class="flex items-center gap-2 mb-3"><span class="icon-chip chip-sm" data-icon="disc"></span><h2 class="text-xs font-bold text-white">Formats de ma collection</h2></div>
+<div id="homeFormatMix" class="space-y-2"></div>
+</div>
+
+<div id="homeWidgetWatchProgress" data-home-widget="watchProgress" data-home-size="small" class="home-widget glass-card p-4 rounded-2xl border border-white/10">
+<div class="flex items-center gap-2 mb-3"><span class="icon-chip chip-sm" data-icon="eye"></span><h2 class="text-xs font-bold text-white">Progression de visionnage</h2></div>
+<div id="homeWatchProgress"></div>
 </div>
 </div>
 
@@ -5936,12 +5977,9 @@ function normalizeProfileData(value) {
   createdAt: String(profileRaw.createdAt || '').trim()
  };
  const homeLayoutRaw = value?.homeLayout && typeof value.homeLayout === 'object' ? value.homeLayout : {};
- const homeLayout = {
-  order: Array.isArray(homeLayoutRaw.order) ? homeLayoutRaw.order.map(String) : [],
-  hidden: Array.isArray(homeLayoutRaw.hidden) ? homeLayoutRaw.hidden.map(String) : [],
-  sizes: homeLayoutRaw.sizes && typeof homeLayoutRaw.sizes === 'object' ? { ...homeLayoutRaw.sizes } : {},
-  options: homeLayoutRaw.options && typeof homeLayoutRaw.options === 'object' ? JSON.parse(JSON.stringify(homeLayoutRaw.options)) : {}
- };
+ const homeLayout = JSON.parse(JSON.stringify(homeLayoutRaw || {}));
+ if (Array.isArray(homeLayout.order)) homeLayout.order = homeLayout.order.map(String);
+ if (Array.isArray(homeLayout.hidden)) homeLayout.hidden = homeLayout.hidden.map(String);
  return { equipment, projects, subscriptions, plex, profile, homeLayout, updatedAt: value?.updatedAt || '' };
 }
 
@@ -7700,16 +7738,23 @@ showToast(`Infos à jour (${updated} film${updated > 1 ? 's' : ''}) ✅`);
 const HOME_WIDGET_DEFS = {
  dashboard:{ label:'Tableau de bord', defaultSize:'wide' },
  recent:{ label:'Derniers ajouts', defaultSize:'wide' },
- calendar:{ label:'Calendrier', defaultSize:'large' },
+ calendar:{ label:'Calendrier', defaultSize:'wide' },
+ releases:{ label:'Détail des sorties', defaultSize:'wide' },
  random:{ label:'Choix aléatoire', defaultSize:'small' },
  topRated:{ label:'Mes films les mieux notés', defaultSize:'wide', defaultHidden:true },
  watchingSeries:{ label:'Mes séries en cours', defaultSize:'wide', defaultHidden:true },
- watchNext:{ label:'À voir ensuite', defaultSize:'small', defaultHidden:true }
+ watchNext:{ label:'À voir ensuite', defaultSize:'small', defaultHidden:true },
+ wishlistFocus:{ label:'Ma wishlist', defaultSize:'wide', defaultHidden:true },
+ formatMix:{ label:'Formats de ma collection', defaultSize:'small', defaultHidden:true },
+ watchProgress:{ label:'Progression de visionnage', defaultSize:'small', defaultHidden:true }
 };
 const HOME_METRIC_DEFS = {
- works:{label:'Œuvres'}, editions:{label:'Éditions'}, steelbooks:{label:'Steelbooks'},
- value:{label:'Valeur estimée'}, discs:{label:'Disques'}, unseen:{label:'À voir'},
- collectors:{label:'Coffrets collector'}, series:{label:'Séries suivies'}
+ works:{label:'Œuvres'}, movies:{label:'Films'}, collectionSeries:{label:'Séries en collection'},
+ editions:{label:'Éditions'}, steelbooks:{label:'Steelbooks'}, collectors:{label:'Coffrets collector'},
+ value:{label:'Valeur estimée'}, purchaseValue:{label:'Valeur d’achat'}, discs:{label:'Disques'},
+ discs4k:{label:'Disques 4K'}, seen:{label:'Films vus'}, unseen:{label:'À voir'},
+ watchRate:{label:'Progression'}, avgRating:{label:'Note moyenne'}, wishlist:{label:'Wishlist'},
+ preorders:{label:'Précommandes'}, series:{label:'Séries suivies'}, equipmentValue:{label:'Valeur installation'}
 };
 const HOME_DEFAULT_METRICS = ['works','editions','steelbooks','value'];
 const HOME_WIDGET_IDS = Object.keys(HOME_WIDGET_DEFS);
@@ -7717,13 +7762,29 @@ let homeCustomizationActive = false;
 let homeLayoutSaveTimer = null;
 let draggedHomeWidget = '';
 
+function homeLayoutDeviceKey() {
+ const width = window.innerWidth || document.documentElement.clientWidth || 1200;
+ const touchTablet = window.matchMedia?.('(hover: none) and (pointer: coarse)').matches && width > 767;
+ if (touchTablet) return 'tablet';
+ return width <= 767 ? 'mobile' : width <= 1100 ? 'tablet' : 'desktop';
+}
+
 function normalizedHomeLayout() {
- const raw = profileData?.homeLayout && typeof profileData.homeLayout === 'object' ? profileData.homeLayout : {};
- const order = Array.isArray(raw.order) ? raw.order.filter(id => HOME_WIDGET_IDS.includes(id)) : [];
- HOME_WIDGET_IDS.forEach(id => { if (!order.includes(id)) order.push(id); });
+ const root = profileData?.homeLayout && typeof profileData.homeLayout === 'object' ? profileData.homeLayout : {};
+ const deviceKey = homeLayoutDeviceKey();
+ const hasDeviceLayouts = root.devices && typeof root.devices === 'object';
+ const raw = hasDeviceLayouts ? (root.devices[deviceKey] || {}) : root;
+ const originalOrder = Array.isArray(raw.order) ? raw.order : [];
+ const order = originalOrder.filter(id => HOME_WIDGET_IDS.includes(id));
+ HOME_WIDGET_IDS.forEach(id => {
+  if (!order.includes(id)) {
+   if (id === 'releases' && order.includes('calendar')) order.splice(order.indexOf('calendar') + 1,0,id);
+   else order.push(id);
+  }
+ });
  const hidden = Array.isArray(raw.hidden) ? raw.hidden.filter(id => HOME_WIDGET_IDS.includes(id)) : [];
  HOME_WIDGET_IDS.forEach(id => {
-  if (HOME_WIDGET_DEFS[id].defaultHidden && (!Array.isArray(raw.order) || !raw.order.includes(id)) && !hidden.includes(id)) hidden.push(id);
+  if (HOME_WIDGET_DEFS[id].defaultHidden && !originalOrder.includes(id) && !hidden.includes(id)) hidden.push(id);
  });
  const sizes = {};
  HOME_WIDGET_IDS.forEach(id => {
@@ -7743,7 +7804,9 @@ function normalizedHomeLayout() {
 }
 
 function persistHomeLayout(layout) {
- profileData.homeLayout = layout;
+ const current = profileData?.homeLayout && typeof profileData.homeLayout === 'object' ? profileData.homeLayout : {};
+ const existingDevices = current.devices && typeof current.devices === 'object' ? current.devices : {};
+ profileData.homeLayout = { devices:{ ...existingDevices, [homeLayoutDeviceKey()]:layout } };
  profileData.updatedAt = new Date().toISOString();
  saveProfileLocal();
  clearTimeout(homeLayoutSaveTimer);
@@ -7849,12 +7912,14 @@ function renderHomeWidgetsContent() {
  renderHomeTopRated();
  renderHomeWatchingSeries();
  renderHomeWatchNext();
+ renderHomeWishlistFocus();
+ renderHomeFormatMix();
+ renderHomeWatchProgress();
 }
 function applyHomeLayout() {
  const tab = document.getElementById('tabHome');
  if (!tab) return;
  const layout = normalizedHomeLayout();
- profileData.homeLayout = layout;
  layout.order.forEach(id => {
   const widget = document.querySelector(`[data-home-widget="${id}"]`);
   if (!widget) return;
@@ -7929,24 +7994,40 @@ function resetHomeLayout() {
 function renderHomeDashboard() {
  const dashboard = document.getElementById('homeDashboard');
  if (!dashboard) return;
- let editions=0, steelbooks=0, estimatedValue=0, discs=0, collectors=0;
+ let editions=0, steelbooks=0, estimatedValue=0, purchaseValue=0, discs=0, discs4k=0, collectors=0;
  collection.forEach(movie => (movie.editions || []).forEach(edition => {
   editions++;
   const type=String(edition.editionType || '').trim().toLowerCase();
   if (type === 'steelbook') steelbooks++;
   if (edition.inBoxSet) collectors++;
   estimatedValue += parseFloat(edition.estimatedPrice) || 0;
-  discs += discCompositionTotal(edition);
+  purchaseValue += parseFloat(edition.purchasePrice) || 0;
+  const composition=normalizeDiscComposition(edition.discComposition);
+  discs += Object.values(composition).reduce((sum,count)=>sum+count,0);
+  discs4k += composition.bluray4k || 0;
  }));
+ const seen=collection.filter(movie=>movie.seen).length;
+ const ratings=collection.map(homeMovieRating).map(item=>item.value).filter(value=>value>0);
+ const movieCount=collection.filter(movie=>!isSeries(movie)).length;
  const values = {
   works:['Œuvres',collection.length,'text-cyan-300'],
+  movies:['Films',movieCount,'text-cyan-300'],
+  collectionSeries:['Séries en collection',collection.length-movieCount,'text-purple-300'],
   editions:['Éditions',editions,'text-blue-300'],
   steelbooks:['Steelbooks',steelbooks,'text-emerald-300'],
-  value:['Valeur estimée',`${estimatedValue.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})} €`,'text-amber-300'],
-  discs:['Disques',discs,'text-sky-300'],
-  unseen:['À voir',collection.filter(movie => !movie.seen).length,'text-orange-300'],
   collectors:['Coffrets collector',collectors,'text-violet-300'],
-  series:['Séries suivies',trackedSeries.length,'text-purple-300']
+  value:['Valeur estimée',`${estimatedValue.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})} €`,'text-amber-300'],
+  purchaseValue:['Valeur d’achat',`${purchaseValue.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})} €`,'text-orange-300'],
+  discs:['Disques',discs,'text-sky-300'],
+  discs4k:['Disques 4K',discs4k,'text-sky-300'],
+  seen:['Films vus',seen,'text-emerald-300'],
+  unseen:['À voir',collection.length-seen,'text-orange-300'],
+  watchRate:['Progression',collection.length ? `${Math.round(seen/collection.length*100)} %` : '0 %','text-emerald-300'],
+  avgRating:['Note moyenne',ratings.length ? `${(ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1)} / 10` : '—','text-amber-300'],
+  wishlist:['Wishlist',wishlist.length,'text-pink-300'],
+  preorders:['Précommandes',wishlist.filter(movie=>movie.preordered).length,'text-pink-300'],
+  series:['Séries suivies',trackedSeries.length,'text-purple-300'],
+  equipmentValue:['Valeur installation',(profileData.equipment||[]).reduce((sum,item)=>sum+(parseFloat(item.price)||0),0).toLocaleString('fr-FR',{style:'currency',currency:'EUR'}),'text-emerald-300']
  };
  const selected=normalizedHomeLayout().options.dashboardMetrics;
  dashboard.style.setProperty('--home-metric-count',Math.min(selected.length,4));
@@ -7964,6 +8045,9 @@ renderHomeDashboard();
 renderHomeTopRated();
 renderHomeWatchingSeries();
 renderHomeWatchNext();
+renderHomeWishlistFocus();
+renderHomeFormatMix();
+renderHomeWatchProgress();
 
 const recentOptions = normalizedHomeLayout().options;
 const recent = [...collection].sort((a,b) => new Date(b.addedAt || 0) - new Date(a.addedAt || 0)).slice(0, recentOptions.recentCount);
@@ -8016,6 +8100,25 @@ function renderHomeWatchNext() {
  if(count)count.textContent=`${unseen.length} à voir`;
  box.innerHTML=unseen.length ? unseen.slice(0,4).map(movie=>`<button type="button" onclick='openMovieDetail(${JSON.stringify(movie.id)})' class="home-watch-next-row"><img src="${safeImageUrl(movie.poster)}" loading="lazy" decoding="async"><span><strong>${escapeHtml(movie.title)}</strong><small>${movie.releaseDate ? String(movie.releaseDate).slice(0,4) : 'Dans votre collection'}</small></span><span class="icon-inline w-3 h-3" data-icon="chevronright"></span></button>`).join('') : '<p class="home-widget-empty">Tous les films de votre collection sont vus.</p>';
  applyStaticIcons();
+}
+function renderHomeWishlistFocus() {
+ const grid=document.getElementById('homeWishlistFocusGrid'); if(!grid)return;
+ const items=[...wishlist].sort((a,b)=>Number(b.preordered)-Number(a.preordered)||new Date(b.addedAt||0)-new Date(a.addedAt||0)).slice(0,6);
+ grid.innerHTML=items.length ? items.map(movie=>`<button type="button" onclick='openMovieDetail(${JSON.stringify(movie.id)})' class="home-media-card home-media-card-pink"><img src="${safeImageUrl(movie.poster)}" loading="lazy" decoding="async"><span class="home-media-gradient"></span><span class="home-media-copy"><strong>${escapeHtml(movie.title)}</strong><small class="text-pink-300">${movie.preordered ? 'Précommandé' : 'Dans ma wishlist'}</small></span></button>`).join('') : '<p class="home-widget-empty">Votre wishlist est vide.</p>';
+}
+
+function renderHomeFormatMix() {
+ const box=document.getElementById('homeFormatMix'); if(!box)return;
+ const formats={};
+ collection.forEach(movie=>(movie.editions||[]).forEach(edition=>{const key=edition.format||'Non précisé';formats[key]=(formats[key]||0)+1;}));
+ const rows=Object.entries(formats).sort((a,b)=>b[1]-a[1]).slice(0,5), max=Math.max(1,...rows.map(row=>row[1]));
+ box.innerHTML=rows.length ? rows.map(([label,value])=>`<div class="home-format-row"><span><b>${escapeHtml(label)}</b><small>${value}</small></span><i><b style="width:${value/max*100}%"></b></i></div>`).join('') : '<p class="home-widget-empty">Ajoutez une édition pour voir vos formats.</p>';
+}
+
+function renderHomeWatchProgress() {
+ const box=document.getElementById('homeWatchProgress'); if(!box)return;
+ const seen=collection.filter(movie=>movie.seen).length, total=collection.length, pct=total?Math.round(seen/total*100):0;
+ box.innerHTML=`<div class="home-progress-value"><strong>${pct}%</strong><span>${seen} vu${seen>1?'s':''} sur ${total}</span></div><div class="home-progress-track"><i style="width:${pct}%"></i></div><p>${Math.max(0,total-seen)} film${total-seen>1?'s':''} encore à découvrir</p>`;
 }
 function pickRandomMovie() {
 if (collection.length === 0) return showToast("Votre collection est vide.");
