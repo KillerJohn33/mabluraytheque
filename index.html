@@ -2015,7 +2015,7 @@ body.global-search-open { overflow:hidden; }
     z-index:90;
     left:1.1rem;
     right:1.1rem;
-    bottom:calc(env(safe-area-inset-bottom) + .55rem);
+    bottom:calc(env(safe-area-inset-bottom) + .25rem);
     width:auto;
     min-height:4rem;
     padding:.3rem .35rem;
@@ -3250,6 +3250,34 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
   body.theme-light #modalContent .series-detail-info,
   body.theme-light #modalContent .series-detail-seasons {
     background:linear-gradient(110deg,rgba(var(--touch-detail-accent),.09),rgba(255,255,255,.64) 42%,rgba(255,255,255,.2)) !important;
+  }
+}
+
+/* Espacement uniforme sous le titre des onglets — téléphone uniquement */
+@media (max-width:767px){
+  :root{--mobile-title-content-gap:1.25rem}
+
+  .mobile-section-hero{
+    margin-bottom:var(--mobile-title-content-gap)!important;
+  }
+
+  .mobile-section-hero + *{
+    margin-top:0!important;
+  }
+
+  #tabStats.modern-page:not(.hidden),
+  #tabSettings.modern-page:not(.hidden){
+    row-gap:0!important;
+  }
+
+  #tabStats > * + *,
+  #tabSettings > * + *{
+    margin-top:1rem!important;
+  }
+
+  #tabStats > .mobile-section-hero + *,
+  #tabSettings > .mobile-section-hero + *{
+    margin-top:0!important;
   }
 }
 </style>
