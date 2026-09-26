@@ -4511,6 +4511,83 @@ body.theme-light #modalContent .movie-detail-actions{
  #tabHome #homeCalendarLayout,
  #tabHome #homeWidgetReleases{width:100%!important}
 }
+
+/* Correction définitive des fiches de séries */
+#modalContent,
+#modalContent .series-detail-shell,
+#modalContent .series-detail-shell>*,
+#modalContent .series-detail-info,
+#modalContent .series-detail-seasons,
+#modalContent .series-season-panel{
+ width:100%!important;
+ max-width:100%!important;
+ min-width:0!important;
+ box-sizing:border-box!important;
+}
+#modalContent .series-detail-shell{overflow:visible!important}
+#modalContent .series-detail-hero{width:100%!important;min-width:0!important}
+#modalContent .series-detail-hero>.relative.flex{width:100%!important;min-width:0!important;align-items:stretch!important}
+#modalContent .series-detail-hero>.relative.flex>div{min-width:0!important}
+#modalContent .series-detail-info{overflow-wrap:anywhere}
+#modalContent .series-detail-seasons>div{width:100%!important;min-width:0!important}
+#modalContent .series-season-panel>summary{width:100%!important;min-width:0!important}
+#modalContent .series-season-panel>summary>div{min-width:0!important}
+#modalContent .series-episode-row{width:100%!important;min-width:0!important}
+#modalContent .series-episode-row>div:nth-child(2){min-width:0!important}
+@media(max-width:767px){
+ #modalContent .series-detail-shell{gap:.85rem!important}
+ #modalContent .series-detail-hero>.relative.flex{gap:.75rem!important;padding:.8rem!important}
+ #modalContent .series-detail-hero>.relative.flex>img{width:5.5rem!important;height:8.25rem!important;object-fit:cover!important;flex:none!important;border-radius:.8rem!important}
+ #modalContent .series-detail-hero h3{font-size:1rem!important;line-height:1.15!important;overflow-wrap:anywhere}
+ #modalContent .series-detail-info,
+ #modalContent .series-detail-seasons{padding:.8rem!important;border-radius:.9rem!important}
+ #modalContent .series-season-panel{overflow:hidden!important;border-radius:.75rem!important}
+ #modalContent .series-season-panel>summary{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:.5rem!important;
+  padding:.7rem!important;
+ }
+ #modalContent .series-season-panel>summary>div{display:flex!important;align-items:center!important;flex-wrap:wrap!important;gap:.25rem!important}
+ #modalContent .series-season-panel>div>.p-2{padding:.55rem!important}
+ #modalContent .series-season-panel>div>.p-2 button{width:100%!important;white-space:normal!important}
+ #modalContent .series-episode-row{
+  display:grid!important;
+  grid-template-columns:3.5rem minmax(0,1fr)!important;
+  align-items:start!important;
+  gap:.55rem!important;
+  padding:.65rem!important;
+ }
+ #modalContent .series-episode-row>div:first-child{width:3.5rem!important;height:2.5rem!important;grid-row:1 / span 2!important}
+ #modalContent .series-episode-row>button{grid-column:2!important;justify-self:start!important;max-width:100%!important}
+}
+
+/* Téléphone : respiration d'origine dans Stats et Mon espace */
+@media(max-width:767px){
+ #tabStats.modern-page:not(.hidden),
+ #tabSettings.modern-page:not(.hidden){
+  display:flex!important;
+  flex-direction:column!important;
+  gap:1.25rem!important;
+  row-gap:1.25rem!important;
+ }
+ #tabStats.modern-page:not(.hidden)>*,
+ #tabSettings.modern-page:not(.hidden)>*{
+  margin-top:0!important;
+  margin-bottom:0!important;
+ }
+ #tabStats .mobile-section-hero,
+ #tabSettings .mobile-section-hero{margin-bottom:0!important}
+ #tabSettings .mobile-installation-toggle{margin:0!important}
+ #tabSettings #spaceProfileSection.mobile-expanded,
+ #tabSettings #spaceInstallationSection.mobile-expanded,
+ #tabSettings #spaceSubscriptionsSection.mobile-expanded{margin-top:0!important}
+ #tabSettings.mobile-options-expanded .space-options-panel{margin-top:0!important;margin-bottom:0!important}
+ #tabStats>.modern-panel,
+ #tabSettings>.modern-panel,
+ #tabSettings>.space-options-panel{width:100%!important;min-width:0!important}
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
