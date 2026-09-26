@@ -2135,21 +2135,21 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
   #detailModal:not(.hidden) > div { transform-origin:bottom center; }
 }
 
-/* EXPERIENCE UI ORDINATEUR — reference precedente conservee dans Git (commit 5dae64d) */
+/* EXPERIENCE UI ORDINATEUR — variante sobre, reference originale conservee dans Git */
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
   :root {
-    --desktop-section-line:rgba(34,211,238,.34);
-    --desktop-section-accent:34,211,238;
+    --desktop-accent:34,211,238;
+    --desktop-divider:rgba(148,163,184,.2);
+    --desktop-surface:rgba(255,255,255,.018);
   }
-  #tabHome { --desktop-section-accent:34,211,238; }
-  #tabCollection { --desktop-section-accent:34,211,238; }
-  #tabSeries { --desktop-section-accent:167,139,250; }
-  #tabWishlist { --desktop-section-accent:34,211,238; }
-  #tabDigital { --desktop-section-accent:34,211,238; }
-  #tabStats { --desktop-section-accent:45,212,191; }
-  #tabSettings { --desktop-section-accent:34,211,238; }
+  #tabHome,
+  #tabCollection,
+  #tabWishlist,
+  #tabDigital,
+  #tabSettings { --desktop-accent:34,211,238; }
+  #tabSeries { --desktop-accent:167,139,250; }
+  #tabStats { --desktop-accent:45,212,191; }
 
-  /* Les panneaux structurants deviennent des sections continues, plus contrastees. */
   #tabHome > .glass-card,
   #homeCalendarLayout > .glass-card,
   #tabCollection > #collectionOverviewBar,
@@ -2166,19 +2166,18 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
     width:100%;
     position:relative;
     margin:0 !important;
-    padding:1.35rem 1rem !important;
+    padding:1.3rem 1rem !important;
     overflow:visible;
     border:0 !important;
-    border-top:1px solid rgba(var(--desktop-section-accent),.42) !important;
-    border-radius:.35rem !important;
-    background:
-      linear-gradient(110deg,rgba(var(--desktop-section-accent),.085),rgba(var(--desktop-section-accent),.025) 28%,transparent 62%) !important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.035) !important;
+    border-top:1px solid var(--desktop-divider) !important;
+    border-radius:0 !important;
+    background:var(--desktop-surface) !important;
+    box-shadow:none !important;
     backdrop-filter:none !important;
     -webkit-backdrop-filter:none !important;
   }
 
-  /* Trait lumineux progressif : il identifie immédiatement le début de chaque section. */
+  /* Un repère court remplace les halos et grands aplats colorés. */
   #tabHome > .glass-card::before,
   #homeCalendarLayout > .glass-card::before,
   #tabCollection > #collectionOverviewBar::before,
@@ -2195,175 +2194,127 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
     content:"";
     display:block !important;
     position:absolute;
-    z-index:0;
     top:-1px;
-    left:0;
-    width:min(15rem,42%);
+    left:1rem;
+    right:auto;
+    bottom:auto;
+    width:3.25rem;
     height:2px;
     border-radius:999px;
-    background:linear-gradient(90deg,rgba(var(--desktop-section-accent),.95),rgba(var(--desktop-section-accent),.35),transparent) !important;
-    box-shadow:0 0 14px rgba(var(--desktop-section-accent),.26);
+    background:rgba(var(--desktop-accent),.72) !important;
+    box-shadow:none;
     pointer-events:none;
   }
-  #tabHome > .glass-card > *,
-  #homeCalendarLayout > .glass-card > *,
-  #tabCollection > #collectionOverviewBar > *,
-  #collectionFilterPanel > .glass-card > *,
-  #tabSeries > .glass-card > *,
-  #seriesSidebarLayout > .glass-card > *,
-  #seriesSidebarLayout > div > .glass-card > *,
-  #tabWishlist > .glass-card > *,
-  #wishlistLayout > .glass-card > *,
-  #tabDigital > .glass-card > *,
-  #digitalFilterPanel > .glass-card > *,
-  #tabStats > .modern-panel > *,
-  #tabSettings > .modern-panel:not(#dangerZonePanel) > * {
-    position:relative;
-    z-index:1;
-  }
 
-  /* Un rythme vertical plus ample améliore le balayage de la page. */
   #tabStats.modern-page:not(.hidden),
-  #tabSettings.modern-page:not(.hidden) {
-    gap:1.45rem !important;
-  }
+  #tabSettings.modern-page:not(.hidden) { gap:1.35rem !important; }
   #homeCalendarLayout,
   #wishlistLayout,
-  #seriesSidebarLayout {
-    gap:1.75rem !important;
-  }
+  #seriesSidebarLayout { gap:1.6rem !important; }
 
-  /* Les sections côte à côte utilisent aussi un repère vertical coloré. */
   #homeCalendarLayout > .glass-card + .glass-card,
   #wishlistLayout > .glass-card + .glass-card {
-    border-left:1px solid rgba(var(--desktop-section-accent),.3) !important;
+    border-left:1px solid var(--desktop-divider) !important;
   }
 
-  /* Les données secondaires gagnent du contraste sans redevenir de gros panneaux. */
+  /* Cartes de synthèse neutres : la couleur reste réservée aux valeurs. */
   #tabStats > .modern-panel > .grid > div,
   #tabStats #statsCountGrid > div,
   #tabStats #statsValueGrid > div,
   #tabSettings > .modern-panel:not(#dangerZonePanel) > .grid > div,
   #tabHome #homeDashboard > div {
-    border-color:rgba(var(--desktop-section-accent),.2) !important;
-    background:linear-gradient(145deg,rgba(var(--desktop-section-accent),.09),rgba(255,255,255,.025)) !important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 8px 20px rgba(0,0,0,.1) !important;
+    border:1px solid rgba(148,163,184,.14) !important;
+    background:rgba(255,255,255,.026) !important;
+    box-shadow:none !important;
+  }
+
+  /* Séries : objets distincts, sans bande colorée ni dégradé envahissant. */
+  #trackedSeriesGrid > .glass-card {
+    border:1px solid rgba(148,163,184,.15) !important;
+    border-radius:.8rem !important;
+    background:rgba(255,255,255,.026) !important;
+    box-shadow:none !important;
+  }
+  #trackedSeriesGrid > .glass-card::before { display:none !important; }
+  #trackedSeriesGrid > .glass-card:hover {
+    border-color:rgba(167,139,250,.38) !important;
+    background:rgba(167,139,250,.045) !important;
+    transform:translateY(-1px);
+  }
+  #trackedUpcomingList > div {
+    border:0 !important;
+    border-bottom:1px solid rgba(148,163,184,.13) !important;
+    border-radius:0 !important;
+    background:transparent !important;
+  }
+  #trackedUpcomingList > div:last-child { border-bottom:0 !important; }
+
+  /* Statistiques : graphiques posés dans le flux, avec un simple séparateur. */
+  #tabStats .chart-box {
+    min-height:205px;
+    height:205px;
+    margin-top:.8rem;
+    padding:1rem .25rem .25rem;
+    border:0;
+    border-top:1px solid rgba(45,212,191,.18);
+    border-radius:0;
+    background:transparent;
+  }
+  #tabStats [id^="stat"][id$="List"] > div {
+    padding:.62rem .1rem !important;
+    border-bottom:1px solid rgba(148,163,184,.12);
+    background:transparent !important;
+  }
+  #tabStats [id^="stat"][id$="List"] > div:last-child { border-bottom:0; }
+
+  /* Mon espace reste pratique, avec des cartes neutres et un survol bleu discret. */
+  #tabSettings .equipment-card,
+  #tabSettings .project-card {
+    border:1px solid rgba(148,163,184,.14) !important;
+    border-radius:.65rem !important;
+    background:rgba(255,255,255,.024) !important;
+    box-shadow:none !important;
+  }
+  #tabSettings .equipment-card:hover,
+  #tabSettings .project-card:hover {
+    border-color:rgba(34,211,238,.28) !important;
+    background:rgba(34,211,238,.035) !important;
+  }
+  #tabSettings .equipment-form,
+  #tabSettings .projects-section {
+    border-color:rgba(148,163,184,.14) !important;
+    background:rgba(255,255,255,.016) !important;
   }
 
   body.theme-light {
-    --desktop-section-line:rgba(2,132,199,.3);
-  }
-  body.theme-light #tabHome > .glass-card,
-  body.theme-light #homeCalendarLayout > .glass-card,
-  body.theme-light #tabCollection > #collectionOverviewBar,
-  body.theme-light #collectionFilterPanel > .glass-card,
-  body.theme-light #tabSeries > .glass-card,
-  body.theme-light #seriesSidebarLayout > .glass-card,
-  body.theme-light #seriesSidebarLayout > div > .glass-card,
-  body.theme-light #tabWishlist > .glass-card,
-  body.theme-light #wishlistLayout > .glass-card,
-  body.theme-light #tabDigital > .glass-card,
-  body.theme-light #digitalFilterPanel > .glass-card,
-  body.theme-light #tabStats > .modern-panel,
-  body.theme-light #tabSettings > .modern-panel:not(#dangerZonePanel) {
-    background:linear-gradient(110deg,rgba(var(--desktop-section-accent),.105),rgba(255,255,255,.58) 34%,rgba(255,255,255,.18)) !important;
-    border-top-color:rgba(var(--desktop-section-accent),.38) !important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.8) !important;
+    --desktop-divider:rgba(15,23,42,.14);
+    --desktop-surface:rgba(255,255,255,.4);
   }
   body.theme-light #tabStats > .modern-panel > .grid > div,
   body.theme-light #tabStats #statsCountGrid > div,
   body.theme-light #tabStats #statsValueGrid > div,
   body.theme-light #tabSettings > .modern-panel:not(#dangerZonePanel) > .grid > div,
-  body.theme-light #tabHome #homeDashboard > div {
-    background:linear-gradient(145deg,rgba(var(--desktop-section-accent),.11),rgba(255,255,255,.72)) !important;
-    border-color:rgba(var(--desktop-section-accent),.2) !important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 7px 18px rgba(15,23,42,.07) !important;
-  }
-  /* Panneaux internes : même vocabulaire visuel, sans empilement de fenêtres. */
-  #trackedSeriesGrid > .glass-card {
-    border:1px solid rgba(167,139,250,.24) !important;
-    border-left:3px solid rgba(167,139,250,.7) !important;
-    border-radius:.8rem !important;
-    background:linear-gradient(105deg,rgba(167,139,250,.105),rgba(255,255,255,.025) 52%,transparent) !important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 8px 22px rgba(0,0,0,.12) !important;
-  }
-  #trackedSeriesGrid > .glass-card::before { display:none !important; }
-  #trackedSeriesGrid > .glass-card:hover {
-    border-color:rgba(167,139,250,.42) !important;
-    background:linear-gradient(105deg,rgba(167,139,250,.15),rgba(255,255,255,.04) 58%,transparent) !important;
-    transform:translateY(-1px);
-  }
-  #trackedUpcomingList > div {
-    border:0 !important;
-    border-left:2px solid rgba(167,139,250,.48) !important;
-    border-radius:.45rem !important;
-    background:linear-gradient(90deg,rgba(167,139,250,.075),transparent 72%) !important;
-  }
-
-  /* Les graphiques et listes statistiques deviennent des surfaces de lecture intégrées. */
-  #tabStats .chart-box {
-    min-height:210px;
-    height:210px;
-    margin-top:.9rem;
-    padding:1rem;
-    border:1px solid rgba(45,212,191,.16);
-    border-top:2px solid rgba(45,212,191,.48);
-    border-radius:.65rem;
-    background:linear-gradient(145deg,rgba(45,212,191,.07),rgba(255,255,255,.018));
-  }
-  #tabStats [id^="stat"][id$="List"] > div {
-    padding:.62rem .2rem !important;
-    border-bottom:1px solid rgba(45,212,191,.12);
-    background:transparent !important;
-  }
-  #tabStats [id^="stat"][id$="List"] > div:last-child {
-    border-bottom:0;
-  }
-
-  /* Mon espace reprend le bleu principal, tout en gardant chaque objet manipulable. */
-  #tabSettings .equipment-card,
-  #tabSettings .project-card {
-    border:1px solid rgba(34,211,238,.16) !important;
-    border-left:2px solid rgba(34,211,238,.46) !important;
-    border-radius:.65rem !important;
-    background:linear-gradient(100deg,rgba(34,211,238,.065),rgba(255,255,255,.02) 55%,transparent) !important;
-    box-shadow:none !important;
-  }
-  #tabSettings .equipment-card:hover,
-  #tabSettings .project-card:hover {
-    border-color:rgba(34,211,238,.3) !important;
-    background:linear-gradient(100deg,rgba(34,211,238,.1),rgba(255,255,255,.035) 58%,transparent) !important;
-  }
-  #tabSettings .equipment-form,
-  #tabSettings .projects-section {
-    border-color:rgba(34,211,238,.15) !important;
-    background:rgba(34,211,238,.025) !important;
-  }
-
-  body.theme-light #trackedSeriesGrid > .glass-card {
-    border-color:rgba(124,58,237,.2) !important;
-    border-left-color:rgba(124,58,237,.55) !important;
-    background:linear-gradient(105deg,rgba(167,139,250,.14),rgba(255,255,255,.72) 58%,rgba(255,255,255,.35)) !important;
-  }
-  body.theme-light #trackedUpcomingList > div {
-    border-left-color:rgba(124,58,237,.4) !important;
-    background:linear-gradient(90deg,rgba(167,139,250,.12),rgba(255,255,255,.42) 72%) !important;
-  }
-  body.theme-light #tabStats .chart-box {
-    border-color:rgba(13,148,136,.18);
-    border-top-color:rgba(13,148,136,.42);
-    background:linear-gradient(145deg,rgba(45,212,191,.12),rgba(255,255,255,.58));
-  }
-  body.theme-light #tabStats [id^="stat"][id$="List"] > div {
-    border-bottom-color:rgba(13,148,136,.14);
-  }
+  body.theme-light #tabHome #homeDashboard > div,
+  body.theme-light #trackedSeriesGrid > .glass-card,
   body.theme-light #tabSettings .equipment-card,
   body.theme-light #tabSettings .project-card {
-    border-color:rgba(2,132,199,.16) !important;
-    border-left-color:rgba(2,132,199,.42) !important;
-    background:linear-gradient(100deg,rgba(14,165,233,.1),rgba(255,255,255,.68) 58%,rgba(255,255,255,.3)) !important;
+    border-color:rgba(15,23,42,.11) !important;
+    background:rgba(255,255,255,.62) !important;
+    box-shadow:none !important;
   }
-
+  body.theme-light #trackedSeriesGrid > .glass-card:hover {
+    border-color:rgba(124,58,237,.27) !important;
+    background:rgba(167,139,250,.08) !important;
+  }
+  body.theme-light #trackedUpcomingList > div,
+  body.theme-light #tabStats [id^="stat"][id$="List"] > div {
+    border-color:rgba(15,23,42,.1) !important;
+  }
+  body.theme-light #tabSettings .equipment-card:hover,
+  body.theme-light #tabSettings .project-card:hover {
+    border-color:rgba(2,132,199,.22) !important;
+    background:rgba(14,165,233,.06) !important;
+  }
 }
 </style>
 </head>
