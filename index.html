@@ -4299,6 +4299,118 @@ body.theme-light .home-resize-handle::before,body.theme-light .home-resize-handl
 .home-customizing .home-widget[data-home-density="compact"],
 .home-customizing .home-widget[data-home-density="airy"]{padding-top:3.15rem!important}
 body.theme-light .home-resize-width::before,body.theme-light .home-resize-height::before{background:rgba(2,132,199,.82)!important}
+
+/* Fiches détaillées : retour à une présentation claire par panneaux */
+#modalContent .movie-detail-shell,
+#modalContent .series-detail-shell{
+ display:flex!important;
+ flex-direction:column!important;
+ gap:1rem!important;
+}
+#modalContent .movie-detail-info,
+#modalContent .movie-detail-editions,
+#modalContent .series-detail-info,
+#modalContent .series-detail-seasons{
+ position:relative;
+ margin:0!important;
+ padding:1rem!important;
+ border:1px solid rgba(148,163,184,.16)!important;
+ border-radius:1rem!important;
+ background:linear-gradient(145deg,rgba(27,32,43,.84),rgba(13,17,24,.78))!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.075),0 10px 28px rgba(0,0,0,.18)!important;
+ backdrop-filter:blur(9px);
+ -webkit-backdrop-filter:blur(9px);
+}
+#modalContent .movie-detail-info::before,
+#modalContent .movie-detail-editions::before,
+#modalContent .series-detail-info::before,
+#modalContent .series-detail-seasons::before{
+ content:"";
+ position:absolute;
+ top:0;left:1rem;right:1rem;height:1px;
+ background:linear-gradient(90deg,transparent,rgba(103,232,249,.28),transparent);
+ pointer-events:none;
+}
+#modalContent .series-detail-info::before,
+#modalContent .series-detail-seasons::before{
+ background:linear-gradient(90deg,transparent,rgba(192,132,252,.3),transparent);
+}
+#modalContent .movie-detail-actions{
+ margin:0!important;
+ padding:.75rem!important;
+ border:1px solid rgba(148,163,184,.12)!important;
+ border-radius:1rem!important;
+ background:rgba(17,22,31,.58)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.05)!important;
+}
+#modalContent .edition-list{
+ display:flex!important;
+ flex-direction:column!important;
+ gap:.75rem!important;
+ padding:.1rem!important;
+}
+#modalContent .edition-list>.edition-card,
+#modalContent .edition-card,
+#modalContent .edition-card.has-edition-cover{
+ width:100%!important;
+ min-width:0!important;
+ margin:0!important;
+ padding:.85rem!important;
+ border:1px solid rgba(34,211,238,.14)!important;
+ border-radius:.9rem!important;
+ background:rgba(255,255,255,.032)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.045)!important;
+}
+#modalContent .edition-card+.edition-card{margin-top:0!important}
+#modalContent .edition-card:hover{border-color:rgba(34,211,238,.25)!important;background:rgba(255,255,255,.043)!important}
+#modalContent .movie-detail-editions>.grid{
+ margin-top:.85rem!important;
+ padding-top:.85rem!important;
+ border-top:1px solid rgba(148,163,184,.12)!important;
+}
+#modalContent .movie-detail-editions>.grid>div{
+ padding:.7rem .8rem!important;
+ border:1px solid rgba(148,163,184,.1)!important;
+ border-radius:.75rem!important;
+ background:rgba(255,255,255,.03)!important;
+}
+#modalContent .series-detail-seasons>h4{margin-bottom:.75rem!important;color:#d8b4fe!important}
+#modalContent .series-detail-seasons>div{display:flex!important;flex-direction:column!important;gap:.7rem!important}
+#modalContent .series-season-panel{
+ margin:0!important;
+ border-color:rgba(192,132,252,.15)!important;
+ background:rgba(255,255,255,.028)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+#modalContent .series-detail-shell>.flex.justify-end{
+ margin:0!important;
+ padding:.75rem!important;
+ border:1px solid rgba(248,113,113,.13)!important;
+ border-radius:1rem!important;
+ background:rgba(127,29,29,.07)!important;
+}
+body.theme-light #modalContent .movie-detail-info,
+body.theme-light #modalContent .movie-detail-editions,
+body.theme-light #modalContent .series-detail-info,
+body.theme-light #modalContent .series-detail-seasons{
+ border-color:rgba(15,23,42,.1)!important;
+ background:linear-gradient(145deg,rgba(255,255,255,.94),rgba(241,245,249,.88))!important;
+ box-shadow:inset 0 1px 0 #fff,0 9px 24px rgba(15,23,42,.07)!important;
+}
+body.theme-light #modalContent .edition-card,
+body.theme-light #modalContent .edition-card.has-edition-cover,
+body.theme-light #modalContent .series-season-panel{
+ border-color:rgba(2,132,199,.13)!important;
+ background:rgba(255,255,255,.68)!important;
+}
+body.theme-light #modalContent .series-season-panel{border-color:rgba(126,34,206,.13)!important}
+body.theme-light #modalContent .movie-detail-actions{background:rgba(248,250,252,.86)!important;border-color:rgba(15,23,42,.09)!important}
+@media(max-width:767px){
+ #modalContent .movie-detail-shell,#modalContent .series-detail-shell{gap:.8rem!important}
+ #modalContent .movie-detail-info,#modalContent .movie-detail-editions,#modalContent .series-detail-info,#modalContent .series-detail-seasons{padding:.8rem!important;border-radius:.9rem!important}
+ #modalContent .edition-list>.edition-card,#modalContent .edition-card,#modalContent .edition-card.has-edition-cover{padding:.7rem!important;border-radius:.8rem!important}
+ #modalContent .movie-detail-actions{padding:.6rem!important}
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -10094,7 +10206,7 @@ ${seenHtml}${ratingHtml}
 </div>
 
 <!-- INFOS ESSENTIELLES -->
-<div class="rounded-2xl border border-white/10 bg-white/[0.025] p-3">
+<div class="movie-detail-info rounded-2xl border border-white/10 bg-white/[0.025] p-3">
 <div class="flex items-center justify-between gap-3 mb-2.5">
 <h4 class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.16em]">Informations</h4>
 ${movie.voteAverage > 0 ? `<span class="text-[9px] text-sky-300 font-semibold">TMDB ${movie.voteAverage.toFixed(1)}${movie.voteCount ? ` · ${movie.voteCount.toLocaleString('fr-FR')} votes` : ''}</span>` : ''}
@@ -10125,7 +10237,7 @@ ${movie.preordered ? `<label class="flex items-center gap-1.5 min-w-0"><span cla
 </div>
 
 <!-- EDITIONS -->
-<div class="rounded-2xl border border-white/10 bg-white/[0.025] p-3 space-y-3">
+<div class="movie-detail-editions rounded-2xl border border-white/10 bg-white/[0.025] p-3 space-y-3">
 <div class="flex items-center justify-between gap-2">
 <div><h4 class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.16em]">Éditions</h4><p class="text-[10px] text-gray-400 mt-0.5">${movie.editions.length} édition${movie.editions.length > 1 ? 's' : ''}</p></div>
 <button onclick="addEditionToMovie(${movieIdArg})" class="detail-edit-only app-action app-action-cyan w-10 h-10" title="Ajouter une édition">${ic('plus','w-4 h-4')}</button>
@@ -10138,7 +10250,7 @@ ${movie.preordered ? `<label class="flex items-center gap-1.5 min-w-0"><span cla
 </div>
 
 <!-- ACTIONS -->
-<div class="flex gap-2 pt-1">
+<div class="movie-detail-actions flex gap-2 pt-1">
 ${isSeriesMovie ? `<button onclick="trackSeriesFromMovie(${movieIdArg})" class="app-action app-action-violet flex-1 px-3 py-2.5 text-[10px]">${ic('tv','w-3.5 h-3.5')} ${isTrackedSeries(movie.tmdb_id) ? 'Gérer le suivi' : 'Suivre la série'}</button>` : ''}
 ${movie.isWishlist ? `<button onclick="moveWishlistToCollection(${movieIdArg})" class="app-action app-action-green flex-1 px-3 py-2.5 text-[10px]">${ic('download','w-3.5 h-3.5')} Ajouter à la collection</button>` : ''}
 <button onclick="deleteMovie(${movieIdArg})" class="app-action app-action-red ${movie.isWishlist ? 'px-3' : 'flex-1'} py-2.5 text-[10px]">${ic('trash','w-3.5 h-3.5')} Supprimer</button>
