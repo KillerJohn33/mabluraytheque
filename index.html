@@ -3512,6 +3512,131 @@ body.theme-light .detail-danger-label{color:#991b1b}
     pointer-events:none;
   }
 }
+
+/* Fiches détaillées iPad : largeur complète et grille sans espace perdu */
+@media (min-width:768px) and (max-width:1366px) and (any-pointer:coarse),
+       (min-width:768px) and (max-width:1366px) and (hover:none) and (pointer:coarse){
+  #detailModal{
+    padding:1rem !important;
+  }
+  #detailModal > div{
+    width:calc(100vw - 2rem) !important;
+    max-width:1180px !important;
+    max-height:calc(100dvh - 2rem) !important;
+    padding:1.15rem !important;
+  }
+  #modalContent,
+  #modalContent > div,
+  #modalContent .movie-detail-shell,
+  #modalContent .series-detail-shell,
+  #modalContent .movie-detail-hero,
+  #modalContent .series-detail-hero,
+  #modalContent .series-detail-info,
+  #modalContent .series-detail-seasons{
+    width:100% !important;
+    min-width:0 !important;
+    max-width:none !important;
+  }
+  #modalContent > div{
+    display:flex !important;
+    flex-direction:column;
+    gap:1rem;
+  }
+  #modalContent > div > *{
+    width:100%;
+    min-width:0;
+  }
+  #modalContent .edition-list{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) !important;
+    gap:.75rem !important;
+    width:100% !important;
+    max-height:none !important;
+    overflow:visible !important;
+  }
+  #modalContent .edition-card,
+  #modalContent .edition-card.has-edition-cover{
+    display:grid !important;
+    width:100% !important;
+    min-width:0 !important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+    grid-template-areas:
+      "heading heading"
+      "fields extras"
+      "boxset boxset"
+      "discs discs"
+      "tech tech" !important;
+    gap:.65rem 1rem !important;
+    align-items:start;
+  }
+  #modalContent .edition-card.has-edition-cover{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) 7.75rem !important;
+    grid-template-areas:
+      "heading heading cover"
+      "fields extras cover"
+      "boxset boxset cover"
+      "discs discs cover"
+      "tech tech tech" !important;
+  }
+  #modalContent .edition-card > *{
+    min-width:0;
+    margin-top:0 !important;
+  }
+  #modalContent .edition-card > :first-child{grid-area:heading}
+  #modalContent .edition-card .edition-form-fields{
+    grid-area:fields;
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:.55rem !important;
+  }
+  #modalContent .edition-card .edition-extra-fields{
+    grid-area:extras;
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) !important;
+    gap:.55rem !important;
+  }
+  #modalContent .edition-card .edition-boxset{grid-area:boxset}
+  #modalContent .edition-card .edition-disc-composition{grid-area:discs}
+  #modalContent .edition-card .edition-tech-inline{
+    grid-area:tech;
+    display:block !important;
+    width:100% !important;
+  }
+  #modalContent .edition-card .edition-tech-inline > div{
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:.75rem !important;
+  }
+  #modalContent .edition-card .edition-tech-details{display:none !important}
+  #modalContent .edition-card .edition-cover-mobile{display:none !important}
+  #modalContent .edition-card .edition-cover-desktop{
+    grid-area:cover;
+    display:block !important;
+    align-self:start;
+    justify-self:end;
+  }
+  #modalContent .edition-card .edition-cover-desktop .detail-edition-cover{
+    width:7.75rem !important;
+    height:11.625rem !important;
+  }
+  #modalContent .series-season-panel,
+  #modalContent .series-episode-row{
+    width:100% !important;
+    min-width:0 !important;
+  }
+}
+@media (min-width:768px) and (max-width:860px) and (any-pointer:coarse){
+  #modalContent .edition-card.has-edition-cover{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) 7rem !important;
+  }
+  #modalContent .edition-card .edition-cover-desktop .detail-edition-cover{
+    width:7rem !important;
+    height:10.5rem !important;
+  }
+  #modalContent .edition-card .edition-tech-inline > div{
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -8511,7 +8636,7 @@ async function attachBlurayEdition(movieId, index) {
  }
 }
 
-const editionTechDesktopQuery = window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine)');
+const editionTechDesktopQuery = window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine), (min-width: 768px) and (any-pointer: coarse) and (max-width: 1366px)');
 editionTechDesktopQuery.addEventListener?.('change', event => {
  document.querySelectorAll('.edition-tech-details').forEach(details => { details.open = event.matches; });
 });
@@ -8603,7 +8728,7 @@ const content = document.getElementById('modalContent');
 const openingDifferentMovie = movieDetailEditMovieId === null || String(movieDetailEditMovieId) !== String(movie.id);
 if (openingDifferentMovie) {
  const hasEditionCover = movie.editions.some(edition => hasDisplayedThumbnail(edition.image));
- const touchTablet = window.matchMedia('(min-width: 768px) and (pointer: coarse)').matches;
+ const touchTablet = window.matchMedia('(min-width: 768px) and (max-width: 1366px) and (any-pointer: coarse)').matches;
  const incompleteOnTablet = touchTablet && getIncompleteReasons(movie).length > 0;
  movieDetailEditMode = !hasEditionCover || incompleteOnTablet;
 }
