@@ -2137,9 +2137,19 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
 
 /* EXPERIENCE UI ORDINATEUR — reference precedente conservee dans Git (commit 5dae64d) */
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
-  :root { --desktop-section-line: rgba(148,163,184,.16); }
+  :root {
+    --desktop-section-line:rgba(34,211,238,.34);
+    --desktop-section-accent:34,211,238;
+  }
+  #tabHome { --desktop-section-accent:34,211,238; }
+  #tabCollection { --desktop-section-accent:56,189,248; }
+  #tabSeries { --desktop-section-accent:167,139,250; }
+  #tabWishlist { --desktop-section-accent:244,114,182; }
+  #tabDigital { --desktop-section-accent:251,191,36; }
+  #tabStats { --desktop-section-accent:45,212,191; }
+  #tabSettings { --desktop-section-accent:74,222,128; }
 
-  /* Les panneaux structurants deviennent des sections continues, comme dans une fiche film. */
+  /* Les panneaux structurants deviennent des sections continues, plus contrastees. */
   #tabHome > .glass-card,
   #homeCalendarLayout > .glass-card,
   #tabCollection > #collectionOverviewBar,
@@ -2154,18 +2164,21 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
   #tabStats > .modern-panel,
   #tabSettings > .modern-panel:not(#dangerZonePanel) {
     width:100%;
+    position:relative;
     margin:0 !important;
-    padding:1.2rem 0 !important;
+    padding:1.35rem 1rem !important;
     overflow:visible;
     border:0 !important;
-    border-top:1px solid var(--desktop-section-line) !important;
-    border-radius:0 !important;
-    background:transparent !important;
-    box-shadow:none !important;
+    border-top:1px solid rgba(var(--desktop-section-accent),.42) !important;
+    border-radius:.35rem !important;
+    background:
+      linear-gradient(110deg,rgba(var(--desktop-section-accent),.085),rgba(var(--desktop-section-accent),.025) 28%,transparent 62%) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.035) !important;
     backdrop-filter:none !important;
     -webkit-backdrop-filter:none !important;
   }
 
+  /* Trait lumineux progressif : il identifie immédiatement le début de chaque section. */
   #tabHome > .glass-card::before,
   #homeCalendarLayout > .glass-card::before,
   #tabCollection > #collectionOverviewBar::before,
@@ -2179,53 +2192,92 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
   #digitalFilterPanel > .glass-card::before,
   #tabStats > .modern-panel::before,
   #tabSettings > .modern-panel:not(#dangerZonePanel)::before {
-    display:none !important;
+    content:"";
+    display:block !important;
+    position:absolute;
+    z-index:0;
+    top:-1px;
+    left:0;
+    width:min(15rem,42%);
+    height:2px;
+    border-radius:999px;
+    background:linear-gradient(90deg,rgba(var(--desktop-section-accent),.95),rgba(var(--desktop-section-accent),.35),transparent) !important;
+    box-shadow:0 0 14px rgba(var(--desktop-section-accent),.26);
+    pointer-events:none;
+  }
+  #tabHome > .glass-card > *,
+  #homeCalendarLayout > .glass-card > *,
+  #tabCollection > #collectionOverviewBar > *,
+  #collectionFilterPanel > .glass-card > *,
+  #tabSeries > .glass-card > *,
+  #seriesSidebarLayout > .glass-card > *,
+  #seriesSidebarLayout > div > .glass-card > *,
+  #tabWishlist > .glass-card > *,
+  #wishlistLayout > .glass-card > *,
+  #tabDigital > .glass-card > *,
+  #digitalFilterPanel > .glass-card > *,
+  #tabStats > .modern-panel > *,
+  #tabSettings > .modern-panel:not(#dangerZonePanel) > * {
+    position:relative;
+    z-index:1;
   }
 
-  /* Les débuts de page respirent davantage, sans ligne décorative superflue. */
-  #tabHome > .glass-card:first-child,
-  #tabCollection > #collectionOverviewBar,
-  #tabSeries > .glass-card:first-of-type,
-  #tabWishlist > .glass-card:first-of-type,
-  #tabDigital > .glass-card:first-of-type,
-  #tabStats > .modern-panel:first-of-type,
-  #tabSettings > .modern-panel:first-of-type {
-    border-top-color:transparent !important;
-    padding-top:.35rem !important;
+  /* Un rythme vertical plus ample améliore le balayage de la page. */
+  #tabStats.modern-page:not(.hidden),
+  #tabSettings.modern-page:not(.hidden) {
+    gap:1.45rem !important;
   }
-
-  /* Deux sections côte à côte restent visuellement reliées au lieu de former deux fenêtres. */
   #homeCalendarLayout,
   #wishlistLayout,
   #seriesSidebarLayout {
-    gap:1.5rem !important;
-  }
-  #homeCalendarLayout > .glass-card + .glass-card,
-  #wishlistLayout > .glass-card + .glass-card {
-    border-left:1px solid var(--desktop-section-line) !important;
-    border-top-color:transparent !important;
-    padding-left:1.5rem !important;
+    gap:1.75rem !important;
   }
 
-  /* Les petites données restent lisibles mais perdent l'effet de boîte dans les pages de synthèse. */
+  /* Les sections côte à côte utilisent aussi un repère vertical coloré. */
+  #homeCalendarLayout > .glass-card + .glass-card,
+  #wishlistLayout > .glass-card + .glass-card {
+    border-left:1px solid rgba(var(--desktop-section-accent),.3) !important;
+  }
+
+  /* Les données secondaires gagnent du contraste sans redevenir de gros panneaux. */
   #tabStats > .modern-panel > .grid > div,
   #tabStats #statsCountGrid > div,
   #tabStats #statsValueGrid > div,
   #tabSettings > .modern-panel:not(#dangerZonePanel) > .grid > div,
   #tabHome #homeDashboard > div {
-    border-color:rgba(148,163,184,.13) !important;
-    background:rgba(255,255,255,.025) !important;
-    box-shadow:none !important;
+    border-color:rgba(var(--desktop-section-accent),.2) !important;
+    background:linear-gradient(145deg,rgba(var(--desktop-section-accent),.09),rgba(255,255,255,.025)) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 8px 20px rgba(0,0,0,.1) !important;
   }
 
-  body.theme-light { --desktop-section-line: rgba(15,23,42,.14); }
+  body.theme-light {
+    --desktop-section-line:rgba(2,132,199,.3);
+  }
+  body.theme-light #tabHome > .glass-card,
+  body.theme-light #homeCalendarLayout > .glass-card,
+  body.theme-light #tabCollection > #collectionOverviewBar,
+  body.theme-light #collectionFilterPanel > .glass-card,
+  body.theme-light #tabSeries > .glass-card,
+  body.theme-light #seriesSidebarLayout > .glass-card,
+  body.theme-light #seriesSidebarLayout > div > .glass-card,
+  body.theme-light #tabWishlist > .glass-card,
+  body.theme-light #wishlistLayout > .glass-card,
+  body.theme-light #tabDigital > .glass-card,
+  body.theme-light #digitalFilterPanel > .glass-card,
+  body.theme-light #tabStats > .modern-panel,
+  body.theme-light #tabSettings > .modern-panel:not(#dangerZonePanel) {
+    background:linear-gradient(110deg,rgba(var(--desktop-section-accent),.105),rgba(255,255,255,.58) 34%,rgba(255,255,255,.18)) !important;
+    border-top-color:rgba(var(--desktop-section-accent),.38) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.8) !important;
+  }
   body.theme-light #tabStats > .modern-panel > .grid > div,
   body.theme-light #tabStats #statsCountGrid > div,
   body.theme-light #tabStats #statsValueGrid > div,
   body.theme-light #tabSettings > .modern-panel:not(#dangerZonePanel) > .grid > div,
   body.theme-light #tabHome #homeDashboard > div {
-    background:rgba(255,255,255,.42) !important;
-    border-color:rgba(15,23,42,.12) !important;
+    background:linear-gradient(145deg,rgba(var(--desktop-section-accent),.11),rgba(255,255,255,.72)) !important;
+    border-color:rgba(var(--desktop-section-accent),.2) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 7px 18px rgba(15,23,42,.07) !important;
   }
 }
 </style>
