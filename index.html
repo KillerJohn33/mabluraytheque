@@ -3386,6 +3386,132 @@ body.theme-light .detail-danger-label{color:#991b1b}
   .detail-danger-zone{padding:.55rem .6rem}
   .detail-danger-label{max-width:9rem;line-height:1.25}
 }
+
+/* Séparateurs droits : la ligne ne suit plus l'arrondi des panneaux */
+@media (min-width:768px) and (hover:hover) and (pointer:fine){
+  #tabHome > .glass-card,
+  #homeCalendarLayout > .glass-card,
+  #tabCollection > #collectionOverviewBar,
+  #collectionFilterPanel > .glass-card,
+  #tabSeries > .glass-card,
+  #seriesSidebarLayout > .glass-card,
+  #seriesSidebarLayout > div > .glass-card,
+  #tabWishlist > .glass-card,
+  #wishlistLayout > .glass-card,
+  #tabDigital > .glass-card,
+  #digitalFilterPanel > .glass-card,
+  #tabStats > .modern-panel,
+  #tabSettings > .modern-panel:not(#dangerZonePanel),
+  #modalContent .movie-detail-shell > :nth-child(2),
+  #modalContent .movie-detail-shell > :nth-child(3),
+  #modalContent .movie-detail-shell > :nth-child(4),
+  #modalContent .series-detail-info,
+  #modalContent .series-detail-seasons{
+    border-top:0 !important;
+  }
+  #tabHome > .glass-card::after,
+  #homeCalendarLayout > .glass-card::after,
+  #tabCollection > #collectionOverviewBar::after,
+  #collectionFilterPanel > .glass-card::after,
+  #tabSeries > .glass-card::after,
+  #seriesSidebarLayout > .glass-card::after,
+  #seriesSidebarLayout > div > .glass-card::after,
+  #tabWishlist > .glass-card::after,
+  #wishlistLayout > .glass-card::after,
+  #tabDigital > .glass-card::after,
+  #digitalFilterPanel > .glass-card::after,
+  #tabStats > .modern-panel::after,
+  #tabSettings > .modern-panel:not(#dangerZonePanel)::after{
+    content:"";
+    position:absolute;
+    z-index:0;
+    top:0;
+    left:0;
+    right:0;
+    height:1px;
+    border-radius:0;
+    background:rgba(var(--unified-accent),.4);
+    pointer-events:none;
+  }
+  #modalContent .movie-detail-shell > :nth-child(2)::after,
+  #modalContent .movie-detail-shell > :nth-child(3)::after,
+  #modalContent .movie-detail-shell > :nth-child(4)::after,
+  #modalContent .series-detail-info::after,
+  #modalContent .series-detail-seasons::after{
+    content:"";
+    position:absolute;
+    z-index:0;
+    top:0;
+    left:0;
+    right:0;
+    height:1px;
+    border-radius:0;
+    background:rgba(var(--detail-accent),.34);
+    pointer-events:none;
+  }
+}
+@media (max-width:767px), (hover:none) and (pointer:coarse) and (max-width:1024px){
+  #tabHome > .glass-card,
+  #homeCalendarLayout > .glass-card,
+  #tabCollection > #collectionOverviewBar,
+  #collectionFilterPanel > .glass-card,
+  #tabSeries > .glass-card,
+  #seriesSidebarLayout > .glass-card,
+  #seriesSidebarLayout > div > .glass-card,
+  #tabWishlist > .glass-card,
+  #wishlistLayout > .glass-card,
+  #tabDigital > .glass-card,
+  #digitalFilterPanel > .glass-card,
+  #tabStats > .modern-panel,
+  #tabSettings > .modern-panel:not(#dangerZonePanel),
+  #modalContent .movie-detail-shell > :nth-child(2),
+  #modalContent .movie-detail-shell > :nth-child(3),
+  #modalContent .movie-detail-shell > :nth-child(4),
+  #modalContent .series-detail-info,
+  #modalContent .series-detail-seasons{
+    border-top:0 !important;
+  }
+  #tabHome > .glass-card::after,
+  #homeCalendarLayout > .glass-card::after,
+  #tabCollection > #collectionOverviewBar::after,
+  #collectionFilterPanel > .glass-card::after,
+  #tabSeries > .glass-card::after,
+  #seriesSidebarLayout > .glass-card::after,
+  #seriesSidebarLayout > div > .glass-card::after,
+  #tabWishlist > .glass-card::after,
+  #wishlistLayout > .glass-card::after,
+  #tabDigital > .glass-card::after,
+  #digitalFilterPanel > .glass-card::after,
+  #tabStats > .modern-panel::after,
+  #tabSettings > .modern-panel:not(#dangerZonePanel)::after{
+    content:"";
+    position:absolute;
+    z-index:0;
+    top:0;
+    left:0;
+    right:0;
+    height:1px;
+    border-radius:0;
+    background:rgba(var(--touch-accent),.34);
+    pointer-events:none;
+  }
+  #modalContent .movie-detail-shell > :nth-child(2)::after,
+  #modalContent .movie-detail-shell > :nth-child(3)::after,
+  #modalContent .movie-detail-shell > :nth-child(4)::after,
+  #modalContent .series-detail-info::after,
+  #modalContent .series-detail-seasons::after{
+    content:"";
+    position:absolute;
+    z-index:0;
+    top:0;
+    left:0;
+    right:0;
+    height:1px;
+    border-radius:0;
+    background:rgba(var(--touch-detail-accent),.3);
+    pointer-events:none;
+  }
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
