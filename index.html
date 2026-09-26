@@ -4241,6 +4241,34 @@ body.theme-light .home-format-row>i,body.theme-light .home-progress-track{backgr
  .home-customize-bar{grid-column:1/-1!important}
 }
 body.theme-light .home-resize-handle::before,body.theme-light .home-resize-handle::after{border-color:rgba(2,132,199,.82)}
+
+/* Correction structurelle de l'espacement de l'onglet Séries */
+#tabSeries:not(.hidden){
+ display:flex!important;
+ flex-direction:column!important;
+ gap:1.35rem!important;
+}
+#tabSeries:not(.hidden)>*{
+ margin-top:0!important;
+ margin-bottom:0!important;
+}
+#seriesSidebarLayout{
+ margin:0!important;
+ column-gap:1.35rem!important;
+ row-gap:1.35rem!important;
+}
+#seriesSidebarLayout>.min-w-0{
+ gap:1.35rem!important;
+}
+#seriesSidebarLayout>.min-w-0>.choice-bar,
+#seriesSidebarLayout>.min-w-0>#trackedSeriesGrid{
+ margin-top:0!important;
+ margin-bottom:0!important;
+}
+#trackedSeriesGrid{
+ column-gap:1.35rem!important;
+ row-gap:1.35rem!important;
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
