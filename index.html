@@ -2426,16 +2426,21 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
     background:rgba(167,139,250,.045);
   }
 
-  /* Même respiration sous la navigation pour chaque page. */
+  /* Même respiration sous la navigation pour chaque page.
+     L'Accueil commence par searchSection, placé avant son conteneur d'onglet. */
+  :root { --desktop-page-top-gap:2.25rem; }
   main { padding-top:var(--topnav-h, 3.5rem) !important; }
-  #tabHome,
+  #searchSection,
   #tabCollection,
   #tabSeries,
   #tabDigital,
   #tabWishlist,
   #tabStats,
   #tabSettings {
-    padding-top:2.25rem !important;
+    padding-top:var(--desktop-page-top-gap) !important;
+  }
+  #tabHome {
+    padding-top:0 !important;
   }
 
   /* Statistiques : retour aux compteurs éditoriaux, dans le bleu de l'accueil. */
