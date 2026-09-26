@@ -1255,7 +1255,7 @@ body.theme-light #incompletePanel summary:hover { color: #b45309; }
 .app-action-violet { --action-rgb: 167, 139, 250; --action-text: #1e1147; }
 .app-action-green { --action-rgb: 52, 211, 153; --action-text: #042e22; }
 .app-action-amber { --action-rgb: 251, 191, 36; --action-text: #3d2a00; }
-.app-action-red { --action-rgb: 248, 113, 113; --action-text: #ffffff; }
+.app-action-red { --action-rgb: 220, 38, 38; --action-text: #ffffff; border-color: rgba(254,202,202,.3) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,.3), inset 0 -3px 7px rgba(69,10,10,.32), 0 4px 13px rgba(220,38,38,.4); }
 .app-action-slate { --action-rgb: 148, 163, 184; --action-text: #1e293b; }
 /* Barres de choix : même finition sobre que les actions */
 .choice-bar {
@@ -3283,6 +3283,72 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
   #tabStats > .mobile-section-hero + *,
   #tabSettings > .mobile-section-hero + *{
     margin-top:0!important;
+  }
+}
+
+/* Suppressions : rouge profond commun aux boutons principaux et compacts */
+.delete-icon-button,
+.equipment-icon-button.danger {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:1.85rem;
+  min-height:1.85rem;
+  color:#fecaca !important;
+  border:1px solid rgba(248,113,113,.3) !important;
+  border-radius:.58rem;
+  background:rgba(185,28,28,.24) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+  transition:color .16s ease,background .16s ease,border-color .16s ease,transform .16s ease;
+}
+.delete-icon-button:hover,
+.equipment-icon-button.danger:hover {
+  color:#fff !important;
+  border-color:rgba(254,202,202,.45) !important;
+  background:rgb(220,38,38) !important;
+  box-shadow:0 4px 12px rgba(220,38,38,.3);
+}
+.delete-icon-button:active,
+.equipment-icon-button.danger:active { transform:scale(.94); }
+body.theme-light .delete-icon-button,
+body.theme-light .equipment-icon-button.danger {
+  color:#b91c1c !important;
+  border-color:rgba(220,38,38,.3) !important;
+  background:rgba(220,38,38,.12) !important;
+}
+body.theme-light .delete-icon-button:hover,
+body.theme-light .equipment-icon-button.danger:hover {
+  color:#fff !important;
+  background:rgb(220,38,38) !important;
+}
+
+/* Téléphone : tous les titres commencent exactement au niveau de Collection. */
+@media (max-width:767px){
+  :root{--mobile-page-title-top-gap:1.25rem}
+
+  body > main > #homeMobileHero,
+  body > main > #collectionMobileHero,
+  body > main > #tabSeries:not(.hidden),
+  body > main > #tabDigital:not(.hidden),
+  body > main > #tabWishlist:not(.hidden),
+  body > main > #tabStats:not(.hidden),
+  body > main > #tabSettings:not(.hidden){
+    margin-top:var(--mobile-page-title-top-gap) !important;
+  }
+
+  @keyframes mobileTabFadeIn{
+    from{opacity:.65}
+    to{opacity:1}
+  }
+  #tabHome:not(.hidden),
+  #tabCollection:not(.hidden),
+  #tabSeries:not(.hidden),
+  #tabDigital:not(.hidden),
+  #tabWishlist:not(.hidden),
+  #tabStats:not(.hidden),
+  #tabSettings:not(.hidden),
+  .tab-panel-enter{
+    animation:mobileTabFadeIn .12s ease-out both !important;
   }
 }
 </style>
@@ -8047,7 +8113,7 @@ if (!filtered.length) {
 }
 grid.innerHTML = filtered.map(s => {
 const p = seriesProgress(s), status = seriesStatus(s), eps = seriesEpisodes(s); const next = eps.find(e => !e.watched && e.air_date && new Date(e.air_date) >= new Date(new Date().setHours(0,0,0,0)));
-return `<div onclick="openTrackedSeriesDetail(${Number(s.tmdb_id)})" class="glass-card relative min-h-[7.5rem] rounded-2xl border border-white/10 p-2.5 overflow-hidden cursor-pointer hover:border-purple-400/30 hover:bg-white/[0.04] transition"><div class="absolute left-1.5 top-1.5 bottom-1.5 w-24 rounded-xl overflow-hidden border border-white/10 shadow"><img src="${safeImageUrl(s.poster)}" loading="lazy" decoding="async" class="w-full h-full object-cover"><div class="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-black/90"></div></div><div class="relative min-w-0 ml-[5.75rem] py-0.5"><div class="flex items-center justify-between gap-2"><h4 class="text-xs font-bold text-white truncate">${escapeHtml(s.title)}</h4><button onclick="event.stopPropagation();removeTrackedSeries(${Number(s.tmdb_id)})" class="text-gray-500 hover:text-red-400 p-1">${ic('x','w-3.5 h-3.5')}</button></div><div class="flex items-center gap-1.5 mt-1 flex-wrap"><span class="text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-400/20">${seriesStatusLabel(status)}</span><span class="text-[9px] text-gray-500">${p.watched}/${p.total} épisodes</span></div><div class="mt-1">${compactSeriesRatings(s)}</div><div class="h-1.5 bg-white/10 rounded-full mt-2 overflow-hidden"><div class="h-full bg-purple-500 rounded-full" style="width:${p.pct}%"></div></div>${next ? `<p class="text-[9px] text-gray-400 mt-2">Prochain : <span class="text-white">S${String(next.season_number).padStart(2,'0')}E${String(next.episode_number).padStart(2,'0')}</span> · ${formatSeriesDate(next.air_date)}</p>` : '<p class="text-[9px] text-emerald-300 mt-2">Tous les épisodes disponibles sont vus.</p>'}<p class="text-[8px] text-purple-300 mt-2 font-semibold">Cliquer pour voir saisons et épisodes →</p></div></div>`;
+return `<div onclick="openTrackedSeriesDetail(${Number(s.tmdb_id)})" class="glass-card relative min-h-[7.5rem] rounded-2xl border border-white/10 p-2.5 overflow-hidden cursor-pointer hover:border-purple-400/30 hover:bg-white/[0.04] transition"><div class="absolute left-1.5 top-1.5 bottom-1.5 w-24 rounded-xl overflow-hidden border border-white/10 shadow"><img src="${safeImageUrl(s.poster)}" loading="lazy" decoding="async" class="w-full h-full object-cover"><div class="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-black/90"></div></div><div class="relative min-w-0 ml-[5.75rem] py-0.5"><div class="flex items-center justify-between gap-2"><h4 class="text-xs font-bold text-white truncate">${escapeHtml(s.title)}</h4><button onclick="event.stopPropagation();removeTrackedSeries(${Number(s.tmdb_id)})" class="delete-icon-button p-1" title="Supprimer" aria-label="Supprimer">${ic('x','w-3.5 h-3.5')}</button></div><div class="flex items-center gap-1.5 mt-1 flex-wrap"><span class="text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-400/20">${seriesStatusLabel(status)}</span><span class="text-[9px] text-gray-500">${p.watched}/${p.total} épisodes</span></div><div class="mt-1">${compactSeriesRatings(s)}</div><div class="h-1.5 bg-white/10 rounded-full mt-2 overflow-hidden"><div class="h-full bg-purple-500 rounded-full" style="width:${p.pct}%"></div></div>${next ? `<p class="text-[9px] text-gray-400 mt-2">Prochain : <span class="text-white">S${String(next.season_number).padStart(2,'0')}E${String(next.episode_number).padStart(2,'0')}</span> · ${formatSeriesDate(next.air_date)}</p>` : '<p class="text-[9px] text-emerald-300 mt-2">Tous les épisodes disponibles sont vus.</p>'}<p class="text-[8px] text-purple-300 mt-2 font-semibold">Cliquer pour voir saisons et épisodes →</p></div></div>`;
 }).join('');
 renderSeriesCalendar();
 if (document.getElementById('homeCalendarGrid')) renderHomeSummaryCalendar();
@@ -8418,7 +8484,7 @@ ${[ed.purchaseLocation, (parseFloat(ed.purchasePrice) > 0 ? Number(ed.purchasePr
 </div>
 <div class="flex flex-shrink-0 items-start gap-1.5">
 ${ed.image ? `<img src="${safeImageUrl(ed.image)}" alt="Jaquette de ${escapeHtml(ed.title || movie.title)}" loading="lazy" onerror="this.style.display='none'" class="edition-cover-mobile detail-edition-cover w-16 h-24 sm:w-20 sm:h-30 object-contain bg-black/40 rounded-xl shadow-lg border border-cyan-400/20">` : ''}
-${movie.editions.length > 1 ? `<button onclick="removeEdition(${movieIdArg}, ${idx})" class="detail-edit-only text-gray-500 hover:text-red-400 transition p-1 rounded-lg hover:bg-red-400/10" title="Supprimer">${ic('x','w-3.5 h-3.5')}</button>` : ''}
+${movie.editions.length > 1 ? `<button onclick="removeEdition(${movieIdArg}, ${idx})" class="detail-edit-only delete-icon-button p-1 rounded-lg" title="Supprimer" aria-label="Supprimer">${ic('x','w-3.5 h-3.5')}</button>` : ''}
 </div>
 </div>
 ${ed.image ? `<figure class="edition-cover-desktop">
