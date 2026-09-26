@@ -4202,6 +4202,45 @@ body.theme-light .home-format-row>i,body.theme-light .home-progress-track{backgr
  #tabSeries{gap:1.35rem!important}
  #trackedSeriesGrid{row-gap:1.35rem!important}
 }
+
+/* Grille d'accueil compacte et redimensionnement libre */
+#tabHome:not(.hidden){
+ grid-auto-flow:dense!important;
+ grid-auto-rows:8px!important;
+ row-gap:0!important;
+ align-items:start!important;
+}
+#tabHome>.home-customize-bar,#tabHome>.home-widget{margin-top:0!important;margin-bottom:0!important}
+.home-widget{container-type:inline-size}
+.home-resize-handle{
+ display:none;position:absolute;z-index:20;right:-.12rem;bottom:-.12rem;width:1.35rem;height:1.35rem;
+ border:0;border-radius:.25rem 0 .65rem 0;background:transparent;cursor:ew-resize;touch-action:none
+}
+.home-resize-handle::before,.home-resize-handle::after{content:"";position:absolute;right:.25rem;bottom:.25rem;border-right:2px solid rgba(103,232,249,.8);border-bottom:2px solid rgba(103,232,249,.8);border-radius:0 0 2px 0}
+.home-resize-handle::before{width:.75rem;height:.75rem}
+.home-resize-handle::after{width:.42rem;height:.42rem;right:.52rem;bottom:.25rem;opacity:.62}
+.home-customizing .home-resize-handle{display:block}
+.home-customizing .home-widget.is-resizing{cursor:ew-resize!important;user-select:none;transition:none!important;outline-color:#67e8f9}
+.home-customizing .home-widget.is-resizing *{pointer-events:none}
+.home-customizing .home-widget.is-resizing .home-resize-handle{pointer-events:auto}
+#homeWidgetRecent[data-home-columns] #recentGrid[data-poster-size="small"]{grid-template-columns:repeat(auto-fit,minmax(78px,1fr))!important}
+#homeWidgetRecent[data-home-columns] #recentGrid[data-poster-size="medium"]{grid-template-columns:repeat(auto-fit,minmax(112px,1fr))!important}
+#homeWidgetRecent[data-home-columns] #recentGrid[data-poster-size="large"]{grid-template-columns:repeat(auto-fit,minmax(165px,1fr))!important}
+#homeWidgetTopRated .home-media-grid,#homeWidgetWishlistFocus .home-media-grid{grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
+@container (max-width:430px){
+ #homeDashboard{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .home-series-widget-list{grid-template-columns:1fr!important}
+ #homeWidgetTopRated .home-media-grid,#homeWidgetWishlistFocus .home-media-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@container (min-width:431px) and (max-width:720px){
+ #homeDashboard{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+ .home-series-widget-list{grid-template-columns:1fr!important}
+}
+@media(max-width:767px){
+ #tabHome:not(.hidden){grid-template-columns:repeat(12,minmax(0,1fr))!important;grid-auto-rows:8px!important;row-gap:0!important}
+ .home-customize-bar{grid-column:1/-1!important}
+}
+body.theme-light .home-resize-handle::before,body.theme-light .home-resize-handle::after{border-color:rgba(2,132,199,.82)}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -4306,7 +4345,7 @@ body.theme-light .home-format-row>i,body.theme-light .home-progress-track{backgr
 <!-- ONGLET ACCUEIL -->
 <div id="tabHome" class="space-y-6">
 <div id="homeCustomizeBar" class="home-customize-bar">
-<div><p class="text-[11px] font-bold text-white">Mon accueil</p><p class="text-[9px] text-gray-500">Organisez vos informations comme vous le souhaitez.</p></div>
+<div><p class="text-[11px] font-bold text-white">Mon accueil</p><p class="text-[9px] text-gray-500">Déplacez les panneaux et étirez leur coin inférieur droit pour composer votre page.</p></div>
 <button id="homeCustomizeToggle" type="button" onclick="toggleHomeCustomization()" aria-expanded="false" class="glass-pill px-3 py-2 rounded-xl text-[10px] font-semibold text-cyan-300 hover:text-white flex items-center gap-1.5"><span class="icon-inline w-3.5 h-3.5" data-icon="settings"></span><span>Personnaliser</span></button>
 <div id="homeHiddenWidgets" class="hidden home-hidden-widgets"></div>
 </div>
@@ -7787,9 +7826,13 @@ function normalizedHomeLayout() {
   if (HOME_WIDGET_DEFS[id].defaultHidden && !originalOrder.includes(id) && !hidden.includes(id)) hidden.push(id);
  });
  const sizes = {};
+ const columns = {};
  HOME_WIDGET_IDS.forEach(id => {
   const size = raw.sizes?.[id];
   sizes[id] = ['small','wide','large'].includes(size) ? size : HOME_WIDGET_DEFS[id].defaultSize;
+  const fallbackColumns = { small:4, wide:8, large:12 }[sizes[id]];
+  const storedColumns = parseInt(raw.columns?.[id],10);
+  columns[id] = Number.isFinite(storedColumns) ? Math.max(3,Math.min(12,storedColumns)) : fallbackColumns;
  });
  const sourceOptions = raw.options && typeof raw.options === 'object' ? raw.options : {};
  const metrics = Array.isArray(sourceOptions.dashboardMetrics) ? sourceOptions.dashboardMetrics.filter(key => HOME_METRIC_DEFS[key]) : HOME_DEFAULT_METRICS;
@@ -7800,7 +7843,7 @@ function normalizedHomeLayout() {
   topRatedCount: [3,4,6,8].includes(Number(sourceOptions.topRatedCount)) ? Number(sourceOptions.topRatedCount) : 4,
   seriesCount: [2,3,4,6].includes(Number(sourceOptions.seriesCount)) ? Number(sourceOptions.seriesCount) : 3
  };
- return { order, hidden, sizes, options };
+ return { order, hidden, sizes, columns, options };
 }
 
 function persistHomeLayout(layout) {
@@ -7813,24 +7856,96 @@ function persistHomeLayout(layout) {
  homeLayoutSaveTimer = setTimeout(() => saveProfileBundleCloud(), 700);
 }
 
-function homeWidgetControls(id, size) {
+function homeWidgetControls(id, size, columns) {
  const sizeLabels = { small:'Petit', wide:'Moyen', large:'Grand' };
+ const presetColumns = { small:4, wide:8, large:12 };
+ const sizeLabel = columns === presetColumns[size] ? sizeLabels[size] : `${columns}/12`;
  return `<div class="home-widget-controls" aria-label="Réglages de ${escapeHtml(HOME_WIDGET_DEFS[id].label)}">
   <button type="button" onclick="moveHomeWidget('${id}',-1)" title="Déplacer avant" aria-label="Déplacer avant">${ic('chevronleft','w-3 h-3')}</button>
-  <button type="button" onclick="cycleHomeWidgetSize('${id}')" title="Changer la taille" class="home-widget-size"><span>${sizeLabels[size]}</span></button>
+  <button type="button" onclick="cycleHomeWidgetSize('${id}')" title="Changer la taille" class="home-widget-size"><span>${sizeLabel}</span></button>
   <button type="button" onclick="moveHomeWidget('${id}',1)" title="Déplacer après" aria-label="Déplacer après">${ic('chevronright','w-3 h-3')}</button>
   ${['dashboard','recent','topRated','watchingSeries'].includes(id) ? `<button type="button" onclick="toggleHomeWidgetOptions('${id}')" title="Personnaliser le contenu" aria-label="Personnaliser le contenu">${ic('settings','w-3 h-3')}</button>` : ''}
   <button type="button" onclick="hideHomeWidget('${id}')" title="Masquer ce panneau" aria-label="Masquer ce panneau">${ic('x','w-3 h-3')}</button>
  </div>`;
 }
 
+let homeMasonryFrame = 0;
+let homeMasonryObserver = null;
+let homeResizeListening = false;
+
+function refreshHomeMasonry() {
+ const tab=document.getElementById('tabHome');
+ if(!tab || tab.classList.contains('hidden')) return;
+ cancelAnimationFrame(homeMasonryFrame);
+ homeMasonryFrame=requestAnimationFrame(()=>{
+  const row=8, breathing=22;
+  tab.querySelectorAll(':scope > .home-customize-bar, :scope > .home-widget:not(.hidden)').forEach(item=>{
+   const height=Math.max(item.scrollHeight,item.getBoundingClientRect().height);
+   item.style.gridRowEnd=`span ${Math.max(1,Math.ceil((height+breathing)/row))}`;
+  });
+ });
+}
+
+function observeHomeMasonry() {
+ const tab=document.getElementById('tabHome'); if(!tab)return;
+ if(!homeMasonryObserver) homeMasonryObserver=new ResizeObserver(()=>refreshHomeMasonry());
+ homeMasonryObserver.disconnect();
+ homeMasonryObserver.observe(tab);
+ tab.querySelectorAll(':scope > .home-customize-bar, :scope > .home-widget').forEach(item=>homeMasonryObserver.observe(item));
+ if(!homeResizeListening){
+  homeResizeListening=true;
+  window.addEventListener('resize',()=>{applyHomeLayout();refreshHomeMasonry();},{passive:true});
+ }
+ refreshHomeMasonry();
+}
+
+function applyHomeWidgetColumns(widget, columns) {
+ const mobile=homeLayoutDeviceKey()==='mobile';
+ const minimum=mobile ? 6 : 3;
+ const value=Math.max(minimum,Math.min(12,parseInt(columns,10)||12));
+ widget.style.setProperty('grid-column',`span ${value}`,'important');
+ widget.dataset.homeColumns=String(value);
+}
+
+function initHomeWidgetResize(widget,id) {
+ const handle=widget.querySelector('.home-resize-handle'); if(!handle)return;
+ handle.onpointerdown=event=>{
+  if(!homeCustomizationActive)return;
+  event.preventDefault();event.stopPropagation();
+  const tab=document.getElementById('tabHome'), rect=widget.getBoundingClientRect(), tabRect=tab.getBoundingClientRect();
+  const gap=parseFloat(getComputedStyle(tab).columnGap)||0;
+  const unit=(tabRect.width-gap*11)/12;
+  const startX=event.clientX,startWidth=rect.width;
+  widget.draggable=false;widget.classList.add('is-resizing');handle.setPointerCapture(event.pointerId);
+  const move=moveEvent=>{
+   const minimum=homeLayoutDeviceKey()==='mobile'?6:3;
+   const wanted=Math.max(unit*minimum,startWidth+moveEvent.clientX-startX);
+   const columns=Math.max(minimum,Math.min(12,Math.round((wanted+gap)/(unit+gap))));
+   applyHomeWidgetColumns(widget,columns);
+   refreshHomeMasonry();
+  };
+  const end=endEvent=>{
+   handle.releasePointerCapture?.(endEvent.pointerId);handle.removeEventListener('pointermove',move);handle.removeEventListener('pointerup',end);handle.removeEventListener('pointercancel',end);
+   widget.classList.remove('is-resizing');widget.draggable=homeCustomizationActive;
+   const layout=normalizedHomeLayout();
+   layout.columns[id]=parseInt(widget.dataset.homeColumns,10)||layout.columns[id];
+   const preset={4:'small',8:'wide',12:'large'}[layout.columns[id]];
+   if(preset)layout.sizes[id]=preset;
+   persistHomeLayout(layout);applyHomeLayout();
+  };
+  handle.addEventListener('pointermove',move);handle.addEventListener('pointerup',end);handle.addEventListener('pointercancel',end);
+ };
+}
 function renderHomeCustomizationControls(layout) {
  HOME_WIDGET_IDS.forEach(id => {
   const widget = document.querySelector(`[data-home-widget="${id}"]`);
   if (!widget) return;
   widget.querySelector('.home-widget-controls')?.remove();
   widget.querySelector('.home-widget-options')?.remove();
-  widget.insertAdjacentHTML('afterbegin', homeWidgetControls(id, layout.sizes[id]));
+  widget.querySelector('.home-resize-handle')?.remove();
+  widget.insertAdjacentHTML('afterbegin', homeWidgetControls(id, layout.sizes[id], layout.columns[id]));
+  widget.insertAdjacentHTML('beforeend', `<button type="button" class="home-resize-handle" aria-label="Redimensionner ${escapeHtml(HOME_WIDGET_DEFS[id].label)}" title="Faire glisser pour redimensionner"></button>`);
+  initHomeWidgetResize(widget,id);
   const optionsHtml = homeWidgetOptionsHtml(id, layout);
   if (optionsHtml) widget.querySelector('.home-widget-controls')?.insertAdjacentHTML('afterend', optionsHtml);
   widget.draggable = homeCustomizationActive;
@@ -7855,7 +7970,7 @@ function renderHomeCustomizationControls(layout) {
    event.preventDefault();
    widget.classList.remove('is-drag-target');
    const source = event.dataTransfer.getData('text/plain') || draggedHomeWidget;
-   reorderHomeWidget(source,id);
+   reorderHomeWidget(source,id,event);
   };
  });
  const hiddenBox = document.getElementById('homeHiddenWidgets');
@@ -7925,10 +8040,12 @@ function applyHomeLayout() {
   if (!widget) return;
   widget.dataset.homeSize = layout.sizes[id];
   widget.classList.toggle('hidden', layout.hidden.includes(id));
+  applyHomeWidgetColumns(widget,layout.columns[id]);
   tab.appendChild(widget);
  });
  tab.classList.toggle('home-customizing', homeCustomizationActive);
  renderHomeCustomizationControls(layout);
+ observeHomeMasonry();
 }
 
 function toggleHomeCustomization() {
@@ -7952,11 +8069,15 @@ function moveHomeWidget(id, direction) {
  applyHomeLayout();
 }
 
-function reorderHomeWidget(source, target) {
+function reorderHomeWidget(source, target, event) {
  if (!HOME_WIDGET_IDS.includes(source) || !HOME_WIDGET_IDS.includes(target) || source === target) return;
  const layout = normalizedHomeLayout();
+ const targetElement=document.querySelector(`[data-home-widget="${target}"]`);
+ const rect=targetElement?.getBoundingClientRect();
+ const placeAfter=!!rect && (event?.clientY > rect.top+rect.height/2 || (Math.abs((event?.clientY||0)-(rect.top+rect.height/2)) < rect.height*.28 && event?.clientX > rect.left+rect.width/2));
  layout.order = layout.order.filter(id => id !== source);
- layout.order.splice(layout.order.indexOf(target),0,source);
+ const targetIndex=layout.order.indexOf(target);
+ layout.order.splice(targetIndex+(placeAfter?1:0),0,source);
  persistHomeLayout(layout);
  applyHomeLayout();
 }
@@ -7965,6 +8086,7 @@ function cycleHomeWidgetSize(id) {
  const layout = normalizedHomeLayout();
  const sizes = ['small','wide','large'];
  layout.sizes[id] = sizes[(sizes.indexOf(layout.sizes[id]) + 1) % sizes.length];
+ layout.columns[id] = ({small:4,wide:8,large:12})[layout.sizes[id]];
  persistHomeLayout(layout);
  applyHomeLayout();
 }
@@ -7984,7 +8106,7 @@ function showHomeWidget(id) {
 }
 
 function resetHomeLayout() {
- const layout = { order:[...HOME_WIDGET_IDS], hidden:HOME_WIDGET_IDS.filter(id => HOME_WIDGET_DEFS[id].defaultHidden), sizes:Object.fromEntries(HOME_WIDGET_IDS.map(id => [id,HOME_WIDGET_DEFS[id].defaultSize])), options:{} };
+ const layout = { order:[...HOME_WIDGET_IDS], hidden:HOME_WIDGET_IDS.filter(id => HOME_WIDGET_DEFS[id].defaultHidden), sizes:Object.fromEntries(HOME_WIDGET_IDS.map(id => [id,HOME_WIDGET_DEFS[id].defaultSize])), columns:Object.fromEntries(HOME_WIDGET_IDS.map(id => [id,({small:4,wide:8,large:12})[HOME_WIDGET_DEFS[id].defaultSize]])), options:{} };
  persistHomeLayout(layout);
  applyHomeLayout();
  showToast("Disposition de l'accueil réinitialisée.");
