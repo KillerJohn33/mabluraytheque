@@ -4588,6 +4588,37 @@ body.theme-light #modalContent .movie-detail-actions{
  #tabSettings>.modern-panel,
  #tabSettings>.space-options-panel{width:100%!important;min-width:0!important}
 }
+
+/* Fiche série : suppression des traits décoratifs superposés */
+#modalContent .series-detail-info::before,
+#modalContent .series-detail-info::after,
+#modalContent .series-detail-seasons::before,
+#modalContent .series-detail-seasons::after{
+ display:none!important;
+ content:none!important;
+}
+#modalContent .series-detail-info,
+#modalContent .series-detail-seasons{
+ border-top-color:rgba(167,139,250,.16)!important;
+}
+
+/* Téléphone : état Vu aligné avec le titre du film */
+.movie-seen-mobile{display:none}
+@media(max-width:767px){
+ #modalContent .movie-detail-title-row{width:100%;min-width:0;align-items:flex-start!important}
+ #modalContent .movie-detail-title-row h3{min-width:0;overflow-wrap:anywhere}
+ #modalContent .movie-seen-mobile{display:block!important}
+ #modalContent .movie-seen-desktop{display:none!important}
+ #modalContent .movie-seen-mobile .movie-seen-toggle{
+  min-height:1.8rem!important;
+  padding:.35rem .5rem!important;
+  border-radius:.65rem!important;
+  font-size:.56rem!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+ }
+ #modalContent .movie-seen-mobile .movie-seen-toggle .icon-inline{width:.7rem!important;height:.7rem!important}
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -10445,10 +10476,13 @@ content.innerHTML = `
 ${movie.isWishlist ? '<span class="px-2 py-1 rounded-full bg-pink-400/10 border border-pink-400/20 text-pink-300 text-[8px] font-bold uppercase tracking-wider">Wishlist</span>' : '<span class="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 text-[8px] font-bold uppercase tracking-wider">Collection</span>'}
 
 </div>
-<h3 class="text-lg sm:text-xl font-extrabold text-white leading-tight">${escapeHtml(movie.title)}</h3>
+<div class="movie-detail-title-row flex items-start gap-2">
+<h3 class="text-lg sm:text-xl font-extrabold text-white leading-tight min-w-0 flex-1">${escapeHtml(movie.title)}</h3>
+<div class="movie-seen-mobile hidden flex-none">${seenHtml}</div>
+</div>
 ${metaParts.length ? `<p class="text-[10px] text-gray-400 mt-1.5">${metaParts.join(' • ')}</p>` : ''}
 <div class="movie-detail-primary-actions flex items-center gap-1.5 mt-3">
-${seenHtml}${ratingHtml}
+<span class="movie-seen-desktop">${seenHtml}</span>${ratingHtml}
 <button type="button" onclick="toggleMovieDetailEdit(this)" class="movie-edit-toggle ml-auto" aria-label="${detailEditing ? 'Terminer les modifications' : 'Modifier la fiche'}" title="${detailEditing ? 'Terminer' : 'Modifier'}" aria-pressed="${detailEditing ? 'true' : 'false'}">${ic('settings','w-3 h-3')} <span class="movie-edit-label">${detailEditing ? 'Terminer' : 'Modifier'}</span></button>
 </div>
 </div>
