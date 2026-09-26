@@ -2426,88 +2426,86 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
     background:rgba(167,139,250,.045);
   }
 
-  /* Statistiques : compteurs éditoriaux et graphiques intégrés aux sections. */
+  /* Plus d'air sous la navigation fixe. */
+  main {
+    padding-top:calc(var(--topnav-h, 3.5rem) + 1.35rem) !important;
+  }
+
+  /* Statistiques : tuiles de tableau de bord centrées et graphiques clairement délimités. */
   #tabStats #statsCountGrid,
   #tabStats #statsValueGrid {
-    gap:.75rem !important;
+    gap:.9rem !important;
   }
   #tabStats #statsCountGrid > div,
   #tabStats #statsValueGrid > div {
     position:relative;
-    min-height:5.5rem;
+    min-height:6.2rem;
     display:flex;
     flex-direction:column;
-    align-items:flex-start;
+    align-items:center;
     justify-content:center;
-    text-align:left !important;
-    padding:.9rem 1rem .85rem !important;
-    border:0 !important;
-    border-left:2px solid rgba(45,212,191,.5) !important;
-    border-radius:.35rem !important;
-    background:linear-gradient(100deg,rgba(45,212,191,.09),rgba(255,255,255,.02) 60%,transparent) !important;
+    text-align:center !important;
+    padding:1rem .8rem !important;
+    border:1px solid rgba(45,212,191,.18) !important;
+    border-top:3px solid rgba(45,212,191,.68) !important;
+    border-radius:.9rem !important;
+    background:rgba(7,20,23,.62) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 10px 24px rgba(0,0,0,.15) !important;
+    transition:transform .18s ease,border-color .18s ease,background .18s ease;
+  }
+  #tabStats #statsCountGrid > div:hover,
+  #tabStats #statsValueGrid > div:hover {
+    transform:translateY(-2px);
+    border-color:rgba(45,212,191,.34) !important;
+    background:rgba(11,29,32,.74) !important;
   }
   #tabStats #statsCountGrid > div::after,
-  #tabStats #statsValueGrid > div::after {
-    content:"";
-    position:absolute;
-    left:0;
-    bottom:0;
-    width:38%;
-    height:1px;
-    background:linear-gradient(90deg,rgba(45,212,191,.42),transparent);
-  }
+  #tabStats #statsValueGrid > div::after { display:none !important; }
   #tabStats #statsCountGrid > div p:last-child,
   #tabStats #statsValueGrid > div p:last-child {
-    font-size:1.35rem !important;
-    line-height:1.15;
+    margin-top:.35rem !important;
+    font-size:1.45rem !important;
+    line-height:1.1;
   }
   #tabStats .chart-box {
-    height:225px;
-    padding:1rem;
-    border:0;
-    border-top:1px solid rgba(45,212,191,.22);
-    border-radius:.35rem;
-    background:linear-gradient(135deg,rgba(45,212,191,.055),rgba(255,255,255,.015));
+    height:240px;
+    margin-top:.9rem;
+    padding:1.15rem;
+    border:1px solid rgba(45,212,191,.17);
+    border-radius:1rem;
+    background:rgba(5,15,18,.54);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 10px 26px rgba(0,0,0,.12);
   }
 
-  /* Barres de choix : navigation fine avec indicateur actif, sans bouton plein. */
+  /* Barres de choix : option active pleine, compacte et clairement identifiable. */
   main .choice-bar {
-    gap:.25rem;
-    padding:0;
-    border:0;
-    border-bottom:1px solid rgba(148,163,184,.18);
-    border-radius:0;
-    background:transparent;
+    gap:.35rem;
+    padding:.3rem;
+    border:1px solid rgba(148,163,184,.17);
+    border-radius:.85rem;
+    background:rgba(255,255,255,.025);
   }
   main .choice-option {
     position:relative;
     min-height:38px;
-    border:0 !important;
-    border-radius:.45rem .45rem 0 0;
+    border:1px solid transparent !important;
+    border-radius:.62rem;
     background:transparent !important;
     box-shadow:none !important;
-    color:#7f8998;
+    color:#8d97a6;
   }
   main .choice-option:hover {
     color:var(--choice-text);
-    background:rgba(var(--choice-rgb),.055) !important;
+    background:rgba(var(--choice-rgb),.13) !important;
   }
   main .choice-option.is-active {
-    color:var(--choice-text);
+    color:var(--choice-active-text) !important;
     font-weight:800;
-    background:rgba(var(--choice-rgb),.07) !important;
+    background:rgb(var(--choice-rgb)) !important;
+    border-color:rgba(255,255,255,.24) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.42),0 4px 12px rgba(var(--choice-rgb),.25) !important;
   }
-  main .choice-option.is-active::after {
-    content:"";
-    position:absolute;
-    left:18%;
-    right:18%;
-    bottom:-1px;
-    height:2px;
-    border-radius:999px;
-    background:rgb(var(--choice-rgb));
-    box-shadow:0 0 10px rgba(var(--choice-rgb),.38);
-  }
+  main .choice-option.is-active::after { display:none !important; }
 
   body.theme-light #modalContent .movie-detail-shell > :nth-child(2),
   body.theme-light #modalContent .movie-detail-shell > :nth-child(3),
@@ -2518,15 +2516,29 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
   }
   body.theme-light #tabStats #statsCountGrid > div,
   body.theme-light #tabStats #statsValueGrid > div {
-    background:linear-gradient(100deg,rgba(45,212,191,.13),rgba(255,255,255,.7) 65%) !important;
+    background:rgba(255,255,255,.78) !important;
+    border-color:rgba(13,148,136,.2) !important;
+    border-top-color:rgba(13,148,136,.58) !important;
+    box-shadow:inset 0 1px 0 #fff,0 9px 22px rgba(15,23,42,.08) !important;
+  }
+  body.theme-light #tabStats #statsCountGrid > div:hover,
+  body.theme-light #tabStats #statsValueGrid > div:hover {
+    background:#fff !important;
+    border-color:rgba(13,148,136,.32) !important;
   }
   body.theme-light #tabStats .chart-box {
-    background:linear-gradient(135deg,rgba(45,212,191,.1),rgba(255,255,255,.58));
+    background:rgba(255,255,255,.68);
+    border-color:rgba(13,148,136,.18);
+    box-shadow:inset 0 1px 0 #fff,0 9px 22px rgba(15,23,42,.07);
   }
   body.theme-light main .choice-bar {
-    border-bottom-color:rgba(15,23,42,.14);
+    background:rgba(255,255,255,.58);
+    border-color:rgba(15,23,42,.13);
   }
   body.theme-light main .choice-option { color:#64748b; }
+  body.theme-light main .choice-option.is-active {
+    color:var(--choice-active-text) !important;
+  }
 
 }
 </style>
