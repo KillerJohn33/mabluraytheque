@@ -2902,6 +2902,137 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
     border-bottom-color:rgba(var(--unified-accent),.13) !important;
   }
 
+  /* Vignettes simples : la couleur structure les sections, pas chaque petite carte. */
+  #trackedSeriesGrid > .glass-card,
+  #tabStats #statsCountGrid > div,
+  #tabStats #statsValueGrid > div,
+  #tabSettings .equipment-card,
+  #tabSettings .project-card,
+  #tabHome #homeDashboard > div {
+    border:1px solid rgba(148,163,184,.16) !important;
+    border-top:1px solid rgba(148,163,184,.16) !important;
+    border-radius:.8rem !important;
+    background:rgba(255,255,255,.03) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 6px 16px rgba(0,0,0,.08) !important;
+  }
+  #trackedSeriesGrid > .glass-card:hover,
+  #tabStats #statsCountGrid > div:hover,
+  #tabStats #statsValueGrid > div:hover,
+  #tabSettings .equipment-card:hover,
+  #tabSettings .project-card:hover {
+    transform:translateY(-1px) !important;
+    border-color:rgba(var(--unified-accent),.27) !important;
+    background:rgba(var(--unified-accent),.045) !important;
+  }
+
+  /* Les fiches détaillées reprennent exactement le rythme visuel des pages. */
+  #detailModal > div {
+    border:1px solid rgba(148,163,184,.16) !important;
+    background:rgba(7,9,14,.97) !important;
+    box-shadow:0 24px 70px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.055) !important;
+  }
+  #modalContent .movie-detail-shell { --detail-accent:34,211,238; }
+  #modalContent .series-detail-shell { --detail-accent:167,139,250; }
+
+  #modalContent .movie-detail-shell > :nth-child(2),
+  #modalContent .movie-detail-shell > :nth-child(3),
+  #modalContent .movie-detail-shell > :nth-child(4),
+  #modalContent .series-detail-info,
+  #modalContent .series-detail-seasons {
+    position:relative;
+    margin-top:1.15rem !important;
+    padding:1.3rem 1rem !important;
+    border:0 !important;
+    border-top:1px solid rgba(var(--detail-accent),.4) !important;
+    border-radius:.4rem !important;
+    background:linear-gradient(110deg,rgba(var(--detail-accent),.085),rgba(var(--detail-accent),.025) 30%,transparent 66%) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.03) !important;
+  }
+  #modalContent .movie-detail-shell > :nth-child(2)::before,
+  #modalContent .movie-detail-shell > :nth-child(3)::before,
+  #modalContent .movie-detail-shell > :nth-child(4)::before,
+  #modalContent .series-detail-info::before,
+  #modalContent .series-detail-seasons::before {
+    content:"";
+    position:absolute;
+    top:-1px;
+    left:0;
+    width:min(15rem,42%);
+    height:2px;
+    border-radius:999px;
+    background:linear-gradient(90deg,rgba(var(--detail-accent),.95),rgba(var(--detail-accent),.32),transparent);
+    box-shadow:0 0 13px rgba(var(--detail-accent),.22);
+    pointer-events:none;
+  }
+  #modalContent .movie-detail-hero,
+  #modalContent .series-detail-hero {
+    border-color:rgba(var(--detail-accent),.23) !important;
+    box-shadow:0 16px 36px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.07);
+  }
+
+  /* Editions, saisons et épisodes restent de simples lignes lisibles. */
+  #modalContent .edition-card,
+  #modalContent .edition-card.has-edition-cover {
+    padding:1rem .25rem !important;
+    border:0 !important;
+    border-top:1px solid rgba(148,163,184,.15) !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+  #modalContent .series-season-panel {
+    border:0 !important;
+    border-top:1px solid rgba(148,163,184,.15) !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+  #modalContent .series-season-panel > summary {
+    padding:.9rem .25rem !important;
+    background:transparent !important;
+  }
+  #modalContent .series-episode-row {
+    border-radius:.5rem;
+  }
+  #modalContent .series-episode-row:hover {
+    background:rgba(var(--detail-accent),.045);
+  }
+
+  body.theme-light #trackedSeriesGrid > .glass-card,
+  body.theme-light #tabStats #statsCountGrid > div,
+  body.theme-light #tabStats #statsValueGrid > div,
+  body.theme-light #tabSettings .equipment-card,
+  body.theme-light #tabSettings .project-card,
+  body.theme-light #tabHome #homeDashboard > div {
+    border-color:rgba(15,23,42,.12) !important;
+    background:rgba(255,255,255,.7) !important;
+    box-shadow:inset 0 1px 0 #fff,0 5px 14px rgba(15,23,42,.055) !important;
+  }
+  body.theme-light #trackedSeriesGrid > .glass-card:hover,
+  body.theme-light #tabStats #statsCountGrid > div:hover,
+  body.theme-light #tabStats #statsValueGrid > div:hover,
+  body.theme-light #tabSettings .equipment-card:hover,
+  body.theme-light #tabSettings .project-card:hover {
+    border-color:rgba(var(--unified-accent),.22) !important;
+    background:rgba(var(--unified-accent),.055) !important;
+  }
+  body.theme-light #detailModal > div {
+    border-color:rgba(15,23,42,.13) !important;
+    background:rgba(248,250,252,.98) !important;
+    box-shadow:0 24px 70px rgba(15,23,42,.2),inset 0 1px 0 #fff !important;
+  }
+  body.theme-light #modalContent .movie-detail-shell > :nth-child(2),
+  body.theme-light #modalContent .movie-detail-shell > :nth-child(3),
+  body.theme-light #modalContent .movie-detail-shell > :nth-child(4),
+  body.theme-light #modalContent .series-detail-info,
+  body.theme-light #modalContent .series-detail-seasons {
+    background:linear-gradient(110deg,rgba(var(--detail-accent),.1),rgba(255,255,255,.65) 38%,rgba(255,255,255,.2)) !important;
+  }
+  body.theme-light #modalContent .edition-card,
+  body.theme-light #modalContent .series-season-panel {
+    border-top-color:rgba(15,23,42,.12) !important;
+  }
+
 }
 </style>
 </head>
