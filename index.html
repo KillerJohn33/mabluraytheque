@@ -2134,6 +2134,100 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
 @media (max-width:767px) {
   #detailModal:not(.hidden) > div { transform-origin:bottom center; }
 }
+
+/* EXPERIENCE UI ORDINATEUR — reference precedente conservee dans Git (commit 5dae64d) */
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  :root { --desktop-section-line: rgba(148,163,184,.16); }
+
+  /* Les panneaux structurants deviennent des sections continues, comme dans une fiche film. */
+  #tabHome > .glass-card,
+  #homeCalendarLayout > .glass-card,
+  #tabCollection > #collectionOverviewBar,
+  #collectionFilterPanel > .glass-card,
+  #tabSeries > .glass-card,
+  #seriesSidebarLayout > .glass-card,
+  #seriesSidebarLayout > div > .glass-card,
+  #tabWishlist > .glass-card,
+  #wishlistLayout > .glass-card,
+  #tabDigital > .glass-card,
+  #digitalFilterPanel > .glass-card,
+  #tabStats > .modern-panel,
+  #tabSettings > .modern-panel:not(#dangerZonePanel) {
+    width:100%;
+    margin:0 !important;
+    padding:1.2rem 0 !important;
+    overflow:visible;
+    border:0 !important;
+    border-top:1px solid var(--desktop-section-line) !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+  }
+
+  #tabHome > .glass-card::before,
+  #homeCalendarLayout > .glass-card::before,
+  #tabCollection > #collectionOverviewBar::before,
+  #collectionFilterPanel > .glass-card::before,
+  #tabSeries > .glass-card::before,
+  #seriesSidebarLayout > .glass-card::before,
+  #seriesSidebarLayout > div > .glass-card::before,
+  #tabWishlist > .glass-card::before,
+  #wishlistLayout > .glass-card::before,
+  #tabDigital > .glass-card::before,
+  #digitalFilterPanel > .glass-card::before,
+  #tabStats > .modern-panel::before,
+  #tabSettings > .modern-panel:not(#dangerZonePanel)::before {
+    display:none !important;
+  }
+
+  /* Les débuts de page respirent davantage, sans ligne décorative superflue. */
+  #tabHome > .glass-card:first-child,
+  #tabCollection > #collectionOverviewBar,
+  #tabSeries > .glass-card:first-of-type,
+  #tabWishlist > .glass-card:first-of-type,
+  #tabDigital > .glass-card:first-of-type,
+  #tabStats > .modern-panel:first-of-type,
+  #tabSettings > .modern-panel:first-of-type {
+    border-top-color:transparent !important;
+    padding-top:.35rem !important;
+  }
+
+  /* Deux sections côte à côte restent visuellement reliées au lieu de former deux fenêtres. */
+  #homeCalendarLayout,
+  #wishlistLayout,
+  #seriesSidebarLayout {
+    gap:1.5rem !important;
+  }
+  #homeCalendarLayout > .glass-card + .glass-card,
+  #wishlistLayout > .glass-card + .glass-card {
+    border-left:1px solid var(--desktop-section-line) !important;
+    border-top-color:transparent !important;
+    padding-left:1.5rem !important;
+  }
+
+  /* Les petites données restent lisibles mais perdent l'effet de boîte dans les pages de synthèse. */
+  #tabStats > .modern-panel > .grid > div,
+  #tabStats #statsCountGrid > div,
+  #tabStats #statsValueGrid > div,
+  #tabSettings > .modern-panel:not(#dangerZonePanel) > .grid > div,
+  #tabHome #homeDashboard > div {
+    border-color:rgba(148,163,184,.13) !important;
+    background:rgba(255,255,255,.025) !important;
+    box-shadow:none !important;
+  }
+
+  body.theme-light { --desktop-section-line: rgba(15,23,42,.14); }
+  body.theme-light #tabStats > .modern-panel > .grid > div,
+  body.theme-light #tabStats #statsCountGrid > div,
+  body.theme-light #tabStats #statsValueGrid > div,
+  body.theme-light #tabSettings > .modern-panel:not(#dangerZonePanel) > .grid > div,
+  body.theme-light #tabHome #homeDashboard > div {
+    background:rgba(255,255,255,.42) !important;
+    border-color:rgba(15,23,42,.12) !important;
+  }
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
