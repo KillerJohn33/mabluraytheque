@@ -3637,6 +3637,79 @@ body.theme-light .detail-danger-label{color:#991b1b}
     grid-template-columns:minmax(0,1fr) !important;
   }
 }
+
+/* Wishlist : filtres compacts et séparateurs roses sur tous les écrans */
+#tabWishlist{
+  --desktop-section-accent:244,114,182;
+  --unified-accent:244,114,182;
+  --touch-accent:244,114,182;
+}
+#wishlistFilterRow{
+  min-height:42px;
+}
+#wishlistFilterToggle[aria-expanded="true"]{
+  color:#fbcfe8 !important;
+  border-color:rgba(244,114,182,.3);
+  background:rgba(244,114,182,.12);
+}
+#wishlistFilterToggle .wishlist-filter-chevron{
+  transition:transform .18s ease;
+}
+#wishlistFilterToggle[aria-expanded="true"] .wishlist-filter-chevron{
+  transform:rotate(180deg);
+}
+#wishlistFilterPanel{
+  width:100%;
+  min-width:0;
+}
+#wishlistFilterPanel:not(.hidden){
+  animation:wishlistFilterReveal .18s ease-out both;
+}
+@keyframes wishlistFilterReveal{
+  from{opacity:0;transform:translateY(-4px)}
+  to{opacity:1;transform:none}
+}
+#wishlistFilterPanel .wishlist-filter-card{
+  position:relative;
+  width:100%;
+  min-width:0;
+  overflow:visible;
+  border:0;
+  border-top:1px solid rgba(244,114,182,.38);
+  border-radius:.4rem;
+  background:linear-gradient(110deg,rgba(244,114,182,.085),rgba(244,114,182,.025) 34%,transparent 70%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
+}
+#wishlistFilterPanel .wishlist-filter-card::before{
+  content:"";
+  position:absolute;
+  top:-1px;
+  left:0;
+  width:min(15rem,42%);
+  height:2px;
+  border-radius:0;
+  background:linear-gradient(90deg,rgba(244,114,182,.95),rgba(244,114,182,.32),transparent);
+  box-shadow:0 0 13px rgba(244,114,182,.22);
+  pointer-events:none;
+}
+#wishlistFilterPanel .wishlist-filter-card > *{
+  position:relative;
+  z-index:1;
+}
+body.theme-light #wishlistFilterPanel .wishlist-filter-card{
+  border-top-color:rgba(219,39,119,.3);
+  background:linear-gradient(110deg,rgba(244,114,182,.13),rgba(255,255,255,.68) 38%,rgba(255,255,255,.24));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+}
+body.theme-light #wishlistFilterToggle[aria-expanded="true"]{
+  color:#9d174d !important;
+  background:rgba(219,39,119,.1);
+}
+@media (max-width:767px){
+  #wishlistFilterRow{min-height:38px}
+  #wishlistFilterToggle{min-height:38px !important;padding:.45rem .7rem !important}
+  #wishlistFilterPanel .wishlist-filter-card{padding:.7rem !important}
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -4031,37 +4104,11 @@ body.theme-light .detail-danger-label{color:#991b1b}
 <span id="wishlistTotalCount" class="bg-pink-500/20 text-pink-300 font-black text-xs px-2.5 py-1 rounded-xl border border-pink-500/30">0 film</span>
 </div>
 
-<div id="wishlistLayout" class="space-y-4 md:space-y-0 md:grid md:grid-cols-2 md:gap-5 md:items-start">
-
-<div class="glass-card p-2.5 md:p-6 rounded-2xl space-y-1.5 md:space-y-4 border border-white/10 w-full">
-<div class="flex items-center gap-2 pb-0.5">
-<span class="icon-chip chip-sm" data-icon="calendar"></span>
-<div>
-<h3 class="text-xs font-bold text-white">Calendrier des Sorties</h3>
-<p class="text-[9px] text-gray-400">Sorties cinéma de votre wishlist.</p>
+<div id="wishlistFilterRow" class="flex items-center gap-2">
+<button id="wishlistFilterToggle" type="button" onclick="toggleWishlistFilters()" aria-expanded="false" aria-controls="wishlistFilterPanel" class="wishlist-filter-toggle glass-pill px-3 py-2 rounded-xl text-[11px] font-semibold text-pink-300 hover:text-white flex items-center gap-2 min-h-[42px]"><span class="icon-inline w-3.5 h-3.5" data-icon="filter"></span> Filtrer <span id="wishlistActiveFilterCount" class="hidden bg-pink-400/20 text-pink-200 rounded-full px-1.5 py-0.5 text-[9px]"></span><span class="wishlist-filter-chevron icon-inline w-3 h-3 ml-0.5" data-icon="chevrondown"></span></button>
 </div>
-</div>
-
-<div class="flex items-center justify-between px-0.5 pt-0.5">
-<button onclick="changeWishlistCalendarMonth(-1)" class="glass-pill w-6 h-6 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center text-gray-300 hover:text-white transition">
-<span class="icon-inline w-3 h-3 md:w-4 md:h-4" data-icon="chevronleft"></span>
-</button>
-<span id="wishlistCalMonthLabel" class="text-[11px] md:text-xl font-bold text-white"></span>
-<button onclick="changeWishlistCalendarMonth(1)" class="glass-pill w-6 h-6 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center text-gray-300 hover:text-white transition">
-<span class="icon-inline w-3 h-3 md:w-4 md:h-4" data-icon="chevronright"></span>
-</button>
-</div>
-
-<div class="grid grid-cols-7 gap-0.5 md:gap-2 text-center text-[8px] md:text-xs text-gray-500 font-bold uppercase pt-0.5">
-<div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div><div>D</div>
-</div>
-<div id="wishlistCalendarGrid" class="grid grid-cols-7 gap-0.5 md:gap-2"></div>
-
-<div id="wishlistCalendarDayDetail" class="hidden"></div>
-</div>
-
-<div class="space-y-4">
-<div class="glass-card p-3 rounded-2xl space-y-2 border border-white/10">
+<div id="wishlistFilterPanel" class="hidden">
+<div class="wishlist-filter-card p-3 space-y-2">
 <div class="flex items-center justify-between border-b border-white/10 pb-2">
 <span class="text-[11px] font-bold text-gray-300 flex items-center gap-1.5"><span class="icon-inline w-3.5 h-3.5 text-pink-300" data-icon="filter"></span> Filtres & Tri</span>
 <button onclick="toggleWishlistViewMode()" id="toggleViewBtnWishlist" class="glass-pill px-2.5 py-1 rounded-xl text-[11px] text-pink-300 hover:text-white flex items-center gap-1 transition">
@@ -4097,10 +4144,38 @@ body.theme-light .detail-danger-label{color:#991b1b}
 <input id="filterTextWishlist" type="text" placeholder="Mot clé..." oninput="renderWishlist()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
 </div>
 </div>
-
-<div id="wishlistGrid" class="grid grid-cols-2 gap-4"></div>
 </div>
 
+<div id="wishlistLayout" class="space-y-4 md:space-y-0 md:grid md:grid-cols-2 md:gap-5 md:items-start">
+<div class="glass-card p-2.5 md:p-6 rounded-2xl space-y-1.5 md:space-y-4 border border-white/10 w-full">
+<div class="flex items-center gap-2 pb-0.5">
+<span class="icon-chip chip-sm" data-icon="calendar"></span>
+<div>
+<h3 class="text-xs font-bold text-white">Calendrier des Sorties</h3>
+<p class="text-[9px] text-gray-400">Sorties cinéma de votre wishlist.</p>
+</div>
+</div>
+
+<div class="flex items-center justify-between px-0.5 pt-0.5">
+<button onclick="changeWishlistCalendarMonth(-1)" class="glass-pill w-6 h-6 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center text-gray-300 hover:text-white transition">
+<span class="icon-inline w-3 h-3 md:w-4 md:h-4" data-icon="chevronleft"></span>
+</button>
+<span id="wishlistCalMonthLabel" class="text-[11px] md:text-xl font-bold text-white"></span>
+<button onclick="changeWishlistCalendarMonth(1)" class="glass-pill w-6 h-6 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center text-gray-300 hover:text-white transition">
+<span class="icon-inline w-3 h-3 md:w-4 md:h-4" data-icon="chevronright"></span>
+</button>
+</div>
+
+<div class="grid grid-cols-7 gap-0.5 md:gap-2 text-center text-[8px] md:text-xs text-gray-500 font-bold uppercase pt-0.5">
+<div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div><div>D</div>
+</div>
+<div id="wishlistCalendarGrid" class="grid grid-cols-7 gap-0.5 md:gap-2"></div>
+
+<div id="wishlistCalendarDayDetail" class="hidden"></div>
+</div>
+<div class="space-y-4 min-w-0">
+<div id="wishlistGrid" class="grid grid-cols-2 gap-4"></div>
+</div>
 </div>
 </div>
 
@@ -7329,9 +7404,11 @@ showToast(`${deleted} fiche${deleted > 1 ? 's' : ''} supprimée${deleted > 1 ? '
 function closeFilterDropdowns() {
 document.getElementById('collectionFilterPanel')?.classList.add('hidden');
 document.getElementById('digitalFilterPanel')?.classList.add('hidden');
+document.getElementById('wishlistFilterPanel')?.classList.add('hidden');
 document.getElementById('filterDropdownBackdrop')?.classList.add('hidden');
 document.getElementById('collectionFilterToggle')?.setAttribute('aria-expanded', 'false');
 document.getElementById('digitalFilterToggle')?.setAttribute('aria-expanded', 'false');
+document.getElementById('wishlistFilterToggle')?.setAttribute('aria-expanded', 'false');
 }
 
 function toggleCollectionFilters() {
@@ -7339,6 +7416,14 @@ const panel = document.getElementById('collectionFilterPanel');
 const button = document.getElementById('collectionFilterToggle');
 const open = panel.classList.toggle('hidden') === false;
 button?.setAttribute('aria-expanded', String(open));
+}
+
+function toggleWishlistFilters() {
+ const panel = document.getElementById('wishlistFilterPanel');
+ const button = document.getElementById('wishlistFilterToggle');
+ if (!panel) return;
+ const open = panel.classList.toggle('hidden') === false;
+ button?.setAttribute('aria-expanded', String(open));
 }
 
 function renderCollectionOverview() {
@@ -7886,6 +7971,12 @@ let filtered = [...wishlist];
 const formatFilter = document.getElementById('filterFormatWishlist').value;
 const sortVal = document.getElementById('sortSelectWishlist').value;
 const textFilter = document.getElementById('filterTextWishlist').value.toLowerCase().trim();
+const wishlistActiveFilterCount = [formatFilter !== 'all', sortVal !== 'added_desc', !!textFilter].filter(Boolean).length;
+const wishlistFilterBadge = document.getElementById('wishlistActiveFilterCount');
+if (wishlistFilterBadge) {
+ wishlistFilterBadge.textContent = wishlistActiveFilterCount ? String(wishlistActiveFilterCount) : '';
+ wishlistFilterBadge.classList.toggle('hidden', !wishlistActiveFilterCount);
+}
 
 if (formatFilter !== 'all') {
 filtered = filtered.filter(m => m.editions && m.editions.some(e => e.format === formatFilter));
