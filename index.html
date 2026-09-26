@@ -8695,11 +8695,11 @@ ${movie.preordered ? `<label class="flex items-center gap-1.5 min-w-0"><span cla
 </div>
 
 <!-- ACTIONS -->
-${(isSeriesMovie || movie.isWishlist) ? `<div class="flex gap-2 pt-1">
+<div class="flex gap-2 pt-1">
 ${isSeriesMovie ? `<button onclick="trackSeriesFromMovie(${movieIdArg})" class="app-action app-action-violet flex-1 px-3 py-2.5 text-[10px]">${ic('tv','w-3.5 h-3.5')} ${isTrackedSeries(movie.tmdb_id) ? 'Gérer le suivi' : 'Suivre la série'}</button>` : ''}
 ${movie.isWishlist ? `<button onclick="moveWishlistToCollection(${movieIdArg})" class="app-action app-action-green flex-1 px-3 py-2.5 text-[10px]">${ic('download','w-3.5 h-3.5')} Ajouter à la collection</button>` : ''}
-</div>` : ''}
-<div class="detail-danger-zone"><span class="detail-danger-label">Supprimer définitivement cette fiche</span><button onclick="deleteMovie(${movieIdArg})" class="app-action app-action-red px-3 py-2.5 text-[10px]">${ic('trash','w-3.5 h-3.5')} Supprimer</button></div>
+<button onclick="deleteMovie(${movieIdArg})" class="app-action app-action-red ${movie.isWishlist ? 'px-3' : 'flex-1'} py-2.5 text-[10px]">${ic('trash','w-3.5 h-3.5')} Supprimer</button>
+</div>
 </div>`;
 
 modal.classList.remove('hidden');
