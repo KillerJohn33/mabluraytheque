@@ -4130,6 +4130,50 @@ body.theme-light .home-widget-controls button:hover{color:#075985;background:rgb
   #homeWidgetRecent #recentGrid{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
   #homeCalendarLayout{grid-template-columns:minmax(0,1fr) !important}
 }
+
+/* Réglages internes et nouveaux panneaux de l'accueil */
+.home-widget-options{position:relative;z-index:4;display:flex;align-items:center;gap:.38rem;flex-wrap:wrap;margin:.15rem 0 .8rem;padding:.55rem .65rem;border:1px solid rgba(34,211,238,.14);border-radius:.85rem;background:rgba(3,10,18,.82)}
+.home-widget-options.hidden{display:none}
+.home-widget-options>span{font-size:.55rem;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:#64748b;margin-right:.12rem}
+.home-option-chip{min-height:1.7rem;padding:.25rem .55rem;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#94a3b8;font-size:.58rem;font-weight:700;transition:.16s ease}
+.home-option-chip:hover{color:#fff;border-color:rgba(34,211,238,.3)}
+.home-option-chip.is-active{color:#cffafe;background:rgba(6,182,212,.18);border-color:rgba(34,211,238,.38)}
+#homeDashboard{grid-template-columns:repeat(var(--home-metric-count,4),minmax(0,1fr))}
+#homeWidgetRecent #recentGrid[data-poster-size="small"]{grid-template-columns:repeat(6,minmax(0,1fr))!important}
+#homeWidgetRecent #recentGrid[data-poster-size="medium"]{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+#homeWidgetRecent #recentGrid[data-poster-size="large"]{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+.home-media-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem}
+.home-media-card{position:relative;overflow:hidden;aspect-ratio:2/3;border-radius:1rem;border:1px solid rgba(255,255,255,.1);background:#05070a;text-align:left;transition:transform .18s ease,border-color .18s ease}
+.home-media-card:hover{transform:translateY(-2px);border-color:rgba(34,211,238,.38)}
+.home-media-card img{width:100%;height:100%;object-fit:cover}
+.home-media-gradient{position:absolute;inset:35% 0 0;background:linear-gradient(transparent,rgba(0,0,0,.96))}
+.home-media-copy{position:absolute;inset:auto .55rem .55rem;display:flex;flex-direction:column;gap:.16rem;min-width:0}
+.home-media-copy strong{font-size:.66rem;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.home-media-copy small{font-size:.58rem;font-weight:800}
+.home-series-widget-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.55rem}
+.home-series-widget-card,.home-watch-next-row{display:flex;align-items:center;gap:.65rem;width:100%;padding:.45rem;border-radius:.9rem;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);text-align:left;transition:.16s ease}
+.home-series-widget-card:hover,.home-watch-next-row:hover{background:rgba(255,255,255,.06);border-color:rgba(167,139,250,.3)}
+.home-series-widget-card img{width:2.65rem;height:3.8rem;border-radius:.65rem;object-fit:cover;flex:none}
+.home-series-widget-card>span,.home-watch-next-row>span:nth-child(2){display:flex;flex-direction:column;gap:.24rem;min-width:0;flex:1}
+.home-series-widget-card strong,.home-watch-next-row strong{font-size:.66rem;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.home-series-widget-card small,.home-watch-next-row small{font-size:.56rem;color:#94a3b8}
+.home-series-widget-card i{display:block;height:.23rem;border-radius:999px;background:rgba(255,255,255,.09);overflow:hidden}
+.home-series-widget-card i b{display:block;height:100%;border-radius:inherit;background:#8b5cf6}
+.home-watch-next-row img{width:2rem;height:2.8rem;border-radius:.5rem;object-fit:cover;flex:none}
+.home-watch-next-row>.icon-inline{color:#64748b;flex:none}
+.home-widget-empty{grid-column:1/-1;padding:1rem;text-align:center;font-size:.65rem;color:#64748b}
+body.theme-light .home-widget-options{background:rgba(248,250,252,.94);border-color:rgba(2,132,199,.18)}
+body.theme-light .home-option-chip{background:rgba(15,23,42,.04);border-color:rgba(15,23,42,.1);color:#64748b}
+body.theme-light .home-option-chip.is-active{color:#075985;background:rgba(14,165,233,.12);border-color:rgba(2,132,199,.3)}
+body.theme-light .home-series-widget-card,body.theme-light .home-watch-next-row{background:rgba(255,255,255,.65);border-color:rgba(15,23,42,.09)}
+@media(max-width:767px){
+ #homeDashboard{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #homeWidgetRecent #recentGrid[data-poster-size="small"]{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+ #homeWidgetRecent #recentGrid[data-poster-size="medium"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #homeWidgetRecent #recentGrid[data-poster-size="large"]{grid-template-columns:1fr!important}
+ .home-media-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .home-series-widget-list{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -4281,6 +4325,21 @@ body.theme-light .home-widget-controls button:hover{color:#075985;background:rgb
 <span>Lancer</span>
 </button>
 </div>
+</div>
+
+<div id="homeWidgetTopRated" data-home-widget="topRated" data-home-size="wide" class="home-widget home-widget-panel">
+<div class="flex items-center justify-between mb-3 px-1"><div class="flex items-center gap-2"><span class="icon-chip chip-sm" data-icon="star"></span><h2 class="text-xs font-bold text-white">Mes films les mieux notés</h2></div><button onclick="switchTab('collection')" class="text-[10px] font-semibold text-cyan-300 hover:text-white">Ma collection →</button></div>
+<div id="homeTopRatedGrid" class="home-media-grid"></div>
+</div>
+
+<div id="homeWidgetWatchingSeries" data-home-widget="watchingSeries" data-home-size="wide" class="home-widget home-widget-panel">
+<div class="flex items-center justify-between mb-3 px-1"><div class="flex items-center gap-2"><span class="icon-chip chip-sm" data-icon="tv"></span><h2 class="text-xs font-bold text-white">Mes séries en cours</h2></div><button onclick="switchTab('series')" class="text-[10px] font-semibold text-purple-300 hover:text-white">Toutes les séries →</button></div>
+<div id="homeWatchingSeriesGrid" class="home-series-widget-list"></div>
+</div>
+
+<div id="homeWidgetWatchNext" data-home-widget="watchNext" data-home-size="small" class="home-widget glass-card p-4 rounded-2xl border border-white/10">
+<div class="flex items-center justify-between gap-2 mb-3"><div class="flex items-center gap-2"><span class="icon-chip chip-sm" data-icon="play"></span><h2 class="text-xs font-bold text-white">À voir ensuite</h2></div><span id="homeUnseenCount" class="text-[9px] font-bold text-orange-300"></span></div>
+<div id="homeWatchNextList" class="space-y-1.5"></div>
 </div>
 </div>
 
@@ -5880,7 +5939,8 @@ function normalizeProfileData(value) {
  const homeLayout = {
   order: Array.isArray(homeLayoutRaw.order) ? homeLayoutRaw.order.map(String) : [],
   hidden: Array.isArray(homeLayoutRaw.hidden) ? homeLayoutRaw.hidden.map(String) : [],
-  sizes: homeLayoutRaw.sizes && typeof homeLayoutRaw.sizes === 'object' ? { ...homeLayoutRaw.sizes } : {}
+  sizes: homeLayoutRaw.sizes && typeof homeLayoutRaw.sizes === 'object' ? { ...homeLayoutRaw.sizes } : {},
+  options: homeLayoutRaw.options && typeof homeLayoutRaw.options === 'object' ? JSON.parse(JSON.stringify(homeLayoutRaw.options)) : {}
  };
  return { equipment, projects, subscriptions, plex, profile, homeLayout, updatedAt: value?.updatedAt || '' };
 }
@@ -7641,8 +7701,17 @@ const HOME_WIDGET_DEFS = {
  dashboard:{ label:'Tableau de bord', defaultSize:'wide' },
  recent:{ label:'Derniers ajouts', defaultSize:'wide' },
  calendar:{ label:'Calendrier', defaultSize:'large' },
- random:{ label:'Choix aléatoire', defaultSize:'small' }
+ random:{ label:'Choix aléatoire', defaultSize:'small' },
+ topRated:{ label:'Mes films les mieux notés', defaultSize:'wide', defaultHidden:true },
+ watchingSeries:{ label:'Mes séries en cours', defaultSize:'wide', defaultHidden:true },
+ watchNext:{ label:'À voir ensuite', defaultSize:'small', defaultHidden:true }
 };
+const HOME_METRIC_DEFS = {
+ works:{label:'Œuvres'}, editions:{label:'Éditions'}, steelbooks:{label:'Steelbooks'},
+ value:{label:'Valeur estimée'}, discs:{label:'Disques'}, unseen:{label:'À voir'},
+ collectors:{label:'Coffrets collector'}, series:{label:'Séries suivies'}
+};
+const HOME_DEFAULT_METRICS = ['works','editions','steelbooks','value'];
 const HOME_WIDGET_IDS = Object.keys(HOME_WIDGET_DEFS);
 let homeCustomizationActive = false;
 let homeLayoutSaveTimer = null;
@@ -7653,12 +7722,24 @@ function normalizedHomeLayout() {
  const order = Array.isArray(raw.order) ? raw.order.filter(id => HOME_WIDGET_IDS.includes(id)) : [];
  HOME_WIDGET_IDS.forEach(id => { if (!order.includes(id)) order.push(id); });
  const hidden = Array.isArray(raw.hidden) ? raw.hidden.filter(id => HOME_WIDGET_IDS.includes(id)) : [];
+ HOME_WIDGET_IDS.forEach(id => {
+  if (HOME_WIDGET_DEFS[id].defaultHidden && (!Array.isArray(raw.order) || !raw.order.includes(id)) && !hidden.includes(id)) hidden.push(id);
+ });
  const sizes = {};
  HOME_WIDGET_IDS.forEach(id => {
   const size = raw.sizes?.[id];
   sizes[id] = ['small','wide','large'].includes(size) ? size : HOME_WIDGET_DEFS[id].defaultSize;
  });
- return { order, hidden, sizes };
+ const sourceOptions = raw.options && typeof raw.options === 'object' ? raw.options : {};
+ const metrics = Array.isArray(sourceOptions.dashboardMetrics) ? sourceOptions.dashboardMetrics.filter(key => HOME_METRIC_DEFS[key]) : HOME_DEFAULT_METRICS;
+ const options = {
+  recentPosterSize: ['small','medium','large'].includes(sourceOptions.recentPosterSize) ? sourceOptions.recentPosterSize : 'medium',
+  recentCount: [4,6,8,10].includes(Number(sourceOptions.recentCount)) ? Number(sourceOptions.recentCount) : 6,
+  dashboardMetrics: metrics.length ? metrics : [...HOME_DEFAULT_METRICS],
+  topRatedCount: [3,4,6,8].includes(Number(sourceOptions.topRatedCount)) ? Number(sourceOptions.topRatedCount) : 4,
+  seriesCount: [2,3,4,6].includes(Number(sourceOptions.seriesCount)) ? Number(sourceOptions.seriesCount) : 3
+ };
+ return { order, hidden, sizes, options };
 }
 
 function persistHomeLayout(layout) {
@@ -7675,6 +7756,7 @@ function homeWidgetControls(id, size) {
   <button type="button" onclick="moveHomeWidget('${id}',-1)" title="Déplacer avant" aria-label="Déplacer avant">${ic('chevronleft','w-3 h-3')}</button>
   <button type="button" onclick="cycleHomeWidgetSize('${id}')" title="Changer la taille" class="home-widget-size"><span>${sizeLabels[size]}</span></button>
   <button type="button" onclick="moveHomeWidget('${id}',1)" title="Déplacer après" aria-label="Déplacer après">${ic('chevronright','w-3 h-3')}</button>
+  ${['dashboard','recent','topRated','watchingSeries'].includes(id) ? `<button type="button" onclick="toggleHomeWidgetOptions('${id}')" title="Personnaliser le contenu" aria-label="Personnaliser le contenu">${ic('settings','w-3 h-3')}</button>` : ''}
   <button type="button" onclick="hideHomeWidget('${id}')" title="Masquer ce panneau" aria-label="Masquer ce panneau">${ic('x','w-3 h-3')}</button>
  </div>`;
 }
@@ -7684,7 +7766,10 @@ function renderHomeCustomizationControls(layout) {
   const widget = document.querySelector(`[data-home-widget="${id}"]`);
   if (!widget) return;
   widget.querySelector('.home-widget-controls')?.remove();
+  widget.querySelector('.home-widget-options')?.remove();
   widget.insertAdjacentHTML('afterbegin', homeWidgetControls(id, layout.sizes[id]));
+  const optionsHtml = homeWidgetOptionsHtml(id, layout);
+  if (optionsHtml) widget.querySelector('.home-widget-controls')?.insertAdjacentHTML('afterend', optionsHtml);
   widget.draggable = homeCustomizationActive;
   widget.ondragstart = event => {
    if (!homeCustomizationActive) return event.preventDefault();
@@ -7718,6 +7803,53 @@ function renderHomeCustomizationControls(layout) {
  applyStaticIcons();
 }
 
+function homeOptionButton(active, label, action) {
+ return `<button type="button" class="home-option-chip ${active ? 'is-active' : ''}" onclick="${action}">${escapeHtml(label)}</button>`;
+}
+
+function homeWidgetOptionsHtml(id, layout) {
+ const o = layout.options;
+ if (id === 'recent') return `<div class="home-widget-options hidden" data-home-options="recent"><span>Affiches</span>${['small','medium','large'].map(size => homeOptionButton(o.recentPosterSize === size, ({small:'Petites',medium:'Moyennes',large:'Grandes'})[size], `updateHomeWidgetOption('recent','recentPosterSize','${size}')`)).join('')}<span>Nombre</span>${[4,6,8,10].map(count => homeOptionButton(o.recentCount === count, String(count), `updateHomeWidgetOption('recent','recentCount',${count})`)).join('')}</div>`;
+ if (id === 'dashboard') return `<div class="home-widget-options hidden" data-home-options="dashboard"><span>Indicateurs</span>${Object.entries(HOME_METRIC_DEFS).map(([key,def]) => homeOptionButton(o.dashboardMetrics.includes(key), def.label, `toggleHomeMetric('${key}')`)).join('')}</div>`;
+ if (id === 'topRated') return `<div class="home-widget-options hidden" data-home-options="topRated"><span>Nombre de films</span>${[3,4,6,8].map(count => homeOptionButton(o.topRatedCount === count, String(count), `updateHomeWidgetOption('topRated','topRatedCount',${count})`)).join('')}</div>`;
+ if (id === 'watchingSeries') return `<div class="home-widget-options hidden" data-home-options="watchingSeries"><span>Nombre de séries</span>${[2,3,4,6].map(count => homeOptionButton(o.seriesCount === count, String(count), `updateHomeWidgetOption('watchingSeries','seriesCount',${count})`)).join('')}</div>`;
+ return '';
+}
+
+function toggleHomeWidgetOptions(id) {
+ const panel = document.querySelector(`[data-home-options="${id}"]`);
+ if (panel) panel.classList.toggle('hidden');
+}
+
+function updateHomeWidgetOption(id, key, value) {
+ const layout = normalizedHomeLayout();
+ layout.options[key] = value;
+ persistHomeLayout(layout);
+ applyHomeLayout();
+ renderHomeWidgetsContent();
+ requestAnimationFrame(() => document.querySelector(`[data-home-options="${id}"]`)?.classList.remove('hidden'));
+}
+
+function toggleHomeMetric(key) {
+ const layout = normalizedHomeLayout();
+ const selected = layout.options.dashboardMetrics;
+ if (selected.includes(key)) {
+  if (selected.length === 1) return showToast('Gardez au moins un indicateur.');
+  layout.options.dashboardMetrics = selected.filter(item => item !== key);
+ } else layout.options.dashboardMetrics = [...selected,key];
+ persistHomeLayout(layout);
+ applyHomeLayout();
+ renderHomeDashboard();
+ requestAnimationFrame(() => document.querySelector('[data-home-options="dashboard"]')?.classList.remove('hidden'));
+}
+
+function renderHomeWidgetsContent() {
+ renderHomeDashboard();
+ renderHomeRecent();
+ renderHomeTopRated();
+ renderHomeWatchingSeries();
+ renderHomeWatchNext();
+}
 function applyHomeLayout() {
  const tab = document.getElementById('tabHome');
  if (!tab) return;
@@ -7787,7 +7919,7 @@ function showHomeWidget(id) {
 }
 
 function resetHomeLayout() {
- const layout = { order:[...HOME_WIDGET_IDS], hidden:[], sizes:Object.fromEntries(HOME_WIDGET_IDS.map(id => [id,HOME_WIDGET_DEFS[id].defaultSize])) };
+ const layout = { order:[...HOME_WIDGET_IDS], hidden:HOME_WIDGET_IDS.filter(id => HOME_WIDGET_DEFS[id].defaultHidden), sizes:Object.fromEntries(HOME_WIDGET_IDS.map(id => [id,HOME_WIDGET_DEFS[id].defaultSize])), options:{} };
  persistHomeLayout(layout);
  applyHomeLayout();
  showToast("Disposition de l'accueil réinitialisée.");
@@ -7795,25 +7927,32 @@ function resetHomeLayout() {
 
 // --- ACCUEIL ---
 function renderHomeDashboard() {
-const dashboard = document.getElementById('homeDashboard');
-if (!dashboard) return;
-let editions = 0, steelbooks = 0, estimatedValue = 0;
-collection.forEach(movie => {
-  (movie.editions || []).forEach(edition => {
-    editions++;
-    if (String(edition.editionType || '').trim().toLowerCase() === 'steelbook') steelbooks++;
-    estimatedValue += parseFloat(edition.estimatedPrice) || 0;
-  });
-});
-const tiles = [
-  ['Œuvres', collection.length, 'text-cyan-300'],
-  ['Éditions', editions, 'text-blue-300'],
-  ['Steelbooks', steelbooks, 'text-emerald-300'],
-  ['Valeur de la collection', `${estimatedValue.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €`, 'text-amber-300']
-];
-dashboard.innerHTML = tiles.map(([label, value, color]) =>
+ const dashboard = document.getElementById('homeDashboard');
+ if (!dashboard) return;
+ let editions=0, steelbooks=0, estimatedValue=0, discs=0, collectors=0;
+ collection.forEach(movie => (movie.editions || []).forEach(edition => {
+  editions++;
+  const type=String(edition.editionType || '').trim().toLowerCase();
+  if (type === 'steelbook') steelbooks++;
+  if (edition.inBoxSet) collectors++;
+  estimatedValue += parseFloat(edition.estimatedPrice) || 0;
+  discs += discCompositionTotal(edition);
+ }));
+ const values = {
+  works:['Œuvres',collection.length,'text-cyan-300'],
+  editions:['Éditions',editions,'text-blue-300'],
+  steelbooks:['Steelbooks',steelbooks,'text-emerald-300'],
+  value:['Valeur estimée',`${estimatedValue.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})} €`,'text-amber-300'],
+  discs:['Disques',discs,'text-sky-300'],
+  unseen:['À voir',collection.filter(movie => !movie.seen).length,'text-orange-300'],
+  collectors:['Coffrets collector',collectors,'text-violet-300'],
+  series:['Séries suivies',trackedSeries.length,'text-purple-300']
+ };
+ const selected=normalizedHomeLayout().options.dashboardMetrics;
+ dashboard.style.setProperty('--home-metric-count',Math.min(selected.length,4));
+ dashboard.innerHTML=selected.map(key => values[key]).filter(Boolean).map(([label,value,color]) =>
   `<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0"><p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold">${label}</p><p class="mt-1 text-lg md:text-xl font-black leading-tight break-words ${color}">${value}</p></div>`
-).join('');
+ ).join('');
 }
 
 function renderHomeRecent() {
@@ -7822,8 +7961,13 @@ grid.innerHTML = '';
 
 renderHomeSummaryCalendar();
 renderHomeDashboard();
+renderHomeTopRated();
+renderHomeWatchingSeries();
+renderHomeWatchNext();
 
-const recent = [...collection].sort((a,b) => new Date(b.addedAt || 0) - new Date(a.addedAt || 0)).slice(0, 6);
+const recentOptions = normalizedHomeLayout().options;
+const recent = [...collection].sort((a,b) => new Date(b.addedAt || 0) - new Date(a.addedAt || 0)).slice(0, recentOptions.recentCount);
+grid.dataset.posterSize = recentOptions.recentPosterSize;
 if (recent.length === 0) {
 grid.innerHTML = `<p class="text-xs text-gray-400 col-span-2 sm:col-span-3 text-center p-4">Aucun film dans votre collection.</p>`;
 return;
@@ -7846,6 +7990,33 @@ grid.appendChild(card);
 });
 }
 
+function homeMovieRating(movie) {
+ const personal = Number(movie.personalRating ?? movie.userRating ?? movie.myRating);
+ const imdb = Number(movie.imdbRating ?? movie.voteAverage);
+ return Number.isFinite(personal) && personal > 0 ? {value:personal,label:'Ma note',color:'text-amber-300'} : {value:Number.isFinite(imdb)?imdb:0,label:'IMDb',color:'text-blue-300'};
+}
+
+function renderHomeTopRated() {
+ const grid=document.getElementById('homeTopRatedGrid'); if(!grid)return;
+ const count=normalizedHomeLayout().options.topRatedCount;
+ const movies=[...collection].map(movie=>({movie,rating:homeMovieRating(movie)})).filter(item=>item.rating.value>0).sort((a,b)=>b.rating.value-a.rating.value).slice(0,count);
+ grid.innerHTML=movies.length ? movies.map(({movie,rating})=>`<button type="button" onclick='openMovieDetail(${JSON.stringify(movie.id)})' class="home-media-card"><img src="${safeImageUrl(movie.poster)}" loading="lazy" decoding="async"><span class="home-media-gradient"></span><span class="home-media-copy"><strong>${escapeHtml(movie.title)}</strong><small class="${rating.color}">★ ${rating.value.toFixed(1)} · ${rating.label}</small></span></button>`).join('') : '<p class="home-widget-empty">Ajoutez vos notes pour faire apparaître vos films préférés.</p>';
+}
+
+function renderHomeWatchingSeries() {
+ const grid=document.getElementById('homeWatchingSeriesGrid'); if(!grid)return;
+ const count=normalizedHomeLayout().options.seriesCount;
+ const series=trackedSeries.filter(item=>seriesStatus(item)==='watching').slice(0,count);
+ grid.innerHTML=series.length ? series.map(item=>{const p=seriesProgress(item);return `<button type="button" onclick="openTrackedSeriesDetail(${Number(item.tmdb_id)})" class="home-series-widget-card"><img src="${safeImageUrl(item.poster)}" loading="lazy" decoding="async"><span><strong>${escapeHtml(item.title)}</strong><small>${p.watched}/${p.total} épisodes · ${p.pct}%</small><i><b style="width:${p.pct}%"></b></i></span></button>`;}).join('') : '<p class="home-widget-empty">Aucune série n’est actuellement en cours.</p>';
+}
+
+function renderHomeWatchNext() {
+ const box=document.getElementById('homeWatchNextList'), count=document.getElementById('homeUnseenCount'); if(!box)return;
+ const unseen=collection.filter(movie=>!movie.seen).sort((a,b)=>new Date(b.addedAt||0)-new Date(a.addedAt||0));
+ if(count)count.textContent=`${unseen.length} à voir`;
+ box.innerHTML=unseen.length ? unseen.slice(0,4).map(movie=>`<button type="button" onclick='openMovieDetail(${JSON.stringify(movie.id)})' class="home-watch-next-row"><img src="${safeImageUrl(movie.poster)}" loading="lazy" decoding="async"><span><strong>${escapeHtml(movie.title)}</strong><small>${movie.releaseDate ? String(movie.releaseDate).slice(0,4) : 'Dans votre collection'}</small></span><span class="icon-inline w-3 h-3" data-icon="chevronright"></span></button>`).join('') : '<p class="home-widget-empty">Tous les films de votre collection sont vus.</p>';
+ applyStaticIcons();
+}
 function pickRandomMovie() {
 if (collection.length === 0) return showToast("Votre collection est vide.");
 const filter = document.getElementById('randomFilter').value;
@@ -9082,6 +9253,8 @@ return `<div onclick="openTrackedSeriesDetail(${Number(s.tmdb_id)})" class="glas
 }).join('');
 renderSeriesCalendar();
 if (document.getElementById('homeCalendarGrid')) renderHomeSummaryCalendar();
+renderHomeDashboard();
+renderHomeWatchingSeries();
 }
 function setTrackedSeriesFilterVisual() {
 ['all','watching','upcoming','completed'].forEach(k => { const b=document.getElementById('seriesFilter'+k.charAt(0).toUpperCase()+k.slice(1)); if(b){b.classList.toggle('is-active',k===trackedSeriesFilter);b.setAttribute('aria-pressed',String(k===trackedSeriesFilter));} });
