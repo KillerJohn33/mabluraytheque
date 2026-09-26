@@ -2364,6 +2364,170 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
     background:linear-gradient(100deg,rgba(14,165,233,.1),rgba(255,255,255,.68) 58%,rgba(255,255,255,.3)) !important;
   }
 
+  /* Fiches film et série : même langage visuel que les pages ordinateur. */
+  #modalContent .movie-detail-shell,
+  #modalContent .series-detail-shell {
+    --detail-accent:34,211,238;
+  }
+  #modalContent .series-detail-shell { --detail-accent:167,139,250; }
+  #modalContent .movie-detail-shell > :nth-child(2),
+  #modalContent .movie-detail-shell > :nth-child(3),
+  #modalContent .movie-detail-shell > :nth-child(4),
+  #modalContent .series-detail-info,
+  #modalContent .series-detail-seasons {
+    position:relative;
+    margin-top:1rem !important;
+    padding:1.15rem 1rem !important;
+    border:0 !important;
+    border-top:1px solid rgba(var(--detail-accent),.34) !important;
+    border-radius:.35rem !important;
+    background:linear-gradient(110deg,rgba(var(--detail-accent),.07),rgba(255,255,255,.018) 42%,transparent) !important;
+  }
+  #modalContent .movie-detail-shell > :nth-child(2)::before,
+  #modalContent .movie-detail-shell > :nth-child(3)::before,
+  #modalContent .movie-detail-shell > :nth-child(4)::before,
+  #modalContent .series-detail-info::before,
+  #modalContent .series-detail-seasons::before {
+    content:"";
+    position:absolute;
+    top:-1px;
+    left:1rem;
+    width:4rem;
+    height:2px;
+    border-radius:999px;
+    background:linear-gradient(90deg,rgba(var(--detail-accent),.95),transparent);
+  }
+  #modalContent .movie-detail-hero,
+  #modalContent .series-detail-hero {
+    border-color:rgba(var(--detail-accent),.25) !important;
+    box-shadow:0 18px 38px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.08);
+  }
+  #modalContent .edition-card {
+    border-top-color:rgba(34,211,238,.25) !important;
+  }
+  #modalContent .series-season-panel {
+    margin:0 !important;
+    border:0 !important;
+    border-top:1px solid rgba(167,139,250,.2) !important;
+    border-radius:0 !important;
+    background:transparent !important;
+  }
+  #modalContent .series-season-panel > summary {
+    padding:.85rem .25rem !important;
+    background:transparent !important;
+  }
+  #modalContent .series-season-panel[open] > summary {
+    color:#ddd6fe;
+  }
+  #modalContent .series-episode-row {
+    transition:background .16s ease;
+  }
+  #modalContent .series-episode-row:hover {
+    background:rgba(167,139,250,.045);
+  }
+
+  /* Statistiques : compteurs éditoriaux et graphiques intégrés aux sections. */
+  #tabStats #statsCountGrid,
+  #tabStats #statsValueGrid {
+    gap:.75rem !important;
+  }
+  #tabStats #statsCountGrid > div,
+  #tabStats #statsValueGrid > div {
+    position:relative;
+    min-height:5.5rem;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:center;
+    text-align:left !important;
+    padding:.9rem 1rem .85rem !important;
+    border:0 !important;
+    border-left:2px solid rgba(45,212,191,.5) !important;
+    border-radius:.35rem !important;
+    background:linear-gradient(100deg,rgba(45,212,191,.09),rgba(255,255,255,.02) 60%,transparent) !important;
+  }
+  #tabStats #statsCountGrid > div::after,
+  #tabStats #statsValueGrid > div::after {
+    content:"";
+    position:absolute;
+    left:0;
+    bottom:0;
+    width:38%;
+    height:1px;
+    background:linear-gradient(90deg,rgba(45,212,191,.42),transparent);
+  }
+  #tabStats #statsCountGrid > div p:last-child,
+  #tabStats #statsValueGrid > div p:last-child {
+    font-size:1.35rem !important;
+    line-height:1.15;
+  }
+  #tabStats .chart-box {
+    height:225px;
+    padding:1rem;
+    border:0;
+    border-top:1px solid rgba(45,212,191,.22);
+    border-radius:.35rem;
+    background:linear-gradient(135deg,rgba(45,212,191,.055),rgba(255,255,255,.015));
+  }
+
+  /* Barres de choix : navigation fine avec indicateur actif, sans bouton plein. */
+  main .choice-bar {
+    gap:.25rem;
+    padding:0;
+    border:0;
+    border-bottom:1px solid rgba(148,163,184,.18);
+    border-radius:0;
+    background:transparent;
+  }
+  main .choice-option {
+    position:relative;
+    min-height:38px;
+    border:0 !important;
+    border-radius:.45rem .45rem 0 0;
+    background:transparent !important;
+    box-shadow:none !important;
+    color:#7f8998;
+  }
+  main .choice-option:hover {
+    color:var(--choice-text);
+    background:rgba(var(--choice-rgb),.055) !important;
+  }
+  main .choice-option.is-active {
+    color:var(--choice-text);
+    font-weight:800;
+    background:rgba(var(--choice-rgb),.07) !important;
+  }
+  main .choice-option.is-active::after {
+    content:"";
+    position:absolute;
+    left:18%;
+    right:18%;
+    bottom:-1px;
+    height:2px;
+    border-radius:999px;
+    background:rgb(var(--choice-rgb));
+    box-shadow:0 0 10px rgba(var(--choice-rgb),.38);
+  }
+
+  body.theme-light #modalContent .movie-detail-shell > :nth-child(2),
+  body.theme-light #modalContent .movie-detail-shell > :nth-child(3),
+  body.theme-light #modalContent .movie-detail-shell > :nth-child(4),
+  body.theme-light #modalContent .series-detail-info,
+  body.theme-light #modalContent .series-detail-seasons {
+    background:linear-gradient(110deg,rgba(var(--detail-accent),.1),rgba(255,255,255,.64) 42%,rgba(255,255,255,.25)) !important;
+  }
+  body.theme-light #tabStats #statsCountGrid > div,
+  body.theme-light #tabStats #statsValueGrid > div {
+    background:linear-gradient(100deg,rgba(45,212,191,.13),rgba(255,255,255,.7) 65%) !important;
+  }
+  body.theme-light #tabStats .chart-box {
+    background:linear-gradient(135deg,rgba(45,212,191,.1),rgba(255,255,255,.58));
+  }
+  body.theme-light main .choice-bar {
+    border-bottom-color:rgba(15,23,42,.14);
+  }
+  body.theme-light main .choice-option { color:#64748b; }
+
 }
 </style>
 </head>
@@ -7175,9 +7339,9 @@ const seasonHtml = orderedSeasons.map((sn, i) => {
  const seen = seps.filter(e=>e.watched).length;
  const allSeen = seps.length > 0 && seen === seps.length;
  const shouldOpen = uiState?.openSeasons ? uiState.openSeasons.includes(sn) : sn === currentSeason;
- return `<details data-season="${sn}" class="rounded-2xl border border-white/10 bg-white/[0.025] overflow-hidden" ${shouldOpen?'open':''}><summary class="cursor-pointer list-none p-3 flex items-center justify-between gap-3 hover:bg-white/[0.035]"><div><span class="text-xs font-bold text-white">Saison ${sn}</span>${sn===currentSeason?'<span class="text-[8px] font-bold text-purple-300 ml-2 px-1.5 py-0.5 rounded-full bg-purple-500/10 border border-purple-400/20">EN COURS</span>':''}<span class="text-[9px] text-gray-500 ml-2">${seen}/${seps.length} vus</span></div><span class="text-[9px] text-purple-300">Afficher</span></summary><div class="border-t border-white/10"><div class="p-2 flex justify-end border-b border-white/5"><button onclick="event.stopPropagation();markTrackedSeasonFromDetail(${tmdbId},${sn},${allSeen?'false':'true'})" class="px-2.5 py-1.5 rounded-lg text-[9px] font-bold border ${allSeen?'bg-white/5 text-gray-400 border-white/10':'bg-emerald-500/10 text-emerald-300 border-emerald-400/20'}">${allSeen?'↶ Marquer la saison à voir':'✓ Marquer toute la saison comme vue'}</button></div><div class="divide-y divide-white/5">${seps.map(e=>`<div class="p-2.5 flex gap-2.5 items-center"><div class="w-16 h-10 rounded-lg bg-white/5 overflow-hidden flex-shrink-0">${e.still_path?`<img src="https://image.tmdb.org/t/p/w300${e.still_path}" class="w-full h-full object-cover">`:''}</div><div class="min-w-0 flex-1"><p class="text-[10px] font-semibold text-white truncate">E${e.episode_number} · ${e.name||'Épisode'}</p><p class="text-[8px] text-gray-500">${e.air_date?formatSeriesDate(e.air_date):'Date inconnue'}${e.runtime?` · ${e.runtime} min`:''}</p>${e.overview?`<p class="text-[9px] text-gray-400 mt-1 line-clamp-2">${e.overview}</p>`:''}</div><button onclick="toggleTrackedEpisodeFromDetail(${tmdbId},${sn},${e.episode_number})" class="px-2 py-1.5 rounded-lg text-[9px] font-bold border ${e.watched?'bg-emerald-500/15 text-emerald-300 border-emerald-400/20':'bg-white/5 text-gray-400 border-white/10'}">${e.watched?'✓ Vu':'À voir'}</button></div>`).join('')}</div></div></details>`;
+ return `<details data-season="${sn}" class="series-season-panel rounded-2xl border border-white/10 bg-white/[0.025] overflow-hidden" ${shouldOpen?'open':''}><summary class="cursor-pointer list-none p-3 flex items-center justify-between gap-3 hover:bg-white/[0.035]"><div><span class="text-xs font-bold text-white">Saison ${sn}</span>${sn===currentSeason?'<span class="text-[8px] font-bold text-purple-300 ml-2 px-1.5 py-0.5 rounded-full bg-purple-500/10 border border-purple-400/20">EN COURS</span>':''}<span class="text-[9px] text-gray-500 ml-2">${seen}/${seps.length} vus</span></div><span class="text-[9px] text-purple-300">Afficher</span></summary><div class="border-t border-white/10"><div class="p-2 flex justify-end border-b border-white/5"><button onclick="event.stopPropagation();markTrackedSeasonFromDetail(${tmdbId},${sn},${allSeen?'false':'true'})" class="px-2.5 py-1.5 rounded-lg text-[9px] font-bold border ${allSeen?'bg-white/5 text-gray-400 border-white/10':'bg-emerald-500/10 text-emerald-300 border-emerald-400/20'}">${allSeen?'↶ Marquer la saison à voir':'✓ Marquer toute la saison comme vue'}</button></div><div class="divide-y divide-white/5">${seps.map(e=>`<div class="series-episode-row p-2.5 flex gap-2.5 items-center"><div class="w-16 h-10 rounded-lg bg-white/5 overflow-hidden flex-shrink-0">${e.still_path?`<img src="https://image.tmdb.org/t/p/w300${e.still_path}" class="w-full h-full object-cover">`:''}</div><div class="min-w-0 flex-1"><p class="text-[10px] font-semibold text-white truncate">E${e.episode_number} · ${e.name||'Épisode'}</p><p class="text-[8px] text-gray-500">${e.air_date?formatSeriesDate(e.air_date):'Date inconnue'}${e.runtime?` · ${e.runtime} min`:''}</p>${e.overview?`<p class="text-[9px] text-gray-400 mt-1 line-clamp-2">${e.overview}</p>`:''}</div><button onclick="toggleTrackedEpisodeFromDetail(${tmdbId},${sn},${e.episode_number})" class="px-2 py-1.5 rounded-lg text-[9px] font-bold border ${e.watched?'bg-emerald-500/15 text-emerald-300 border-emerald-400/20':'bg-white/5 text-gray-400 border-white/10'}">${e.watched?'✓ Vu':'À voir'}</button></div>`).join('')}</div></div></details>`;
 }).join('');
-content.innerHTML = `<div class="space-y-4"><div class="relative overflow-hidden rounded-3xl border border-white/10 bg-black/30"><div class="absolute inset-0 opacity-30 pointer-events-none" style="background-image:linear-gradient(90deg,rgba(0,0,0,.9),rgba(0,0,0,.35)),url('${series.poster}');background-size:cover;background-position:center;filter:blur(18px);transform:scale(1.08)"></div><div class="relative flex gap-3.5 p-3.5 sm:p-4"><img src="${series.poster}" class="w-24 h-36 sm:w-28 object-cover rounded-2xl shadow-xl border border-white/15"><div class="flex-1 min-w-0 flex flex-col justify-end"><span class="self-start px-2 py-1 rounded-full bg-purple-400/10 border border-purple-400/20 text-purple-300 text-[8px] font-bold uppercase">Série suivie</span><h3 class="text-lg sm:text-xl font-extrabold text-white leading-tight mt-2">${series.title}</h3><p class="text-[10px] text-gray-400 mt-1">${[year, `${seasons.length} saison${seasons.length>1?'s':''}`, `${p.total} épisodes`].filter(Boolean).join(' • ')}</p><div class="mt-1.5">${compactSeriesRatings(series)}</div><div class="mt-3"><span class="text-[10px] text-emerald-300 font-bold">${p.watched}/${p.total} vus · ${p.pct}%</span><div class="h-1.5 bg-white/10 rounded-full mt-1 overflow-hidden"><div class="h-full bg-purple-500 rounded-full" style="width:${p.pct}%"></div></div></div></div></div></div><div class="rounded-2xl border border-white/10 bg-white/[0.025] p-3 space-y-2">${genres.length?`<div class="flex flex-wrap gap-1.5">${genres.map(g=>`<span class="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] text-gray-300">${g}</span>`).join('')}</div>`:''}${creators?`<p class="text-[10px] text-gray-300"><span class="text-gray-500">Créateur :</span> ${creators}</p>`:''}${cast?`<p class="text-[10px] text-gray-300"><span class="text-gray-500">Casting :</span> ${cast}</p>`:''}${overview?`<p class="text-[10px] text-gray-400 leading-relaxed pt-1">${overview}</p>`:''}</div><div><h4 class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.16em] mb-2">Saisons et épisodes</h4><div class="space-y-2">${seasonHtml || '<p class="text-[10px] text-gray-500">Aucun épisode disponible.</p>'}</div></div></div>`;
+content.innerHTML = `<div class="series-detail-shell space-y-4"><div class="series-detail-hero relative overflow-hidden rounded-3xl border border-white/10 bg-black/30"><div class="absolute inset-0 opacity-30 pointer-events-none" style="background-image:linear-gradient(90deg,rgba(0,0,0,.9),rgba(0,0,0,.35)),url('${series.poster}');background-size:cover;background-position:center;filter:blur(18px);transform:scale(1.08)"></div><div class="relative flex gap-3.5 p-3.5 sm:p-4"><img src="${series.poster}" class="w-24 h-36 sm:w-28 object-cover rounded-2xl shadow-xl border border-white/15"><div class="flex-1 min-w-0 flex flex-col justify-end"><span class="self-start px-2 py-1 rounded-full bg-purple-400/10 border border-purple-400/20 text-purple-300 text-[8px] font-bold uppercase">Série suivie</span><h3 class="text-lg sm:text-xl font-extrabold text-white leading-tight mt-2">${series.title}</h3><p class="text-[10px] text-gray-400 mt-1">${[year, `${seasons.length} saison${seasons.length>1?'s':''}`, `${p.total} épisodes`].filter(Boolean).join(' • ')}</p><div class="mt-1.5">${compactSeriesRatings(series)}</div><div class="mt-3"><span class="text-[10px] text-emerald-300 font-bold">${p.watched}/${p.total} vus · ${p.pct}%</span><div class="h-1.5 bg-white/10 rounded-full mt-1 overflow-hidden"><div class="h-full bg-purple-500 rounded-full" style="width:${p.pct}%"></div></div></div></div></div></div><div class="series-detail-info rounded-2xl border border-white/10 bg-white/[0.025] p-3 space-y-2">${genres.length?`<div class="flex flex-wrap gap-1.5">${genres.map(g=>`<span class="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] text-gray-300">${g}</span>`).join('')}</div>`:''}${creators?`<p class="text-[10px] text-gray-300"><span class="text-gray-500">Créateur :</span> ${creators}</p>`:''}${cast?`<p class="text-[10px] text-gray-300"><span class="text-gray-500">Casting :</span> ${cast}</p>`:''}${overview?`<p class="text-[10px] text-gray-400 leading-relaxed pt-1">${overview}</p>`:''}</div><div class="series-detail-seasons"><h4 class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.16em] mb-2">Saisons et épisodes</h4><div class="space-y-2">${seasonHtml || '<p class="text-[10px] text-gray-500">Aucun épisode disponible.</p>'}</div></div></div>`;
 if (uiState) {
  const scroller = modal.querySelector(':scope > div');
  requestAnimationFrame(() => { if (scroller) scroller.scrollTop = uiState.scrollTop || 0; });
