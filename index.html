@@ -4697,6 +4697,55 @@ body.theme-light #modalContent .movie-detail-actions{
  from{opacity:0;transform:translateY(-5px)}
  to{opacity:1;transform:none}
 }
+
+/* Séries mobile : résumé et calendrier sur une même ligne */
+@media(max-width:767px){
+ #tabSeries:not(.hidden){
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  column-gap:.5rem!important;
+  row-gap:1.35rem!important;
+  align-items:stretch!important;
+ }
+ #tabSeries:not(.hidden)>*{grid-column:1 / -1}
+ #tabSeries:not(.hidden)>#seriesOverviewPanel{
+  grid-column:1!important;
+  min-width:0!important;
+  min-height:2.5rem!important;
+  height:2.5rem!important;
+  padding:.45rem .65rem!important;
+  border-radius:.75rem!important;
+ }
+ #tabSeries:not(.hidden)>#seriesMobileTools{
+  grid-column:2!important;
+  display:flex!important;
+  align-items:stretch!important;
+  width:auto!important;
+ }
+ #seriesOverviewPanel>div:first-child{min-width:0!important;gap:.4rem!important}
+ #seriesOverviewPanel>div:first-child>.icon-chip,
+ #seriesOverviewPanel>div:first-child p,
+ #seriesOverviewPanel>div:last-child>button{display:none!important}
+ #seriesOverviewPanel h2{font-size:.68rem!important;white-space:nowrap!important}
+ #seriesOverviewPanel>div:last-child{flex:none!important}
+ #seriesOverviewPanel #trackedSeriesCount{
+  padding:.3rem .5rem!important;
+  border-radius:.6rem!important;
+  font-size:.62rem!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+ }
+ #seriesCalendarToggle{
+  width:8.5rem!important;
+  min-width:8.5rem!important;
+  min-height:2.5rem!important;
+  height:2.5rem!important;
+  padding:.45rem .65rem!important;
+  border-radius:.75rem!important;
+  font-size:.68rem!important;
+  line-height:1!important;
+ }
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -5003,7 +5052,7 @@ body.theme-light #modalContent .movie-detail-actions{
 <!-- ONGLET MES SÉRIES -->
 <div id="tabSeries" class="hidden space-y-4">
 <div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="tv"></span><h2 class="font-black text-white relative z-10">S&eacute;ries</h2></div>
-<div class="glass-card p-3 rounded-2xl border border-purple-400/20 flex items-center justify-between">
+<div id="seriesOverviewPanel" class="glass-card p-3 rounded-2xl border border-purple-400/20 flex items-center justify-between">
 <div class="flex items-center gap-2.5">
 <span class="icon-chip chip-sm" data-icon="tv"></span>
 <div><h2 class="text-xs font-bold text-purple-200">Mes séries</h2><p class="text-[10px] text-gray-400">Suivez vos séries et leurs prochains épisodes.</p></div>
