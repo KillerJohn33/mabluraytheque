@@ -4656,6 +4656,23 @@ body.theme-light #modalContent .movie-detail-actions{
  }
  #wishlistGrid.wishlist-shelf .shelf-item{width:100%;height:auto;aspect-ratio:2/3}
 }
+
+/* Wishlist mobile : boutons Filtrer et Calendrier uniformes */
+@media(max-width:767px){
+ #wishlistFilterRow>#wishlistFilterToggle,
+ #wishlistFilterRow>#wishlistCalendarToggle{
+  flex:1 1 0!important;
+  width:50%!important;
+  min-width:0!important;
+  min-height:2.5rem!important;
+  height:2.5rem!important;
+  padding:.45rem .65rem!important;
+  justify-content:center!important;
+  border-radius:.75rem!important;
+  font-size:.68rem!important;
+  line-height:1!important;
+ }
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
