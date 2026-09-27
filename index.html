@@ -4673,6 +4673,30 @@ body.theme-light #modalContent .movie-detail-actions{
   line-height:1!important;
  }
 }
+
+/* Séries mobile : calendrier à la demande */
+.series-mobile-tools{display:none}
+@media(max-width:767px){
+ #seriesMobileTools{display:flex!important;align-items:center;gap:.5rem}
+ #seriesCalendarToggle{display:inline-flex!important;min-width:8.5rem}
+ #seriesCalendarToggle.is-active,
+ #seriesCalendarToggle[aria-expanded="true"]{
+  color:#ede9fe!important;
+  border-color:rgba(167,139,250,.34)!important;
+  background:rgba(139,92,246,.13)!important;
+ }
+ #seriesCalendarPanel{display:none!important}
+ #seriesCalendarPanel.mobile-calendar-open{
+  display:block!important;
+  animation:seriesCalendarReveal .18s ease-out both;
+ }
+ #seriesSidebarLayout{display:block!important}
+ #seriesSidebarLayout>.min-w-0{width:100%!important}
+}
+@keyframes seriesCalendarReveal{
+ from{opacity:0;transform:translateY(-5px)}
+ to{opacity:1;transform:none}
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -4990,14 +5014,13 @@ body.theme-light #modalContent .movie-detail-actions{
 </div>
 </div>
 
-<div class="glass-card p-3 rounded-2xl border border-white/10 space-y-3">
-<div class="flex items-center justify-between gap-2"><div><h3 class="text-xs font-bold text-white">Ajouter une série à suivre</h3><p class="text-[9px] text-gray-500">Recherchez-la dans le champ TMDB en haut de l'application.</p></div><button onclick="addTrackedSeriesFromCollection()" class="app-action app-action-violet px-3 py-2 text-[10px]">Depuis ma collection</button></div>
+<div id="seriesMobileTools" class="series-mobile-tools">
+<button id="seriesCalendarToggle" type="button" onclick="toggleSeriesCalendar()" aria-expanded="false" aria-controls="seriesCalendarPanel" class="glass-pill px-3 py-2 rounded-xl text-[11px] font-semibold text-purple-300 hover:text-white items-center justify-center gap-2 min-h-[40px]"><span class="icon-inline w-3.5 h-3.5" data-icon="calendar"></span> Calendrier</button>
 </div>
-
 <div id="seriesSidebarLayout" class="grid grid-cols-1 lg:grid-cols-[340px_minmax(0,1fr)] gap-4 items-start">
 <!-- CALENDRIER + SÉRIES SUIVIES AU-DESSUS DES ÉPISODES À VENIR -->
 <!-- CALENDRIER COMPACT -->
-<div class="glass-card p-3.5 md:p-4 rounded-2xl border border-white/10 space-y-3 lg:sticky lg:top-3">
+<div id="seriesCalendarPanel" class="glass-card p-3.5 md:p-4 rounded-2xl border border-white/10 space-y-3 lg:sticky lg:top-3">
 <div><h3 class="text-xs font-bold text-white">Calendrier</h3><p class="text-[9px] text-gray-500">Diffusions TMDB.</p></div>
 <div class="flex items-center justify-between"><button onclick="changeSeriesCalendarMonth(-1)" class="glass-pill w-8 h-8 rounded-xl flex items-center justify-center text-gray-300 hover:text-white"><span class="icon-inline w-3 h-3" data-icon="chevronleft"></span></button><span id="seriesCalMonthLabel" class="text-xs md:text-sm font-bold text-white"></span><button onclick="changeSeriesCalendarMonth(1)" class="glass-pill w-8 h-8 rounded-xl flex items-center justify-center text-gray-300 hover:text-white"><span class="icon-inline w-3 h-3" data-icon="chevronright"></span></button></div>
 <div class="grid grid-cols-7 gap-1 text-center text-[8px] md:text-[9px] text-gray-500 font-bold uppercase"><div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div><div>D</div></div>
@@ -10080,6 +10103,15 @@ function formatSeriesDate(date) { if (!date) return 'Date inconnue'; return new 
 async function toggleTrackedEpisode(tmdbId, season, episode) { const s=getTrackedSeries(tmdbId); if(!s)return; const e=(s.episodes||[]).find(x=>Number(x.season_number)===Number(season)&&Number(x.episode_number)===Number(episode)); if(!e)return; e.watched=!e.watched; e.watchedAt=e.watched?new Date().toISOString():null; saveTrackedSeriesLocal(); renderTrackedSeries(); await saveTrackedSeriesCloud(s); }
 async function removeTrackedSeries(tmdbId) { const s=getTrackedSeries(tmdbId); if(!s)return false; if(!confirm(`Arrêter de suivre « ${s.title} » ?`))return false; trackedSeries=trackedSeries.filter(x=>String(x.tmdb_id)!==String(tmdbId)); saveTrackedSeriesLocal(); await deleteTrackedSeriesCloud(tmdbId); renderTrackedSeries(); showToast('Série retirée du suivi.'); return true; }
 async function removeTrackedSeriesFromDetail(tmdbId) { if (await removeTrackedSeries(tmdbId)) closeModal(); }
+function toggleSeriesCalendar() {
+ const panel=document.getElementById('seriesCalendarPanel');
+ const button=document.getElementById('seriesCalendarToggle');
+ if(!panel||!button)return;
+ const open=panel.classList.toggle('mobile-calendar-open');
+ button.setAttribute('aria-expanded',String(open));
+ button.classList.toggle('is-active',open);
+ if(open)renderSeriesCalendar();
+}
 function changeSeriesCalendarMonth(delta) { seriesCalDate=new Date(seriesCalDate.getFullYear(),seriesCalDate.getMonth()+delta,1);seriesCalSelected=null;renderSeriesCalendar(); }
 function renderSeriesCalendar() {
 const grid=document.getElementById('seriesCalendarGrid'), label=document.getElementById('seriesCalMonthLabel'); if(!grid||!label)return; const y=seriesCalDate.getFullYear(),m=seriesCalDate.getMonth(); const months=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];label.textContent=`${months[m]} ${y}`; const byDay={}; trackedSeries.forEach(s=>seriesEpisodes(s).forEach(e=>{if(!e.air_date)return;const d=new Date(e.air_date+'T12:00:00');if(d.getFullYear()!==y||d.getMonth()!==m)return;const k=`${y}-${pad2(m+1)}-${pad2(d.getDate())}`;(byDay[k]??=[]).push({...e,seriesTitle:s.title,poster:s.poster,tmdb_id:s.tmdb_id});})); const first=new Date(y,m,1);let offset=first.getDay()-1;if(offset<0)offset=6;const days=new Date(y,m+1,0).getDate();const now=new Date();const today=`${now.getFullYear()}-${pad2(now.getMonth()+1)}-${pad2(now.getDate())}`;let html='';for(let i=0;i<offset;i++)html+='<div></div>';for(let d=1;d<=days;d++){const k=`${y}-${pad2(m+1)}-${pad2(d)}`,has=!!byDay[k],sel=k===seriesCalSelected,isToday=k===today;html+=`<button onclick="selectSeriesCalendarDay('${k}')" class="aspect-square rounded-lg flex flex-col items-center justify-center text-[10px] md:text-[11px] transition ${sel?'bg-purple-500 text-white':isToday?'text-purple-300 border border-purple-400/50':'text-gray-300 hover:bg-white/10'}"><span>${d}</span>${has?`<span class="w-1 h-1 rounded-full mt-0.5 ${sel?'bg-white':'bg-purple-400'}"></span>`:''}</button>`;}grid.innerHTML=html;renderSeriesCalendarDayDetail(byDay); }
