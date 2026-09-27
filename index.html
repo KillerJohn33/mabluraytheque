@@ -4554,13 +4554,14 @@ body.theme-light #modalContent .movie-detail-actions{
  #modalContent .series-season-panel>div>.p-2 button{width:100%!important;white-space:normal!important}
  #modalContent .series-episode-row{
   display:grid!important;
-  grid-template-columns:3.5rem minmax(0,1fr)!important;
+  grid-template-columns:3.5rem minmax(0,1fr) auto!important;
   align-items:start!important;
   gap:.55rem!important;
   padding:.65rem!important;
  }
  #modalContent .series-episode-row>div:first-child{width:3.5rem!important;height:2.5rem!important;grid-row:1 / span 2!important}
- #modalContent .series-episode-row>button{grid-column:2!important;justify-self:start!important;max-width:100%!important}
+ #modalContent .series-episode-row>div:nth-child(2){grid-column:2!important;grid-row:1 / span 2!important}
+ #modalContent .series-episode-row>button{grid-column:3!important;grid-row:1!important;align-self:start!important;justify-self:end!important;max-width:100%!important;white-space:nowrap!important;padding:.35rem .55rem!important;line-height:1!important}
 }
 
 /* Téléphone : respiration d'origine dans Stats et Mon espace */
