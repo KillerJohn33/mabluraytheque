@@ -4619,6 +4619,43 @@ body.theme-light #modalContent .movie-detail-actions{
  }
  #modalContent .movie-seen-mobile .movie-seen-toggle .icon-inline{width:.7rem!important;height:.7rem!important}
 }
+
+/* Wishlist mobile : calendrier à la demande */
+.wishlist-calendar-toggle{display:none}
+@media(max-width:767px){
+ #wishlistFilterRow{display:flex!important;align-items:center!important;gap:.5rem!important}
+ #wishlistFilterToggle,#wishlistCalendarToggle{flex:0 0 auto}
+ .wishlist-calendar-toggle{display:inline-flex!important}
+ #wishlistCalendarToggle.is-active,
+ #wishlistCalendarToggle[aria-expanded="true"]{
+  color:#fbcfe8!important;
+  border-color:rgba(244,114,182,.32)!important;
+  background:rgba(244,114,182,.12)!important;
+ }
+ #wishlistCalendarPanel{display:none!important}
+ #wishlistCalendarPanel.mobile-calendar-open{
+  display:block!important;
+  animation:wishlistCalendarReveal .18s ease-out both;
+ }
+ #wishlistLayout{display:block!important}
+ #wishlistLayout>.space-y-4{margin-top:0!important}
+}
+@keyframes wishlistCalendarReveal{
+ from{opacity:0;transform:translateY(-5px)}
+ to{opacity:1;transform:none}
+}
+
+/* Wishlist : vue étagère */
+#wishlistGrid.wishlist-shelf{align-items:start}
+#wishlistGrid.wishlist-shelf .shelf-item{border-color:rgba(244,114,182,.22)}
+#wishlistGrid.wishlist-shelf .shelf-item:hover{box-shadow:0 10px 24px rgba(244,114,182,.16)}
+@media(max-width:767px){
+ #wishlistGrid.wishlist-shelf{
+  grid-template-columns:repeat(auto-fill,minmax(4.4rem,1fr));
+  gap:.6rem;
+ }
+ #wishlistGrid.wishlist-shelf .shelf-item{width:100%;height:auto;aspect-ratio:2/3}
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -5048,6 +5085,7 @@ body.theme-light #modalContent .movie-detail-actions{
 
 <div id="wishlistFilterRow" class="flex items-center gap-2">
 <button id="wishlistFilterToggle" type="button" onclick="toggleWishlistFilters()" aria-expanded="false" aria-controls="wishlistFilterPanel" class="wishlist-filter-toggle glass-pill px-3 py-2 rounded-xl text-[11px] font-semibold text-pink-300 hover:text-white flex items-center gap-2 min-h-[42px]"><span class="icon-inline w-3.5 h-3.5" data-icon="filter"></span> Filtrer <span id="wishlistActiveFilterCount" class="hidden bg-pink-400/20 text-pink-200 rounded-full px-1.5 py-0.5 text-[9px]"></span><span class="wishlist-filter-chevron icon-inline w-3 h-3 ml-0.5" data-icon="chevrondown"></span></button>
+<button id="wishlistCalendarToggle" type="button" onclick="toggleWishlistCalendar()" aria-expanded="false" aria-controls="wishlistCalendarPanel" class="wishlist-calendar-toggle glass-pill px-3 py-2 rounded-xl text-[11px] font-semibold text-pink-300 hover:text-white items-center gap-2 min-h-[42px]"><span class="icon-inline w-3.5 h-3.5" data-icon="calendar"></span> Calendrier</button>
 </div>
 <div id="wishlistFilterPanel" class="hidden">
 <div class="wishlist-filter-card p-3 space-y-2">
@@ -5089,7 +5127,7 @@ body.theme-light #modalContent .movie-detail-actions{
 </div>
 
 <div id="wishlistLayout" class="space-y-4 md:space-y-0 md:grid md:grid-cols-2 md:gap-5 md:items-start">
-<div class="glass-card p-2.5 md:p-6 rounded-2xl space-y-1.5 md:space-y-4 border border-white/10 w-full">
+<div id="wishlistCalendarPanel" class="glass-card p-2.5 md:p-6 rounded-2xl space-y-1.5 md:space-y-4 border border-white/10 w-full">
 <div class="flex items-center gap-2 pb-0.5">
 <span class="icon-chip chip-sm" data-icon="calendar"></span>
 <div>
@@ -5890,7 +5928,7 @@ let editingEquipmentId = null;
 let editingSubscriptionId = null;
 let collectionViewMode = 'grid';
 let collectionGroupBySaga = localStorage.getItem('collection_group_saga') === '1';
-let isWishlistListView = localStorage.getItem('wishlist_view_mode') === 'list';
+let wishlistViewMode = ['grid','list','shelf'].includes(localStorage.getItem('wishlist_view_mode')) ? localStorage.getItem('wishlist_view_mode') : 'grid';
 let html5QrcodeScanner = null;
 let barcodeScanBusy = false;
 let batchScanActive = false;
@@ -6069,7 +6107,7 @@ collectionViewMode = ['grid', 'list', 'shelf'].includes(savedViewMode) ? savedVi
 document.getElementById('defaultViewSelect').value = savedDefaultView;
 updateCollectionViewModeLabel();
 updateDigitalViewModeLabel();
-document.getElementById('viewModeLabelWishlist').innerText = isWishlistListView ? "Vue Grille" : "Vue Liste";
+updateWishlistViewModeLabel();
 
 document.getElementById('settingTmdbKey').value = API_KEY;
 document.getElementById('settingSupaUrl').value = SUPABASE_URL;
@@ -9180,11 +9218,29 @@ return 0;
 renderCollectionGrid(filtered);
 }
 
+function updateWishlistViewModeLabel() {
+ const label=document.getElementById('viewModeLabelWishlist');
+ const button=document.getElementById('toggleViewBtnWishlist');
+ const next=wishlistViewMode==='grid'?'list':wishlistViewMode==='list'?'shelf':'grid';
+ const labels={grid:'Vue Grille',list:'Vue Liste',shelf:'Vue Étagère'};
+ if(label)label.innerText=labels[next];
+}
+
 function toggleWishlistViewMode() {
-isWishlistListView = !isWishlistListView;
-localStorage.setItem('wishlist_view_mode', isWishlistListView ? 'list' : 'grid');
-document.getElementById('viewModeLabelWishlist').innerText = isWishlistListView ? "Vue Grille" : "Vue Liste";
-renderWishlist();
+ wishlistViewMode=wishlistViewMode==='grid'?'list':wishlistViewMode==='list'?'shelf':'grid';
+ localStorage.setItem('wishlist_view_mode',wishlistViewMode);
+ updateWishlistViewModeLabel();
+ renderWishlist();
+}
+
+function toggleWishlistCalendar() {
+ const panel=document.getElementById('wishlistCalendarPanel');
+ const button=document.getElementById('wishlistCalendarToggle');
+ if(!panel||!button)return;
+ const open=panel.classList.toggle('mobile-calendar-open');
+ button.setAttribute('aria-expanded',String(open));
+ button.classList.toggle('is-active',open);
+ if(open)renderWishlistCalendarGrid();
 }
 
 let digitalTypeFilter = 'all';
@@ -9451,8 +9507,10 @@ if (countLabel) countLabel.innerText = `${wishlist.length} film${wishlist.length
 
 renderWishlistCalendarGrid();
 
-if (isWishlistListView) {
+if (wishlistViewMode === 'list') {
 grid.className = "flex flex-col gap-3 coll-list-view";
+} else if (wishlistViewMode === 'shelf') {
+grid.className = "collection-shelf wishlist-shelf";
 } else {
 grid.className = "grid grid-cols-2 gap-4";
 }
@@ -9505,7 +9563,16 @@ card.onclick = () => openMovieDetail(m.id);
 
 const priceLabel = totals.totalPurchase > 0 ? `${totals.totalPurchase.toFixed(2)} €` : 'Wishlist';
 
-if (isWishlistListView) {
+if (wishlistViewMode === 'shelf') {
+card.className = "group relative shelf-item overflow-hidden cursor-pointer bg-black border border-pink-500/20 hover:border-pink-400/55 shadow-lg transition-transform";
+card.innerHTML = `
+<img src="${safeImageUrl(m.poster)}" loading="lazy" decoding="async" class="w-full h-full object-cover" alt="${escapeHtml(m.title)}">
+<div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/90 to-transparent pointer-events-none"></div>
+<div class="absolute left-1.5 right-1.5 bottom-1.5 flex items-end justify-between gap-1">
+<h4 class="text-[8px] font-bold text-white truncate min-w-0">${escapeHtml(m.title)}</h4>
+${wishlistPersonalRatingBadge(m,'w-2.5 h-2.5')}
+</div>`;
+} else if (wishlistViewMode === 'list') {
 card.className = "relative rounded-2xl overflow-hidden cursor-pointer bg-white/[0.035] border border-pink-500/20 hover:border-pink-400/45 hover:bg-white/[0.055] transition-all duration-200";
 card.innerHTML = `
 <div class="flex items-center gap-3 p-2">
