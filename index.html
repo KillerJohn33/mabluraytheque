@@ -5287,6 +5287,221 @@ html.is-ipad body.theme-light>header{
  background:rgba(248,250,252,.97)!important;
  box-shadow:0 10px 26px rgba(15,23,42,.1)!important;
 }
+
+/* ===== FINITION ERGONOMIQUE iPAD ===== */
+html.is-ipad{
+ --ipad-panel-pad:1.2rem;
+ --ipad-page-space:1.15rem;
+}
+html.is-ipad body{
+ background:
+  radial-gradient(circle at 78% 8%,rgba(14,165,233,.055),transparent 28rem),
+  radial-gradient(circle at 18% 82%,rgba(99,102,241,.04),transparent 32rem),
+  #050505!important;
+}
+html.is-ipad body.theme-light{
+ background:
+  radial-gradient(circle at 78% 8%,rgba(14,165,233,.08),transparent 28rem),
+  radial-gradient(circle at 18% 82%,rgba(99,102,241,.055),transparent 32rem),
+  #eef2f7!important;
+}
+
+/* Rail plus lisible, sans occuper davantage la page. */
+html.is-ipad #bottomNav.mobile-bottom-nav{padding:.72rem .6rem!important;gap:.5rem!important}
+html.is-ipad #bottomNav .bottom-nav-btn{
+ min-height:4.45rem!important;
+ padding:.65rem .3rem!important;
+ transition:color .16s ease,background .16s ease,border-color .16s ease,transform .12s ease!important
+}
+html.is-ipad #bottomNav .bottom-nav-btn:active{transform:scale(.96)}
+html.is-ipad #bottomNav .bottom-nav-label{font-size:.63rem!important;letter-spacing:.005em}
+html.is-ipad #bottomNav .bottom-nav-btn.active .icon-inline{filter:drop-shadow(0 0 8px rgba(34,211,238,.32))}
+
+/* Barre supérieure : titre clairement séparé de la recherche. */
+html.is-ipad body>header{padding-left:.8rem!important}
+html.is-ipad body>header .global-search-trigger{
+ display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:.5rem!important;
+ width:11rem!important;min-width:11rem!important;padding:.45rem .9rem!important;
+ border:1px solid rgba(255,255,255,.08)!important
+}
+html.is-ipad body>header .global-search-placeholder{font-size:.7rem!important;font-weight:650!important;color:#94a3b8!important}
+
+/* Rythme général et panneaux. */
+html.is-ipad #tabHome,
+html.is-ipad #tabCollection,
+html.is-ipad #tabSeries,
+html.is-ipad #tabDigital,
+html.is-ipad #tabWishlist,
+html.is-ipad #tabStats,
+html.is-ipad #tabSettings{--touch-panel-space:var(--ipad-page-space)}
+html.is-ipad .glass-card,
+html.is-ipad .modern-panel,
+html.is-ipad .home-widget-panel{
+ border-color:rgba(255,255,255,.085)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 10px 26px rgba(0,0,0,.13)!important
+}
+html.is-ipad #tabHome>.glass-card,
+html.is-ipad #ipadHomeFlow>.home-widget,
+html.is-ipad #tabStats>.modern-panel,
+html.is-ipad #tabSettings>.modern-panel,
+html.is-ipad #tabSettings>.space-options-panel{
+ padding:var(--ipad-panel-pad)!important
+}
+html.is-ipad h2,html.is-ipad h3,html.is-ipad h4{line-height:1.25}
+html.is-ipad p{line-height:1.45}
+
+/* Les barres de choix deviennent de véritables commandes tablette. */
+html.is-ipad .tab-switcher{
+ width:min(100%,42rem)!important;
+ align-self:center!important;
+ margin-left:auto!important;margin-right:auto!important;
+ padding:.32rem!important;background:rgba(255,255,255,.035)!important
+}
+html.is-ipad .tab-switcher .choice-option{
+ min-height:2.85rem!important;font-size:.74rem!important
+}
+html.is-ipad #collectionFilterToggle,
+html.is-ipad #wishlistFilterToggle,
+html.is-ipad #seriesCalendarToggle{
+ min-height:2.75rem!important;padding:.55rem 1rem!important
+}
+
+/* Recherche d’accueil mieux proportionnée. */
+html.is-ipad #searchSection{
+ width:100%!important;padding:.1rem 0 .25rem!important
+}
+html.is-ipad #searchSection input{min-height:3.15rem!important;font-size:.9rem!important}
+html.is-ipad #searchSection button{min-height:3.15rem}
+html.is-ipad #searchResults:not(.hidden){
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:.9rem!important
+}
+
+/* Accueil : panneaux pleine largeur, contenus organisés horizontalement. */
+html.is-ipad #ipadHomeFlow{gap:var(--ipad-page-space)!important}
+html.is-ipad #homeWidgetDashboard,
+html.is-ipad #ipadHomeFlow>.home-widget{
+ border-radius:1.2rem!important
+}
+html.is-ipad #homeDashboard>div{
+ min-height:5.25rem;padding:.9rem 1rem!important
+}
+html.is-ipad #homeWidgetRecent #recentGrid,
+html.is-ipad #homeWidgetTopRated .home-media-grid,
+html.is-ipad #homeWidgetWishlistFocus .home-media-grid{gap:.9rem!important}
+html.is-ipad #homeWidgetWatchNext #homeWatchNextList,
+html.is-ipad #homeWidgetFormatMix #homeFormatMix{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem
+}
+
+/* Collections : cartes aérées et outils regroupés. */
+html.is-ipad #collectionOverviewBar,
+html.is-ipad #tabWishlist>.glass-card,
+html.is-ipad #digitalEmptyState{
+ padding:1rem 1.15rem!important
+}
+html.is-ipad #collectionGrid,
+html.is-ipad #digitalGrid,
+html.is-ipad #wishlistGrid{gap:1.1rem!important}
+html.is-ipad #collectionGrid>article,
+html.is-ipad #digitalGrid>article,
+html.is-ipad #wishlistGrid>article,
+html.is-ipad #collectionGrid>.glass-card,
+html.is-ipad #digitalGrid>.glass-card,
+html.is-ipad #wishlistGrid>.glass-card{
+ border-radius:1.05rem!important;overflow:hidden
+}
+html.is-ipad #collectionFilterPanel .glass-card,
+html.is-ipad #digitalFilterPanel .glass-card,
+html.is-ipad #wishlistFilterPanel .wishlist-filter-card{
+ padding:1.1rem!important;border-radius:1.05rem!important
+}
+html.is-ipad #bulkToolbar{
+ padding:.75rem!important;border-radius:1rem!important
+}
+
+/* Séries : séparation claire entre le calendrier et la liste. */
+html.is-ipad #seriesOverviewPanel{border-radius:1.1rem!important}
+html.is-ipad #seriesSidebarLayout{gap:1.15rem!important}
+html.is-ipad #seriesCalendarPanel{padding:1.1rem!important;border-radius:1.1rem!important}
+html.is-ipad #trackedSeriesGrid{gap:1rem!important}
+html.is-ipad #trackedSeriesGrid>.glass-card{min-height:9.5rem;border-radius:1.05rem!important}
+html.is-ipad #trackedUpcomingList{gap:.7rem!important}
+
+/* Statistiques : grands panneaux, indicateurs denses mais lisibles. */
+html.is-ipad #tabStats>.modern-panel{padding:1.25rem!important;border-radius:1.15rem!important}
+html.is-ipad #tabStats #statsCountGrid,
+html.is-ipad #tabStats #statsValueGrid{gap:.8rem!important}
+html.is-ipad #tabStats #statsCountGrid>div,
+html.is-ipad #tabStats #statsValueGrid>div{
+ min-height:5.9rem!important;padding:1rem!important;border-radius:.9rem!important
+}
+html.is-ipad #tabStats .chart-box{
+ padding:1rem!important;border-radius:1rem!important;background:rgba(0,0,0,.12)!important
+}
+
+/* Mon espace : onglets clairs et formulaires adaptés au clavier tactile. */
+html.is-ipad #ipadSpaceNav{padding:.42rem!important;gap:.42rem!important;border-radius:1.15rem!important}
+html.is-ipad #ipadSpaceNav button{min-height:3.3rem!important;font-size:.73rem!important}
+html.is-ipad #tabSettings input,
+html.is-ipad #tabSettings select,
+html.is-ipad #tabSettings textarea{
+ min-height:2.8rem!important;font-size:max(.78rem,16px)!important
+}
+html.is-ipad #tabSettings textarea{min-height:5.5rem!important}
+html.is-ipad #spaceInstallationSection .equipment-group-items{gap:.8rem!important}
+html.is-ipad #spaceInstallationSection .equipment-card{
+ padding:.85rem 4.35rem .85rem .9rem!important;border-radius:.95rem!important
+}
+
+/* Fiches détaillées : lecture plus calme et boutons faciles à toucher. */
+html.is-ipad #detailModal>div{scroll-padding-top:1rem}
+html.is-ipad #modalContent .movie-detail-hero,
+html.is-ipad #modalContent .series-detail-hero{border-radius:1.2rem!important}
+html.is-ipad #modalContent .movie-detail-info,
+html.is-ipad #modalContent .movie-detail-editions,
+html.is-ipad #modalContent .series-detail-info,
+html.is-ipad #modalContent .series-detail-seasons{
+ padding:1.15rem!important
+}
+html.is-ipad #modalContent .edition-card{padding:1rem .5rem!important}
+html.is-ipad #modalContent .series-season-panel>summary{min-height:3.2rem!important;padding:.85rem!important}
+html.is-ipad #modalContent .series-episode-row{min-height:4.75rem!important;padding:.75rem!important}
+html.is-ipad #modalContent .movie-detail-actions{padding:.9rem 0 .1rem!important}
+html.is-ipad #modalContent .movie-detail-actions .app-action{min-height:3rem!important}
+html.is-ipad #detailModal>div>.detail-modal-close{
+ border-radius:.85rem!important;background:rgba(15,18,27,.92)!important;border:1px solid rgba(255,255,255,.13)!important
+}
+
+/* Paysage : davantage de contenu sans serrer les cartes. */
+@media (orientation:landscape){
+ html.is-ipad{--ipad-panel-pad:1.3rem}
+ html.is-ipad #collectionGrid,
+ html.is-ipad #digitalGrid,
+ html.is-ipad #wishlistGrid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+ html.is-ipad #spaceInstallationSection .equipment-form .grid,
+ html.is-ipad #spaceSubscriptionsSection .equipment-form .grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+
+/* Portrait : une largeur confortable et moins de colonnes internes. */
+@media (orientation:portrait){
+ html.is-ipad{--ipad-panel-pad:1.1rem;--ipad-page-space:1rem}
+ html.is-ipad body>header .global-search-trigger{width:8.5rem!important;min-width:8.5rem!important}
+ html.is-ipad #homeWidgetWatchNext #homeWatchNextList,
+ html.is-ipad #homeWidgetFormatMix #homeFormatMix{grid-template-columns:minmax(0,1fr)}
+ html.is-ipad #searchResults:not(.hidden){grid-template-columns:minmax(0,1fr)!important}
+}
+
+/* Équivalent clair. */
+html.is-ipad body.theme-light .glass-card,
+html.is-ipad body.theme-light .modern-panel,
+html.is-ipad body.theme-light .home-widget-panel{
+ border-color:rgba(15,23,42,.1)!important;
+ box-shadow:inset 0 1px 0 #fff,0 9px 24px rgba(15,23,42,.07)!important
+}
+html.is-ipad body.theme-light #tabStats .chart-box{background:rgba(255,255,255,.5)!important}
+html.is-ipad body.theme-light #detailModal>div>.detail-modal-close{
+ background:rgba(255,255,255,.94)!important;border-color:rgba(15,23,42,.12)!important
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
