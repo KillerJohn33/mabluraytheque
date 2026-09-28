@@ -5502,6 +5502,79 @@ html.is-ipad body.theme-light #tabStats .chart-box{background:rgba(255,255,255,.
 html.is-ipad body.theme-light #detailModal>div>.detail-modal-close{
  background:rgba(255,255,255,.94)!important;border-color:rgba(15,23,42,.12)!important
 }
+
+/* iPad : fiches successives, statistiques compactes et accueil à petites affiches. */
+html.is-ipad #modalContent .movie-detail-shell,
+html.is-ipad #modalContent .series-detail-shell{
+ display:flex!important;flex-direction:column!important;gap:1rem!important;
+}
+html.is-ipad #modalContent .movie-detail-shell>*,
+html.is-ipad #modalContent .series-detail-shell>*{
+ width:100%!important;max-width:none!important;min-width:0!important;
+ grid-column:auto!important;grid-row:auto!important;margin:0!important;box-sizing:border-box;
+}
+html.is-ipad #tabStats #statsCountGrid,
+html.is-ipad #tabStats #statsValueGrid{
+ display:flex!important;flex-wrap:wrap!important;gap:.65rem!important;
+}
+html.is-ipad #tabStats #statsCountGrid>div,
+html.is-ipad #tabStats #statsValueGrid>div{
+ flex:1 1 7.5rem;min-width:0!important;min-height:4.5rem!important;
+ padding:.75rem!important;grid-column:auto!important;
+}
+html.is-ipad #tabStats .chart-box{
+ min-height:0!important;height:auto!important;padding:.6rem!important;
+}
+html.is-ipad #tabStats .chart-box:not(.hidden){
+ display:block!important;
+}
+html.is-ipad #tabStats .chart-box canvas{
+ max-width:100%!important;max-height:17rem!important;
+}
+html.is-ipad #tabStats>.modern-panel{
+ min-height:0!important;height:auto!important;padding:1rem!important;
+}
+html.is-ipad #ipadHomeCalendarRow{
+ display:grid!important;grid-template-columns:minmax(0,19rem) minmax(0,1fr)!important;
+ gap:1rem!important;align-items:start!important;width:100%!important;
+}
+html.is-ipad #ipadHomeCalendarRow>.home-widget{
+ display:block!important;width:100%!important;height:auto!important;
+ min-width:0!important;margin:0!important;padding:.85rem!important;box-sizing:border-box;
+}
+html.is-ipad #ipadHomeCalendarRow #homeCalendarLayout{
+ grid-template-columns:none!important;
+}
+html.is-ipad #ipadHomeCalendarRow #homeCalendarDetail{
+ max-height:23rem;overflow-y:auto;overscroll-behavior:contain;
+}
+html.is-ipad #tabHome #recentGrid,
+html.is-ipad #tabHome #homeTopRatedGrid,
+html.is-ipad #tabHome #homeWishlistFocusGrid{
+ display:grid!important;
+ grid-template-columns:repeat(auto-fill,minmax(6rem,1fr))!important;
+ gap:.65rem!important;
+}
+html.is-ipad #tabHome #recentGrid>div,
+html.is-ipad #tabHome .home-media-card{
+ width:100%!important;max-width:8rem!important;justify-self:start;
+ aspect-ratio:2/3!important;min-height:0!important;
+}
+html.is-ipad #tabHome #recentGrid>div>img,
+html.is-ipad #tabHome .home-media-card>img{
+ width:100%!important;height:100%!important;aspect-ratio:2/3!important;object-fit:cover!important;
+}
+html.is-ipad #tabHome .home-series-widget-card>img{
+ width:2.5rem!important;height:3.75rem!important;flex:none;object-fit:cover;
+}
+html.is-ipad #tabHome #recentGrid h4,
+html.is-ipad #tabHome .home-media-copy strong{font-size:.6rem!important}
+html.is-ipad #tabHome .home-media-copy small{font-size:.55rem!important}
+@media(max-width:650px){
+ html.is-ipad #ipadHomeCalendarRow{
+  grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)!important;gap:.6rem!important;
+ }
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -9460,11 +9533,19 @@ function applyIPadHomeLayout() {
   dashboard.style.removeProperty('height');
   tab.appendChild(dashboard);
  }
+ let calendarRow=document.getElementById('ipadHomeCalendarRow');
+ if(!calendarRow){
+  calendarRow=document.createElement('div');
+  calendarRow.id='ipadHomeCalendarRow';
+ }
  selected.forEach(id=>{
   const widget=document.getElementById(id);
   if(!widget)return;
   widget.classList.remove('hidden');
-  flow.appendChild(widget);
+  if(id==='homeCalendarLayout'||id==='homeWidgetReleases'){
+   calendarRow.appendChild(widget);
+   if(id==='homeCalendarLayout')flow.appendChild(calendarRow);
+  }else flow.appendChild(widget);
  });
  excluded.forEach(id=>document.getElementById(id)?.classList.add('hidden'));
  tab.appendChild(flow);
