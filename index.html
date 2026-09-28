@@ -7285,49 +7285,43 @@ async function fetchAndUploadPlexPoster(base, token, thumbPath, ratingKey) {
 
 async function syncPlexLibrary(silent = false) {
  const plex = profileData.plex || {};
- if (!plex.token || !plex.serverUri) { if (!silent) showToast('Connectez d’abord votre compte Plex.'); return false; }
+ if (!plex.token) { if (!silent) showToast('Connectez d’abord votre compte Plex.'); return false; }
  if (!silent) showToast('Synchronisation Plex en cours…');
  try {
-  const base = plex.serverUri.replace(/\/$/, '');
-  const sectionsRes = await fetch(`${base}/library/sections?X-Plex-Token=${encodeURIComponent(plex.token)}`, { headers: { Accept: 'application/json' } });
-  if (!sectionsRes.ok) throw new Error('sections');
-  const sectionsData = await sectionsRes.json();
-  const sections = (sectionsData?.MediaContainer?.Directory || []).filter(s => s.type === 'movie' || s.type === 'show');
-  const items = [];
-  for (const section of sections) {
-   const itemsRes = await fetch(`${base}/library/sections/${section.key}/all?X-Plex-Token=${encodeURIComponent(plex.token)}`, { headers: { Accept: 'application/json' } });
-   if (!itemsRes.ok) continue;
-   const itemsData = await itemsRes.json();
-   (itemsData?.MediaContainer?.Metadata || []).forEach(m => {
-    const tmdbGuid = (m.Guid || []).find(g => g.id && g.id.startsWith('tmdb://'));
-    const media = Array.isArray(m.Media) ? m.Media[0] : null;
-    const part = media && Array.isArray(media.Part) ? media.Part[0] : null;
-    items.push({
-     id: `plex_${m.ratingKey}`,
-     ratingKey: String(m.ratingKey),
-     title: m.title || 'Sans titre',
-     year: m.year || null,
-     type: section.type,
-     sectionTitle: section.title,
-     tmdbId: tmdbGuid ? tmdbGuid.id.replace('tmdb://', '') : '',
-     poster: '',
-     thumbPath: m.thumb || '',
-     posterData: '',
-     duration: m.duration ? Math.round(m.duration / 60000) : 0,
-     resolution: media?.videoResolution || '',
-     videoCodec: media?.videoCodec || '',
-     audioCodec: media?.audioCodec || '',
-     audioChannels: media?.audioChannels || null,
-     container: media?.container || part?.container || '',
-     fileSize: part?.size || null,
-     addedAt: m.addedAt ? m.addedAt * 1000 : Date.now(),
-     updatedAt: new Date().toISOString()
-    });
-   });
-  }
+  const libraryRes = await callPlexApi('library', {
+   token: plex.token,
+   clientId: plex.clientId || getPlexClientId(),
+   serverClientIdentifier: plex.serverClientIdentifier || ''
+  });
+  const libraryData = await libraryRes.json().catch(() => ({}));
+  if (!libraryRes.ok) throw new Error(libraryData?.error || 'library');
+  const base = String(libraryData.serverUri || plex.serverUri || '').replace(/\/$/, '');
+  const sourceItems = Array.isArray(libraryData.items) ? libraryData.items : [];
+  const items = sourceItems.map(m => ({
+   id: `plex_${m.ratingKey}`,
+   ratingKey: String(m.ratingKey || ''),
+   title: m.title || 'Sans titre',
+   year: m.year || null,
+   type: m.type === 'show' ? 'show' : 'movie',
+   sectionTitle: m.sectionTitle || '',
+   tmdbId: m.tmdbId || '',
+   poster: '',
+   thumbPath: m.thumbPath || '',
+   posterData: '',
+   duration: Number(m.duration) || 0,
+   resolution: m.resolution || '',
+   videoCodec: m.videoCodec || '',
+   audioCodec: m.audioCodec || '',
+   audioChannels: m.audioChannels || null,
+   container: m.container || '',
+   fileSize: m.fileSize || null,
+   addedAt: Number(m.addedAt) || Date.now(),
+   updatedAt: new Date().toISOString()
+  })).filter(item => item.ratingKey);
 
-  // Recupere et met en cache les affiches (en base64) pour un affichage rapide sans dependre de Plex
-  if (!silent) showToast('Téléchargement des affiches vers le cloud…');
+  // Les affiches déjà mises en cache sont conservées. Les nouvelles sont
+  // récupérées directement lorsque la connexion Plex le permet.
+  if (!silent) showToast('Mise à jour des affiches…');
   const previousByKey = new Map(digitalLibrary.map(d => [d.ratingKey, d]));
   await mapWithConcurrency(items, 5, async item => {
    const previous = previousByKey.get(item.ratingKey);
@@ -7335,23 +7329,28 @@ async function syncPlexLibrary(silent = false) {
     item.posterData = previous.posterData;
     return;
    }
-   item.posterData = await fetchAndUploadPlexPoster(base, plex.token, item.thumbPath, item.ratingKey);
+   item.posterData = base ? await fetchAndUploadPlexPoster(base, plex.token, item.thumbPath, item.ratingKey) : '';
   });
 
   digitalLibrary = items;
+  profileData.plex.serverUri = base || plex.serverUri || '';
+  profileData.plex.serverName = libraryData.serverName || plex.serverName || 'Serveur Plex';
   saveDigitalLibraryLocal();
   profileData.plex.lastSyncAt = new Date().toISOString();
   profileData.updatedAt = new Date().toISOString();
   saveProfileLocal();
   renderDigital();
   renderPlexCard();
-  await saveDigitalLibraryBundleCloud();
-  await saveProfileBundleCloud();
-  if (!silent) showToast(`${items.length} élément(s) importé(s), affiches mises en cache dans le cloud.`);
+  const [librarySaved, profileSaved] = await Promise.all([
+   saveDigitalLibraryBundleCloud(),
+   saveProfileBundleCloud()
+  ]);
+  if (!librarySaved || !profileSaved) throw new Error('cloud_save');
+  if (!silent) showToast(`${items.length} élément(s) synchronisé(s) depuis Plex.`);
   return true;
  } catch (error) {
   console.warn('Synchronisation Plex indisponible :', error);
-  if (!silent) showToast('⚠️ Synchronisation Plex impossible (vérifiez que le serveur est accessible depuis cet appareil).');
+  if (!silent) showToast(`⚠️ ${error?.message && error.message !== 'library' ? error.message : 'Synchronisation Plex impossible.'}`);
   return false;
  }
 }
