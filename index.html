@@ -4747,6 +4747,26 @@ body.theme-light #modalContent .movie-detail-actions{
   line-height:1!important;
  }
 }
+
+/* Fiche film : suppression indépendante et discrète des éditions */
+#modalContent .edition-delete-button{
+ min-width:1.55rem;
+ min-height:1.55rem;
+ width:1.55rem;
+ height:1.55rem;
+ padding:0;
+ flex:none;
+ opacity:.68;
+ border-color:rgba(248,113,113,.2)!important;
+ background:rgba(127,29,29,.14)!important;
+ box-shadow:none;
+}
+#modalContent .edition-delete-button:hover,
+#modalContent .edition-delete-button:focus-visible{
+ opacity:1;
+ border-color:rgba(248,113,113,.42)!important;
+ background:rgba(220,38,38,.82)!important;
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -10522,7 +10542,7 @@ ${[ed.purchaseLocation, (parseFloat(ed.purchasePrice) > 0 ? Number(ed.purchasePr
 </div>
 <div class="flex flex-shrink-0 items-start gap-1.5">
 ${ed.image ? `<img src="${safeImageUrl(ed.image)}" alt="Jaquette de ${escapeHtml(ed.title || movie.title)}" loading="lazy" onerror="this.style.display='none'" class="edition-cover-mobile detail-edition-cover w-16 h-24 sm:w-20 sm:h-30 object-contain bg-black/40 rounded-xl shadow-lg border border-cyan-400/20">` : ''}
-${movie.editions.length > 1 ? `<button onclick="removeEdition(${movieIdArg}, ${idx})" class="detail-edit-only delete-icon-button p-1 rounded-lg" title="Supprimer" aria-label="Supprimer">${ic('x','w-3.5 h-3.5')}</button>` : ''}
+${movie.editions.length > 1 ? `<button type="button" onclick="event.stopPropagation();removeEdition(${movieIdArg}, ${idx})" class="delete-icon-button edition-delete-button" title="Supprimer cette édition" aria-label="Supprimer cette édition">${ic('trash','w-3 h-3')}</button>` : ''}
 </div>
 </div>
 ${ed.image ? `<figure class="edition-cover-desktop">
@@ -10800,11 +10820,25 @@ else { openMovieDetail(movieId); renderCollection(); renderWishlist(); }
 
 async function removeEdition(movieId, editionIdx) {
 let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
-if (!movie || movie.editions.length <= 1) return;
+if (!movie || !movie.editions?.[editionIdx]) return;
+if (movie.editions.length <= 1) {
+ showToast('Une fiche doit conserver au moins une édition.');
+ return;
+}
+const edition = movie.editions[editionIdx];
+const editionLabel = edition.title || edition.format || 'cette édition';
+if (!confirm(`Supprimer l’édition « ${editionLabel} » ?`)) return;
 const removed = movie.editions.splice(editionIdx, 1)[0];
 const result = await updateMovieInCloud(movie);
-if (!result.success) movie.editions.splice(editionIdx, 0, removed);
-else { openMovieDetail(movieId); renderCollection(); renderWishlist(); }
+if (!result.success) {
+ movie.editions.splice(editionIdx, 0, removed);
+ showToast('Impossible de supprimer cette édition.');
+} else {
+ showToast('Édition supprimée.');
+ openMovieDetail(movieId);
+ renderCollection();
+ renderWishlist();
+}
 }
 
 async function updateEditionDiscCount(movieId, editionIdx, discType, value) {
