@@ -81,6 +81,84 @@ async function listResources(token, clientId) {
   return servers;
 }
 
+function orderedConnections(server) {
+  const connections = Array.isArray(server?.connections) ? server.connections : [];
+  return [...connections]
+    .filter(connection => /^https:\/\//i.test(String(connection.uri || '')))
+    .sort((a, b) => {
+      const score = connection => (!connection.local && !connection.relay ? 0 : connection.relay ? 1 : 2);
+      return score(a) - score(b);
+    });
+}
+
+async function fetchPlexJson(base, path, token, clientId) {
+  const response = await fetchWithTimeout(`${String(base).replace(/\/$/, '')}${path}`, {
+    headers: plexHeaders(clientId, { 'X-Plex-Token': token })
+  }, 12000);
+  if (!response.ok) throw new Error(`plex_http_${response.status}`);
+  return response.json();
+}
+
+function plexLibraryItem(metadata, section) {
+  const tmdbGuid = (Array.isArray(metadata.Guid) ? metadata.Guid : []).find(g => String(g?.id || '').startsWith('tmdb://'));
+  const media = Array.isArray(metadata.Media) ? metadata.Media[0] : null;
+  const part = media && Array.isArray(media.Part) ? media.Part[0] : null;
+  return {
+    ratingKey: String(metadata.ratingKey || ''),
+    title: metadata.title || 'Sans titre',
+    year: metadata.year || null,
+    type: section.type,
+    sectionTitle: section.title || '',
+    tmdbId: tmdbGuid ? String(tmdbGuid.id).replace('tmdb://', '') : '',
+    thumbPath: metadata.thumb || '',
+    duration: metadata.duration ? Math.round(metadata.duration / 60000) : 0,
+    resolution: media?.videoResolution || '',
+    videoCodec: media?.videoCodec || '',
+    audioCodec: media?.audioCodec || '',
+    audioChannels: media?.audioChannels || null,
+    container: media?.container || part?.container || '',
+    fileSize: part?.size || null,
+    addedAt: metadata.addedAt ? metadata.addedAt * 1000 : Date.now()
+  };
+}
+
+async function readLibrary(token, clientId, serverClientIdentifier) {
+  const servers = await listResources(token, clientId);
+  const server = servers.find(item => item.clientIdentifier === serverClientIdentifier)
+    || servers.find(item => item.owned)
+    || servers[0];
+  if (!server) throw new Error('no_server');
+
+  const connections = orderedConnections(server);
+  if (!connections.length && /^https:\/\//i.test(server.uri || '')) connections.push({ uri: server.uri });
+  let base = '';
+  let sectionsData = null;
+  for (const connection of connections) {
+    try {
+      sectionsData = await fetchPlexJson(connection.uri, '/library/sections', token, clientId);
+      base = String(connection.uri).replace(/\/$/, '');
+      break;
+    } catch (_) {}
+  }
+  if (!sectionsData || !base) throw new Error('server_unreachable');
+
+  const sections = (sectionsData?.MediaContainer?.Directory || [])
+    .filter(section => section.type === 'movie' || section.type === 'show');
+  const results = await Promise.all(sections.map(async section => {
+    try {
+      const data = await fetchPlexJson(base, `/library/sections/${encodeURIComponent(section.key)}/all`, token, clientId);
+      return (data?.MediaContainer?.Metadata || []).map(metadata => plexLibraryItem(metadata, section));
+    } catch (_) {
+      return [];
+    }
+  }));
+  return {
+    serverName: server.name || 'Serveur Plex',
+    serverUri: base,
+    items: results.flat().filter(item => item.ratingKey)
+  };
+}
+
 function requestBody(req) {
   if (req.body && typeof req.body === 'object') return req.body;
   if (typeof req.body === 'string' && req.body.length <= 4096) {
@@ -118,8 +196,19 @@ export default async function handler(req, res) {
       if (!token || token.length > 512) return res.status(400).json({ error: 'Jeton Plex invalide.' });
       return res.status(200).json(await listResources(token, clientId));
     }
+    if (action === 'library') {
+      const token = String(body.token || '').trim();
+      const serverClientIdentifier = String(body.serverClientIdentifier || '').trim();
+      if (!token || token.length > 512) return res.status(400).json({ error: 'Jeton Plex invalide.' });
+      if (serverClientIdentifier.length > 256) return res.status(400).json({ error: 'Serveur Plex invalide.' });
+      return res.status(200).json(await readLibrary(token, clientId, serverClientIdentifier));
+    }
     return res.status(400).json({ error: 'Action inconnue.' });
-  } catch (_) {
-    return res.status(502).json({ error: 'Service Plex indisponible.' });
+  } catch (error) {
+    const messages = {
+      no_server: 'Aucun serveur Plex trouvé sur ce compte.',
+      server_unreachable: 'Le serveur Plex est actuellement inaccessible.'
+    };
+    return res.status(502).json({ error: messages[error?.message] || 'Service Plex indisponible.' });
   }
 }
