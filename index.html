@@ -5670,6 +5670,22 @@ html.is-ipad #ipadHomeCalendarRow #homeWidgetReleases>div:first-child{
   grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)!important;
  }
 }
+
+/* iPad : toutes les affiches accessibles dans des rangées horizontales. */
+html.is-ipad #tabHome #recentGrid,
+html.is-ipad #tabHome #homeTopRatedGrid{
+ display:flex!important;flex-wrap:nowrap!important;gap:.65rem!important;
+ width:100%!important;min-width:0!important;
+ overflow-x:auto!important;overflow-y:hidden!important;
+ padding:.1rem 0 .6rem!important;scroll-snap-type:x proximity;
+ -webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
+ scrollbar-width:thin;scrollbar-color:rgba(34,211,238,.45) transparent;
+}
+html.is-ipad #tabHome #recentGrid>div,
+html.is-ipad #tabHome #homeTopRatedGrid>.home-media-card{
+ flex:0 0 7rem!important;width:7rem!important;max-width:7rem!important;
+ scroll-snap-align:start;
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -9812,7 +9828,8 @@ renderHomeFormatMix();
 renderHomeWatchProgress();
 
 const recentOptions = normalizedHomeLayout().options;
-const recent = [...collection].sort((a,b) => new Date(b.addedAt || 0) - new Date(a.addedAt || 0)).slice(0, recentOptions.recentCount);
+const recentSorted = [...collection].sort((a,b) => new Date(b.addedAt || 0) - new Date(a.addedAt || 0));
+const recent = document.documentElement.classList.contains('is-ipad') ? recentSorted : recentSorted.slice(0, recentOptions.recentCount);
 grid.dataset.posterSize = recentOptions.recentPosterSize;
 if (recent.length === 0) {
 grid.innerHTML = `<p class="text-xs text-gray-400 col-span-2 sm:col-span-3 text-center p-4">Aucun film dans votre collection.</p>`;
@@ -9845,7 +9862,8 @@ function renderHomeTopRated() {
  const grid=document.getElementById('homeTopRatedGrid'); if(!grid)return;
  const options=normalizedHomeLayout().options, count=options.topRatedCount;
  const ratingFor=homeMovieRating;
- const movies=[...collection].map(movie=>({movie,rating:ratingFor(movie)})).filter(item=>item.rating.value>0).sort((a,b)=>b.rating.value-a.rating.value).slice(0,count);
+ const ranked=[...collection].map(movie=>({movie,rating:ratingFor(movie)})).filter(item=>item.rating.value>0).sort((a,b)=>b.rating.value-a.rating.value);
+ const movies=document.documentElement.classList.contains('is-ipad') ? ranked : ranked.slice(0,count);
  grid.innerHTML=movies.length ? movies.map(({movie,rating})=>`<button type="button" onclick='openMovieDetail(${JSON.stringify(movie.id)})' class="home-media-card"><img src="${safeImageUrl(movie.poster)}" loading="lazy" decoding="async"><span class="home-media-gradient"></span><span class="home-media-copy"><strong>${escapeHtml(movie.title)}</strong><small class="${rating.color}">★ ${rating.value.toFixed(1)} · ${rating.label}</small></span></button>`).join('') : '<p class="home-widget-empty">Ajoutez vos notes pour faire apparaître vos films préférés.</p>';
 }
 
