@@ -5099,6 +5099,194 @@ html.is-ipad body.theme-light>header .global-search-trigger{
  html.is-ipad #ipadHomeFlow{column-count:1}
  html.is-ipad #recentGrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
 }
+
+/* ===== STABILISATION DE LA MISE EN PAGE iPAD ===== */
+html.is-ipad{
+ --ipad-safe-top:max(.7rem,env(safe-area-inset-top));
+}
+
+/* La barre commence sous la zone d’état et ne touche plus le bord flouté. */
+html.is-ipad body>header{
+ position:sticky!important;
+ top:var(--ipad-safe-top)!important;
+ margin-top:var(--ipad-safe-top)!important;
+ margin-bottom:.85rem!important;
+ z-index:40!important;
+ border:1px solid rgba(255,255,255,.08)!important;
+ border-radius:1rem!important;
+ background:rgba(9,11,17,.96)!important;
+ backdrop-filter:none!important;
+ -webkit-backdrop-filter:none!important;
+ box-shadow:0 10px 28px rgba(0,0,0,.2)!important;
+}
+html.is-ipad body>main{
+ padding-top:0!important;
+}
+
+/* Chaque écran retrouve un vrai flux vertical. Les marges Tailwind
+   neutralisées précédemment sont remplacées par un gap unique. */
+html.is-ipad #tabCollection:not(.hidden),
+html.is-ipad #tabSeries:not(.hidden),
+html.is-ipad #tabDigital:not(.hidden),
+html.is-ipad #tabWishlist:not(.hidden),
+html.is-ipad #tabSettings:not(.hidden){
+ display:flex!important;
+ flex-direction:column!important;
+ align-items:stretch!important;
+ gap:1rem!important;
+}
+html.is-ipad #tabCollection:not(.hidden)>*,
+html.is-ipad #tabSeries:not(.hidden)>*,
+html.is-ipad #tabDigital:not(.hidden)>*,
+html.is-ipad #tabWishlist:not(.hidden)>*,
+html.is-ipad #tabSettings:not(.hidden)>*{
+ position:relative;
+ flex:none;
+ width:100%;
+ min-width:0;
+ margin:0!important;
+}
+
+/* Aucun contrôle secondaire ne flotte au-dessus du panneau suivant. */
+html.is-ipad #bulkToolbar,
+html.is-ipad #seriesCalendarPanel,
+html.is-ipad #ipadSpaceNav{
+ position:relative!important;
+ top:auto!important;
+}
+html.is-ipad #collectionTopBars,
+html.is-ipad #wishlistFilterRow,
+html.is-ipad #digitalFilterBar{
+ position:relative!important;
+ z-index:auto!important;
+}
+html.is-ipad #collectionFilterPanel,
+html.is-ipad #wishlistFilterPanel,
+html.is-ipad #digitalFilterPanel{
+ clear:both;
+ width:100%!important;
+ margin-top:0!important;
+}
+
+/* Accueil sans espace résiduel : tous les panneaux retenus se suivent
+   sur toute la largeur. Leur contenu interne continue à exploiter l’iPad. */
+html.is-ipad #homeWidgetDashboard{margin-bottom:1rem!important}
+html.is-ipad #ipadHomeFlow{
+ display:flex!important;
+ flex-direction:column!important;
+ width:100%!important;
+ column-count:auto!important;
+ column-gap:0!important;
+ gap:1rem!important;
+}
+html.is-ipad #ipadHomeFlow>.home-widget{
+ display:block!important;
+ width:100%!important;
+ max-width:none!important;
+ margin:0!important;
+ break-inside:auto!important;
+}
+html.is-ipad #recentGrid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+html.is-ipad #homeTopRatedGrid,
+html.is-ipad #homeWishlistFocusGrid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+html.is-ipad #homeWatchingSeriesGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+
+/* Statistiques : chaque panneau occupe toute la largeur comme sur PC. */
+html.is-ipad #tabStats:not(.hidden){
+ display:flex!important;
+ flex-direction:column!important;
+ align-items:stretch!important;
+ gap:1rem!important;
+ width:100%!important;
+}
+html.is-ipad #tabStats:not(.hidden)>*{
+ grid-column:auto!important;
+ width:100%!important;
+ max-width:none!important;
+ min-width:0!important;
+ margin:0!important;
+}
+html.is-ipad #tabStats .modern-panel{
+ display:block;
+ width:100%!important;
+}
+html.is-ipad #tabStats #statsCountGrid,
+html.is-ipad #tabStats #statsValueGrid{
+ grid-template-columns:repeat(4,minmax(0,1fr))!important;
+}
+html.is-ipad #tabStats .chart-box{
+ width:100%!important;
+ min-height:17rem;
+}
+
+/* Les fiches deviennent de vraies fenêtres pleine largeur.
+   Le modal recouvre le rail afin de disposer de tout l’écran. */
+html.is-ipad #detailModal{
+ z-index:70!important;
+ align-items:stretch!important;
+ padding:var(--ipad-safe-top) 1rem 1rem!important;
+}
+html.is-ipad #detailModal>div{
+ width:calc(100vw - 2rem)!important;
+ max-width:none!important;
+ height:calc(100dvh - var(--ipad-safe-top) - 1rem)!important;
+ max-height:none!important;
+ margin:0!important;
+ padding:1.15rem 1.25rem!important;
+ border-radius:1.25rem!important;
+}
+html.is-ipad #modalContent,
+html.is-ipad #modalContent>div,
+html.is-ipad #modalContent .movie-detail-shell,
+html.is-ipad #modalContent .series-detail-shell{
+ width:100%!important;
+ max-width:none!important;
+ min-width:0!important;
+}
+html.is-ipad #modalContent .movie-detail-hero,
+html.is-ipad #modalContent .series-detail-hero,
+html.is-ipad #modalContent .movie-detail-info,
+html.is-ipad #modalContent .movie-detail-editions,
+html.is-ipad #modalContent .series-detail-info,
+html.is-ipad #modalContent .series-detail-seasons{
+ width:100%!important;
+ max-width:none!important;
+ min-width:0!important;
+}
+html.is-ipad #globalSearchModal{
+ padding-left:1rem!important;
+ z-index:75!important;
+}
+
+/* En paysage, les fiches gardent les colonnes utiles, mais chacune
+   remplit réellement sa part sans largeur maximale héritée. */
+@media (orientation:landscape){
+ html.is-ipad #modalContent .movie-detail-shell,
+ html.is-ipad #modalContent .series-detail-shell{
+  grid-template-columns:minmax(0,.9fr) minmax(0,1.35fr)!important;
+  width:100%!important;
+ }
+}
+
+/* En portrait, les contenus internes restent denses sans être comprimés. */
+@media (orientation:portrait){
+ html.is-ipad #recentGrid,
+ html.is-ipad #homeTopRatedGrid,
+ html.is-ipad #homeWishlistFocusGrid{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ }
+ html.is-ipad #tabStats #statsCountGrid,
+ html.is-ipad #tabStats #statsValueGrid{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ }
+}
+
+/* Variante claire sans flou en haut. */
+html.is-ipad body.theme-light>header{
+ border-color:rgba(15,23,42,.1)!important;
+ background:rgba(248,250,252,.97)!important;
+ box-shadow:0 10px 26px rgba(15,23,42,.1)!important;
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
