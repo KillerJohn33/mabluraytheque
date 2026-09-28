@@ -5629,6 +5629,47 @@ html.is-ipad #homeCalendarLayout>div:first-child h3{font-size:.7rem!important}
   grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)!important;gap:.6rem!important;
  }
 }
+
+/* iPad : wishlist complète en rangée et calendrier/sorties de hauteur égale. */
+html.is-ipad #tabHome #homeWishlistFocusGrid{
+ display:flex!important;flex-wrap:nowrap!important;gap:.65rem!important;
+ width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;
+ padding:.1rem 0 .6rem!important;scroll-snap-type:x proximity;
+ -webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
+ scrollbar-width:thin;scrollbar-color:rgba(244,114,182,.45) transparent;
+}
+html.is-ipad #tabHome #homeWishlistFocusGrid>.home-media-card{
+ flex:0 0 7rem!important;width:7rem!important;max-width:7rem!important;
+ scroll-snap-align:start;
+}
+html.is-ipad #ipadHomeCalendarRow{
+ align-items:stretch!important;grid-template-columns:minmax(0,17.5rem) minmax(0,1fr)!important;
+}
+html.is-ipad #ipadHomeCalendarRow>#homeCalendarLayout,
+html.is-ipad #ipadHomeCalendarRow>#homeWidgetReleases{
+ display:flex!important;flex-direction:column!important;
+ height:21rem!important;min-height:0!important;box-sizing:border-box;
+}
+html.is-ipad #ipadHomeCalendarRow #homeCalendarGrid{
+ flex:1 1 auto!important;min-height:0!important;
+ grid-auto-rows:minmax(0,1fr)!important;align-content:stretch!important;
+}
+html.is-ipad #ipadHomeCalendarRow #homeCalendarGrid>button,
+html.is-ipad #ipadHomeCalendarRow #homeCalendarGrid>div{
+ height:100%!important;min-height:0!important;aspect-ratio:auto!important;
+}
+html.is-ipad #ipadHomeCalendarRow #homeCalendarDetail{
+ flex:1 1 auto!important;min-height:0!important;max-height:none!important;
+ overflow-y:auto!important;overscroll-behavior:contain;
+}
+html.is-ipad #ipadHomeCalendarRow #homeWidgetReleases>div:first-child{
+ flex:none;
+}
+@media(max-width:650px){
+ html.is-ipad #ipadHomeCalendarRow{
+  grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)!important;
+ }
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -9480,7 +9521,7 @@ function homeWidgetOptionsHtml(id, layout) {
  let specific='';
  if(id==='recent') specific=`<span>Affiches</span>${['small','medium','large'].map(size=>homeOptionButton(o.recentPosterSize===size,({small:'Petites',medium:'Moyennes',large:'Grandes'})[size],`updateHomeWidgetOption('recent','recentPosterSize','${size}')`)).join('')}<span>Nombre</span>${[4,6,8,10].map(count=>homeOptionButton(o.recentCount===count,String(count),`updateHomeWidgetOption('recent','recentCount',${count})`)).join('')}`;
  if(id==='dashboard') specific=`<span>Indicateurs</span>${Object.entries(HOME_METRIC_DEFS).map(([key,def])=>homeOptionButton(o.dashboardMetrics.includes(key),def.label,`toggleHomeMetric('${key}')`)).join('')}`;
- if(id==='topRated') specific=`<span>Films</span>${[3,4,6,8].map(count=>homeOptionButton(o.topRatedCount===count,String(count),`updateHomeWidgetOption('topRated','topRatedCount',${count})`)).join('')}<span>Notes</span>${[['mixed','Meilleure'],['personal','Personnelle'],['imdb','IMDb']].map(([key,label])=>homeOptionButton(o.topRatingSource===key,label,`updateHomeWidgetOption('topRated','topRatingSource','${key}')`)).join('')}`;
+ if(id==='topRated') specific=`<span>Films</span>${[3,4,6,8].map(count=>homeOptionButton(o.topRatedCount===count,String(count),`updateHomeWidgetOption('topRated','topRatedCount',${count})`)).join('')}<span>Notes</span><span class="text-amber-300">Mes notes personnelles</span>`;
  if(id==='watchingSeries') specific=`<span>Séries</span>${[2,3,4,6].map(count=>homeOptionButton(o.seriesCount===count,String(count),`updateHomeWidgetOption('watchingSeries','seriesCount',${count})`)).join('')}`;
  if(id==='releases') specific=`<span>Sorties</span>${[4,8,12].map(count=>homeOptionButton(o.releasesCount===count,String(count),`updateHomeWidgetOption('releases','releasesCount',${count})`)).join('')}<span>Contenu</span>${[['all','Tout'],['wishlist','Wishlist'],['series','Séries']].map(([key,label])=>homeOptionButton(o.releasesType===key,label,`updateHomeWidgetOption('releases','releasesType','${key}')`)).join('')}`;
  if(id==='watchNext') specific=`<span>Films</span>${[3,4,6].map(count=>homeOptionButton(o.watchNextCount===count,String(count),`updateHomeWidgetOption('watchNext','watchNextCount',${count})`)).join('')}`;
@@ -9796,15 +9837,14 @@ grid.appendChild(card);
 }
 
 function homeMovieRating(movie) {
- const personal = Number(movie.personalRating ?? movie.userRating ?? movie.myRating);
- const imdb = Number(movie.imdbRating ?? movie.voteAverage);
- return Number.isFinite(personal) && personal > 0 ? {value:personal,label:'Ma note',color:'text-amber-300'} : {value:Number.isFinite(imdb)?imdb:0,label:'IMDb',color:'text-blue-300'};
+ const personal=Number(movie.imdbUserRating ?? movie.personalRating ?? movie.userRating ?? movie.myRating);
+ return {value:Number.isFinite(personal)&&personal>0?personal:0,label:'Ma note',color:'text-amber-300'};
 }
 
 function renderHomeTopRated() {
  const grid=document.getElementById('homeTopRatedGrid'); if(!grid)return;
  const options=normalizedHomeLayout().options, count=options.topRatedCount;
- const ratingFor=movie=>{if(options.topRatingSource==='personal'){const value=Number(movie.personalRating??movie.userRating??movie.myRating);return {value:Number.isFinite(value)?value:0,label:'Ma note',color:'text-amber-300'};}if(options.topRatingSource==='imdb'){const value=Number(movie.imdbRating??movie.voteAverage);return {value:Number.isFinite(value)?value:0,label:'IMDb',color:'text-blue-300'};}return homeMovieRating(movie);};
+ const ratingFor=homeMovieRating;
  const movies=[...collection].map(movie=>({movie,rating:ratingFor(movie)})).filter(item=>item.rating.value>0).sort((a,b)=>b.rating.value-a.rating.value).slice(0,count);
  grid.innerHTML=movies.length ? movies.map(({movie,rating})=>`<button type="button" onclick='openMovieDetail(${JSON.stringify(movie.id)})' class="home-media-card"><img src="${safeImageUrl(movie.poster)}" loading="lazy" decoding="async"><span class="home-media-gradient"></span><span class="home-media-copy"><strong>${escapeHtml(movie.title)}</strong><small class="${rating.color}">★ ${rating.value.toFixed(1)} · ${rating.label}</small></span></button>`).join('') : '<p class="home-widget-empty">Ajoutez vos notes pour faire apparaître vos films préférés.</p>';
 }
@@ -9825,7 +9865,8 @@ function renderHomeWatchNext() {
 }
 function renderHomeWishlistFocus() {
  const grid=document.getElementById('homeWishlistFocusGrid'); if(!grid)return;
- const items=[...wishlist].sort((a,b)=>Number(b.preordered)-Number(a.preordered)||new Date(b.addedAt||0)-new Date(a.addedAt||0)).slice(0,normalizedHomeLayout().options.wishlistCount);
+ const sorted=[...wishlist].sort((a,b)=>Number(b.preordered)-Number(a.preordered)||new Date(b.addedAt||0)-new Date(a.addedAt||0));
+ const items=document.documentElement.classList.contains('is-ipad') ? sorted : sorted.slice(0,normalizedHomeLayout().options.wishlistCount);
  grid.innerHTML=items.length ? items.map(movie=>`<button type="button" onclick='openMovieDetail(${JSON.stringify(movie.id)})' class="home-media-card home-media-card-pink"><img src="${safeImageUrl(movie.poster)}" loading="lazy" decoding="async"><span class="home-media-gradient"></span><span class="home-media-copy"><strong>${escapeHtml(movie.title)}</strong><small class="text-pink-300">${movie.preordered ? 'Précommandé' : 'Dans ma wishlist'}</small></span></button>`).join('') : '<p class="home-widget-empty">Votre wishlist est vide.</p>';
 }
 
