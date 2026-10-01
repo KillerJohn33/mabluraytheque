@@ -5698,6 +5698,30 @@ html.is-ipad #tabHome #homeTopRatedGrid>.home-media-card{
   box-sizing:border-box!important;
  }
 }
+
+/* --- Comportement d'application native ---------------------------------- */
+/* Pas de zoom au double-toucher (le pincement reste possible). */
+:where(html, body, body *) { touch-action: manipulation; }
+/* Pas de rebond qui fait glisser toute l'application. */
+html, body { overscroll-behavior: none; }
+body > main, #detailModal > div, #globalSearchModal * { overscroll-behavior: contain; }
+@media (hover: none) and (pointer: coarse) {
+  /* Pas de sélection de texte ni de menu contextuel sur l'interface… */
+  body {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  img, svg, a { -webkit-user-drag: none; }
+  /* …mais toujours possible dans les champs de saisie et sur les jetons à copier. */
+  input, textarea, select, [contenteditable]:not([contenteditable="false"]),
+  .allow-select, .allow-select *, [data-copy], [data-copy] *, code, pre, kbd {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
+  }
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -7020,22 +7044,50 @@ const showPending = state === 'offline' || pendingCount > 0;
 ['topOfflineBadge','bottomOfflineBadge'].forEach(id => document.getElementById(id)?.classList.toggle('hidden', !showPending));
 }
 
+// Empreinte des données affichées : sert à ne redessiner l'écran que si une
+// actualisation automatique apporte réellement du nouveau.
+function appDataSignature() {
+ try { return JSON.stringify([collection, wishlist, trackedSeries, profileData, digitalLibrary]); }
+ catch (_) { return String(Date.now()); }
+}
+
+// Conserve la position de défilement pendant un rendu en arrière-plan.
+function preserveAppScroll(render) {
+ const main = document.querySelector('body > main');
+ const mainTop = main ? main.scrollTop : 0;
+ const windowTop = window.scrollY;
+ render();
+ if (main && main.scrollTop !== mainTop) main.scrollTop = mainTop;
+ if (detailModalScrollY === null && window.scrollY !== windowTop) window.scrollTo(0, windowTop);
+}
+
+let hasCompletedInitialSync = false;
 async function syncAllData(silent = false) {
 if (!navigator.onLine) { setSyncStatus('offline'); if (!silent) showToast('Mode hors ligne.'); return false; }
 setSyncStatus('syncing');
-const collectionOk = await fetchCollectionFromCloud();
+const quietRefresh = silent && hasCompletedInitialSync;
+const before = quietRefresh ? appDataSignature() : null;
+const collectionOk = await fetchCollectionFromCloud({ quiet: silent, deferRender: true });
 const seriesOk = await loadTrackedSeriesFromCloud();
-const profileOk = await loadProfileFromCloud();
+const profileOk = await loadProfileFromCloud({ deferRender: true });
 const digitalOk = await loadDigitalLibraryFromCloud();
-if (collectionOk && seriesOk && profileOk && digitalOk) {
+const ok = collectionOk && seriesOk && profileOk && digitalOk;
+if (!quietRefresh || appDataSignature() !== before) {
+ preserveAppScroll(() => {
+  applyHomeLayout();
+  renderCollection();
+  renderWishlist();
+  renderIncompletePanel();
+  renderTrackedSeries();
+  renderEquipment();
+  renderDigital();
+  updateSettingsCounters();
+ });
+}
+hasCompletedInitialSync = true;
+if (ok) {
 localStorage.setItem('last_cloud_sync', new Date().toISOString());
 setSyncStatus('synced');
-renderCollection();
-renderWishlist();
-renderTrackedSeries();
-renderEquipment();
-renderDigital();
-updateSettingsCounters();
 if (!silent) showToast('Données synchronisées avec le cloud.');
 return true;
 }
@@ -7120,11 +7172,24 @@ Object.entries(immediateMobileActions).forEach(([id, config]) => {
   event.preventDefault();
   event.stopPropagation();
 
+  if (handleActiveTabReselect(config.tab)) {
+   appHaptic('light');
+   return;
+  }
   const scrollContainer = cancelMobileScrollMomentum();
   config.action();
   finishMobileTabSwitch(scrollContainer);
   appHaptic('light');
  }, { passive: false, capture: true });
+});
+
+const topNavTabs = { tabHomeBtn:'home', tabCollectionBtn:'collection', tabSeriesBtn:'series', tabStatsBtn:'stats', tabSettingsBtn:'settings' };
+Object.entries(topNavTabs).forEach(([id, tab]) => {
+ document.getElementById(id)?.addEventListener('click', event => {
+  if (!handleActiveTabReselect(tab)) return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+ }, { capture: true });
 });
 
 const updateMobileNavigation = () => {
@@ -7521,7 +7586,7 @@ async function saveProfileBundleCloud() {
  }
 }
 
-async function loadProfileFromCloud() {
+async function loadProfileFromCloud({ deferRender = false } = {}) {
  let localRaw;
  try { localRaw = JSON.parse(localStorage.getItem('profile_bundle_v1') || '{}'); }
  catch (_) { localRaw = {}; }
@@ -7542,8 +7607,10 @@ async function loadProfileFromCloud() {
  };
  setDevicePlexToken(deviceToken);
  saveProfileLocal();
- applyHomeLayout();
- renderEquipment();
+ if (!deferRender) {
+  applyHomeLayout();
+  renderEquipment();
+ }
  const cloudPlex = cloudRaw?.plex || {};
  const cloudContainedSecret = Boolean(cloudPlex.token || cloudPlex.clientId || cloudPlex.serverUri || cloudPlex.serverClientIdentifier);
  if (!profileBundleCloudId || localDate > cloudDate || cloudContainedSecret) {
@@ -8447,8 +8514,9 @@ return label;
 }
 
 // --- SUPABASE SYNCHRO ---
-async function fetchCollectionFromCloud() {
-showToast("Chargement du cloud...");
+async function fetchCollectionFromCloud({ quiet = false, deferRender = false } = {}) {
+if (!quiet) showToast("Chargement du cloud...");
+const before = quiet ? JSON.stringify([collection, wishlist]) : null;
 try {
 const { data, error } = await db.from('bluray').select('*');
 if (error) {
@@ -8485,9 +8553,14 @@ m = normalizeMovieData(m);
 if (m.isWishlist) wishlist.push(m);
 else collection.push(m);
 });
-renderCollection();
-renderWishlist();
-renderIncompletePanel();
+// En mode silencieux, ne redessiner que si la collection a réellement changé.
+if (!deferRender && (!quiet || JSON.stringify([collection, wishlist]) !== before)) {
+ preserveAppScroll(() => {
+  renderCollection();
+  renderWishlist();
+  renderIncompletePanel();
+ });
+}
 return true;
 }
 } catch (err) {
@@ -8545,7 +8618,7 @@ async function flushPendingMovieUpdates() {
   localStorage.setItem('last_cloud_sync', new Date().toISOString());
   setSyncStatus('synced');
   showToast('Modifications hors ligne synchronisées');
-  await fetchCollectionFromCloud();
+  await fetchCollectionFromCloud({ quiet: true });
  }
 }
 window.addEventListener('online', () => { setSyncStatus('syncing'); flushPendingMovieUpdates(); });
@@ -8725,7 +8798,9 @@ function openSpaceSection(section) {
  }
 }
 
+let currentTab = 'home';
 function switchTab(tab) {
+currentTab = tab;
 ['tabHome', 'tabCollection', 'tabWishlist', 'tabSeries', 'tabDigital', 'tabStats', 'tabSettings'].forEach(id => {
 const el = document.getElementById(id);
 if (el) el.classList.add('hidden');
@@ -8798,6 +8873,39 @@ updateSettingsCounters();
 renderIncompletePanel();
 animateActiveTabPanel(tab);
 updateTopNavIndicator();
+}
+
+// Conteneur qui défile réellement : <main> sur téléphone, la fenêtre ailleurs.
+function getAppScroller() {
+ const main = document.querySelector('body > main');
+ if (main && /(auto|scroll)/.test(getComputedStyle(main).overflowY) && main.scrollHeight > main.clientHeight) return main;
+ return null;
+}
+
+function scrollAppToTop() {
+ const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+ const scroller = getAppScroller();
+ if (scroller) scroller.scrollTo({ top: 0, behavior });
+ else window.scrollTo({ top: 0, behavior });
+}
+
+// Revenir à la liste principale de Mon espace : rubriques repliées, formulaires fermés.
+function resetSpaceToMainList() {
+ toggleMobileProfile(false);
+ toggleMobileInstallation(false);
+ toggleMobileSubscriptions(false);
+ toggleMobileOptions(false);
+ closeEquipmentForm();
+ if (activeSpaceSection !== 'installation') applySpaceSection('installation');
+}
+
+// Toucher l'onglet déjà actif : remonte en douceur (et, dans Mon espace, revient
+// à la liste principale). Renvoie false si l'onglet n'était pas déjà affiché.
+function handleActiveTabReselect(tab) {
+ if (tab !== currentTab) return false;
+ if (tab === 'settings') resetSpaceToMainList();
+ scrollAppToTop();
+ return true;
 }
 
 function updateTopNavIndicator() {
@@ -9205,6 +9313,7 @@ let updated = 0;
 
 for (const movie of allMovies) {
 try {
+const beforeMovie = JSON.stringify(movie);
 const info = await fetchTMDBExtraInfo(movie.tmdb_id);
 movie.genres = info.genres.length ? info.genres : (movie.genres || []);
 movie.runtime = info.runtime !== null ? info.runtime : (movie.runtime || null);
@@ -9223,8 +9332,10 @@ if (!movie.blurayReleaseDateManual) {
 movie.blurayReleaseDateFR = info.blurayDateFR || movie.blurayReleaseDateFR || null;
 }
 
+if (JSON.stringify(movie) !== beforeMovie) {
 await updateMovieInCloud(movie);
 updated++;
+}
 } catch (e) {
 console.error("Erreur lors du rafraîchissement de", movie.title, e);
 }
@@ -9232,9 +9343,13 @@ done++;
 if (btn) document.getElementById('refreshTmdbBtnText').innerText = `Mise à jour... (${done}/${allMovies.length})`;
 }
 
+if (!silent || updated > 0) {
+preserveAppScroll(() => {
 renderCollection();
 renderWishlist();
 renderHomeRecent();
+});
+}
 
 if (btn) {
 btn.disabled = false;
@@ -11471,7 +11586,7 @@ function lockDetailBackgroundScroll() {
  if (window.innerWidth < 768 && main) {
   detailModalScrollY = main.scrollTop;
   detailModalUsesMainScroll = true;
-  main.style.overflowY = 'hidden';
+  main.style.setProperty('overflow-y', 'hidden', 'important');
   main.style.touchAction = 'none';
   return;
  }
@@ -11490,7 +11605,7 @@ function unlockDetailBackgroundScroll() {
   const main = document.querySelector('body > main');
   detailModalUsesMainScroll = false;
   if (main) {
-   main.style.overflowY = '';
+   main.style.removeProperty('overflow-y');
    main.style.touchAction = '';
    main.scrollTop = scrollY;
   }
@@ -13228,6 +13343,97 @@ if ('serviceWorker' in navigator) {
       .catch(error => console.warn('Service worker non disponible :', error));
   });
 }
+</script>
+<script>
+// --- Comportement d'application native : toucher, défilement, menus ----------
+(() => {
+ const isTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+ const SELECTABLE = 'input, textarea, select, [contenteditable]:not([contenteditable="false"]), .allow-select, [data-copy], code, pre, kbd';
+
+ // Pas de menu contextuel à l'appui long, sauf sur les zones de saisie / à copier.
+ if (isTouch) {
+  document.addEventListener('contextmenu', event => {
+   if (!event.target.closest?.(SELECTABLE)) event.preventDefault();
+  });
+ }
+
+ // Les boutons et les cartes s'enfoncent légèrement sous le doigt.
+ const supportsHas = (() => { try { document.querySelector(':has(*)'); return true; } catch (_) { return false; } })();
+ const PRESSABLE = 'button, a[href], [onclick], [role="button"], summary' + (supportsHas ? ', label:has(input[type="checkbox"])' : '');
+ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+ let pressed = null, pressAnim = null, pressX = 0, pressY = 0;
+ const release = () => {
+  if (!pressed) return;
+  const el = pressed, anim = pressAnim;
+  pressed = null; pressAnim = null;
+  const current = getComputedStyle(el).scale;
+  anim?.cancel();
+  el.animate([{ scale: current && current !== 'none' ? current : '1' }, { scale: '1' }], { duration: 200, easing: 'cubic-bezier(.2,.8,.2,1)' });
+ };
+ document.addEventListener('pointerdown', event => {
+  release();
+  if (reduceMotion.matches || !event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0)) return;
+  const el = event.target.closest?.(PRESSABLE);
+  if (!el || typeof el.animate !== 'function') return;
+  if (el.matches(':disabled, [aria-disabled="true"], [role="dialog"], #detailModal, #bottomNav *, .no-press')) return;
+  const rect = el.getBoundingClientRect();
+  // Ne pas enfoncer de grands blocs (sections entières).
+  if (rect.width * rect.height > window.innerWidth * window.innerHeight * 0.45) return;
+  const scale = rect.width > 220 || rect.height > 140 ? 0.975 : 0.94;
+  pressed = el; pressX = event.clientX; pressY = event.clientY;
+  pressAnim = el.animate([{ scale: '1' }, { scale: String(scale) }], { duration: 90, easing: 'ease-out', fill: 'forwards' });
+ }, { passive: true, capture: true });
+ document.addEventListener('pointermove', event => {
+  if (pressed && Math.hypot(event.clientX - pressX, event.clientY - pressY) > 10) release();
+ }, { passive: true, capture: true });
+ ['pointerup', 'pointercancel', 'dragstart', 'blur'].forEach(type => window.addEventListener(type, release, { passive: true, capture: true }));
+ document.addEventListener('scroll', release, { passive: true, capture: true });
+
+ // Défilement : seules les zones qui défilent réellement bougent. Le reste de
+ // l'application ne rebondit plus, et une fenêtre ouverte n'entraîne plus la page.
+ const MODALS = '#detailModal, #globalSearchModal, [aria-modal="true"]';
+ const openModal = () => [...document.querySelectorAll(MODALS)].filter(el => !el.classList.contains('hidden') && el.getClientRects().length).pop() || null;
+ const root = document.scrollingElement || document.documentElement;
+ const canScroll = (el, axis, delta) => {
+  if (el === document.body || el === document.documentElement) {
+   if (axis === 'y') return delta > 0 ? window.scrollY > 0 : window.scrollY + window.innerHeight < root.scrollHeight - 1;
+   return delta > 0 ? window.scrollX > 0 : window.scrollX + window.innerWidth < root.scrollWidth - 1;
+  }
+  const style = getComputedStyle(el);
+  if (axis === 'y') {
+   if (!/(auto|scroll)/.test(style.overflowY) || el.scrollHeight <= el.clientHeight + 1) return false;
+   return delta > 0 ? el.scrollTop > 0 : el.scrollTop + el.clientHeight < el.scrollHeight - 1;
+  }
+  if (!/(auto|scroll)/.test(style.overflowX) || el.scrollWidth <= el.clientWidth + 1) return false;
+  return delta > 0 ? el.scrollLeft > 0 : el.scrollLeft + el.clientWidth < el.scrollWidth - 1;
+ };
+ let startX = 0, startY = 0, lastX = 0, lastY = 0, gestureAllowed = false;
+ document.addEventListener('touchstart', event => {
+  if (event.touches.length !== 1) return;
+  startX = lastX = event.touches[0].clientX;
+  startY = lastY = event.touches[0].clientY;
+  const target = event.target;
+  // Champs, curseurs et zones à geste personnalisé gardent leur comportement.
+  gestureAllowed = !!target.closest?.('input, textarea, select, [contenteditable]') ||
+   [target, ...(function* (n) { while ((n = n.parentElement)) yield n; })(target)].some(n => n.nodeType === 1 && getComputedStyle(n).touchAction === 'none');
+ }, { passive: true, capture: true });
+ document.addEventListener('touchmove', event => {
+  if (event.touches.length !== 1 || !event.cancelable || gestureAllowed) return;
+  const touch = event.touches[0];
+  const totalX = touch.clientX - startX, totalY = touch.clientY - startY;
+  const axis = Math.abs(totalX) > Math.abs(totalY) ? 'x' : 'y';
+  const delta = axis === 'x' ? touch.clientX - lastX : touch.clientY - lastY;
+  lastX = touch.clientX; lastY = touch.clientY;
+  if (!delta) return;
+  const modal = openModal();
+  if (modal && !modal.contains(event.target)) { event.preventDefault(); return; }
+  for (let el = event.target; el && el.nodeType === 1; el = el.parentElement) {
+   if (canScroll(el, axis, delta)) return;
+   if (el === modal) break;
+  }
+  event.preventDefault();
+ }, { passive: false, capture: true });
+})();
 </script>
 </body>
 </html>
