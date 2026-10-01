@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#050505">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -5700,8 +5700,8 @@ html.is-ipad #tabHome #homeTopRatedGrid>.home-media-card{
 }
 
 /* --- Comportement d'application native ---------------------------------- */
-/* Pas de zoom au double-toucher (le pincement reste possible). */
-:where(html, body, body *) { touch-action: manipulation; }
+/* Aucun zoom : ni double-toucher, ni pincement. */
+:where(html, body, body *) { touch-action: pan-x pan-y; }
 /* Pas de rebond qui fait glisser toute l'application. */
 html, body { overscroll-behavior: none; }
 body > main, #detailModal > div, #globalSearchModal * { overscroll-behavior: contain; }
@@ -13349,6 +13349,17 @@ if ('serviceWorker' in navigator) {
 (() => {
  const isTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
  const SELECTABLE = 'input, textarea, select, [contenteditable]:not([contenteditable="false"]), .allow-select, [data-copy], code, pre, kbd';
+
+ // Aucun zoom : Safari iOS ignore user-scalable=no, on bloque donc le pincement
+ // directement (le double-toucher est déjà neutralisé par touch-action).
+ ['gesturestart', 'gesturechange', 'gestureend'].forEach(type => document.addEventListener(type, event => event.preventDefault(), { passive: false }));
+ document.addEventListener('touchmove', event => {
+  if (event.touches.length > 1 && event.cancelable) event.preventDefault();
+ }, { passive: false, capture: true });
+ window.addEventListener('wheel', event => { if (event.ctrlKey) event.preventDefault(); }, { passive: false });
+ document.addEventListener('keydown', event => {
+  if ((event.ctrlKey || event.metaKey) && ['+', '-', '=', '0'].includes(event.key)) event.preventDefault();
+ });
 
  // Pas de menu contextuel à l'appui long, sauf sur les zones de saisie / à copier.
  if (isTouch) {
