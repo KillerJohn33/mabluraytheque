@@ -12,12 +12,12 @@
 <title>Ma Collection Blu-ray & Wishlist</title>
 <script>
 (function(){
- // Interface mobile v2 (activée par défaut). localStorage.ui_v2 = '0' restaure l'ancienne.
- let uiV2=true; try{ uiV2=localStorage.getItem('ui_v2')!=='0'; }catch(_){}
- if(uiV2) document.documentElement.classList.add('ui-v2');
  const ua=navigator.userAgent||'';
  const isIPad=/iPad/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
  if(isIPad) document.documentElement.classList.add('is-ipad');
+ // Nouvelle interface : téléphone et iPad. localStorage.ui_v2 = '0' restaure l'ancienne.
+ let uiV2=true; try{ uiV2=localStorage.getItem('ui_v2')!=='0'; }catch(_){}
+ if(uiV2 && (isIPad || window.matchMedia('(max-width: 767px)').matches)) document.documentElement.classList.add('ui-v2');
 })();
 </script>
 <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAIGklEQVR4nKWXa4xcZRnHf897LjNnLnuZ7nYXt5RyKwUsCTQ2IjFEibdQiFIQjDFq4icrUCFoIl/UT4SYYDABLyEGETSk1UgwjcgHAzYllkttLVikZdtQaLfdzs7unDNzzpzzPn54Z7e73baa8CaTOZl5z/v/P7f/87yCWx5QjI2NrbGWe0A3AWsAHxA+3FIgByZBnjeGR48fPz45jynzDyMjI18WMT8TkZUAqvohcZcuEWeHqk6p2rtPnjz5LOAJwOjo6GYRs62/oQAM57B8gZac8Xef8HncpYAVEQ8gSeLb2+32dhke/siFvp/vBQYBi/PIWd9WY8DzUd8HzwPT52ktFDmS5+7b2nMSEZGi2+2aJElavu9d4/t+734RM9S3fBm4A/bQMESjClSqEFWwYcmRQBxolkEnQTox0kmQLEWKYgkRESHPc6/T6RQiMlQUer+MjIweEpE183uWgIugQYit1tDBYbzBYdJSmVyVEoDpb7fO/WoESbtIawZpNTHtOaSXIYvyaXZ2lqIoVERQ1UkZHV2Zn9VyEWypjB0cRkbHsPVBWoWyYniIleuu5N3Vl2OHV6CAaZ3CmzyIf+BNpHkK9Qwy18KcOI60mki3gwfEcUyapgsJCRT+ecEbI5jxCZKoii2V2HrrzXznM5/irz3l22+9T6nVxKpSjK+id+1GCHyCV16mtOM5EMGGJcTz8JrTpLOtM8EBPP+sMQ9C7OAwZnyCdlRlbHycZ763ldD3ue83v+fve/9FPW6fdq0IGlXI115JesuX6F23kerjj2COHkHHV5HnBUmziRizUC0LeTE6unLJL9Z42MEhmFhNZ7DB6Ng4f3noh7z42h62/vLXWGupV6vusKLo2+GBVaQTg1W6d3yVbOMnqf3kR5j3j9A5/gHFuwcxrVPQ6y0hYJZZH4bo4DBFfQgNSzzz4AO8+MZe7vnpY9SjiOGBAUy3C2kXjSquMrIU6SZotYbWakRPP0HwysvEW75P5ofkURVprEBL5WX6sSQEagwaVTCDw8wUBQ/cditREPDdx59gaEXD5UbcJl+3nvzSK6DIHWvfxzt8kGD/HrSfO9G2p2ivvZrOzbfjPfkYDDWgeQq6Hcjz5QS0nxJaqaLlMtHgMH/+2E3seOq3hGqdm+M26Q2fRmt1wl1/Q9pz7t1Kld6G60lXrKT00gvOM56HPPskfOte2PEHdOoDpFpD51pOsM4aAt+HqIKqYtZexZvdgv/s20upWsXGMb1169FanfLz25C5WVfjvQyJ25R2/BE8j976DZgkJvUD7Fv7kKSNrr/OqWWlCr6/JAynCYiA56FhCRTyiy8nPHaUShJjjQHPUFy6lnD3TrRSAbX01l1D7+prQRWt1Ql276S46BIy49HLcyTtwuFD6KVXAAJh6TwEAIzX13jBDq+AmWmsKhQFWhuEokDac0heUFx+FcmWrSRb7ib/6HVIlmE6CXS7dKMKUhQOaPoEDDfcuZ7nMM5VBX1XLIrJogoVWdQKFfV8J2EeqO+534CiKM5yxrl75FIh6nc1rGJaTYrxiYXQSLsFvktSYsX/9z4qv/g56vsEe3ZDqUwGFEGAmZ1xGqcKjRFoNZ1m2MJhnNUDqqe7GuBNvoO9YJWrc6tInuMdPki24XpM3AZjCP75D8JXdyKeR96cJrv248h7h12pCVAqoRddghx8G1DIUleCizxriqJY0GfJc+gkIIJ/YD8aBORrr0Y6MVqpEuzfg+Q53c9/ES2VUc9H/QDrB3Rv2gRhiLy2Cyo1SGL0snVQH0T2ve5mhySBvLcolODHScJAvY4AWuQOLEuR5jThKy/RveUOgr2vukwvlSm99AK99RvIbvysU0Cg5wXo4UPI67sgCJ31WYZu/hqyeyccP+o8G7eRvMdiBuL7gZbKZaqVClYVG1Ww4xPYC1ZBpUr7wYfx979B5elfYRsjIIIkMRqE6FCDXt4jOzHlSq5Sc+AnptC7voG98XN4P9gCrSZy7CgcPYLEMejpPDAiQtrtkmUZRgRJU9fD51rQSag+/jC9jTfQ+co3kbk5Bx5VIAigOU3vxBTieVCtQSeGmRn0rq9jv3Ar3iM/htkZp5jNaUdSlyahBEGorsqEgYEBMAYbhGhjFDtxIZQj7MRFxFvuQ5KY8p+24b9zANIOSbeLLfoHlsroZWvRzXehIyvxHnkI3jmAZCm8dxhOHke6neXteJ6AqhKGIbVaDQvYcoRtjKDjE1CO0EqNdNNtZBs/gUk6yJFJiqkplzuNBrp6DQzUkd27MNt+B7NNJE3hg/cceBIvK8F5AgsjmapSrVYplUoUgJYjdKiBHRlD6wOItejIGOkVV5GuvhhpjLpTZk4hh95G9u2BY++DZ5zbp45B8yTSSU7PDktXIb4fLBtKBwYGMMa4oTQMsdU6OjiMDjXQIKQTx06ivfmxvHCJbcRle6sJzWmYm3VxX275vNcnfRGeA+4FCsBTVZIkoV6vu3ilKSbP0U4CszPEYtysVyqf1nVbOJFJEojbkMRI2lkmOouWBTwRnpNyuXxhUdglFxNVJYoioihC1Wm8GEM3y0h6PSTodzXTF1JrHVjec3Ve2GXZvtjtOAVueZ65RgDCMNysyrYzNki9Xsf3XbvI85y5ubl+oOTsV7Pz3yeVRTcvEW7Psmy7Abwsy7aD3gk61d8gqkocx84Di54XwKxd+vnfl9n+RVinQO90mP3LaR+0KJVKa6y196iySUTWqKofRZGoKt1u98yZ/v9dCuSqOinC88aYR9M0nZzH/C+eagvVsJQ4vQAAAABJRU5ErkJggg==">
@@ -5726,92 +5726,132 @@ body > main, #detailModal > div, #globalSearchModal * { overscroll-behavior: con
   }
 }
 
-#incompleteQuickBtn { display: none !important; }
 /* ======================================================================
-   INTERFACE MOBILE v2 — aérée, cartes iOS, pastilles et boutons en pilule
-   (inspirée de « Mes Commandes »), thème sombre.
-   Tout est rangé derrière html.ui-v2 : retirer cette classe (ou
-   localStorage.ui_v2 = '0') restaure à l'identique l'interface précédente.
+   INTERFACE v2 — téléphone et iPad, thèmes sombre et clair
+   Cartes arrondies, pastilles et boutons en pilule (inspirés de
+   « Mes Commandes »), palette bleue harmonisée, transitions de page.
+   Activée par la classe html.ui-v2 (posée au démarrage sur téléphone et
+   iPad). Réglage « Nouvelle interface » dans Options, ou
+   localStorage.ui_v2 = '0', pour retrouver l'ancienne apparence.
+   Deux parties : habillage commun, puis mise en page compacte du téléphone.
    ====================================================================== */
-@media (max-width: 767px) {
-html.ui-v2 {
+#incompleteQuickBtn { display: none !important; }
+
+/* ---------- Jetons : thème sombre ---------- */
+html.ui-v2 body {
+  --rgb-accent: 95, 176, 255;   --on-accent: #04182e;
+  --rgb-blue2: 91, 143, 242;    --on-blue2: #ffffff;
+  --rgb-azure: 79, 198, 236;    --on-azure: #03202b;
+  --rgb-pink: 243, 170, 203;    --on-pink: #3a1226;
+  --rgb-green: 141, 220, 188;   --on-green: #0e2a20;
+  --rgb-orange: 246, 193, 138;  --on-orange: #2e1d08;
+  --rgb-red: 255, 154, 154;
+  --rgb-neutral: 210, 214, 228;
+  --soft: .16;
   --v2-bg: #000000;
-  --v2-card: #1c1c1e;
-  --v2-card-2: #2c2c2e;
   --v2-text: #f2f2f7;
   --v2-muted: #98989f;
-  --v2-line: rgba(84, 84, 88, .55);
-  --v2-accent: #5fb0ff;
-  --v2-accent-soft: rgba(95, 176, 255, .17);
-  --v2-on-accent: #04182e;
-  --v2-accent-glow: rgba(95, 176, 255, .38);
-  --v2-grad-accent: linear-gradient(135deg, #8cc8ff, #4a9af0);
-  --v2-violet: #5b8ff2;  --v2-violet-soft: rgba(91, 143, 242, .18);
-  --v2-green: #8ddcbc;   --v2-green-soft: rgba(141, 220, 188, .13);
-  --v2-orange: #f6c18a;  --v2-orange-soft: rgba(246, 193, 138, .13);
-  --v2-red: #ff9a9a;     --v2-red-soft: rgba(255, 154, 154, .13);
-  --v2-blue: #4fc6ec;    --v2-blue-soft: rgba(79, 198, 236, .16);
-  --v2-pink: #f3aacb;    --v2-pink-soft: rgba(243, 170, 203, .13);
+  --v2-card: #16181e;
+  --v2-card-2: #21252d;
+  --v2-panel: radial-gradient(120% 90% at 0% 0%, rgba(90, 160, 255, .12), transparent 55%),
+              linear-gradient(165deg, #1b1e25 0%, #16181e 60%, #121419 100%);
   --v2-gray-soft: rgba(120, 120, 128, .24);
-  --v2-hair: inset 0 0 0 1px rgba(255, 255, 255, .07);
+  --v2-hair: inset 0 0 0 1px rgba(255, 255, 255, .075);
   --v2-lift: 0 10px 28px -12px rgba(0, 0, 0, .85);
+  --v2-header-bg: rgba(0, 0, 0, .82);
+  --v2-nav-shadow: 0 12px 34px rgba(0, 0, 0, .7);
+  --v2-modal-bg: #0b0c10;
+  --v2-overlay: rgba(0, 0, 0, .55);
+  --v2-seg-bg: rgba(255, 255, 255, .07);
+  --v2-track-other: #6b707c;
+  --v2-glow: rgba(95, 176, 255, .07);
   --v2-radius: 22px;
   --v2-radius-sm: 16px;
 }
+/* ---------- Jetons : thème clair ---------- */
+html.ui-v2 body.theme-light {
+  --rgb-accent: 23, 110, 230;   --on-accent: #ffffff;
+  --rgb-blue2: 61, 90, 214;     --on-blue2: #ffffff;
+  --rgb-azure: 8, 140, 180;     --on-azure: #ffffff;
+  --rgb-pink: 214, 51, 132;     --on-pink: #ffffff;
+  --rgb-green: 5, 150, 105;     --on-green: #ffffff;
+  --rgb-orange: 211, 112, 6;    --on-orange: #ffffff;
+  --rgb-red: 220, 38, 38;
+  --rgb-neutral: 71, 85, 105;
+  --soft: .10;
+  --v2-bg: #f2f4f8;
+  --v2-text: #0f172a;
+  --v2-muted: #64748b;
+  --v2-card: #ffffff;
+  --v2-card-2: #f1f4f9;
+  --v2-panel: radial-gradient(120% 90% at 0% 0%, rgba(37, 125, 235, .07), transparent 55%),
+              linear-gradient(165deg, #ffffff 0%, #fbfcfe 100%);
+  --v2-gray-soft: rgba(100, 116, 139, .12);
+  --v2-hair: inset 0 0 0 1px rgba(15, 23, 42, .07);
+  --v2-lift: 0 10px 26px -14px rgba(15, 23, 42, .22);
+  --v2-header-bg: rgba(242, 244, 248, .86);
+  --v2-nav-shadow: 0 12px 30px -8px rgba(15, 23, 42, .22);
+  --v2-modal-bg: #f2f4f8;
+  --v2-overlay: rgba(15, 23, 42, .35);
+  --v2-seg-bg: rgba(15, 23, 42, .06);
+  --v2-track-other: #cbd2dc;
+  --v2-glow: rgba(37, 125, 235, .06);
+}
+/* Couleurs dérivées (identiques pour les deux thèmes) */
+html.ui-v2 body {
+  --v2-accent: rgb(var(--rgb-accent));       --v2-accent-soft: rgba(var(--rgb-accent), var(--soft));
+  --v2-violet: rgb(var(--rgb-blue2));        --v2-violet-soft: rgba(var(--rgb-blue2), var(--soft));
+  --v2-blue: rgb(var(--rgb-azure));          --v2-blue-soft: rgba(var(--rgb-azure), var(--soft));
+  --v2-pink: rgb(var(--rgb-pink));           --v2-pink-soft: rgba(var(--rgb-pink), var(--soft));
+  --v2-green: rgb(var(--rgb-green));         --v2-green-soft: rgba(var(--rgb-green), var(--soft));
+  --v2-orange: rgb(var(--rgb-orange));       --v2-orange-soft: rgba(var(--rgb-orange), var(--soft));
+  --v2-red: rgb(var(--rgb-red));             --v2-red-soft: rgba(var(--rgb-red), var(--soft));
+}
 
+/* =========================== HABILLAGE COMMUN (téléphone et iPad) =========================== */
 /* ---------- Fond & typographie ---------- */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) {
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body {
   background: var(--v2-bg) !important;
   color: var(--v2-text);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main {
-  background: radial-gradient(120% 300px at 50% -60px, rgba(95, 176, 255, .07), transparent 70%) no-repeat;
-  padding-left: 18px !important;
-  padding-right: 18px !important;
-}
+html.ui-v2:has(> body.theme-light) { background: #f2f4f8; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body::after { background: var(--v2-bg) !important; }
 
-/* ---------- En-tête : titre à gauche, bouton rond de recherche ---------- */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > header.glass-card {
-  background: rgba(0, 0, 0, .82) !important;
+/* ---------- En-tête ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > header.glass-card {
+  background: var(--v2-header-bg) !important;
   backdrop-filter: saturate(180%) blur(20px) !important;
   -webkit-backdrop-filter: saturate(180%) blur(20px) !important;
   border: 0 !important;
   box-shadow: none !important;
-  justify-content: flex-start !important;
-  padding: 12px 18px !important;
-  font-size: 17px !important;
-  letter-spacing: -.01em !important;
 }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > header::before,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > header::after { display: none !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > header > span:nth-of-type(2) {
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > header::before, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > header::after { display: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > header > span:nth-of-type(2) {
   background: none !important;
   -webkit-text-fill-color: var(--v2-text) !important;
   color: var(--v2-text) !important;
   font-weight: 700 !important;
 }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > header .icon-chip.chip-lg {
-  width: 34px !important; height: 34px !important;
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > header .icon-chip.chip-lg {
   border-radius: 11px !important;
   background: var(--v2-accent-soft) !important;
   color: var(--v2-accent) !important;
   filter: none !important;
   box-shadow: var(--v2-hair) !important;
 }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > header .icon-chip.chip-lg svg { width: 20px !important; height: 20px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .global-search-trigger {
-  width: 40px !important; height: 40px !important;
-  border-radius: 50% !important;
-  background: var(--v2-card) !important;
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .global-search-trigger {
+  background: var(--v2-card-2) !important;
   border: 0 !important;
+  border-radius: 999px !important;
   box-shadow: var(--v2-hair) !important;
   color: var(--v2-text) !important;
 }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .global-search-trigger .global-search-placeholder { color: var(--v2-muted) !important; }
 
-/* ---------- Titres de page : grand titre iOS, sans bandeau ---------- */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .mobile-section-hero {
+/* ---------- Titres de page ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .mobile-section-hero {
   background: none !important;
   border: 0 !important;
   box-shadow: none !important;
@@ -5820,44 +5860,47 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .mobile-sect
   gap: 0 !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  margin-bottom: 1.1rem !important;
 }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .mobile-section-hero::before,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .mobile-section-hero::after { display: none !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .mobile-section-hero .page-hero-icon { display: none !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .mobile-section-hero h2 {
-  font-size: 32px !important;
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .mobile-section-hero::before, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .mobile-section-hero::after { display: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .mobile-section-hero .page-hero-icon { display: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .mobile-section-hero h2 {
+  font-size: 28px !important;
   line-height: 1.1 !important;
   font-weight: 800 !important;
   letter-spacing: -.025em !important;
   color: var(--v2-text) !important;
 }
 
-/* ---------- Cartes : fond uni, coins généreux, liseré fin ---------- */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .glass-card,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .modern-panel,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .stat-tile {
-  background: var(--v2-card) !important;
+/* ---------- Panneaux ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .glass-card,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .modern-panel,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .stat-tile,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #tabSettings .mobile-installation-toggle,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #modalContent .movie-detail-hero,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #modalContent .movie-detail-info,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #modalContent .movie-detail-editions,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #modalContent .series-detail-info,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #modalContent .series-detail-seasons {
+  background: var(--v2-panel) !important;
   border: 0 !important;
   border-radius: var(--v2-radius) !important;
-  background-image: none !important;
   box-shadow: var(--v2-hair), var(--v2-lift) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .glass-card::before,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .modern-panel::before { display: none !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .glass-card.p-3,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .glass-card.p-4 { padding: 16px !important; }
-/* cartes imbriquées : un cran plus clair */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .glass-card .glass-card,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .modern-panel .glass-card {
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .glass-card::before, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .modern-panel::before,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #modalContent .movie-detail-hero::before, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #modalContent .movie-detail-hero::after,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #modalContent .movie-detail-info::before, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #modalContent .movie-detail-info::after,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #modalContent .movie-detail-editions::before, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #modalContent .movie-detail-editions::after,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #modalContent .series-detail-info::before, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #modalContent .series-detail-info::after,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #modalContent .series-detail-seasons::before, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #modalContent .series-detail-seasons::after { display: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .glass-card .glass-card,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .modern-panel .glass-card {
   background: var(--v2-card-2) !important;
   box-shadow: none !important;
   border-radius: var(--v2-radius-sm) !important;
 }
-/* Panneaux de l'accueil sans carte : sections aérées */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget-panel {
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .home-widget-panel {
   background: none !important;
   border: 0 !important;
   box-shadow: none !important;
@@ -5865,687 +5908,73 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget-panel::before,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget-panel::after { display: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .home-widget-panel::before, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .home-widget-panel::after { display: none !important; }
 
-/* Titres de section */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget-panel > .flex:first-child { padding: 0 2px !important; margin-bottom: 12px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget h2,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget h3,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .modern-panel h2,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .modern-panel h3 {
+/* Titres de panneaux */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .home-widget h2, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .home-widget h3,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .modern-panel h2, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .modern-panel h3 {
   text-transform: none !important;
   letter-spacing: -.01em !important;
   color: var(--v2-text) !important;
-  font-size: 18px !important;
+  font-size: 16px !important;
   font-weight: 700 !important;
 }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget-panel > .flex:first-child h2 { font-size: 20px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget p.text-\[10px\],
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget p.text-\[9px\] { font-size: 13px !important; color: var(--v2-muted) !important; }
-/* Lien « Tout voir » en pastille */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget > .flex:first-child > button:last-child:not(.app-action),
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget > .flex:first-child > a:last-child {
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .home-widget-panel > .flex:first-child { padding: 0 2px !important; margin-bottom: 10px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .home-widget-panel > .flex:first-child h2 { font-size: 18px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .home-widget p.text-\[10px\], html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .home-widget p.text-\[9px\] { font-size: 12px !important; color: var(--v2-muted) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .modern-panel > .flex:first-child p { color: var(--v2-muted) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .modern-panel p.uppercase { font-size: 11.5px !important; letter-spacing: .05em !important; color: var(--v2-muted) !important; }
+
+/* Raccourcis « Tout voir » et compteurs : pastilles */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .home-widget > .flex:first-child > button:last-child:not(.app-action),
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .home-widget > .flex:first-child > a:last-child,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .home-widget > .flex:first-child > span:last-child:not(.icon-chip) {
   background: var(--v2-accent-soft) !important;
   color: var(--v2-accent) !important;
-  padding: 6px 12px !important;
-  border-radius: 999px !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  border: 0 !important;
-  white-space: nowrap;
-}
-
-/* Icônes de titre : pastille carrée arrondie, sans néon */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .icon-chip:not(.chip-lg) {
-  width: 34px !important; height: 34px !important;
-  border-radius: 11px !important;
-  background: var(--v2-accent-soft) !important;
-  color: var(--v2-accent) !important;
-  filter: none !important;
-  border: 0 !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .icon-chip:not(.chip-lg) svg { width: 18px !important; height: 18px !important; }
-
-/* ---------- Champs : pilule grise ---------- */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .glass-input {
-  background: var(--v2-gray-soft) !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  color: var(--v2-text) !important;
-  border-radius: 14px !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #searchInput {
-  border-radius: 999px !important;
-  font-size: 16px !important;
-  min-height: 48px;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .glass-input::placeholder { color: var(--v2-muted) !important; }
-
-/* ---------- Boutons d'action : pilules pleines, sans effet verni ---------- */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action {
-  border: 0 !important;
-  border-radius: 999px !important;
-  min-height: 46px;
-  font-weight: 650 !important;
-  letter-spacing: -.005em;
-  box-shadow: 0 10px 24px -12px rgba(var(--action-rgb), .7) !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action-cyan { background: var(--v2-grad-accent) !important; color: var(--v2-on-accent) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action-red { background: var(--v2-red-soft) !important; color: var(--v2-red) !important; box-shadow: none !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action-slate { background: var(--v2-card-2) !important; color: var(--v2-text) !important; box-shadow: var(--v2-hair) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action:active { transform: scale(.96) !important; opacity: .88; }
-/* Icône dans une bulle ronde (bouton « Send ↗ » de la maquette) */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .app-action .icon-chip:not(.chip-lg) {
-  width: 34px !important; height: 34px !important;
-  border-radius: 50% !important;
-  background: rgba(255, 255, 255, .92) !important;
-  color: #134a85 !important;
-  filter: none !important;
-  order: 2;
-  margin-left: auto;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .app-action .icon-chip:not(.chip-lg) svg { width: 18px !important; height: 18px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action:has(> .icon-chip) {
-  justify-content: space-between !important;
-  padding: 6px 6px 6px 22px !important;
-  font-size: 16px !important;
-  min-height: 52px;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action:has(> .icon-chip) > span:not(.icon-chip) { order: 1; }
-/* Boutons secondaires « verre » → pastilles grises */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .glass-pill {
-  background: var(--v2-card-2) !important;
-  border: 0 !important;
-  box-shadow: var(--v2-hair) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .glass-pill::before { display: none !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill { border-radius: 999px !important; }
-
-/* ---------- Sélecteurs segmentés (Ma collection / Digital / Wishlist…) ---------- */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar {
-  background: var(--v2-gray-soft) !important;
-  border: 0 !important;
-  border-radius: 14px !important;
-  padding: 3px !important;
-  gap: 3px !important;
-  box-shadow: none !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-option {
-  border: 0 !important;
-  border-radius: 11px !important;
-  color: var(--v2-muted) !important;
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  min-height: 38px !important;
-  box-shadow: none !important;
-  background: transparent !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-option.is-active {
-  background: #48484c !important;
-  color: var(--v2-text) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .35) !important;
-}
-
-/* ---------- Filtres rapides en pastilles ---------- */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip {
-  border: 0 !important;
-  border-radius: 999px !important;
-  padding: 8px 14px !important;
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  background: var(--v2-card) !important;
-  color: var(--v2-text) !important;
-  box-shadow: var(--v2-hair) !important;
-  min-height: 36px;
-  white-space: nowrap;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip.is-active,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip[aria-pressed="true"] {
-  background: var(--v2-grad-accent) !important;
-  color: var(--v2-on-accent) !important;
-  box-shadow: 0 6px 16px -6px var(--v2-accent-glow) !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionQuickChips {
-  gap: 8px !important;
-  margin: 0 -18px !important;
-  padding: 2px 18px 4px !important;
-  scrollbar-width: none;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionQuickChips::-webkit-scrollbar { display: none; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionFilterToggle {
-  border-radius: 999px !important;
-  padding: 8px 16px !important;
-  font-size: 14px !important;
-  background: var(--v2-accent-soft) !important;
-  color: var(--v2-accent) !important;
-  min-height: 38px;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bulkToggle { font-size: 14px !important; color: var(--v2-accent) !important; }
-
-/* ---------- Tableau de bord de l'accueil : pastilles KPI ---------- */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard { gap: 10px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard > div {
-  --k: var(--v2-accent); --k-soft: var(--v2-accent-soft);
-  --k-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='16' rx='2'/%3E%3Cpath d='M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4'/%3E%3C/svg%3E");
-  position: relative;
-  border: 0 !important;
-  border-radius: 20px !important;
-  padding: 14px !important;
-  background: linear-gradient(135deg, var(--k-soft), transparent 75%), var(--v2-card-2) !important;
-  box-shadow: var(--v2-hair) !important;
-  display: flex; flex-direction: column;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard > div::before {
-  content: "";
-  width: 36px; height: 36px; border-radius: 50%;
-  margin-bottom: 14px;
-  background: var(--k);
-  box-shadow: 0 4px 14px -3px var(--k);
-  -webkit-mask: var(--k-icon) center / 18px no-repeat, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask: var(--k-icon) center / 18px no-repeat, linear-gradient(#000 0 0);
-  mask-composite: exclude;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard > div:nth-child(4n+2) {
-  --k: var(--v2-violet); --k-soft: var(--v2-violet-soft);
-  --k-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Ccircle cx='12' cy='12' r='2.5'/%3E%3C/svg%3E");
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard > div:nth-child(4n+3) {
-  --k: var(--v2-green); --k-soft: var(--v2-green-soft);
-  --k-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M21 8 12 3 3 8v8l9 5 9-5z'/%3E%3Cpath d='M3 8l9 5 9-5M12 13v8'/%3E%3C/svg%3E");
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard > div:nth-child(4n) {
-  --k: var(--v2-orange); --k-soft: var(--v2-orange-soft);
-  --k-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M17 6.5A7 7 0 1 0 17 17.5M4 10h9M4 14h9'/%3E%3C/svg%3E");
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard > div > p:first-child {
-  text-transform: none !important;
-  letter-spacing: 0 !important;
-  font-size: 13px !important;
-  font-weight: 500 !important;
-  color: var(--v2-muted) !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard > div > p + p {
-  font-size: 24px !important;
-  font-weight: 700 !important;
-  letter-spacing: -.02em !important;
-  color: var(--v2-text) !important;
-  font-variant-numeric: tabular-nums;
-  margin-top: 2px !important;
-}
-
-/* ---------- Vignettes de films : jaquette + légende sous l'image ---------- */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden {
-  background: var(--v2-card) !important;
-  border: 0 !important;
-  border-radius: 20px !important;
-  box-shadow: var(--v2-hair), var(--v2-lift) !important;
-  transition: transform .12s ease, opacity .12s ease !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden:active { transform: scale(.975); opacity: .88; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden > img {
-  border-radius: 20px 20px 0 0;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden > .absolute.inset-x-0.bottom-0.pointer-events-none { display: none !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden > .absolute.inset-x-0.bottom-0:not(.pointer-events-none) {
-  position: static !important;
-  padding: 10px 12px 13px !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden h4 {
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  line-height: 1.25 !important;
-  color: var(--v2-text) !important;
-}
-/* Pastilles d'information sous le titre */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden > .absolute.bottom-0 > div {
-  justify-content: flex-start !important;
-  flex-wrap: wrap;
-  gap: 5px !important;
-  margin-top: 7px !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden > .absolute.bottom-0 > div > span,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden > .absolute.bottom-0 > p {
-  display: inline-flex !important;
-  align-items: center;
-  gap: 4px;
-  font-size: 11.5px !important;
-  font-weight: 600 !important;
-  line-height: 1 !important;
-  padding: 4px 8px !important;
-  border-radius: 999px !important;
-  background: var(--v2-gray-soft);
-  color: var(--v2-muted) !important;
-  white-space: nowrap;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 .text-cyan-300,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 > p { background: var(--v2-accent-soft) !important; color: var(--v2-accent) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 > p { margin-top: 7px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 .text-emerald-400,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 span.text-emerald-400,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 .text-emerald-300 { background: var(--v2-green-soft) !important; color: var(--v2-green) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 .text-amber-300,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 .text-amber-400 { background: var(--v2-orange-soft) !important; color: var(--v2-orange) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 .text-pink-300,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 .text-pink-400 { background: var(--v2-pink-soft) !important; color: var(--v2-pink) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 .text-violet-300,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 .text-purple-300 { background: var(--v2-violet-soft) !important; color: var(--v2-violet) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 div > span > span { background: none !important; padding: 0 !important; }
-/* grilles plus aérées */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"].grid { gap: 14px !important; }
-
-/* Derniers ajouts : carrousel horizontal */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #recentGrid {
-  display: flex !important;
-  gap: 12px !important;
-  overflow-x: auto;
-  margin: 0 -18px;
-  padding: 2px 18px 8px;
-  scroll-snap-type: x mandatory;
-  scroll-padding: 0 18px;
-  scrollbar-width: none;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #recentGrid::-webkit-scrollbar { display: none; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #recentGrid > * {
-  flex: none;
-  width: 136px;
-  scroll-snap-align: start;
-}
-
-/* Bilan de la collection */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionOverviewBar strong { font-size: 28px !important; letter-spacing: -.02em; color: var(--v2-text) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionOverviewBar .text-\[11px\] { font-size: 14px !important; color: var(--v2-muted) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionOverviewValue {
-  background: var(--v2-green-soft); color: var(--v2-green) !important;
-  padding: 5px 11px; border-radius: 999px; font-size: 14px !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionOverviewBarTrack { height: 8px !important; background: var(--v2-gray-soft) !important; gap: 3px; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionOverviewBarTrack > * { border-radius: 999px; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionOverviewLegend { font-size: 12px !important; color: var(--v2-muted) !important; }
-
-/* ---------- Barre d'onglets flottante ---------- */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav.mobile-bottom-nav {
-  left: 16px !important;
-  right: 16px !important;
-  bottom: max(env(safe-area-inset-bottom), 12px) !important;
-  height: 66px !important;
-  padding: 6px !important;
-  gap: 2px !important;
-  align-items: stretch !important;
-  border: 0 !important;
-  border-radius: 999px !important;
-  background: rgba(36, 36, 40, .80) !important;
-  backdrop-filter: saturate(180%) blur(22px) !important;
-  -webkit-backdrop-filter: saturate(180%) blur(22px) !important;
-  box-shadow: 0 10px 34px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(255, 255, 255, .08) !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav.mobile-bottom-nav::before,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav.mobile-bottom-nav::after { display: none !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav .bottom-nav-btn {
-  flex: 1 1 0 !important;
-  height: auto !important;
-  min-width: 0 !important;
-  border-radius: 999px !important;
-  justify-content: center !important;
-  gap: 3px !important;
-  padding: 0 2px !important;
-  color: var(--v2-muted) !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  border: 0 !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav .bottom-nav-btn .icon-inline,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav .bottom-nav-btn .icon-inline svg { width: 22px !important; height: 22px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav .bottom-nav-label {
-  display: block !important;
-  font-size: 10px !important;
-  font-weight: 600 !important;
-  line-height: 1 !important;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav .bottom-nav-btn.active {
-  color: var(--v2-accent) !important;
-  background: var(--v2-accent-soft) !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav .bottom-nav-badge { top: 8px !important; right: calc(50% - 16px) !important; box-shadow: 0 0 0 2px #242428 !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) { padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
-
-/* Vignettes de la wishlist (image dans un cadre) */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden {
-  background: var(--v2-card) !important;
-  border: 0 !important;
-  border-radius: 20px !important;
-  box-shadow: var(--v2-hair), var(--v2-lift) !important;
-  transform: none !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden > .relative.overflow-hidden {
-  aspect-ratio: auto !important;
-  overflow: visible !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden > .relative.overflow-hidden > img {
-  height: auto !important;
-  aspect-ratio: 2 / 3;
-  border-radius: 20px 20px 0 0;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden .absolute.inset-0[class*="bg-gradient"] { display: none !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden > .relative.overflow-hidden > .absolute.inset-x-0.bottom-0 {
-  position: static !important;
-  padding: 10px 12px 13px !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden h4 {
-  font-size: 14px !important; font-weight: 600 !important; line-height: 1.25 !important; color: var(--v2-text) !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden > .relative.overflow-hidden > .absolute.inset-x-0.bottom-0 > div:empty { display: none !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .group .absolute.top-2 > span {
-  font-size: 10px !important; letter-spacing: .04em !important;
-  padding: 4px 9px !important;
-  background: rgba(0, 0, 0, .55) !important;
-  backdrop-filter: blur(10px) !important; -webkit-backdrop-filter: blur(10px) !important;
-  border: 0 !important;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14) !important;
-}
-
-/* Encart « Films à compléter » : alerte douce */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompletePanel > summary {
-  background: var(--v2-orange-soft) !important;
-  color: var(--v2-orange) !important;
-  border-radius: 16px !important;
-  padding: 12px 14px !important;
-  font-size: 14px !important;
-  gap: 10px !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompletePanel > summary .icon-inline {
-  width: 30px !important; height: 30px !important; border-radius: 10px;
-  background: var(--v2-orange); color: #1c1003; padding: 7px; flex: none;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompletePanel > summary #incompleteCount {
-  font-size: 12px !important; padding: 3px 9px !important; background: rgba(246, 193, 138, .22) !important; color: var(--v2-orange) !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompletePanel { padding: 0 !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompletePanel > p { font-size: 13px !important; color: var(--v2-muted) !important; margin: 8px 4px 0 !important; }
-
-/* Titres de panneaux : un peu plus compacts pour éviter les retours à la ligne */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget:not(.home-widget-panel) > .flex:first-child h2,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget:not(.home-widget-panel) > .flex:first-child h3 { font-size: 17px !important; }
-
-/* ---------- Statistiques : tuiles chiffres façon pastilles ---------- */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl {
-  border: 0 !important;
-  border-radius: 18px !important;
-  background: var(--v2-card-2) !important;
-  box-shadow: var(--v2-hair) !important;
-  text-align: left !important;
-  padding: 14px !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl > p:first-child {
-  text-transform: none !important; letter-spacing: 0 !important;
-  font-size: 13px !important; font-weight: 500 !important; color: var(--v2-muted) !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl > p + p {
-  font-size: 24px !important; font-weight: 700 !important; letter-spacing: -.02em !important;
-  font-variant-numeric: tabular-nums;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats .modern-panel p.uppercase {
-  font-size: 13px !important; letter-spacing: .04em !important; color: var(--v2-muted) !important; margin: 6px 2px 10px !important;
-}
-
-/* ---------- Mon espace : lignes de réglages avec icône colorée ---------- */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabSettings .mobile-installation-toggle {
-  min-height: 60px !important;
-  padding: 10px 14px !important;
-  border: 0 !important;
-  border-radius: 18px !important;
-  background: var(--v2-card) !important;
-  box-shadow: var(--v2-hair) !important;
-  color: var(--v2-text) !important;
-  font-size: 16px !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabSettings .mobile-installation-toggle + * { margin-top: 0; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabSettings .mobile-installation-toggle > span:first-child { gap: 14px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabSettings .mobile-installation-toggle > span:first-child > .icon-inline:first-child {
-  --ico: var(--v2-accent);
-  width: 34px !important; height: 34px !important; padding: 8px; border-radius: 10px;
-  background: var(--ico); color: #fff;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #mobileInstallationToggle > span:first-child > .icon-inline:first-child { --ico: #5e5ce6 !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #mobileSubscriptionsToggle > span:first-child > .icon-inline:first-child { --ico: #30b158 !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #mobileOptionsToggle > span:first-child > .icon-inline:first-child { --ico: #8e8e93 !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #mobileProfileToggle > span:first-child > .icon-inline:first-child { --ico: #0a84ff !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabSettings .mobile-installation-toggle .font-bold { font-weight: 600 !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabSettings .mobile-installation-toggle [class*="rounded-full"] {
-  font-size: 12px !important; min-width: 22px; padding: 2px 8px !important;
-  background: var(--v2-gray-soft) !important; color: var(--v2-muted) !important; border: 0 !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabSettings .mobile-installation-toggle[aria-expanded="true"] { background: var(--v2-card-2) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabSettings .mobile-installation-chevron { color: var(--v2-muted) !important; opacity: .7; }
-
-/* ---------- Fiche film / série ---------- */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #detailModal { background: rgba(0, 0, 0, .55) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #detailModal > div {
-  background: var(--v2-bg) !important;
-  border-radius: 28px !important;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, .08), 0 30px 60px rgba(0, 0, 0, .8) !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-hero,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-info,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-editions,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .series-detail-info,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .series-detail-seasons {
-  border: 0 !important;
-  border-radius: 22px !important;
-  background: var(--v2-card) !important;
-  box-shadow: var(--v2-hair) !important;
-  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-hero::before, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-hero::after,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-info::before, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-info::after,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-editions::before, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-editions::after,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .series-detail-info::before, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .series-detail-info::after,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .series-detail-seasons::before, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .series-detail-seasons::after { display: none !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent h3, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent h4.uppercase, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent p.uppercase { letter-spacing: .02em !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .detail-modal-close {
-  background: rgba(120, 120, 128, .32) !important;
-  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-  color: var(--v2-text) !important; border: 0 !important;
-}
-
-/* ---------- Lisibilité : micro-textes un cran plus grands ---------- */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-\[8px\] { font-size: 10px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-\[9px\] { font-size: 11px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-\[10px\] { font-size: 12px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-\[11px\] { font-size: 13px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main #homeCalendarGrid .text-\[9px\], html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main #homeCalendarGrid .text-\[10px\] { font-size: 10px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill:not(.w-8):not(.w-9):not(.w-10) { font-size: 14px !important; }
-
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl { display: flex !important; flex-direction: column !important; align-items: flex-start !important; justify-content: flex-start !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl > p { text-align: left !important; width: 100%; }
-/* Compteurs à droite des titres de panneaux : pastille */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget > .flex:first-child > span:last-child:not(.icon-chip) {
-  white-space: nowrap !important;
-  background: var(--v2-accent-soft);
-  color: var(--v2-accent) !important;
-  padding: 4px 10px !important;
+  padding: 5px 11px !important;
   border-radius: 999px !important;
   font-size: 12px !important;
   font-weight: 600 !important;
+  border: 0 !important;
+  white-space: nowrap !important;
   flex: none;
 }
 
-/* ======================= v2.1 : compact, panneaux bleutés, curseurs colorés ======================= */
-/* Fond bleu subtil des panneaux */
-html.ui-v2 {
-  --v2-card: #16181e;
-  --v2-card-2: #21252d;
-  --v2-panel: radial-gradient(120% 90% at 0% 0%, rgba(90, 160, 255, .12), transparent 55%),
-              linear-gradient(165deg, #1b1e25 0%, #16181e 60%, #121419 100%);
-  --v2-hair: inset 0 0 0 1px rgba(255, 255, 255, .075);
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .glass-card,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .modern-panel,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .stat-tile,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabSettings .mobile-installation-toggle,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-hero,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-info,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-editions,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .series-detail-info,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .series-detail-seasons {
-  background: var(--v2-panel) !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .glass-card .glass-card,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .modern-panel .glass-card { background: var(--v2-card-2) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #detailModal > div { background: #0b0c10 !important; }
-
-/* Curseurs de choix colorés (une couleur par option) */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar { background: rgba(255, 255, 255, .07) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option:nth-child(4n+1) { --c: 95, 176, 255;  --c-on: #04191d; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option:nth-child(4n+2) { --c: 91, 143, 242; --c-on: #ffffff; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option:nth-child(4n+3) { --c: 243, 170, 203; --c-on: #3a1226; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option:nth-child(4n)   { --c: 141, 220, 188;  --c-on: #0e2a20; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option { color: rgba(var(--c), .85) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option.is-active {
-  background: rgb(var(--c)) !important;
-  color: var(--c-on) !important;
-  box-shadow: 0 6px 16px -6px rgba(var(--c), .75) !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option.is-active .bg-pink-500 { background: rgba(255, 255, 255, .9) !important; color: #be185d !important; }
-
-/* Pastilles de filtre colorées */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip { --c: 95, 176, 255; --c-on: #04191d; color: rgb(var(--c)) !important; background: rgba(var(--c), .12) !important; box-shadow: inset 0 0 0 1px rgba(var(--c), .18) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip[data-quick-format="4K UHD"] { --c: 91, 143, 242; --c-on: #ffffff; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip[data-quick-format="Blu-ray 1080p"] { --c: 79, 198, 236; --c-on: #03202b; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip[data-quick-format="DVD"] { --c: 246, 193, 138; --c-on: #2e1d08; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip.quick-chip-saga { --c: 141, 220, 188; --c-on: #0e2a20; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip.is-active,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip[aria-pressed="true"] {
-  background: rgb(var(--c)) !important;
-  color: var(--c-on) !important;
-  box-shadow: 0 6px 16px -6px rgba(var(--c), .75) !important;
-}
-/* Boutons verre colorés selon leur texte */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-cyan-300 { background: rgba(95, 176, 255, .14) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-purple-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-purple-200 { background: rgba(91, 143, 242, .16) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-pink-300 { background: rgba(243, 170, 203, .14) !important; }
-
-/* ---------- Accueil compact ---------- */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeMobileHero h2, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .mobile-section-hero h2 { font-size: 26px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .mobile-section-hero { margin-bottom: .8rem !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome { row-gap: 14px; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome > .home-widget { margin-bottom: 0 !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome .glass-card.home-widget { padding: 12px !important; border-radius: 18px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome .home-widget h2, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome .home-widget h3 { font-size: 15px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome .home-widget-panel > .flex:first-child h2 { font-size: 16px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome .home-widget-panel > .flex:first-child { margin-bottom: 8px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome .home-widget p.text-\[10px\], html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome .home-widget p.text-\[9px\] { font-size: 11.5px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome .icon-chip:not(.chip-lg) { width: 28px !important; height: 28px !important; border-radius: 9px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome .icon-chip:not(.chip-lg) svg { width: 15px !important; height: 15px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome .home-widget > .flex:first-child > button:last-child:not(.app-action),
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome .home-widget > .flex:first-child > span:last-child:not(.icon-chip) { font-size: 11.5px !important; padding: 4px 10px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #searchInput { min-height: 42px; font-size: 15px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #searchSection .app-action { min-height: 42px; font-size: 14px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #searchSection .app-action:has(> .icon-chip) { min-height: 46px; font-size: 15px !important; padding: 5px 5px 5px 18px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #searchSection .app-action .icon-chip { width: 34px !important; height: 34px !important; }
-
-/* Tableau de bord : 4 pastilles compactes, icône à gauche */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 8px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard > div {
-  display: grid !important;
-  grid-template-columns: 30px minmax(0, 1fr);
-  grid-template-rows: auto auto;
-  column-gap: 10px;
-  align-items: center;
-  padding: 9px 11px !important;
-  border-radius: 16px !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard > div::before {
-  grid-row: 1 / span 2;
+/* Icônes de titre : pastille arrondie */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .icon-chip:not(.chip-lg) {
   width: 30px !important; height: 30px !important;
-  margin: 0 !important;
-  -webkit-mask-size: 15px, auto !important;
-  mask-size: 15px, auto !important;
+  border-radius: 10px !important;
+  background: var(--v2-accent-soft) !important;
+  color: var(--v2-accent) !important;
+  filter: none !important;
+  border: 0 !important;
 }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard > div > p:first-child { font-size: 11.5px !important; line-height: 1.2 !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard > div > p + p { font-size: 17px !important; line-height: 1.15 !important; margin-top: 0 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .icon-chip:not(.chip-lg) svg { width: 16px !important; height: 16px !important; }
 
-/* Vignettes de l'accueil plus petites, en carrousel */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #recentGrid > * { width: 104px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #recentGrid > .relative.rounded-2xl.overflow-hidden { border-radius: 16px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #recentGrid > .relative.rounded-2xl.overflow-hidden > img { border-radius: 16px 16px 0 0 !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #recentGrid > .relative.rounded-2xl.overflow-hidden > .absolute.bottom-0:not(.pointer-events-none) { padding: 7px 8px 9px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #recentGrid h4 { font-size: 12px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #recentGrid .absolute.bottom-0 > p { font-size: 10px !important; padding: 3px 7px !important; margin-top: 5px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeTopRatedGrid, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeWishlistFocusGrid {
-  display: flex !important;
-  gap: 10px !important;
-  overflow-x: auto;
-  margin: 0 -18px;
-  padding: 2px 18px 6px;
-  scroll-snap-type: x mandatory;
-  scroll-padding: 0 18px;
-  scrollbar-width: none;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeTopRatedGrid::-webkit-scrollbar, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeWishlistFocusGrid::-webkit-scrollbar { display: none; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeTopRatedGrid > .home-media-card, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeWishlistFocusGrid > .home-media-card {
-  flex: none; width: 104px !important; scroll-snap-align: start;
-  border-radius: 16px !important; border: 0 !important;
-  box-shadow: var(--v2-hair), var(--v2-lift) !important;
-}
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-media-copy strong { font-size: 12px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-media-copy small { font-size: 10.5px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-watch-next-row strong { font-size: 13px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-watch-next-row small { font-size: 11px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-watch-next-row img { border-radius: 8px !important; }
-
-/* ---------- Statistiques compactes ---------- */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats .modern-panel { padding: 12px !important; border-radius: 18px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats .modern-panel h2, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats .modern-panel h3 { font-size: 15px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats .modern-panel > .flex:first-child p { font-size: 11.5px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats .icon-chip { width: 28px !important; height: 28px !important; border-radius: 9px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats .icon-chip svg { width: 15px !important; height: 15px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats .modern-panel p.uppercase { font-size: 11px !important; margin: 4px 2px 6px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] { gap: 8px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl {
-  flex-direction: row !important;
-  align-items: baseline !important;
-  justify-content: space-between !important;
-  gap: 6px;
-  padding: 9px 11px !important;
+/* ---------- Champs ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .glass-input {
+  background: var(--v2-gray-soft) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  color: var(--v2-text) !important;
   border-radius: 14px !important;
-  min-height: 0 !important;
 }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl > p { width: auto !important; margin: 0 !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl > p:first-child { font-size: 11.5px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl > p + p { font-size: 16px !important; flex: none; text-align: right !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats .choice-option { min-height: 34px !important; font-size: 13px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats { row-gap: 0 !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats > * + * { margin-top: .75rem !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .glass-input::placeholder { color: var(--v2-muted) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .glass-input:focus { box-shadow: 0 0 0 2px rgba(var(--rgb-accent), .35) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #searchInput { border-radius: 999px !important; }
 
-/* Calendrier de l'accueil compact */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeCalendarGrid { gap: 3px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeCalendarGrid > button, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeCalendarGrid > div { aspect-ratio: auto !important; height: 34px !important; min-height: 0 !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeCalendarGrid > button { border-radius: 10px !important; font-size: 12px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeCalendarGrid > button.border { background: var(--v2-accent-soft) !important; border-color: transparent !important; font-weight: 700; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeCalendarLayout { row-gap: 8px; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeCalendarLayout > * + * { margin-top: 8px !important; }
-/* Stats : libellés sur deux lignes plutôt que tronqués */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl { align-items: center !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl > p:first-child { white-space: normal !important; line-height: 1.2 !important; }
-
-/* ======================= v2.2 : boutons uniformes, affichage remonté, barre bleue ======================= */
-html.ui-v2 { --mobile-page-title-top-gap: .35rem; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main { padding-top: 6px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .mobile-section-hero { margin-bottom: .7rem !important; }
-
-/* Un seul style de bouton : pastille teintée façon « Tout voir » */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action {
-  background: rgba(var(--action-rgb), .16) !important;
+/* ---------- Boutons : pastille teintée façon « Tout voir » ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .app-action { --action-rgb: var(--rgb-accent); }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .app-action-violet { --action-rgb: var(--rgb-blue2); }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .app-action-pink   { --action-rgb: var(--rgb-pink); }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .app-action-green  { --action-rgb: var(--rgb-green); }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .app-action-amber  { --action-rgb: var(--rgb-orange); }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .app-action-red    { --action-rgb: var(--rgb-red); }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .app-action-slate  { --action-rgb: var(--rgb-neutral); }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .app-action {
+  background: rgba(var(--action-rgb), var(--soft)) !important;
   color: rgb(var(--action-rgb)) !important;
   box-shadow: none !important;
   border: 0 !important;
@@ -6554,128 +5983,564 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action 
   padding: 7px 16px !important;
   font-size: 14px !important;
   font-weight: 600 !important;
+  letter-spacing: -.005em;
   filter: none !important;
 }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action-cyan { background: var(--v2-accent-soft) !important; color: var(--v2-accent) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action-red { background: var(--v2-red-soft) !important; color: var(--v2-red) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action-slate { background: var(--v2-gray-soft) !important; color: var(--v2-text) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action:has(> .icon-chip),
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #searchSection .app-action:has(> .icon-chip) {
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .app-action:active { transform: scale(.96) !important; opacity: .88; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .app-action:has(> .icon-chip) {
+  justify-content: space-between !important;
   min-height: 44px !important;
   padding: 4px 4px 4px 18px !important;
   font-size: 15px !important;
 }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .app-action .icon-chip:not(.chip-lg) {
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .app-action:has(> .icon-chip) > span:not(.icon-chip) { order: 1; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .app-action .icon-chip:not(.chip-lg) {
   width: 36px !important; height: 36px !important;
-  background: rgba(var(--action-rgb), .22) !important;
+  border-radius: 50% !important;
+  background: rgba(var(--action-rgb), calc(var(--soft) + .08)) !important;
   color: rgb(var(--action-rgb)) !important;
+  order: 2;
+  margin-left: auto;
 }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .app-action-cyan .icon-chip:not(.chip-lg) { background: rgba(95, 176, 255, .22) !important; color: var(--v2-accent) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #detailModal button.glass-pill {
-  --c: 95, 176, 255;
-  background: rgba(var(--c), .14) !important;
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .app-action .icon-chip:not(.chip-lg) svg { width: 18px !important; height: 18px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .glass-pill {
+  background: var(--v2-card-2) !important;
+  border: 0 !important;
+  box-shadow: var(--v2-hair) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .glass-pill::before { display: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main button.glass-pill,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #detailModal button.glass-pill {
+  --c: var(--rgb-accent);
+  background: rgba(var(--c), var(--soft)) !important;
   color: rgb(var(--c)) !important;
   box-shadow: none !important;
   border: 0 !important;
   border-radius: 999px !important;
   font-weight: 600 !important;
 }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-purple-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-purple-200 { --c: 91, 143, 242; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-pink-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-pink-200 { --c: 243, 170, 203; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-amber-300 { --c: 246, 193, 138; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-gray-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-gray-400 { --c: 210, 214, 228; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill:not(.w-8):not(.w-9):not(.w-10) { font-size: 13px !important; padding: 6px 13px !important; min-height: 34px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionFilterToggle, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bulkToggle, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompleteQuickBtn {
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main button.glass-pill.text-purple-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main button.glass-pill.text-purple-200 { --c: var(--rgb-blue2); }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main button.glass-pill.text-pink-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main button.glass-pill.text-pink-200 { --c: var(--rgb-pink); }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main button.glass-pill.text-amber-300 { --c: var(--rgb-orange); }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main button.glass-pill.text-gray-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main button.glass-pill.text-gray-400 { --c: var(--rgb-neutral); }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main button.glass-pill:not(.w-8):not(.w-9):not(.w-10) { font-size: 13px !important; padding: 6px 13px !important; min-height: 34px !important; }
+
+/* ---------- Curseurs de choix : une couleur par option ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .choice-bar {
+  background: var(--v2-seg-bg) !important;
+  border: 0 !important;
+  border-radius: 14px !important;
+  padding: 3px !important;
+  gap: 3px !important;
+  box-shadow: none !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .choice-bar > .choice-option:nth-child(4n+1) { --c: var(--rgb-accent); --c-on: var(--on-accent); }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .choice-bar > .choice-option:nth-child(4n+2) { --c: var(--rgb-blue2);  --c-on: var(--on-blue2); }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .choice-bar > .choice-option:nth-child(4n+3) { --c: var(--rgb-pink);   --c-on: var(--on-pink); }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .choice-bar > .choice-option:nth-child(4n)   { --c: var(--rgb-green);  --c-on: var(--on-green); }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .choice-option {
+  border: 0 !important;
+  border-radius: 11px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  min-height: 36px !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  color: var(--v2-muted) !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .choice-bar > .choice-option { color: rgb(var(--c)) !important; opacity: .9; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .choice-bar > .choice-option.is-active {
+  opacity: 1;
+  background: rgb(var(--c)) !important;
+  color: var(--c-on) !important;
+  box-shadow: 0 6px 16px -6px rgba(var(--c), .75) !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .choice-bar > .choice-option.is-active .bg-pink-500 { background: rgba(255, 255, 255, .9) !important; color: #be185d !important; }
+
+/* ---------- Pastilles de filtre ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .quick-chip {
+  --c: var(--rgb-accent); --c-on: var(--on-accent);
+  border: 0 !important;
+  border-radius: 999px !important;
+  padding: 6px 13px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  min-height: 32px;
+  white-space: nowrap;
+  color: rgb(var(--c)) !important;
+  background: rgba(var(--c), var(--soft)) !important;
+  box-shadow: inset 0 0 0 1px rgba(var(--c), .18) !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .quick-chip[data-quick-format="4K UHD"] { --c: var(--rgb-blue2); --c-on: var(--on-blue2); }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .quick-chip[data-quick-format="Blu-ray 1080p"] { --c: var(--rgb-azure); --c-on: var(--on-azure); }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .quick-chip[data-quick-format="DVD"] { --c: var(--rgb-orange); --c-on: var(--on-orange); }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .quick-chip.quick-chip-saga { --c: var(--rgb-green); --c-on: var(--on-green); }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .quick-chip.is-active,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .quick-chip[aria-pressed="true"] {
+  background: rgb(var(--c)) !important;
+  color: var(--c-on) !important;
+  box-shadow: 0 6px 16px -6px rgba(var(--c), .75) !important;
+}
+
+/* ---------- Barre d'actions de la collection ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #collectionFilterToggle, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #bulkToggle, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #incompleteQuickBtn {
   white-space: nowrap; flex: none;
   display: inline-flex; align-items: center; gap: 6px;
-  min-height: 34px !important; padding: 6px 13px !important;
+  min-height: 34px !important; padding: 6px 12px !important;
   border: 0 !important; border-radius: 999px !important;
+  box-shadow: none !important;
   font-size: 13px !important; font-weight: 600 !important;
 }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionFilterToggle { background: var(--v2-accent-soft) !important; color: var(--v2-accent) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bulkToggle { background: var(--v2-gray-soft) !important; color: var(--v2-text) !important; margin-left: auto; order: 3; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompleteQuickBtn:not(.hidden) { display: inline-flex !important; background: var(--v2-orange-soft) !important; color: var(--v2-orange) !important; order: 2; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompleteQuickBtn .incomplete-quick-count { background: rgba(246, 193, 138, .25); border-radius: 999px; padding: 1px 7px; font-size: 11.5px; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionActionRow { gap: 6px !important; width: 100%; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionActionRow > button { padding: 6px 11px !important; }
-/* Liste des films à compléter : ouverte depuis le bouton, sans en-tête */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompletePanel > summary { display: none !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompletePanel:not([open]) { display: none !important; }
-/* Pastilles de format dans le panneau Filtrer */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionFilterPanel > #collectionQuickChips { margin: 0 !important; padding: 0 !important; flex-wrap: wrap; overflow: visible; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionFilterPanel > #collectionQuickChips .quick-chip { min-height: 32px; padding: 6px 12px !important; font-size: 13px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionFilterPanel > #collectionQuickChips .ml-auto { margin-left: 0 !important; }
-/* Liens « Tout voir » et pastilles d'en-tête identiques partout */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .home-widget > .flex:first-child > button:last-child:not(.app-action) { font-size: 12px !important; padding: 5px 11px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #collectionFilterToggle { background: var(--v2-accent-soft) !important; color: var(--v2-accent) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #bulkToggle { background: var(--v2-gray-soft) !important; color: var(--v2-text) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #incompleteQuickBtn:not(.hidden) { display: inline-flex !important; background: var(--v2-orange-soft) !important; color: var(--v2-orange) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #incompleteQuickBtn .incomplete-quick-count { background: rgba(var(--rgb-orange), .22); border-radius: 999px; padding: 1px 7px; font-size: 11.5px; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #incompletePanel { padding: 0 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #incompletePanel > summary { display: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #incompletePanel:not([open]) { display: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #incompletePanel > p { font-size: 13px !important; color: var(--v2-muted) !important; margin: 0 4px 8px !important; }
 
-/* Barre de navigation : même fond bleu que les panneaux */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav.mobile-bottom-nav {
-  background: var(--v2-panel) !important;
-  box-shadow: 0 12px 34px rgba(0, 0, 0, .7), var(--v2-hair) !important;
+/* ---------- Tableau de bord : pastilles KPI ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #homeDashboard { gap: 8px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #homeDashboard > div {
+  --k: var(--rgb-accent);
+  --k-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='16' rx='2'/%3E%3Cpath d='M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4'/%3E%3C/svg%3E");
+  position: relative;
+  display: grid !important;
+  grid-template-columns: 30px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: 10px;
+  align-items: center;
+  border: 0 !important;
+  border-radius: 16px !important;
+  padding: 9px 11px !important;
+  background: linear-gradient(135deg, rgba(var(--k), var(--soft)), transparent 75%), var(--v2-card-2) !important;
+  box-shadow: var(--v2-hair) !important;
 }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav .bottom-nav-btn.active { background: rgba(95, 176, 255, .16) !important; }
-/* En-tête : boutons ronds assortis */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .global-search-trigger { background: var(--v2-card-2) !important; }
-/* Vignettes : même fond que les panneaux */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden { background: var(--v2-panel) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #homeDashboard > div::before {
+  content: "";
+  grid-row: 1 / span 2;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: rgb(var(--k));
+  box-shadow: 0 4px 14px -4px rgb(var(--k));
+  -webkit-mask: var(--k-icon) center / 15px no-repeat, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: var(--k-icon) center / 15px no-repeat, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #homeDashboard > div:nth-child(4n+2) {
+  --k: var(--rgb-blue2);
+  --k-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Ccircle cx='12' cy='12' r='2.5'/%3E%3C/svg%3E");
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #homeDashboard > div:nth-child(4n+3) {
+  --k: var(--rgb-green);
+  --k-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M21 8 12 3 3 8v8l9 5 9-5z'/%3E%3Cpath d='M3 8l9 5 9-5M12 13v8'/%3E%3C/svg%3E");
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #homeDashboard > div:nth-child(4n) {
+  --k: var(--rgb-orange);
+  --k-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M17 6.5A7 7 0 1 0 17 17.5M4 10h9M4 14h9'/%3E%3C/svg%3E");
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #homeDashboard > div > p:first-child {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+  color: var(--v2-muted) !important;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #homeDashboard > div > p + p {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+  letter-spacing: -.02em !important;
+  color: var(--v2-text) !important;
+  font-variant-numeric: tabular-nums;
+  margin-top: 0 !important;
+}
 
-/* ======================= v2.3 : palette douce harmonisée + transitions de page ======================= */
-/* Boutons d'action : mêmes teintes douces partout */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action-violet { --action-rgb: 91, 143, 242; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action-pink   { --action-rgb: 243, 170, 203; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action-green  { --action-rgb: 141, 220, 188; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action-amber  { --action-rgb: 246, 193, 138; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action-red    { --action-rgb: 255, 154, 154; }
-/* Textes d'accent de l'ancienne palette ramenés vers les teintes douces */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-cyan-200, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-cyan-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-cyan-400,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #detailModal .text-cyan-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #detailModal .text-cyan-400 { color: var(--v2-accent) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-purple-200, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-purple-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-violet-300 { color: var(--v2-violet) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-pink-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-pink-400 { color: var(--v2-pink) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-emerald-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-emerald-400 { color: var(--v2-green) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-amber-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-amber-400 { color: var(--v2-orange) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-sky-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-blue-300 { color: var(--v2-blue) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .icon-chip, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > header .icon-chip.chip-lg { color: var(--v2-accent) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .bg-pink-500 { background: var(--v2-pink) !important; color: #3a1226 !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeCalendarGrid > button.border { color: var(--v2-accent) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .glass-input:focus { box-shadow: 0 0 0 2px rgba(95, 176, 255, .35) !important; }
+/* ---------- Vignettes : jaquette + légende en pastilles ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden {
+  background: var(--v2-panel) !important;
+  border: 0 !important;
+  border-radius: 18px !important;
+  box-shadow: var(--v2-hair), var(--v2-lift) !important;
+  transform: none !important;
+  transition: transform .12s ease, opacity .12s ease !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden:active { transform: scale(.975) !important; opacity: .88; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden > img { border-radius: 18px 18px 0 0; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden > .absolute.inset-x-0.bottom-0.pointer-events-none { display: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden > .absolute.inset-x-0.bottom-0:not(.pointer-events-none) {
+  position: static !important;
+  padding: 9px 11px 11px !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden h4,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden h4 {
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+  color: var(--v2-text) !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden > .absolute.bottom-0 > div {
+  justify-content: flex-start !important;
+  flex-wrap: wrap;
+  gap: 5px !important;
+  margin-top: 6px !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden > .absolute.bottom-0 > div > span,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden > .absolute.bottom-0 > p {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  padding: 4px 8px !important;
+  border-radius: 999px !important;
+  background: var(--v2-gray-soft);
+  color: var(--v2-muted) !important;
+  white-space: nowrap;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] .absolute.bottom-0 > p { margin-top: 6px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] .absolute.bottom-0 .text-cyan-300,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] .absolute.bottom-0 > p { background: var(--v2-accent-soft) !important; color: var(--v2-accent) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] .absolute.bottom-0 .text-emerald-300,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] .absolute.bottom-0 .text-emerald-400 { background: var(--v2-green-soft) !important; color: var(--v2-green) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] .absolute.bottom-0 .text-amber-300,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] .absolute.bottom-0 .text-amber-400 { background: var(--v2-orange-soft) !important; color: var(--v2-orange) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] .absolute.bottom-0 .text-pink-300,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] .absolute.bottom-0 .text-pink-400 { background: var(--v2-pink-soft) !important; color: var(--v2-pink) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] .absolute.bottom-0 .text-violet-300,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] .absolute.bottom-0 .text-purple-300 { background: var(--v2-violet-soft) !important; color: var(--v2-violet) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] .absolute.bottom-0 div > span > span { background: none !important; padding: 0 !important; }
+/* Vignettes de la wishlist (image encadrée) */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden > .relative.overflow-hidden { aspect-ratio: auto !important; overflow: visible !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden > .relative.overflow-hidden > img { height: auto !important; aspect-ratio: 2 / 3; border-radius: 18px 18px 0 0; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden .absolute.inset-0[class*="bg-gradient"] { display: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden > .relative.overflow-hidden > .absolute.inset-x-0.bottom-0 { position: static !important; padding: 9px 11px 11px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden > .relative.overflow-hidden > .absolute.inset-x-0.bottom-0 > div:empty { display: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [id$="Grid"] > .group .absolute.top-2 > span {
+  font-size: 10px !important; letter-spacing: .04em !important;
+  padding: 4px 9px !important;
+  color: #fff !important;
+  background: rgba(0, 0, 0, .55) !important;
+  backdrop-filter: blur(10px) !important; -webkit-backdrop-filter: blur(10px) !important;
+  border: 0 !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14) !important;
+}
+/* Vignettes des widgets de l'accueil */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .home-media-card { border-radius: 16px !important; border: 0 !important; box-shadow: var(--v2-hair), var(--v2-lift) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .home-watch-next-row img { border-radius: 8px !important; }
 
-/* Transitions : fondu qui se déplie à chaque changement de page */
+/* ---------- Bilan de la collection ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #collectionOverviewBar strong { font-size: 26px !important; letter-spacing: -.02em; color: var(--v2-text) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #collectionOverviewBar .text-\[11px\] { font-size: 14px !important; color: var(--v2-muted) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #collectionOverviewValue { background: var(--v2-green-soft); color: var(--v2-green) !important; padding: 5px 11px; border-radius: 999px; font-size: 14px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #collectionOverviewBarTrack { height: 8px !important; background: var(--v2-gray-soft) !important; gap: 3px; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #collectionOverviewBarTrack > * { border-radius: 999px; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #collectionOverviewLegend { font-size: 12px !important; color: var(--v2-muted) !important; }
+
+/* ---------- Statistiques : tuiles libellé + valeur ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #tabStats [id$="Grid"] { gap: 8px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #tabStats [id$="Grid"] > div.rounded-xl {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 6px;
+  border: 0 !important;
+  border-radius: 14px !important;
+  background: var(--v2-card-2) !important;
+  box-shadow: var(--v2-hair) !important;
+  text-align: left !important;
+  padding: 9px 12px !important;
+  min-height: 0 !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #tabStats [id$="Grid"] > div.rounded-xl > p { width: auto !important; margin: 0 !important; text-align: left !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #tabStats [id$="Grid"] > div.rounded-xl > p:first-child {
+  text-transform: none !important; letter-spacing: 0 !important;
+  font-size: 12px !important; font-weight: 500 !important; line-height: 1.2 !important;
+  color: var(--v2-muted) !important; white-space: normal !important; min-width: 0;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #tabStats [id$="Grid"] > div.rounded-xl > p + p {
+  font-size: 17px !important; font-weight: 700 !important; letter-spacing: -.02em !important;
+  font-variant-numeric: tabular-nums; flex: none; text-align: right !important;
+}
+
+/* ---------- Mon espace : rubriques façon réglages ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #tabSettings .mobile-installation-toggle { color: var(--v2-text) !important; font-size: 16px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #tabSettings .mobile-installation-toggle > span:first-child { gap: 14px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #tabSettings .mobile-installation-toggle > span:first-child > .icon-inline:first-child {
+  --ico: #0a84ff;
+  width: 34px !important; height: 34px !important; padding: 8px; border-radius: 10px;
+  background: var(--ico); color: #fff;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #mobileInstallationToggle > span:first-child > .icon-inline:first-child { --ico: #4f7cf0 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #mobileSubscriptionsToggle > span:first-child > .icon-inline:first-child { --ico: #2fae8c !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #mobileOptionsToggle > span:first-child > .icon-inline:first-child { --ico: #8e8e93 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #tabSettings .mobile-installation-toggle .font-bold { font-weight: 600 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #tabSettings .mobile-installation-toggle [class*="rounded-full"] {
+  font-size: 12px !important; min-width: 22px; padding: 2px 8px !important;
+  background: var(--v2-gray-soft) !important; color: var(--v2-muted) !important; border: 0 !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #tabSettings .mobile-installation-chevron { color: var(--v2-muted) !important; opacity: .7; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #ipadSpaceNav button { border-radius: 999px !important; }
+
+/* ---------- Fiche film / série ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #detailModal { background: var(--v2-overlay) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #detailModal > div {
+  background: var(--v2-modal-bg) !important;
+  border: 0 !important;
+  border-radius: 28px !important;
+  box-shadow: var(--v2-hair), 0 30px 60px rgba(0, 0, 0, .45) !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #modalContent h3, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #modalContent h4.uppercase, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #modalContent p.uppercase { letter-spacing: .02em !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .detail-modal-close {
+  background: var(--v2-gray-soft) !important;
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  color: var(--v2-text) !important; border: 0 !important;
+}
+
+/* ---------- Barre de navigation (téléphone en bas, iPad sur le côté) ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #bottomNav.mobile-bottom-nav {
+  background: var(--v2-panel) !important;
+  border: 0 !important;
+  box-shadow: var(--v2-nav-shadow), var(--v2-hair) !important;
+  backdrop-filter: saturate(180%) blur(22px) !important;
+  -webkit-backdrop-filter: saturate(180%) blur(22px) !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #bottomNav.mobile-bottom-nav::before, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #bottomNav.mobile-bottom-nav::after { display: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #bottomNav .bottom-nav-btn {
+  color: var(--v2-muted) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #bottomNav .bottom-nav-label { font-weight: 600 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #bottomNav .bottom-nav-btn.active {
+  color: var(--v2-accent) !important;
+  background: var(--v2-accent-soft) !important;
+  box-shadow: none !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #bottomNav .bottom-nav-btn.active .icon-inline { color: var(--v2-accent) !important; }
+
+/* ---------- Palette : anciennes couleurs ramenées vers la nouvelle ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-cyan-200, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-cyan-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-cyan-400,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #detailModal .text-cyan-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #detailModal .text-cyan-400 { color: var(--v2-accent) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-purple-200, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-purple-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-violet-300 { color: var(--v2-violet) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-pink-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-pink-400 { color: var(--v2-pink) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-emerald-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-emerald-400 { color: var(--v2-green) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-amber-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-amber-400 { color: var(--v2-orange) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-sky-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-blue-300 { color: var(--v2-blue) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .icon-chip, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > header .icon-chip.chip-lg { color: var(--v2-accent) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .bg-pink-500 { background: var(--v2-pink) !important; color: var(--on-pink) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [style*="#22d3ee"] { background: var(--v2-accent) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [style*="#fbbf24"] { background: var(--v2-orange) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main [style*="#64748b"] { background: var(--v2-track-other) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .bg-cyan-400, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .bg-cyan-500 { background-color: var(--v2-accent) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .bg-purple-500, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .bg-violet-500 { background-color: var(--v2-violet) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .bg-emerald-400, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .bg-emerald-500 { background-color: var(--v2-green) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .bg-amber-400, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .bg-amber-500 { background-color: var(--v2-orange) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #homeCalendarGrid > button.border { background: var(--v2-accent-soft) !important; border-color: transparent !important; color: var(--v2-accent) !important; font-weight: 700; }
+
+/* ---------- Lisibilité : micro-textes un cran plus grands ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-\[8px\] { font-size: 10px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-\[9px\] { font-size: 11px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-\[10px\] { font-size: 12px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-\[11px\] { font-size: 13px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main #homeCalendarGrid .text-\[9px\], html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main #homeCalendarGrid .text-\[10px\] { font-size: 10px !important; }
+
+/* ---------- Transitions : fondu qui se déplie à chaque changement de page ---------- */
 @keyframes v2Unfold {
   0%   { opacity: 0; transform: translateY(18px) scale(.965); }
   60%  { opacity: 1; }
   100% { opacity: 1; transform: none; }
 }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .tab-panel-enter,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabSeries:not(.hidden), html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabDigital:not(.hidden), html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabWishlist:not(.hidden),
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats:not(.hidden), html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabSettings:not(.hidden) { animation: none !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > .mobile-section-hero,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > #searchSection,
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > [id^="tab"] > * {
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .tab-panel-enter,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #tabSeries:not(.hidden), html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #tabDigital:not(.hidden), html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #tabWishlist:not(.hidden),
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #tabStats:not(.hidden), html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #tabSettings:not(.hidden) { animation: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > main > .mobile-section-hero,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > main > #searchSection,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > main > [id^="tab"] > * {
   transform-origin: 50% 0;
   animation: v2Unfold .46s cubic-bezier(.2, .85, .25, 1) both;
 }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > [id^="tab"] > *:nth-child(1) { animation-delay: .03s; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > [id^="tab"] > *:nth-child(2) { animation-delay: .07s; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > [id^="tab"] > *:nth-child(3) { animation-delay: .11s; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > [id^="tab"] > *:nth-child(4) { animation-delay: .15s; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > [id^="tab"] > *:nth-child(5) { animation-delay: .19s; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > [id^="tab"] > *:nth-child(n+6) { animation-delay: .22s; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > #searchSection { animation-delay: .03s; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light).home-customizing > main > [id^="tab"] > *, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-customizing > * { animation: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > main > [id^="tab"] > *:nth-child(1) { animation-delay: .03s; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > main > [id^="tab"] > *:nth-child(2) { animation-delay: .07s; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > main > [id^="tab"] > *:nth-child(3) { animation-delay: .11s; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > main > [id^="tab"] > *:nth-child(4) { animation-delay: .15s; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > main > [id^="tab"] > *:nth-child(5) { animation-delay: .19s; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > main > [id^="tab"] > *:nth-child(n+6) { animation-delay: .22s; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > main > #searchSection { animation-delay: .03s; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .home-customizing > * { animation: none !important; }
 @media (prefers-reduced-motion: reduce) {
-  html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > .mobile-section-hero, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > #searchSection, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > [id^="tab"] > * { animation: none !important; }
+  html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > main > .mobile-section-hero, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > main > #searchSection, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > main > [id^="tab"] > * { animation: none !important; }
 }
 
-/* Barres de répartition et de progression aux teintes douces */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [style*="#22d3ee"] { background: var(--v2-accent) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [style*="#fbbf24"] { background: var(--v2-orange) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [style*="#64748b"] { background: #6b707c !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .bg-cyan-400, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .bg-cyan-500 { background-color: var(--v2-accent) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .bg-purple-500, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .bg-violet-500 { background-color: var(--v2-violet) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .bg-emerald-400, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .bg-emerald-500 { background-color: var(--v2-green) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .bg-amber-400, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .bg-amber-500 { background-color: var(--v2-orange) !important; }
+/* Vignettes « Derniers ajouts » : légende sous la jaquette aussi sur iPad */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #tabHome #recentGrid > div { aspect-ratio: auto !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #tabHome #recentGrid > div > img { height: auto !important; aspect-ratio: 2 / 3 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #tabHome #recentGrid h4 { font-size: 12px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #tabHome #recentGrid .absolute.bottom-0 > p { font-size: 10.5px !important; padding: 3px 7px !important; margin-top: 5px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #tabHome #recentGrid > .relative.rounded-2xl.overflow-hidden > .absolute.bottom-0:not(.pointer-events-none) { padding: 7px 8px 9px !important; }
+
+/* iPad : rubriques de Mon espace */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #ipadSpaceNav {
+  background: var(--v2-panel) !important;
+  border: 0 !important;
+  box-shadow: var(--v2-hair), var(--v2-lift) !important;
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #ipadSpaceNav button { color: var(--v2-muted) !important; border: 0 !important; background: transparent !important; box-shadow: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #ipadSpaceNav button.is-active {
+  color: var(--v2-accent) !important;
+  background: var(--v2-accent-soft) !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+}
+/* Teintes résiduelles de l'ancienne palette */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-amber-200, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-orange-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-yellow-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-yellow-400 { color: var(--v2-orange) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-red-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-red-400, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-rose-400 { color: var(--v2-red) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-teal-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-emerald-200 { color: var(--v2-green) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-pink-100, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-pink-200 { color: var(--v2-pink) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-cyan-100 { color: var(--v2-accent) !important; }
+
+/* =========================== MISE EN PAGE DU TÉLÉPHONE =========================== */
+@media (max-width: 767px) {
+html.ui-v2:not(.is-ipad) { --mobile-page-title-top-gap: .35rem; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body { padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body > main { padding: 6px 18px 0 !important; background: radial-gradient(120% 300px at 50% -60px, var(--v2-glow), transparent 70%) no-repeat; }
+
+/* En-tête */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body > header.glass-card {
+  justify-content: flex-start !important;
+  padding: 12px 18px !important;
+  font-size: 17px !important;
+  letter-spacing: -.01em !important;
+  border-radius: 0 !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body > header .icon-chip.chip-lg { width: 34px !important; height: 34px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body > header .icon-chip.chip-lg svg { width: 20px !important; height: 20px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body .global-search-trigger { width: 40px !important; height: 40px !important; }
+
+/* Titres et espacements */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body .mobile-section-hero { margin-bottom: .7rem !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body .mobile-section-hero h2 { font-size: 26px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body main .glass-card.p-3, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body main .glass-card.p-4 { padding: 14px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabHome { row-gap: 14px; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabHome > .home-widget { margin-bottom: 0 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabHome .glass-card.home-widget { padding: 12px !important; border-radius: 18px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabHome .home-widget h2, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabHome .home-widget h3 { font-size: 15px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabHome .home-widget-panel > .flex:first-child h2 { font-size: 16px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabHome .home-widget-panel > .flex:first-child { margin-bottom: 8px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabHome .home-widget p.text-\[10px\], html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabHome .home-widget p.text-\[9px\] { font-size: 11.5px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabHome .icon-chip:not(.chip-lg) { width: 28px !important; height: 28px !important; border-radius: 9px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabHome .icon-chip:not(.chip-lg) svg { width: 15px !important; height: 15px !important; }
+
+/* Recherche et scanner */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #searchInput { min-height: 42px; font-size: 15px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #searchSection .app-action { min-height: 42px !important; }
+
+/* Tableau de bord en 2 colonnes */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #homeDashboard { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #homeDashboard > div > p:first-child { font-size: 11.5px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #homeDashboard > div > p + p { font-size: 17px !important; }
+
+/* Grilles et carrousels */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body main [id$="Grid"].grid { gap: 14px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #recentGrid, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #homeTopRatedGrid, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #homeWishlistFocusGrid {
+  display: flex !important;
+  gap: 10px !important;
+  overflow-x: auto;
+  margin: 0 -18px;
+  padding: 2px 18px 8px;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 0 18px;
+  scrollbar-width: none;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #recentGrid::-webkit-scrollbar, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #homeTopRatedGrid::-webkit-scrollbar, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #homeWishlistFocusGrid::-webkit-scrollbar { display: none; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #recentGrid > *, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #homeTopRatedGrid > .home-media-card, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #homeWishlistFocusGrid > .home-media-card {
+  flex: none; width: 104px !important; scroll-snap-align: start;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #recentGrid > .relative.rounded-2xl.overflow-hidden { border-radius: 16px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #recentGrid > .relative.rounded-2xl.overflow-hidden > img { border-radius: 16px 16px 0 0 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #recentGrid > .relative.rounded-2xl.overflow-hidden > .absolute.bottom-0:not(.pointer-events-none) { padding: 7px 8px 9px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #recentGrid h4 { font-size: 12px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #recentGrid .absolute.bottom-0 > p { font-size: 10px !important; padding: 3px 7px !important; margin-top: 5px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body .home-media-copy strong { font-size: 12px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body .home-media-copy small { font-size: 10.5px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body .home-watch-next-row strong { font-size: 13px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body .home-watch-next-row small { font-size: 11px !important; }
+
+/* Calendrier compact */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #homeCalendarGrid { gap: 3px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #homeCalendarGrid > button, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #homeCalendarGrid > div { aspect-ratio: auto !important; height: 34px !important; min-height: 0 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #homeCalendarGrid > button { border-radius: 10px !important; font-size: 12px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #homeCalendarLayout > * + * { margin-top: 8px !important; }
+
+/* Collection */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #collectionActionRow { gap: 6px !important; width: 100%; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #collectionActionRow > button { padding: 6px 11px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #bulkToggle { margin-left: auto; order: 3; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #incompleteQuickBtn { order: 2; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #collectionQuickChips { gap: 8px !important; margin: 0 -18px !important; padding: 2px 18px 4px !important; scrollbar-width: none; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #collectionQuickChips::-webkit-scrollbar { display: none; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #collectionFilterPanel > #collectionQuickChips { margin: 0 !important; padding: 0 !important; flex-wrap: wrap; overflow: visible; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #collectionFilterPanel > #collectionQuickChips .ml-auto { margin-left: 0 !important; }
+
+/* Statistiques compactes */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabStats { row-gap: 0 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabStats > * + * { margin-top: .75rem !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabStats .modern-panel { padding: 12px !important; border-radius: 18px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabStats .modern-panel h2, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabStats .modern-panel h3 { font-size: 15px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabStats .modern-panel > .flex:first-child p { font-size: 11.5px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabStats .icon-chip { width: 28px !important; height: 28px !important; border-radius: 9px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabStats .icon-chip svg { width: 15px !important; height: 15px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabStats .modern-panel p.uppercase { font-size: 11px !important; margin: 4px 2px 6px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabStats [id$="Grid"] > div.rounded-xl > p:first-child { font-size: 11.5px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabStats [id$="Grid"] > div.rounded-xl > p + p { font-size: 16px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabStats .choice-option { min-height: 34px !important; font-size: 13px !important; }
+
+/* Mon espace */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #tabSettings .mobile-installation-toggle { min-height: 60px !important; padding: 10px 14px !important; border-radius: 18px !important; }
+
+/* Barre d'onglets flottante */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #bottomNav.mobile-bottom-nav {
+  left: 16px !important;
+  right: 16px !important;
+  bottom: max(env(safe-area-inset-bottom), 12px) !important;
+  height: 66px !important;
+  padding: 6px !important;
+  gap: 2px !important;
+  align-items: stretch !important;
+  border-radius: 999px !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #bottomNav .bottom-nav-btn {
+  flex: 1 1 0 !important;
+  height: auto !important;
+  min-width: 0 !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  padding: 0 2px !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #bottomNav .bottom-nav-btn .icon-inline,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #bottomNav .bottom-nav-btn .icon-inline svg { width: 22px !important; height: 22px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #bottomNav .bottom-nav-label {
+  display: block !important;
+  font-size: 10px !important;
+  line-height: 1 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #bottomNav .bottom-nav-badge { top: 8px !important; right: calc(50% - 16px) !important; }
 }
 </style>
 </head>
@@ -7609,7 +7474,7 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .bg-amb
 <input id="hapticsToggle" type="checkbox" onchange="setHapticsEnabled(this.checked)" class="w-4 h-4 accent-cyan-400">
 </label>
 <label class="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.025] px-3 py-2.5">
-<span><span class="block text-xs font-semibold text-gray-300">Nouvelle interface mobile</span><span class="block text-[10px] text-gray-500 mt-0.5">Désactiver pour retrouver l’ancienne apparence sur téléphone</span></span>
+<span><span class="block text-xs font-semibold text-gray-300">Nouvelle interface</span><span class="block text-[10px] text-gray-500 mt-0.5">Téléphone et iPad. Désactiver pour retrouver l’ancienne apparence</span></span>
 <input id="uiV2Toggle" type="checkbox" onchange="setUiV2Enabled(this.checked)" class="w-4 h-4 accent-cyan-400">
 </label>
 </div>
@@ -8169,7 +8034,7 @@ changeTheme(savedTheme);
 const hapticsToggle = document.getElementById('hapticsToggle');
 if (hapticsToggle) hapticsToggle.checked = localStorage.getItem('haptics_enabled') !== '0';
 const uiV2Toggle = document.getElementById('uiV2Toggle');
-if (uiV2Toggle) uiV2Toggle.checked = document.documentElement.classList.contains('ui-v2');
+if (uiV2Toggle) uiV2Toggle.checked = isUiV2Preferred();
 if (getPendingMovieUpdates().length) {
  setSyncStatus(navigator.onLine ? 'syncing' : 'offline');
  if (navigator.onLine) setTimeout(flushPendingMovieUpdates, 600);
@@ -8369,26 +8234,34 @@ document.addEventListener('keydown', event => {
  if(event.key==='Enter' && document.activeElement?.id==='globalSearchInput') { event.preventDefault(); openGlobalSearchResult(globalSearchSelection); }
 });
 
-// Interface mobile v2 : l'ancienne apparence reste disponible en désactivant ce réglage.
-function setUiV2Enabled(enabled) {
- try { localStorage.setItem('ui_v2', enabled ? '1' : '0'); } catch (_) {}
- document.documentElement.classList.toggle('ui-v2', enabled);
+// Nouvelle interface (téléphone et iPad) : l'ancienne apparence reste disponible via ce réglage.
+const uiV2MobileQuery = window.matchMedia('(max-width: 767px)');
+function isUiV2Preferred() {
+ try { return localStorage.getItem('ui_v2') !== '0'; } catch (_) { return true; }
+}
+function applyUiV2() {
+ const root = document.documentElement;
+ root.classList.toggle('ui-v2', isUiV2Preferred() && (root.classList.contains('is-ipad') || uiV2MobileQuery.matches));
  placeCollectionQuickChips();
 }
+function setUiV2Enabled(enabled) {
+ try { localStorage.setItem('ui_v2', enabled ? '1' : '0'); } catch (_) {}
+ applyUiV2();
+}
 
-// Interface v2 sur téléphone : les pastilles de format rejoignent le panneau « Filtrer ».
-const uiV2MobileQuery = window.matchMedia('(max-width: 767px)');
+// Sur téléphone, les pastilles de format rejoignent le panneau « Filtrer ».
 function placeCollectionQuickChips() {
  const chips = document.getElementById('collectionQuickChips');
  const panel = document.getElementById('collectionFilterPanel');
  const row = document.getElementById('collectionFilterRow');
  if (!chips || !panel || !row) return;
- const inPanel = document.documentElement.classList.contains('ui-v2') && uiV2MobileQuery.matches;
+ const root = document.documentElement;
+ const inPanel = root.classList.contains('ui-v2') && !root.classList.contains('is-ipad') && uiV2MobileQuery.matches;
  if (inPanel && chips.parentElement !== panel) panel.prepend(chips);
  else if (!inPanel && chips.parentElement !== row) row.appendChild(chips);
 }
-uiV2MobileQuery.addEventListener?.('change', placeCollectionQuickChips);
-document.addEventListener('DOMContentLoaded', placeCollectionQuickChips);
+uiV2MobileQuery.addEventListener?.('change', applyUiV2);
+document.addEventListener('DOMContentLoaded', applyUiV2);
 
 // Bouton « À compléter » à côté de Filtrer : ouvre ou ferme la liste des films incomplets.
 function toggleIncompleteQuick() {
