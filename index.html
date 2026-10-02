@@ -5741,17 +5741,17 @@ html.ui-v2 {
   --v2-text: #f2f2f7;
   --v2-muted: #98989f;
   --v2-line: rgba(84, 84, 88, .55);
-  --v2-accent: #22d3ee;
-  --v2-accent-soft: rgba(34, 211, 238, .16);
-  --v2-on-accent: #04191d;
-  --v2-accent-glow: rgba(34, 211, 238, .30);
-  --v2-grad-accent: linear-gradient(135deg, #67e8f9, #06b6d4);
-  --v2-violet: #a79bff;  --v2-violet-soft: rgba(167, 155, 255, .18);
-  --v2-green: #34d399;   --v2-green-soft: rgba(52, 211, 153, .16);
-  --v2-orange: #ffa94d;  --v2-orange-soft: rgba(255, 169, 77, .16);
-  --v2-red: #ff6b6b;     --v2-red-soft: rgba(255, 107, 107, .16);
-  --v2-blue: #5aa5ff;    --v2-blue-soft: rgba(90, 165, 255, .16);
-  --v2-pink: #f472b6;    --v2-pink-soft: rgba(244, 114, 182, .16);
+  --v2-accent: #a5b8ff;
+  --v2-accent-soft: rgba(165, 184, 255, .13);
+  --v2-on-accent: #11173a;
+  --v2-accent-glow: rgba(165, 184, 255, .28);
+  --v2-grad-accent: linear-gradient(135deg, #c3cfff, #93a6f5);
+  --v2-violet: #c0b0ff;  --v2-violet-soft: rgba(192, 176, 255, .14);
+  --v2-green: #8ddcbc;   --v2-green-soft: rgba(141, 220, 188, .13);
+  --v2-orange: #f6c18a;  --v2-orange-soft: rgba(246, 193, 138, .13);
+  --v2-red: #ff9a9a;     --v2-red-soft: rgba(255, 154, 154, .13);
+  --v2-blue: #9cc6ff;    --v2-blue-soft: rgba(156, 198, 255, .13);
+  --v2-pink: #f3aacb;    --v2-pink-soft: rgba(243, 170, 203, .13);
   --v2-gray-soft: rgba(120, 120, 128, .24);
   --v2-hair: inset 0 0 0 1px rgba(255, 255, 255, .07);
   --v2-lift: 0 10px 28px -12px rgba(0, 0, 0, .85);
@@ -5767,7 +5767,7 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) {
   -webkit-font-smoothing: antialiased;
 }
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main {
-  background: radial-gradient(120% 300px at 50% -60px, rgba(167, 139, 250, .08), transparent 70%) no-repeat;
+  background: radial-gradient(120% 300px at 50% -60px, rgba(165, 184, 255, .07), transparent 70%) no-repeat;
   padding-left: 18px !important;
   padding-right: 18px !important;
 }
@@ -5942,7 +5942,7 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .app-ac
   width: 34px !important; height: 34px !important;
   border-radius: 50% !important;
   background: rgba(255, 255, 255, .92) !important;
-  color: #0e7490 !important;
+  color: #3b4a9c !important;
   filter: none !important;
   order: 2;
   margin-left: auto;
@@ -6267,7 +6267,7 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompleteP
   background: var(--v2-orange); color: #1c1003; padding: 7px; flex: none;
 }
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompletePanel > summary #incompleteCount {
-  font-size: 12px !important; padding: 3px 9px !important; background: rgba(255, 169, 77, .22) !important; color: var(--v2-orange) !important;
+  font-size: 12px !important; padding: 3px 9px !important; background: rgba(246, 193, 138, .22) !important; color: var(--v2-orange) !important;
 }
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompletePanel { padding: 0 !important; }
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompletePanel > p { font-size: 13px !important; color: var(--v2-muted) !important; margin: 8px 4px 0 !important; }
@@ -6405,10 +6405,10 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #detailModal
 
 /* Curseurs de choix colorés (une couleur par option) */
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar { background: rgba(255, 255, 255, .07) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option:nth-child(4n+1) { --c: 34, 211, 238;  --c-on: #04191d; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option:nth-child(4n+2) { --c: 139, 124, 255; --c-on: #ffffff; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option:nth-child(4n+3) { --c: 244, 114, 182; --c-on: #ffffff; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option:nth-child(4n)   { --c: 52, 211, 153;  --c-on: #04231a; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option:nth-child(4n+1) { --c: 165, 184, 255;  --c-on: #04191d; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option:nth-child(4n+2) { --c: 192, 176, 255; --c-on: #1e1640; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option:nth-child(4n+3) { --c: 243, 170, 203; --c-on: #3a1226; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option:nth-child(4n)   { --c: 141, 220, 188;  --c-on: #0e2a20; }
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option { color: rgba(var(--c), .85) !important; }
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option.is-active {
   background: rgb(var(--c)) !important;
@@ -6418,11 +6418,11 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar 
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option.is-active .bg-pink-500 { background: rgba(255, 255, 255, .9) !important; color: #be185d !important; }
 
 /* Pastilles de filtre colorées */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip { --c: 34, 211, 238; --c-on: #04191d; color: rgb(var(--c)) !important; background: rgba(var(--c), .12) !important; box-shadow: inset 0 0 0 1px rgba(var(--c), .18) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip[data-quick-format="4K UHD"] { --c: 139, 124, 255; --c-on: #ffffff; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip[data-quick-format="Blu-ray 1080p"] { --c: 90, 165, 255; --c-on: #ffffff; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip[data-quick-format="DVD"] { --c: 255, 169, 77; --c-on: #2a1600; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip.quick-chip-saga { --c: 52, 211, 153; --c-on: #04231a; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip { --c: 165, 184, 255; --c-on: #04191d; color: rgb(var(--c)) !important; background: rgba(var(--c), .12) !important; box-shadow: inset 0 0 0 1px rgba(var(--c), .18) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip[data-quick-format="4K UHD"] { --c: 192, 176, 255; --c-on: #1e1640; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip[data-quick-format="Blu-ray 1080p"] { --c: 156, 198, 255; --c-on: #0f2240; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip[data-quick-format="DVD"] { --c: 246, 193, 138; --c-on: #2e1d08; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip.quick-chip-saga { --c: 141, 220, 188; --c-on: #0e2a20; }
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip.is-active,
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip[aria-pressed="true"] {
   background: rgb(var(--c)) !important;
@@ -6430,9 +6430,9 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip[
   box-shadow: 0 6px 16px -6px rgba(var(--c), .75) !important;
 }
 /* Boutons verre colorés selon leur texte */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-cyan-300 { background: rgba(34, 211, 238, .14) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-purple-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-purple-200 { background: rgba(139, 124, 255, .16) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-pink-300 { background: rgba(244, 114, 182, .14) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-cyan-300 { background: rgba(165, 184, 255, .14) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-purple-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-purple-200 { background: rgba(192, 176, 255, .16) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-pink-300 { background: rgba(243, 170, 203, .14) !important; }
 
 /* ---------- Accueil compact ---------- */
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeMobileHero h2, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .mobile-section-hero h2 { font-size: 26px !important; }
@@ -6570,10 +6570,10 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .app-ac
   background: rgba(var(--action-rgb), .22) !important;
   color: rgb(var(--action-rgb)) !important;
 }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .app-action-cyan .icon-chip:not(.chip-lg) { background: rgba(34, 211, 238, .22) !important; color: var(--v2-accent) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .app-action-cyan .icon-chip:not(.chip-lg) { background: rgba(165, 184, 255, .22) !important; color: var(--v2-accent) !important; }
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill,
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #detailModal button.glass-pill {
-  --c: 34, 211, 238;
+  --c: 165, 184, 255;
   background: rgba(var(--c), .14) !important;
   color: rgb(var(--c)) !important;
   box-shadow: none !important;
@@ -6581,10 +6581,10 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #detailModal
   border-radius: 999px !important;
   font-weight: 600 !important;
 }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-purple-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-purple-200 { --c: 167, 155, 255; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-pink-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-pink-200 { --c: 244, 114, 182; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-amber-300 { --c: 255, 169, 77; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-gray-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-gray-400 { --c: 200, 210, 230; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-purple-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-purple-200 { --c: 192, 176, 255; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-pink-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-pink-200 { --c: 243, 170, 203; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-amber-300 { --c: 246, 193, 138; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-gray-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-gray-400 { --c: 210, 214, 228; }
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill:not(.w-8):not(.w-9):not(.w-10) { font-size: 13px !important; padding: 6px 13px !important; min-height: 34px !important; }
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionFilterToggle, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bulkToggle, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompleteQuickBtn {
   white-space: nowrap; flex: none;
@@ -6596,7 +6596,7 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionF
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionFilterToggle { background: var(--v2-accent-soft) !important; color: var(--v2-accent) !important; }
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bulkToggle { background: var(--v2-gray-soft) !important; color: var(--v2-text) !important; margin-left: auto; order: 3; }
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompleteQuickBtn:not(.hidden) { display: inline-flex !important; background: var(--v2-orange-soft) !important; color: var(--v2-orange) !important; order: 2; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompleteQuickBtn .incomplete-quick-count { background: rgba(255, 169, 77, .25); border-radius: 999px; padding: 1px 7px; font-size: 11.5px; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompleteQuickBtn .incomplete-quick-count { background: rgba(246, 193, 138, .25); border-radius: 999px; padding: 1px 7px; font-size: 11.5px; }
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionActionRow { gap: 6px !important; width: 100%; }
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionActionRow > button { padding: 6px 11px !important; }
 /* Liste des films à compléter : ouverte depuis le bouton, sans en-tête */
@@ -6614,12 +6614,68 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav.m
   background: var(--v2-panel) !important;
   box-shadow: 0 12px 34px rgba(0, 0, 0, .7), var(--v2-hair) !important;
 }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav .bottom-nav-btn.active { background: rgba(34, 211, 238, .16) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav .bottom-nav-btn.active { background: rgba(165, 184, 255, .16) !important; }
 /* En-tête : boutons ronds assortis */
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .global-search-trigger { background: var(--v2-card-2) !important; }
 /* Vignettes : même fond que les panneaux */
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden,
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden { background: var(--v2-panel) !important; }
+
+/* ======================= v2.3 : palette douce harmonisée + transitions de page ======================= */
+/* Boutons d'action : mêmes teintes douces partout */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action-violet { --action-rgb: 192, 176, 255; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action-pink   { --action-rgb: 243, 170, 203; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action-green  { --action-rgb: 141, 220, 188; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action-amber  { --action-rgb: 246, 193, 138; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action-red    { --action-rgb: 255, 154, 154; }
+/* Textes d'accent de l'ancienne palette ramenés vers les teintes douces */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-cyan-200, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-cyan-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-cyan-400,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #detailModal .text-cyan-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #detailModal .text-cyan-400 { color: var(--v2-accent) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-purple-200, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-purple-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-violet-300 { color: var(--v2-violet) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-pink-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-pink-400 { color: var(--v2-pink) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-emerald-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-emerald-400 { color: var(--v2-green) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-amber-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-amber-400 { color: var(--v2-orange) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-sky-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-blue-300 { color: var(--v2-blue) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .icon-chip, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > header .icon-chip.chip-lg { color: var(--v2-accent) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .bg-pink-500 { background: var(--v2-pink) !important; color: #3a1226 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeCalendarGrid > button.border { color: var(--v2-accent) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .glass-input:focus { box-shadow: 0 0 0 2px rgba(165, 184, 255, .35) !important; }
+
+/* Transitions : fondu qui se déplie à chaque changement de page */
+@keyframes v2Unfold {
+  0%   { opacity: 0; transform: translateY(18px) scale(.965); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: none; }
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .tab-panel-enter,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabSeries:not(.hidden), html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabDigital:not(.hidden), html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabWishlist:not(.hidden),
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats:not(.hidden), html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabSettings:not(.hidden) { animation: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > .mobile-section-hero,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > #searchSection,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > [id^="tab"] > * {
+  transform-origin: 50% 0;
+  animation: v2Unfold .46s cubic-bezier(.2, .85, .25, 1) both;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > [id^="tab"] > *:nth-child(1) { animation-delay: .03s; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > [id^="tab"] > *:nth-child(2) { animation-delay: .07s; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > [id^="tab"] > *:nth-child(3) { animation-delay: .11s; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > [id^="tab"] > *:nth-child(4) { animation-delay: .15s; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > [id^="tab"] > *:nth-child(5) { animation-delay: .19s; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > [id^="tab"] > *:nth-child(n+6) { animation-delay: .22s; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > #searchSection { animation-delay: .03s; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light).home-customizing > main > [id^="tab"] > *, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-customizing > * { animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > .mobile-section-hero, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > #searchSection, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main > [id^="tab"] > * { animation: none !important; }
+}
+
+/* Barres de répartition et de progression aux teintes douces */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [style*="#22d3ee"] { background: var(--v2-accent) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [style*="#fbbf24"] { background: var(--v2-orange) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [style*="#64748b"] { background: #6b6878 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .bg-cyan-400, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .bg-cyan-500 { background-color: var(--v2-accent) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .bg-purple-500, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .bg-violet-500 { background-color: var(--v2-violet) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .bg-emerald-400, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .bg-emerald-500 { background-color: var(--v2-green) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .bg-amber-400, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .bg-amber-500 { background-color: var(--v2-orange) !important; }
 }
 </style>
 </head>
