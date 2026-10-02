@@ -12,6 +12,9 @@
 <title>Ma Collection Blu-ray & Wishlist</title>
 <script>
 (function(){
+ // Interface mobile v2 (activée par défaut). localStorage.ui_v2 = '0' restaure l'ancienne.
+ let uiV2=true; try{ uiV2=localStorage.getItem('ui_v2')!=='0'; }catch(_){}
+ if(uiV2) document.documentElement.classList.add('ui-v2');
  const ua=navigator.userAgent||'';
  const isIPad=/iPad/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
  if(isIPad) document.documentElement.classList.add('is-ipad');
@@ -5722,6 +5725,659 @@ body > main, #detailModal > div, #globalSearchModal * { overscroll-behavior: con
     -webkit-touch-callout: default;
   }
 }
+
+/* ======================================================================
+   INTERFACE MOBILE v2 — aérée, cartes iOS, pastilles et boutons en pilule
+   (inspirée de « Mes Commandes »), thème sombre.
+   Tout est rangé derrière html.ui-v2 : retirer cette classe (ou
+   localStorage.ui_v2 = '0') restaure à l'identique l'interface précédente.
+   ====================================================================== */
+@media (max-width: 767px) {
+html.ui-v2 {
+  --v2-bg: #000000;
+  --v2-card: #1c1c1e;
+  --v2-card-2: #2c2c2e;
+  --v2-text: #f2f2f7;
+  --v2-muted: #98989f;
+  --v2-line: rgba(84, 84, 88, .55);
+  --v2-accent: #22d3ee;
+  --v2-accent-soft: rgba(34, 211, 238, .16);
+  --v2-on-accent: #04191d;
+  --v2-accent-glow: rgba(34, 211, 238, .30);
+  --v2-grad-accent: linear-gradient(135deg, #67e8f9, #06b6d4);
+  --v2-violet: #a79bff;  --v2-violet-soft: rgba(167, 155, 255, .18);
+  --v2-green: #34d399;   --v2-green-soft: rgba(52, 211, 153, .16);
+  --v2-orange: #ffa94d;  --v2-orange-soft: rgba(255, 169, 77, .16);
+  --v2-red: #ff6b6b;     --v2-red-soft: rgba(255, 107, 107, .16);
+  --v2-blue: #5aa5ff;    --v2-blue-soft: rgba(90, 165, 255, .16);
+  --v2-pink: #f472b6;    --v2-pink-soft: rgba(244, 114, 182, .16);
+  --v2-gray-soft: rgba(120, 120, 128, .24);
+  --v2-hair: inset 0 0 0 1px rgba(255, 255, 255, .07);
+  --v2-lift: 0 10px 28px -12px rgba(0, 0, 0, .85);
+  --v2-radius: 22px;
+  --v2-radius-sm: 16px;
+}
+
+/* ---------- Fond & typographie ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) {
+  background: var(--v2-bg) !important;
+  color: var(--v2-text);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main {
+  background: radial-gradient(120% 300px at 50% -60px, rgba(34, 211, 238, .10), transparent 70%) no-repeat;
+  padding-left: 18px !important;
+  padding-right: 18px !important;
+}
+
+/* ---------- En-tête : titre à gauche, bouton rond de recherche ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > header.glass-card {
+  background: rgba(0, 0, 0, .82) !important;
+  backdrop-filter: saturate(180%) blur(20px) !important;
+  -webkit-backdrop-filter: saturate(180%) blur(20px) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  justify-content: flex-start !important;
+  padding: 12px 18px !important;
+  font-size: 17px !important;
+  letter-spacing: -.01em !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > header::before,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > header::after { display: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > header > span:nth-of-type(2) {
+  background: none !important;
+  -webkit-text-fill-color: var(--v2-text) !important;
+  color: var(--v2-text) !important;
+  font-weight: 700 !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > header .icon-chip.chip-lg {
+  width: 34px !important; height: 34px !important;
+  border-radius: 11px !important;
+  background: var(--v2-accent-soft) !important;
+  color: var(--v2-accent) !important;
+  filter: none !important;
+  box-shadow: var(--v2-hair) !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > header .icon-chip.chip-lg svg { width: 20px !important; height: 20px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .global-search-trigger {
+  width: 40px !important; height: 40px !important;
+  border-radius: 50% !important;
+  background: var(--v2-card) !important;
+  border: 0 !important;
+  box-shadow: var(--v2-hair) !important;
+  color: var(--v2-text) !important;
+}
+
+/* ---------- Titres de page : grand titre iOS, sans bandeau ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .mobile-section-hero {
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 2px !important;
+  min-height: 0 !important;
+  gap: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  margin-bottom: 1.1rem !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .mobile-section-hero::before,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .mobile-section-hero::after { display: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .mobile-section-hero .page-hero-icon { display: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .mobile-section-hero h2 {
+  font-size: 32px !important;
+  line-height: 1.1 !important;
+  font-weight: 800 !important;
+  letter-spacing: -.025em !important;
+  color: var(--v2-text) !important;
+}
+
+/* ---------- Cartes : fond uni, coins généreux, liseré fin ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .glass-card,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .modern-panel,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .stat-tile {
+  background: var(--v2-card) !important;
+  border: 0 !important;
+  border-radius: var(--v2-radius) !important;
+  background-image: none !important;
+  box-shadow: var(--v2-hair), var(--v2-lift) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .glass-card::before,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .modern-panel::before { display: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .glass-card.p-3,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .glass-card.p-4 { padding: 16px !important; }
+/* cartes imbriquées : un cran plus clair */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .glass-card .glass-card,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .modern-panel .glass-card {
+  background: var(--v2-card-2) !important;
+  box-shadow: none !important;
+  border-radius: var(--v2-radius-sm) !important;
+}
+/* Panneaux de l'accueil sans carte : sections aérées */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget-panel {
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget-panel::before,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget-panel::after { display: none !important; }
+
+/* Titres de section */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget-panel > .flex:first-child { padding: 0 2px !important; margin-bottom: 12px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget h2,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget h3,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .modern-panel h2,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .modern-panel h3 {
+  text-transform: none !important;
+  letter-spacing: -.01em !important;
+  color: var(--v2-text) !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget-panel > .flex:first-child h2 { font-size: 20px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget p.text-\[10px\],
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget p.text-\[9px\] { font-size: 13px !important; color: var(--v2-muted) !important; }
+/* Lien « Tout voir » en pastille */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget > .flex:first-child > button:last-child:not(.app-action),
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget > .flex:first-child > a:last-child {
+  background: var(--v2-accent-soft) !important;
+  color: var(--v2-accent) !important;
+  padding: 6px 12px !important;
+  border-radius: 999px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  border: 0 !important;
+  white-space: nowrap;
+}
+
+/* Icônes de titre : pastille carrée arrondie, sans néon */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .icon-chip:not(.chip-lg) {
+  width: 34px !important; height: 34px !important;
+  border-radius: 11px !important;
+  background: var(--v2-accent-soft) !important;
+  color: var(--v2-accent) !important;
+  filter: none !important;
+  border: 0 !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .icon-chip:not(.chip-lg) svg { width: 18px !important; height: 18px !important; }
+
+/* ---------- Champs : pilule grise ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .glass-input {
+  background: var(--v2-gray-soft) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  color: var(--v2-text) !important;
+  border-radius: 14px !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #searchInput {
+  border-radius: 999px !important;
+  font-size: 16px !important;
+  min-height: 48px;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .glass-input::placeholder { color: var(--v2-muted) !important; }
+
+/* ---------- Boutons d'action : pilules pleines, sans effet verni ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action {
+  border: 0 !important;
+  border-radius: 999px !important;
+  min-height: 46px;
+  font-weight: 650 !important;
+  letter-spacing: -.005em;
+  box-shadow: 0 10px 24px -12px rgba(var(--action-rgb), .7) !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action-cyan { background: var(--v2-grad-accent) !important; color: var(--v2-on-accent) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action-red { background: var(--v2-red-soft) !important; color: var(--v2-red) !important; box-shadow: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action-slate { background: var(--v2-card-2) !important; color: var(--v2-text) !important; box-shadow: var(--v2-hair) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action:active { transform: scale(.96) !important; opacity: .88; }
+/* Icône dans une bulle ronde (bouton « Send ↗ » de la maquette) */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .app-action .icon-chip:not(.chip-lg) {
+  width: 34px !important; height: 34px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, .92) !important;
+  color: #0e7490 !important;
+  filter: none !important;
+  order: 2;
+  margin-left: auto;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .app-action .icon-chip:not(.chip-lg) svg { width: 18px !important; height: 18px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action:has(> .icon-chip) {
+  justify-content: space-between !important;
+  padding: 6px 6px 6px 22px !important;
+  font-size: 16px !important;
+  min-height: 52px;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action:has(> .icon-chip) > span:not(.icon-chip) { order: 1; }
+/* Boutons secondaires « verre » → pastilles grises */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .glass-pill {
+  background: var(--v2-card-2) !important;
+  border: 0 !important;
+  box-shadow: var(--v2-hair) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .glass-pill::before { display: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill { border-radius: 999px !important; }
+
+/* ---------- Sélecteurs segmentés (Ma collection / Digital / Wishlist…) ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar {
+  background: var(--v2-gray-soft) !important;
+  border: 0 !important;
+  border-radius: 14px !important;
+  padding: 3px !important;
+  gap: 3px !important;
+  box-shadow: none !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-option {
+  border: 0 !important;
+  border-radius: 11px !important;
+  color: var(--v2-muted) !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  min-height: 38px !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-option.is-active {
+  background: #48484c !important;
+  color: var(--v2-text) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .35) !important;
+}
+
+/* ---------- Filtres rapides en pastilles ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip {
+  border: 0 !important;
+  border-radius: 999px !important;
+  padding: 8px 14px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  background: var(--v2-card) !important;
+  color: var(--v2-text) !important;
+  box-shadow: var(--v2-hair) !important;
+  min-height: 36px;
+  white-space: nowrap;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip.is-active,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip[aria-pressed="true"] {
+  background: var(--v2-grad-accent) !important;
+  color: var(--v2-on-accent) !important;
+  box-shadow: 0 6px 16px -6px var(--v2-accent-glow) !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionQuickChips {
+  gap: 8px !important;
+  margin: 0 -18px !important;
+  padding: 2px 18px 4px !important;
+  scrollbar-width: none;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionQuickChips::-webkit-scrollbar { display: none; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionFilterToggle {
+  border-radius: 999px !important;
+  padding: 8px 16px !important;
+  font-size: 14px !important;
+  background: var(--v2-accent-soft) !important;
+  color: var(--v2-accent) !important;
+  min-height: 38px;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bulkToggle { font-size: 14px !important; color: var(--v2-accent) !important; }
+
+/* ---------- Tableau de bord de l'accueil : pastilles KPI ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard { gap: 10px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard > div {
+  --k: var(--v2-accent); --k-soft: var(--v2-accent-soft);
+  --k-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='16' rx='2'/%3E%3Cpath d='M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4'/%3E%3C/svg%3E");
+  position: relative;
+  border: 0 !important;
+  border-radius: 20px !important;
+  padding: 14px !important;
+  background: linear-gradient(135deg, var(--k-soft), transparent 75%), var(--v2-card-2) !important;
+  box-shadow: var(--v2-hair) !important;
+  display: flex; flex-direction: column;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard > div::before {
+  content: "";
+  width: 36px; height: 36px; border-radius: 50%;
+  margin-bottom: 14px;
+  background: var(--k);
+  box-shadow: 0 4px 14px -3px var(--k);
+  -webkit-mask: var(--k-icon) center / 18px no-repeat, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: var(--k-icon) center / 18px no-repeat, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard > div:nth-child(4n+2) {
+  --k: var(--v2-violet); --k-soft: var(--v2-violet-soft);
+  --k-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Ccircle cx='12' cy='12' r='2.5'/%3E%3C/svg%3E");
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard > div:nth-child(4n+3) {
+  --k: var(--v2-green); --k-soft: var(--v2-green-soft);
+  --k-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M21 8 12 3 3 8v8l9 5 9-5z'/%3E%3Cpath d='M3 8l9 5 9-5M12 13v8'/%3E%3C/svg%3E");
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard > div:nth-child(4n) {
+  --k: var(--v2-orange); --k-soft: var(--v2-orange-soft);
+  --k-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M17 6.5A7 7 0 1 0 17 17.5M4 10h9M4 14h9'/%3E%3C/svg%3E");
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard > div > p:first-child {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: var(--v2-muted) !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard > div > p + p {
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  letter-spacing: -.02em !important;
+  color: var(--v2-text) !important;
+  font-variant-numeric: tabular-nums;
+  margin-top: 2px !important;
+}
+
+/* ---------- Vignettes de films : jaquette + légende sous l'image ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden {
+  background: var(--v2-card) !important;
+  border: 0 !important;
+  border-radius: 20px !important;
+  box-shadow: var(--v2-hair), var(--v2-lift) !important;
+  transition: transform .12s ease, opacity .12s ease !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden:active { transform: scale(.975); opacity: .88; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden > img {
+  border-radius: 20px 20px 0 0;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden > .absolute.inset-x-0.bottom-0.pointer-events-none { display: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden > .absolute.inset-x-0.bottom-0:not(.pointer-events-none) {
+  position: static !important;
+  padding: 10px 12px 13px !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden h4 {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+  color: var(--v2-text) !important;
+}
+/* Pastilles d'information sous le titre */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden > .absolute.bottom-0 > div {
+  justify-content: flex-start !important;
+  flex-wrap: wrap;
+  gap: 5px !important;
+  margin-top: 7px !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden > .absolute.bottom-0 > div > span,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden > .absolute.bottom-0 > p {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  padding: 4px 8px !important;
+  border-radius: 999px !important;
+  background: var(--v2-gray-soft);
+  color: var(--v2-muted) !important;
+  white-space: nowrap;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 .text-cyan-300,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 > p { background: var(--v2-accent-soft) !important; color: var(--v2-accent) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 > p { margin-top: 7px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 .text-emerald-400,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 span.text-emerald-400,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 .text-emerald-300 { background: var(--v2-green-soft) !important; color: var(--v2-green) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 .text-amber-300,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 .text-amber-400 { background: var(--v2-orange-soft) !important; color: var(--v2-orange) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 .text-pink-300,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 .text-pink-400 { background: var(--v2-pink-soft) !important; color: var(--v2-pink) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 .text-violet-300,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 .text-purple-300 { background: var(--v2-violet-soft) !important; color: var(--v2-violet) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] .absolute.bottom-0 div > span > span { background: none !important; padding: 0 !important; }
+/* grilles plus aérées */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"].grid { gap: 14px !important; }
+
+/* Derniers ajouts : carrousel horizontal */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #recentGrid {
+  display: flex !important;
+  gap: 12px !important;
+  overflow-x: auto;
+  margin: 0 -18px;
+  padding: 2px 18px 8px;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 0 18px;
+  scrollbar-width: none;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #recentGrid::-webkit-scrollbar { display: none; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #recentGrid > * {
+  flex: none;
+  width: 136px;
+  scroll-snap-align: start;
+}
+
+/* Bilan de la collection */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionOverviewBar strong { font-size: 28px !important; letter-spacing: -.02em; color: var(--v2-text) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionOverviewBar .text-\[11px\] { font-size: 14px !important; color: var(--v2-muted) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionOverviewValue {
+  background: var(--v2-green-soft); color: var(--v2-green) !important;
+  padding: 5px 11px; border-radius: 999px; font-size: 14px !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionOverviewBarTrack { height: 8px !important; background: var(--v2-gray-soft) !important; gap: 3px; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionOverviewBarTrack > * { border-radius: 999px; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionOverviewLegend { font-size: 12px !important; color: var(--v2-muted) !important; }
+
+/* ---------- Barre d'onglets flottante ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav.mobile-bottom-nav {
+  left: 16px !important;
+  right: 16px !important;
+  bottom: max(env(safe-area-inset-bottom), 12px) !important;
+  height: 66px !important;
+  padding: 6px !important;
+  gap: 2px !important;
+  align-items: stretch !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: rgba(36, 36, 40, .80) !important;
+  backdrop-filter: saturate(180%) blur(22px) !important;
+  -webkit-backdrop-filter: saturate(180%) blur(22px) !important;
+  box-shadow: 0 10px 34px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(255, 255, 255, .08) !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav.mobile-bottom-nav::before,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav.mobile-bottom-nav::after { display: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav .bottom-nav-btn {
+  flex: 1 1 0 !important;
+  height: auto !important;
+  min-width: 0 !important;
+  border-radius: 999px !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  padding: 0 2px !important;
+  color: var(--v2-muted) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav .bottom-nav-btn .icon-inline,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav .bottom-nav-btn .icon-inline svg { width: 22px !important; height: 22px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav .bottom-nav-label {
+  display: block !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav .bottom-nav-btn.active {
+  color: var(--v2-accent) !important;
+  background: var(--v2-accent-soft) !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav .bottom-nav-badge { top: 8px !important; right: calc(50% - 16px) !important; box-shadow: 0 0 0 2px #242428 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) { padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
+
+/* Vignettes de la wishlist (image dans un cadre) */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden {
+  background: var(--v2-card) !important;
+  border: 0 !important;
+  border-radius: 20px !important;
+  box-shadow: var(--v2-hair), var(--v2-lift) !important;
+  transform: none !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden > .relative.overflow-hidden {
+  aspect-ratio: auto !important;
+  overflow: visible !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden > .relative.overflow-hidden > img {
+  height: auto !important;
+  aspect-ratio: 2 / 3;
+  border-radius: 20px 20px 0 0;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden .absolute.inset-0[class*="bg-gradient"] { display: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden > .relative.overflow-hidden > .absolute.inset-x-0.bottom-0 {
+  position: static !important;
+  padding: 10px 12px 13px !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden h4 {
+  font-size: 14px !important; font-weight: 600 !important; line-height: 1.25 !important; color: var(--v2-text) !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden > .relative.overflow-hidden > .absolute.inset-x-0.bottom-0 > div:empty { display: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .group .absolute.top-2 > span {
+  font-size: 10px !important; letter-spacing: .04em !important;
+  padding: 4px 9px !important;
+  background: rgba(0, 0, 0, .55) !important;
+  backdrop-filter: blur(10px) !important; -webkit-backdrop-filter: blur(10px) !important;
+  border: 0 !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14) !important;
+}
+
+/* Encart « Films à compléter » : alerte douce */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompletePanel > summary {
+  background: var(--v2-orange-soft) !important;
+  color: var(--v2-orange) !important;
+  border-radius: 16px !important;
+  padding: 12px 14px !important;
+  font-size: 14px !important;
+  gap: 10px !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompletePanel > summary .icon-inline {
+  width: 30px !important; height: 30px !important; border-radius: 10px;
+  background: var(--v2-orange); color: #1c1003; padding: 7px; flex: none;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompletePanel > summary #incompleteCount {
+  font-size: 12px !important; padding: 3px 9px !important; background: rgba(255, 169, 77, .22) !important; color: var(--v2-orange) !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompletePanel { padding: 0 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompletePanel > p { font-size: 13px !important; color: var(--v2-muted) !important; margin: 8px 4px 0 !important; }
+
+/* Titres de panneaux : un peu plus compacts pour éviter les retours à la ligne */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget:not(.home-widget-panel) > .flex:first-child h2,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget:not(.home-widget-panel) > .flex:first-child h3 { font-size: 17px !important; }
+
+/* ---------- Statistiques : tuiles chiffres façon pastilles ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl {
+  border: 0 !important;
+  border-radius: 18px !important;
+  background: var(--v2-card-2) !important;
+  box-shadow: var(--v2-hair) !important;
+  text-align: left !important;
+  padding: 14px !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl > p:first-child {
+  text-transform: none !important; letter-spacing: 0 !important;
+  font-size: 13px !important; font-weight: 500 !important; color: var(--v2-muted) !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl > p + p {
+  font-size: 24px !important; font-weight: 700 !important; letter-spacing: -.02em !important;
+  font-variant-numeric: tabular-nums;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats .modern-panel p.uppercase {
+  font-size: 13px !important; letter-spacing: .04em !important; color: var(--v2-muted) !important; margin: 6px 2px 10px !important;
+}
+
+/* ---------- Mon espace : lignes de réglages avec icône colorée ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabSettings .mobile-installation-toggle {
+  min-height: 60px !important;
+  padding: 10px 14px !important;
+  border: 0 !important;
+  border-radius: 18px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-hair) !important;
+  color: var(--v2-text) !important;
+  font-size: 16px !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabSettings .mobile-installation-toggle + * { margin-top: 0; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabSettings .mobile-installation-toggle > span:first-child { gap: 14px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabSettings .mobile-installation-toggle > span:first-child > .icon-inline:first-child {
+  --ico: var(--v2-accent);
+  width: 34px !important; height: 34px !important; padding: 8px; border-radius: 10px;
+  background: var(--ico); color: #fff;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #mobileInstallationToggle > span:first-child > .icon-inline:first-child { --ico: #5e5ce6 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #mobileSubscriptionsToggle > span:first-child > .icon-inline:first-child { --ico: #30b158 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #mobileOptionsToggle > span:first-child > .icon-inline:first-child { --ico: #8e8e93 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #mobileProfileToggle > span:first-child > .icon-inline:first-child { --ico: #0a84ff !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabSettings .mobile-installation-toggle .font-bold { font-weight: 600 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabSettings .mobile-installation-toggle [class*="rounded-full"] {
+  font-size: 12px !important; min-width: 22px; padding: 2px 8px !important;
+  background: var(--v2-gray-soft) !important; color: var(--v2-muted) !important; border: 0 !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabSettings .mobile-installation-toggle[aria-expanded="true"] { background: var(--v2-card-2) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabSettings .mobile-installation-chevron { color: var(--v2-muted) !important; opacity: .7; }
+
+/* ---------- Fiche film / série ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #detailModal { background: rgba(0, 0, 0, .55) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #detailModal > div {
+  background: var(--v2-bg) !important;
+  border-radius: 28px !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .08), 0 30px 60px rgba(0, 0, 0, .8) !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-hero,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-info,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-editions,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .series-detail-info,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .series-detail-seasons {
+  border: 0 !important;
+  border-radius: 22px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-hair) !important;
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-hero::before, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-hero::after,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-info::before, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-info::after,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-editions::before, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-editions::after,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .series-detail-info::before, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .series-detail-info::after,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .series-detail-seasons::before, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .series-detail-seasons::after { display: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent h3, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent h4.uppercase, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent p.uppercase { letter-spacing: .02em !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .detail-modal-close {
+  background: rgba(120, 120, 128, .32) !important;
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  color: var(--v2-text) !important; border: 0 !important;
+}
+
+/* ---------- Lisibilité : micro-textes un cran plus grands ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-\[8px\] { font-size: 10px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-\[9px\] { font-size: 11px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-\[10px\] { font-size: 12px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .text-\[11px\] { font-size: 13px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main #homeCalendarGrid .text-\[9px\], html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main #homeCalendarGrid .text-\[10px\] { font-size: 10px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill:not(.w-8):not(.w-9):not(.w-10) { font-size: 14px !important; }
+
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl { display: flex !important; flex-direction: column !important; align-items: flex-start !important; justify-content: flex-start !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl > p { text-align: left !important; width: 100%; }
+/* Compteurs à droite des titres de panneaux : pastille */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget > .flex:first-child > span:last-child:not(.icon-chip) {
+  white-space: nowrap !important;
+  background: var(--v2-accent-soft);
+  color: var(--v2-accent) !important;
+  padding: 4px 10px !important;
+  border-radius: 999px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  flex: none;
+}
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -6652,6 +7308,10 @@ body > main, #detailModal > div, #globalSearchModal * { overscroll-behavior: con
 <span><span class="block text-xs font-semibold text-gray-300">Retours tactiles</span><span class="block text-[10px] text-gray-500 mt-0.5">Vibration légère pour les actions importantes</span></span>
 <input id="hapticsToggle" type="checkbox" onchange="setHapticsEnabled(this.checked)" class="w-4 h-4 accent-cyan-400">
 </label>
+<label class="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.025] px-3 py-2.5">
+<span><span class="block text-xs font-semibold text-gray-300">Nouvelle interface mobile</span><span class="block text-[10px] text-gray-500 mt-0.5">Désactiver pour retrouver l’ancienne apparence sur téléphone</span></span>
+<input id="uiV2Toggle" type="checkbox" onchange="setUiV2Enabled(this.checked)" class="w-4 h-4 accent-cyan-400">
+</label>
 </div>
 
 <div class="modern-panel space-options-panel p-4 md:p-5 space-y-3">
@@ -7208,6 +7868,8 @@ const savedTheme = localStorage.getItem('app_theme') || 'theme-noir';
 changeTheme(savedTheme);
 const hapticsToggle = document.getElementById('hapticsToggle');
 if (hapticsToggle) hapticsToggle.checked = localStorage.getItem('haptics_enabled') !== '0';
+const uiV2Toggle = document.getElementById('uiV2Toggle');
+if (uiV2Toggle) uiV2Toggle.checked = document.documentElement.classList.contains('ui-v2');
 if (getPendingMovieUpdates().length) {
  setSyncStatus(navigator.onLine ? 'syncing' : 'offline');
  if (navigator.onLine) setTimeout(flushPendingMovieUpdates, 600);
@@ -7406,6 +8068,12 @@ document.addEventListener('keydown', event => {
  }
  if(event.key==='Enter' && document.activeElement?.id==='globalSearchInput') { event.preventDefault(); openGlobalSearchResult(globalSearchSelection); }
 });
+
+// Interface mobile v2 : l'ancienne apparence reste disponible en désactivant ce réglage.
+function setUiV2Enabled(enabled) {
+ try { localStorage.setItem('ui_v2', enabled ? '1' : '0'); } catch (_) {}
+ document.documentElement.classList.toggle('ui-v2', enabled);
+}
 
 function setHapticsEnabled(enabled) {
  localStorage.setItem('haptics_enabled', enabled ? '1' : '0');
