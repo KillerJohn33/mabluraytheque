@@ -5726,6 +5726,7 @@ body > main, #detailModal > div, #globalSearchModal * { overscroll-behavior: con
   }
 }
 
+#incompleteQuickBtn { display: none !important; }
 /* ======================================================================
    INTERFACE MOBILE v2 — aérée, cartes iOS, pastilles et boutons en pilule
    (inspirée de « Mes Commandes »), thème sombre.
@@ -6536,6 +6537,89 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeCalenda
 /* Stats : libellés sur deux lignes plutôt que tronqués */
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl { align-items: center !important; }
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl > p:first-child { white-space: normal !important; line-height: 1.2 !important; }
+
+/* ======================= v2.2 : boutons uniformes, affichage remonté, barre bleue ======================= */
+html.ui-v2 { --mobile-page-title-top-gap: .35rem; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) > main { padding-top: 6px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .mobile-section-hero { margin-bottom: .7rem !important; }
+
+/* Un seul style de bouton : pastille teintée façon « Tout voir » */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action {
+  background: rgba(var(--action-rgb), .16) !important;
+  color: rgb(var(--action-rgb)) !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  min-height: 38px !important;
+  padding: 7px 16px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  filter: none !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action-cyan { background: var(--v2-accent-soft) !important; color: var(--v2-accent) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action-red { background: var(--v2-red-soft) !important; color: var(--v2-red) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action-slate { background: var(--v2-gray-soft) !important; color: var(--v2-text) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .app-action:has(> .icon-chip),
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #searchSection .app-action:has(> .icon-chip) {
+  min-height: 44px !important;
+  padding: 4px 4px 4px 18px !important;
+  font-size: 15px !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .app-action .icon-chip:not(.chip-lg) {
+  width: 36px !important; height: 36px !important;
+  background: rgba(var(--action-rgb), .22) !important;
+  color: rgb(var(--action-rgb)) !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .app-action-cyan .icon-chip:not(.chip-lg) { background: rgba(34, 211, 238, .22) !important; color: var(--v2-accent) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #detailModal button.glass-pill {
+  --c: 34, 211, 238;
+  background: rgba(var(--c), .14) !important;
+  color: rgb(var(--c)) !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  font-weight: 600 !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-purple-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-purple-200 { --c: 167, 155, 255; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-pink-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-pink-200 { --c: 244, 114, 182; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-amber-300 { --c: 255, 169, 77; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-gray-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-gray-400 { --c: 200, 210, 230; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill:not(.w-8):not(.w-9):not(.w-10) { font-size: 13px !important; padding: 6px 13px !important; min-height: 34px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionFilterToggle, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bulkToggle, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompleteQuickBtn {
+  white-space: nowrap; flex: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 34px !important; padding: 6px 13px !important;
+  border: 0 !important; border-radius: 999px !important;
+  font-size: 13px !important; font-weight: 600 !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionFilterToggle { background: var(--v2-accent-soft) !important; color: var(--v2-accent) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bulkToggle { background: var(--v2-gray-soft) !important; color: var(--v2-text) !important; margin-left: auto; order: 3; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompleteQuickBtn:not(.hidden) { display: inline-flex !important; background: var(--v2-orange-soft) !important; color: var(--v2-orange) !important; order: 2; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompleteQuickBtn .incomplete-quick-count { background: rgba(255, 169, 77, .25); border-radius: 999px; padding: 1px 7px; font-size: 11.5px; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionActionRow { gap: 6px !important; width: 100%; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionActionRow > button { padding: 6px 11px !important; }
+/* Liste des films à compléter : ouverte depuis le bouton, sans en-tête */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompletePanel > summary { display: none !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #incompletePanel:not([open]) { display: none !important; }
+/* Pastilles de format dans le panneau Filtrer */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionFilterPanel > #collectionQuickChips { margin: 0 !important; padding: 0 !important; flex-wrap: wrap; overflow: visible; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionFilterPanel > #collectionQuickChips .quick-chip { min-height: 32px; padding: 6px 12px !important; font-size: 13px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #collectionFilterPanel > #collectionQuickChips .ml-auto { margin-left: 0 !important; }
+/* Liens « Tout voir » et pastilles d'en-tête identiques partout */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main .home-widget > .flex:first-child > button:last-child:not(.app-action) { font-size: 12px !important; padding: 5px 11px !important; }
+
+/* Barre de navigation : même fond bleu que les panneaux */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav.mobile-bottom-nav {
+  background: var(--v2-panel) !important;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .7), var(--v2-hair) !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #bottomNav .bottom-nav-btn.active { background: rgba(34, 211, 238, .16) !important; }
+/* En-tête : boutons ronds assortis */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .global-search-trigger { background: var(--v2-card-2) !important; }
+/* Vignettes : même fond que les panneaux */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .relative.rounded-2xl.overflow-hidden,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main [id$="Grid"] > .group.relative.rounded-2xl.overflow-hidden { background: var(--v2-panel) !important; }
 }
 </style>
 </head>
@@ -6746,6 +6830,7 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [i
 <div id="collectionActionRow" class="flex items-center gap-2">
 <button id="collectionFilterToggle" type="button" onclick="toggleCollectionFilters()" aria-expanded="false" aria-controls="collectionFilterPanel" class="glass-pill px-3 py-2 rounded-xl text-[11px] font-semibold text-cyan-300 hover:text-white flex items-center gap-2 min-h-[42px]"><span class="icon-inline w-3.5 h-3.5" data-icon="filter"></span> Filtrer <span id="activeFilterCount" class="hidden bg-cyan-400/20 text-cyan-200 rounded-full px-1.5 py-0.5 text-[9px]"></span></button>
 <button id="bulkToggle" onclick="toggleBulkMode()" class="text-[11px] text-gray-400 hover:text-cyan-300 px-2 py-2 rounded-xl min-h-[42px]" aria-expanded="false" aria-controls="bulkToolbar">Sélectionner</button>
+<button id="incompleteQuickBtn" type="button" onclick="toggleIncompleteQuick()" aria-expanded="false" aria-controls="incompletePanel" class="incomplete-quick-btn hidden" title="Films à compléter"><span class="icon-inline w-3.5 h-3.5" data-icon="alert"></span><span>À compléter</span><span id="incompleteQuickCount" class="incomplete-quick-count">0</span></button>
 </div>
 <div id="collectionQuickChips" class="flex items-center gap-1.5 overflow-x-auto pb-0.5 md:pb-0 md:flex-1">
 <button type="button" onclick="setQuickFormatFilter('all')" data-quick-format="all" class="quick-chip is-active">Tous</button>
@@ -8232,6 +8317,29 @@ document.addEventListener('keydown', event => {
 function setUiV2Enabled(enabled) {
  try { localStorage.setItem('ui_v2', enabled ? '1' : '0'); } catch (_) {}
  document.documentElement.classList.toggle('ui-v2', enabled);
+ placeCollectionQuickChips();
+}
+
+// Interface v2 sur téléphone : les pastilles de format rejoignent le panneau « Filtrer ».
+const uiV2MobileQuery = window.matchMedia('(max-width: 767px)');
+function placeCollectionQuickChips() {
+ const chips = document.getElementById('collectionQuickChips');
+ const panel = document.getElementById('collectionFilterPanel');
+ const row = document.getElementById('collectionFilterRow');
+ if (!chips || !panel || !row) return;
+ const inPanel = document.documentElement.classList.contains('ui-v2') && uiV2MobileQuery.matches;
+ if (inPanel && chips.parentElement !== panel) panel.prepend(chips);
+ else if (!inPanel && chips.parentElement !== row) row.appendChild(chips);
+}
+uiV2MobileQuery.addEventListener?.('change', placeCollectionQuickChips);
+document.addEventListener('DOMContentLoaded', placeCollectionQuickChips);
+
+// Bouton « À compléter » à côté de Filtrer : ouvre ou ferme la liste des films incomplets.
+function toggleIncompleteQuick() {
+ const panel = document.getElementById('incompletePanel');
+ if (!panel) return;
+ panel.open = !panel.open;
+ document.getElementById('incompleteQuickBtn')?.setAttribute('aria-expanded', String(panel.open));
 }
 
 function setHapticsEnabled(enabled) {
@@ -12925,6 +13033,12 @@ const incomplete = collection.filter(movie => !isSeries(movie)).map(movie => ({m
 const panel = document.getElementById('incompletePanel');
 panel.classList.toggle('hidden', !incomplete.length || document.getElementById('tabCollection').classList.contains('hidden'));
 document.getElementById('incompleteCount').textContent = incomplete.length;
+const quickBtn = document.getElementById('incompleteQuickBtn');
+if (quickBtn) {
+ quickBtn.classList.toggle('hidden', !incomplete.length);
+ document.getElementById('incompleteQuickCount').textContent = incomplete.length;
+ quickBtn.setAttribute('aria-expanded', String(panel.open));
+}
 list.innerHTML = incomplete.length ? incomplete.map(({movie, reasons}) =>
   `<button type="button" data-movie-id="${escapeHtml(movie.id)}" class="incomplete-item text-left flex items-center gap-2.5 min-w-0 rounded-xl border border-white/10 bg-white/[0.035] p-2 hover:border-cyan-400/30">
     <img src="${safeImageUrl(hasDisplayedThumbnail(movie.poster) ? movie.poster : movie.editions?.find(ed => hasDisplayedThumbnail(ed.image))?.image)}" alt="" loading="lazy" class="w-10 h-[60px] object-cover rounded-md bg-black flex-shrink-0">

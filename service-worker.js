@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'bluraytheque-v14';
+const CACHE_VERSION = 'bluraytheque-v15';
 const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/apple-touch-icon.png'];
 
 self.addEventListener('install', event => {
