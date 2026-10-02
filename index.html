@@ -6411,6 +6411,22 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-teal-300, html:is(.
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-pink-100, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-pink-200 { color: var(--v2-pink) !important; }
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body main .text-cyan-100 { color: var(--v2-accent) !important; }
 
+/* Fiches : zone d'actions du bas sans le trait ni le dégradé de l'ancienne interface */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #modalContent [class*="detail-actions"] {
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #modalContent [class*="detail-actions"]::before,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #modalContent [class*="detail-actions"]::after { display: none !important; }
+
+/* Fiches : mêmes teintes que le reste de l'interface */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #detailModal .text-cyan-100, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #detailModal .text-cyan-200 { color: var(--v2-accent) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #detailModal .text-purple-200, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #detailModal .text-purple-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #detailModal .text-violet-300 { color: var(--v2-violet) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #detailModal .text-pink-200, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #detailModal .text-pink-300 { color: var(--v2-pink) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #detailModal .text-emerald-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #detailModal .text-emerald-400 { color: var(--v2-green) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #detailModal .text-amber-200, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #detailModal .text-amber-300 { color: var(--v2-orange) !important; }
+
 /* =========================== MISE EN PAGE DU TÉLÉPHONE =========================== */
 @media (max-width: 767px) {
 html.ui-v2:not(.is-ipad) { --mobile-page-title-top-gap: .35rem; }
