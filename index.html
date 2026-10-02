@@ -6377,6 +6377,165 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-widget
   font-weight: 600 !important;
   flex: none;
 }
+
+/* ======================= v2.1 : compact, panneaux bleutés, curseurs colorés ======================= */
+/* Fond bleu subtil des panneaux */
+html.ui-v2 {
+  --v2-card: #111827;
+  --v2-card-2: #1a2438;
+  --v2-panel: radial-gradient(130% 90% at 0% 0%, rgba(56, 132, 255, .16), transparent 60%),
+              linear-gradient(160deg, #14203a 0%, #0f1626 55%, #0c1220 100%);
+  --v2-hair: inset 0 0 0 1px rgba(120, 170, 255, .10);
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .glass-card,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .modern-panel,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .stat-tile,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabSettings .mobile-installation-toggle,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-hero,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-info,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .movie-detail-editions,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .series-detail-info,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #modalContent .series-detail-seasons {
+  background: var(--v2-panel) !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .glass-card .glass-card,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .modern-panel .glass-card { background: var(--v2-card-2) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #detailModal > div { background: #070b14 !important; }
+
+/* Curseurs de choix colorés (une couleur par option) */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar { background: rgba(120, 150, 200, .12) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option:nth-child(4n+1) { --c: 34, 211, 238;  --c-on: #04191d; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option:nth-child(4n+2) { --c: 139, 124, 255; --c-on: #ffffff; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option:nth-child(4n+3) { --c: 244, 114, 182; --c-on: #ffffff; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option:nth-child(4n)   { --c: 52, 211, 153;  --c-on: #04231a; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option { color: rgba(var(--c), .85) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option.is-active {
+  background: rgb(var(--c)) !important;
+  color: var(--c-on) !important;
+  box-shadow: 0 6px 16px -6px rgba(var(--c), .75) !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .choice-bar > .choice-option.is-active .bg-pink-500 { background: rgba(255, 255, 255, .9) !important; color: #be185d !important; }
+
+/* Pastilles de filtre colorées */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip { --c: 34, 211, 238; --c-on: #04191d; color: rgb(var(--c)) !important; background: rgba(var(--c), .12) !important; box-shadow: inset 0 0 0 1px rgba(var(--c), .18) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip[data-quick-format="4K UHD"] { --c: 139, 124, 255; --c-on: #ffffff; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip[data-quick-format="Blu-ray 1080p"] { --c: 90, 165, 255; --c-on: #ffffff; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip[data-quick-format="DVD"] { --c: 255, 169, 77; --c-on: #2a1600; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip.quick-chip-saga { --c: 52, 211, 153; --c-on: #04231a; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip.is-active,
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .quick-chip[aria-pressed="true"] {
+  background: rgb(var(--c)) !important;
+  color: var(--c-on) !important;
+  box-shadow: 0 6px 16px -6px rgba(var(--c), .75) !important;
+}
+/* Boutons verre colorés selon leur texte */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-cyan-300 { background: rgba(34, 211, 238, .14) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-purple-300, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-purple-200 { background: rgba(139, 124, 255, .16) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) main button.glass-pill.text-pink-300 { background: rgba(244, 114, 182, .14) !important; }
+
+/* ---------- Accueil compact ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeMobileHero h2, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .mobile-section-hero h2 { font-size: 26px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .mobile-section-hero { margin-bottom: .8rem !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome { row-gap: 14px; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome > .home-widget { margin-bottom: 0 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome .glass-card.home-widget { padding: 12px !important; border-radius: 18px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome .home-widget h2, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome .home-widget h3 { font-size: 15px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome .home-widget-panel > .flex:first-child h2 { font-size: 16px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome .home-widget-panel > .flex:first-child { margin-bottom: 8px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome .home-widget p.text-\[10px\], html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome .home-widget p.text-\[9px\] { font-size: 11.5px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome .icon-chip:not(.chip-lg) { width: 28px !important; height: 28px !important; border-radius: 9px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome .icon-chip:not(.chip-lg) svg { width: 15px !important; height: 15px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome .home-widget > .flex:first-child > button:last-child:not(.app-action),
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabHome .home-widget > .flex:first-child > span:last-child:not(.icon-chip) { font-size: 11.5px !important; padding: 4px 10px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #searchInput { min-height: 42px; font-size: 15px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #searchSection .app-action { min-height: 42px; font-size: 14px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #searchSection .app-action:has(> .icon-chip) { min-height: 46px; font-size: 15px !important; padding: 5px 5px 5px 18px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #searchSection .app-action .icon-chip { width: 34px !important; height: 34px !important; }
+
+/* Tableau de bord : 4 pastilles compactes, icône à gauche */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 8px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard > div {
+  display: grid !important;
+  grid-template-columns: 30px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: 10px;
+  align-items: center;
+  padding: 9px 11px !important;
+  border-radius: 16px !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard > div::before {
+  grid-row: 1 / span 2;
+  width: 30px !important; height: 30px !important;
+  margin: 0 !important;
+  -webkit-mask-size: 15px, auto !important;
+  mask-size: 15px, auto !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard > div > p:first-child { font-size: 11.5px !important; line-height: 1.2 !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeDashboard > div > p + p { font-size: 17px !important; line-height: 1.15 !important; margin-top: 0 !important; }
+
+/* Vignettes de l'accueil plus petites, en carrousel */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #recentGrid > * { width: 104px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #recentGrid > .relative.rounded-2xl.overflow-hidden { border-radius: 16px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #recentGrid > .relative.rounded-2xl.overflow-hidden > img { border-radius: 16px 16px 0 0 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #recentGrid > .relative.rounded-2xl.overflow-hidden > .absolute.bottom-0:not(.pointer-events-none) { padding: 7px 8px 9px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #recentGrid h4 { font-size: 12px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #recentGrid .absolute.bottom-0 > p { font-size: 10px !important; padding: 3px 7px !important; margin-top: 5px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeTopRatedGrid, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeWishlistFocusGrid {
+  display: flex !important;
+  gap: 10px !important;
+  overflow-x: auto;
+  margin: 0 -18px;
+  padding: 2px 18px 6px;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 0 18px;
+  scrollbar-width: none;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeTopRatedGrid::-webkit-scrollbar, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeWishlistFocusGrid::-webkit-scrollbar { display: none; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeTopRatedGrid > .home-media-card, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeWishlistFocusGrid > .home-media-card {
+  flex: none; width: 104px !important; scroll-snap-align: start;
+  border-radius: 16px !important; border: 0 !important;
+  box-shadow: var(--v2-hair), var(--v2-lift) !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-media-copy strong { font-size: 12px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-media-copy small { font-size: 10.5px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-watch-next-row strong { font-size: 13px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-watch-next-row small { font-size: 11px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) .home-watch-next-row img { border-radius: 8px !important; }
+
+/* ---------- Statistiques compactes ---------- */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats .modern-panel { padding: 12px !important; border-radius: 18px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats .modern-panel h2, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats .modern-panel h3 { font-size: 15px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats .modern-panel > .flex:first-child p { font-size: 11.5px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats .icon-chip { width: 28px !important; height: 28px !important; border-radius: 9px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats .icon-chip svg { width: 15px !important; height: 15px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats .modern-panel p.uppercase { font-size: 11px !important; margin: 4px 2px 6px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] { gap: 8px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl {
+  flex-direction: row !important;
+  align-items: baseline !important;
+  justify-content: space-between !important;
+  gap: 6px;
+  padding: 9px 11px !important;
+  border-radius: 14px !important;
+  min-height: 0 !important;
+}
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl > p { width: auto !important; margin: 0 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl > p:first-child { font-size: 11.5px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl > p + p { font-size: 16px !important; flex: none; text-align: right !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats .choice-option { min-height: 34px !important; font-size: 13px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats { row-gap: 0 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats > * + * { margin-top: .75rem !important; }
+
+/* Calendrier de l'accueil compact */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeCalendarGrid { gap: 3px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeCalendarGrid > button, html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeCalendarGrid > div { aspect-ratio: auto !important; height: 34px !important; min-height: 0 !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeCalendarGrid > button { border-radius: 10px !important; font-size: 12px !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeCalendarGrid > button.border { background: var(--v2-accent-soft) !important; border-color: transparent !important; font-weight: 700; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeCalendarLayout { row-gap: 8px; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #homeCalendarLayout > * + * { margin-top: 8px !important; }
+/* Stats : libellés sur deux lignes plutôt que tronqués */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl { align-items: center !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body:not(.theme-light) #tabStats [id$="Grid"] > div.rounded-xl > p:first-child { white-space: normal !important; line-height: 1.2 !important; }
 }
 </style>
 </head>
