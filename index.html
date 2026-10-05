@@ -6434,7 +6434,11 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #detailModal .edition-more-det
 @media (max-width: 767px) {
 html.ui-v2:not(.is-ipad) { --mobile-page-title-top-gap: .35rem; }
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body { padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body > main { padding: 6px 18px 0 !important; background: radial-gradient(120% 300px at 50% -60px, var(--v2-glow), transparent 70%) no-repeat; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body > main {
+  /* Marge basse : le dernier élément reste visible au-dessus de la barre de navigation flottante. */
+  padding: 6px 18px calc(var(--mobile-nav-height, calc(96px + env(safe-area-inset-bottom))) + 1.5rem) !important;
+  scroll-padding-bottom: calc(var(--mobile-nav-height, calc(96px + env(safe-area-inset-bottom))) + 1.5rem);
+  background: radial-gradient(120% 300px at 50% -60px, var(--v2-glow), transparent 70%) no-repeat; }
 
 /* En-tête */
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body > header.glass-card {
