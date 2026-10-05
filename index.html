@@ -14628,7 +14628,8 @@ function applyBlurayEdition(edition, data) {
  const exact = data.match === 'barcode';
  edition.blurayUrl = data.url;
  edition.blurayAutoMatch = data.match;
- if (exact || !edition.image) edition.image = data.image || edition.image || '';
+ // Une jaquette déjà présente n'est jamais remplacée.
+ if (!edition.image && data.image) edition.image = data.image;
  if (exact && data.title && (!edition.title || /^(Édition Standard|Nouvelle édition|Nouvelle Édition)$/i.test(edition.title))) edition.title = data.title;
  edition.videoCodec = edition.videoCodec || data.videoCodec || '';
  if (!edition.audioTracks) edition.audioTracks = (data.audioTracks || []).join(' · ');
@@ -14657,6 +14658,8 @@ async function autoEnrichMovie(movie, { quiet = false } = {}) {
  if (!movie || !navigator.onLine || autoEnrichRunning.has(movie.id)) return false;
  autoEnrichRunning.add(movie.id);
  const before = JSON.stringify(movie);
+ // Éditions déjà illustrées : leur fiche est considérée comme correcte et n'est pas modifiée.
+ const alreadyIllustrated = new Set((movie.editions || []).filter(ed => String(ed.image || '').trim()).map(ed => ed.id));
  try {
   if (movie.tmdb_id && movie.tmdbExtrasVersion !== TMDB_EXTRAS_VERSION) {
    try {
@@ -14673,7 +14676,7 @@ async function autoEnrichMovie(movie, { quiet = false } = {}) {
   if (!movie.isWishlist) {
    for (const edition of movie.editions || []) {
     // Après plusieurs échecs d'affilée, Blu-ray.com est laissé tranquille jusqu'au prochain lancement.
-    if (edition.blurayUrl || edition.blurayAutoVersion === BLURAY_AUTO_VERSION || blurayAutoFailures >= 3) continue;
+    if (edition.blurayUrl || alreadyIllustrated.has(edition.id) || edition.blurayAutoVersion === BLURAY_AUTO_VERSION || blurayAutoFailures >= 3) continue;
     try {
      const data = await findBlurayEditionAuto(movie, edition);
      if (data) applyBlurayEdition(edition, data);
@@ -14703,7 +14706,7 @@ async function backfillCollectionInfo() {
  collectionBackfillStarted = true;
  const pending = [...collection, ...wishlist].filter(movie => movie.tmdb_id && (
   movie.tmdbExtrasVersion !== TMDB_EXTRAS_VERSION ||
-  (!movie.isWishlist && (movie.editions || []).some(ed => !ed.blurayUrl && ed.blurayAutoVersion !== BLURAY_AUTO_VERSION))
+  (!movie.isWishlist && (movie.editions || []).some(ed => !ed.blurayUrl && !String(ed.image || '').trim() && ed.blurayAutoVersion !== BLURAY_AUTO_VERSION))
  ));
  for (const movie of pending) {
   if (!navigator.onLine) break;
