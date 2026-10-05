@@ -6834,6 +6834,13 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #bottomNav .bott
 </div>
 
 <div>
+<label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Boîtier</label>
+<select id="filterCase" onchange="renderCollection()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
+<option class="bg-gray-900" value="all">Tous les boîtiers</option>
+</select>
+</div>
+
+<div class="col-span-2">
 <label class="block text-[9px] text-gray-400 font-bold uppercase mb-1">Statut Visionnage</label>
 <select id="filterSeen" onchange="renderCollection()" class="w-full glass-input text-white text-xs px-2 py-1.5 rounded-xl focus:outline-none">
 <option class="bg-gray-900" value="all">Tous (Vus + Non vus)</option>
@@ -8173,8 +8180,22 @@ function toggleMovieDetailEdit(button) {
  showToast(editing ? 'Mode modification activé' : 'Modifications enregistrées');
 }
 
+// Liste des boîtiers : types habituels + ceux réellement présents dans la collection.
+function syncCollectionCaseOptions() {
+ const select = document.getElementById('filterCase');
+ if (!select) return 'all';
+ const current = select.value || 'all';
+ const counts = new Map();
+ collection.forEach(movie => new Set((movie.editions || []).map(e => e.editionType || 'Amaray')).forEach(type => counts.set(type, (counts.get(type) || 0) + 1)));
+ const types = [...new Set(['Amaray', 'Steelbook', 'Digibook', 'Coffret Collector', ...counts.keys()])].filter(type => counts.has(type) || type === current);
+ const markup = `<option class="bg-gray-900" value="all">Tous les boîtiers</option>` + types.map(type => `<option class="bg-gray-900" value="${escapeHtml(type)}">${escapeHtml(type)} (${counts.get(type) || 0})</option>`).join('');
+ if (select.dataset.markup !== markup) { select.innerHTML = markup; select.dataset.markup = markup; }
+ select.value = types.includes(current) ? current : 'all';
+ return select.value;
+}
+
 function resetCollectionFilters() {
- const defaults = { filterMediaType:'all', filterFormat:'all', filterSeen:'all', sortSelect:'added_desc', filterText:'' };
+ const defaults = { filterMediaType:'all', filterFormat:'all', filterCase:'all', filterSeen:'all', sortSelect:'added_desc', filterText:'' };
  Object.entries(defaults).forEach(([id,value]) => { const el=document.getElementById(id); if(el) el.value=value; });
  renderCollection();
 }
@@ -11334,6 +11355,7 @@ let filtered = [...collection];
 const mediaTypeFilter = document.getElementById('filterMediaType')?.value || 'all';
 const formatFilter = document.getElementById('filterFormat').value;
 const seenFilter = document.getElementById('filterSeen').value;
+const caseFilter = syncCollectionCaseOptions();
 syncCollectionQuickChips(formatFilter);
 
 if (mediaTypeFilter === 'series') {
@@ -11343,13 +11365,17 @@ filtered = filtered.filter(m => !isSeries(m));
 }
 const sortVal = document.getElementById('sortSelect').value;
 const textFilter = document.getElementById('filterText').value.toLowerCase().trim();
-const activeFilterCount = [mediaTypeFilter !== 'all', formatFilter !== 'all', seenFilter !== 'all', !!textFilter, sortVal !== 'added_desc'].filter(Boolean).length;
+const activeFilterCount = [mediaTypeFilter !== 'all', formatFilter !== 'all', caseFilter !== 'all', seenFilter !== 'all', !!textFilter, sortVal !== 'added_desc'].filter(Boolean).length;
 const activeFilterBadge = document.getElementById('activeFilterCount');
 activeFilterBadge.textContent = activeFilterCount ? String(activeFilterCount) : '';
 activeFilterBadge.classList.toggle('hidden', !activeFilterCount);
 
 if (formatFilter !== 'all') {
 filtered = filtered.filter(m => m.editions && m.editions.some(e => e.format === formatFilter));
+}
+
+if (caseFilter !== 'all') {
+filtered = filtered.filter(m => (m.editions || []).some(e => (e.editionType || 'Amaray') === caseFilter));
 }
 
 if (seenFilter === 'seen') filtered = filtered.filter(m => m.seen);
