@@ -6561,6 +6561,26 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #bottomNav .bott
 }
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #bottomNav .bottom-nav-badge { top: 8px !important; right: calc(50% - 16px) !important; }
 }
+
+/* --- Actions rapides (appui long sur une vignette) --- */
+.quick-sheet{position:fixed;inset:0;z-index:90;display:flex;align-items:flex-end;justify-content:center;padding:0 .75rem calc(env(safe-area-inset-bottom) + .75rem);background:var(--v2-overlay,rgba(0,0,0,.55));-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);opacity:0;transition:opacity .18s ease}
+.quick-sheet.is-open{opacity:1}
+.quick-sheet-panel{width:100%;max-width:26rem;display:grid;gap:.6rem;transform:translateY(24px) scale(.98);transition:transform .26s cubic-bezier(.2,.9,.25,1)}
+.quick-sheet.is-open .quick-sheet-panel{transform:none}
+.quick-sheet-card{border-radius:var(--v2-radius,22px);background:var(--v2-card,#16181e);box-shadow:var(--v2-hair,inset 0 0 0 1px rgba(255,255,255,.075)),0 18px 40px -12px rgba(0,0,0,.6);overflow:hidden;color:var(--v2-text,#f2f2f7)}
+.quick-sheet-head{display:flex;align-items:center;gap:.8rem;padding:.85rem .95rem}
+.quick-sheet-head img{width:2.6rem;height:3.9rem;border-radius:.6rem;object-fit:cover;flex:none;background:#05070a}
+.quick-sheet-title{font-weight:800;font-size:.95rem;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.quick-sheet-sub{font-size:.72rem;color:var(--v2-muted,#98989f);margin-top:.2rem}
+.quick-sheet button{-webkit-appearance:none;appearance:none;margin:0;border:0;border-radius:0;background:transparent!important;box-shadow:none!important;font-family:inherit;cursor:pointer}
+.quick-sheet-action{display:flex;align-items:center;gap:.8rem;width:100%;padding:.85rem .95rem;font-size:.9rem;font-weight:600;text-align:left;color:inherit!important;border-top:1px solid rgba(var(--rgb-neutral,210,214,228),.1)!important}
+.quick-sheet-action .quick-sheet-ico{width:2rem;height:2rem;border-radius:999px;display:grid;place-items:center;flex:none;background:rgba(var(--qa,var(--rgb-accent,95,176,255)),var(--soft,.16));color:rgb(var(--qa,var(--rgb-accent,95,176,255)))}
+.quick-sheet-action .quick-sheet-ico .icon-inline{width:1rem;height:1rem}
+.quick-sheet-action small{display:block;font-size:.7rem;font-weight:500;color:var(--v2-muted,#98989f);margin-top:.1rem}
+.quick-sheet-action.is-danger{color:rgb(var(--rgb-red,255,154,154))!important}
+.quick-sheet-action.is-danger .quick-sheet-ico{--qa:var(--rgb-red,255,154,154)}
+.quick-sheet-cancel{width:100%;padding:.95rem;font-weight:800;font-size:.95rem;text-align:center;color:var(--v2-text,#f2f2f7)!important}
+@media (prefers-reduced-motion: reduce){.quick-sheet,.quick-sheet-panel{transition:none}}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -10851,6 +10871,7 @@ const totals = calculateMovieTotals(m);
 const card = document.createElement('div');
 card.className = 'relative rounded-2xl overflow-hidden cursor-pointer bg-black border border-white/10 hover:border-cyan-500/50 transition';
 card.onclick = () => openMovieDetail(m.id);
+card.dataset.quickMovie = m.id;
 card.innerHTML = `
 <img src="${safeImageUrl(m.poster)}" loading="lazy" decoding="async" class="w-full aspect-[2/3] object-cover">
 <div class="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none"></div>
@@ -11129,6 +11150,7 @@ list.forEach(m => {
 const totals = calculateMovieTotals(m);
 const card = document.createElement('div');
 card.onclick = () => bulkMode ? toggleBulkMovie(m.id) : openMovieDetail(m.id);
+card.dataset.quickMovie = m.id;
 card.setAttribute('role', 'button');
 card.tabIndex = 0;
 card.setAttribute('aria-label', bulkMode ? `Sélectionner ${m.title}` : `Ouvrir ${m.title}`);
@@ -11685,6 +11707,7 @@ filtered.forEach(m => {
 const totals = calculateMovieTotals(m);
 const card = document.createElement('div');
 card.onclick = () => openMovieDetail(m.id);
+card.dataset.quickMovie = m.id;
 
 const priceLabel = totals.totalPurchase > 0 ? `${totals.totalPurchase.toFixed(2)} €` : 'Wishlist';
 
@@ -14333,6 +14356,161 @@ if ('serviceWorker' in navigator) {
   }
   event.preventDefault();
  }, { passive: false, capture: true });
+})();
+</script>
+<script>
+// --- Actions rapides : appui long sur une vignette de film ou de série ---------
+(() => {
+ const LONG_PRESS_MS = 450;
+ const findMovieById = id => collection.find(m => String(m.id) === String(id)) || wishlist.find(m => String(m.id) === String(id)) || null;
+ const refreshMovieViews = () => preserveAppScroll(() => { renderCollection(); renderWishlist(); renderHomeRecent(); renderIncompletePanel(); });
+ const todayStart = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
+ const nextEpisode = series => seriesEpisodes(series).find(e => Number(e.season_number) > 0 && Number(e.episode_number) > 0 && !e.watched && e.air_date && new Date(e.air_date) <= todayStart()) || null;
+ const episodeLabel = e => `S${String(e.season_number).padStart(2, '0')}E${String(e.episode_number).padStart(2, '0')}`;
+
+ // Retrouve le film ou la série derrière l'élément touché.
+ const resolveTarget = el => {
+  const card = el.closest?.('[data-quick-movie], [data-quick-series], [onclick*="openMovieDetail"], [onclick*="openTrackedSeriesDetail"]');
+  if (!card || card.closest('#detailModal, .quick-sheet, #globalSearchModal')) return null;
+  if (card.dataset.quickMovie) return { type: 'movie', id: card.dataset.quickMovie, card };
+  if (card.dataset.quickSeries) return { type: 'series', id: card.dataset.quickSeries, card };
+  const code = card.getAttribute('onclick') || '';
+  let match = code.match(/openMovieDetail\(\s*['"]?([^'")]+)['"]?\s*\)/);
+  if (match) return { type: 'movie', id: match[1], card };
+  match = code.match(/openTrackedSeriesDetail\(\s*(?:Number\()?\s*['"]?(\d+)/);
+  if (match) return { type: 'series', id: match[1], card };
+  return null;
+ };
+
+ // Mise à jour rapide d'un film, sans ouvrir sa fiche (annulée si le cloud refuse).
+ async function quickUpdateMovie(movie, changes, message) {
+  const previous = {};
+  Object.keys(changes).forEach(key => { previous[key] = movie[key]; });
+  Object.assign(movie, changes);
+  refreshMovieViews();
+  appHaptic('success');
+  const result = await updateMovieInCloud(movie);
+  if (!result.success) { Object.assign(movie, previous); refreshMovieViews(); showToast('⚠️ Modification non enregistrée.'); return; }
+  showToast(message);
+ }
+
+ const shareItem = async (title, url) => {
+  try { await navigator.share({ title, text: title, url }); } catch (_) {}
+ };
+
+ function buildActions(target) {
+  if (target.type === 'movie') {
+   const movie = findMovieById(target.id);
+   if (!movie) return null;
+   const isWish = wishlist.includes(movie);
+   const seenLabel = movie.seen ? 'Marquer comme non vu' : 'Marquer comme vu';
+   const actions = [
+    { icon: 'book', label: 'Ouvrir la fiche', run: () => openMovieDetail(movie.id) },
+    { icon: 'eye', rgb: '--rgb-green', label: seenLabel, run: () => quickUpdateMovie(movie, { seen: !movie.seen }, movie.seen ? 'Marqué comme non vu.' : 'Marqué comme vu 👀') }
+   ];
+   if (isWish) {
+    actions.push({ icon: 'check', rgb: '--rgb-accent', label: 'Je l’ai acheté', hint: 'Transférer dans la collection', run: () => moveWishlistToCollection(movie.id) });
+    actions.push({ icon: 'package', rgb: '--rgb-pink', label: movie.preordered ? 'Annuler la précommande' : 'Marquer comme précommandé',
+     run: () => quickUpdateMovie(movie, { preordered: !movie.preordered, preorderLocation: movie.preorderLocation || (!movie.preordered ? 'Fnac' : movie.preorderLocation) }, movie.preordered ? 'Précommande retirée.' : 'Précommande enregistrée 📦') });
+   }
+   if (navigator.share && movie.tmdb_id) {
+    actions.push({ icon: 'upload', rgb: '--rgb-neutral', label: 'Partager', run: () => shareItem(movie.title, `https://www.themoviedb.org/${isSeries(movie) ? 'tv' : 'movie'}/${movie.tmdb_id}`) });
+   }
+   actions.push({ icon: 'trash', danger: true, label: isWish ? 'Retirer de la wishlist' : 'Supprimer de la collection', run: () => deleteMovie(movie.id) });
+   const year = String(movie.release_date || movie.year || '').slice(0, 4);
+   const sub = [isWish ? 'Wishlist' : 'Collection', year, movie.seen ? 'Vu' : ''].filter(Boolean).join(' · ');
+   return { title: movie.title, sub, poster: movie.poster, actions };
+  }
+  const series = getTrackedSeries(target.id);
+  if (!series) return null;
+  const next = nextEpisode(series);
+  const progress = seriesProgress(series);
+  const actions = [{ icon: 'book', label: 'Ouvrir la fiche', run: () => openTrackedSeriesDetail(Number(series.tmdb_id)) }];
+  if (next) actions.push({ icon: 'check', rgb: '--rgb-green', label: `Marquer ${episodeLabel(next)} comme vu`, hint: next.name || 'Prochain épisode',
+   run: async () => { await toggleTrackedEpisode(series.tmdb_id, next.season_number, next.episode_number); appHaptic('success'); preserveAppScroll(() => renderHomeRecent()); showToast(`${episodeLabel(next)} vu ✅`); } });
+  if (navigator.share) actions.push({ icon: 'upload', rgb: '--rgb-neutral', label: 'Partager', run: () => shareItem(series.title, `https://www.themoviedb.org/tv/${series.tmdb_id}`) });
+  actions.push({ icon: 'trash', danger: true, label: 'Arrêter le suivi', run: () => removeTrackedSeries(series.tmdb_id) });
+  return { title: series.title, sub: `Série · ${progress.watched}/${progress.total} épisodes vus`, poster: series.poster, actions };
+ }
+
+ let sheet = null;
+ function closeQuickSheet() {
+  if (!sheet) return;
+  const el = sheet; sheet = null;
+  el.classList.remove('is-open');
+  setTimeout(() => el.remove(), 200);
+ }
+
+ function openQuickSheet(target) {
+  const data = buildActions(target);
+  if (!data) return false;
+  closeQuickSheet();
+  appHaptic('light');
+  const el = document.createElement('div');
+  el.className = 'quick-sheet';
+  el.setAttribute('role', 'dialog');
+  el.setAttribute('aria-modal', 'true');
+  el.setAttribute('aria-label', `Actions rapides : ${data.title || ''}`);
+  el.innerHTML = `<div class="quick-sheet-panel">
+   <div class="quick-sheet-card">
+    <div class="quick-sheet-head"><img src="${safeImageUrl(data.poster)}" alt=""><div class="min-w-0"><p class="quick-sheet-title">${escapeHtml(data.title || '')}</p><p class="quick-sheet-sub">${escapeHtml(data.sub || '')}</p></div></div>
+    ${data.actions.map((a, i) => `<button type="button" class="quick-sheet-action${a.danger ? ' is-danger' : ''}" data-index="${i}"${a.rgb ? ` style="--qa:var(${a.rgb})"` : ''}><span class="quick-sheet-ico">${ic(a.icon)}</span><span class="min-w-0">${escapeHtml(a.label)}${a.hint ? `<small>${escapeHtml(a.hint)}</small>` : ''}</span></button>`).join('')}
+   </div>
+   <div class="quick-sheet-card"><button type="button" class="quick-sheet-cancel">Annuler</button></div>
+  </div>`;
+  el.addEventListener('click', event => {
+   const button = event.target.closest('.quick-sheet-action');
+   if (button) { const action = data.actions[Number(button.dataset.index)]; closeQuickSheet(); action?.run(); return; }
+   if (event.target.closest('.quick-sheet-cancel') || !event.target.closest('.quick-sheet-card')) closeQuickSheet();
+  });
+  document.body.appendChild(el);
+  sheet = el;
+  requestAnimationFrame(() => el.classList.add('is-open'));
+  return true;
+ }
+ window.closeQuickSheet = closeQuickSheet;
+ document.addEventListener('keydown', event => { if (event.key === 'Escape') closeQuickSheet(); });
+
+ // Détection de l'appui long (doigt) et du clic droit (souris).
+ let timer = null, startX = 0, startY = 0, suppressClickUntil = 0, longPressActive = false;
+ const cancel = () => { clearTimeout(timer); timer = null; };
+ document.addEventListener('pointerdown', event => {
+  cancel();
+  if (event.pointerType === 'mouse' || !event.isPrimary || (typeof bulkMode !== 'undefined' && bulkMode)) return;
+  const target = resolveTarget(event.target);
+  if (!target) return;
+  startX = event.clientX; startY = event.clientY;
+  timer = setTimeout(() => {
+   timer = null;
+   if (openQuickSheet(target)) longPressActive = true;
+  }, LONG_PRESS_MS);
+ }, { passive: true });
+ document.addEventListener('pointermove', event => {
+  if (timer && Math.hypot(event.clientX - startX, event.clientY - startY) > 10) cancel();
+ }, { passive: true });
+ ['pointerup', 'pointercancel'].forEach(type => document.addEventListener(type, () => {
+  cancel();
+  // Le clic qui suit le lever du doigt appartient à l'appui long : on l'ignore.
+  if (longPressActive) { longPressActive = false; suppressClickUntil = Date.now() + 400; }
+ }, { passive: true }));
+ document.addEventListener('scroll', cancel, { passive: true, capture: true });
+ // Le toucher qui a ouvert le menu ne doit pas aussi ouvrir la fiche.
+ document.addEventListener('click', event => {
+  if (Date.now() < suppressClickUntil) {
+   event.preventDefault();
+   event.stopImmediatePropagation();
+   suppressClickUntil = 0;
+  }
+ }, { capture: true });
+ document.addEventListener('contextmenu', event => {
+  const target = resolveTarget(event.target);
+  if (!target) return;
+  event.preventDefault();
+  if (sheet) return;
+  const fromTouch = !!timer || event.pointerType === 'touch';
+  cancel();
+  if (openQuickSheet(target) && fromTouch) longPressActive = true;
+ });
 })();
 </script>
 </body>
