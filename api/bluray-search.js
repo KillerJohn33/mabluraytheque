@@ -38,7 +38,7 @@ async function fetchHtml(url, timeoutMs = 6000) {
 // Liens de fiches d'édition présents dans une page de résultats.
 function editionLinks(html) {
   const links = new Set();
-  const pattern = /href="((?:https?:\/\/www\.blu-ray\.com)?\/movies\/[A-Za-z0-9%-]+\/\d+\/?)"/gi;
+  const pattern = /href="((?:https?:\/\/www\.blu-ray\.com)?\/(?:movies|dvd)\/[A-Za-z0-9%._-]+\/\d+\/?)"/gi;
   let match;
   while ((match = pattern.exec(html))) {
     const path = match[1].replace(/^https?:\/\/www\.blu-ray\.com/i, '');
@@ -47,8 +47,8 @@ function editionLinks(html) {
   return [...links];
 }
 
-function searchUrl(keyword, country) {
-  const params = new URLSearchParams({ quicksearch: '1', quicksearch_country: country, quicksearch_keyword: keyword, section: 'bluraymovies' });
+function searchUrl(keyword, country, dvd = false) {
+  const params = new URLSearchParams({ quicksearch: '1', quicksearch_country: country, quicksearch_keyword: keyword, section: dvd ? 'dvdmovies' : 'bluraymovies' });
   return `${SITE}/search/?${params}`;
 }
 
@@ -68,10 +68,10 @@ function barcodeVariants(code) {
   return [...variants].filter(v => v.length >= 8);
 }
 
-async function searchByCode(code) {
+async function searchByCode(code, dvd = false) {
   const variants = barcodeVariants(code);
   if (!variants.length) return null;
-  const links = editionLinks(await fetchHtml(searchUrl(variants[0], 'all'))).slice(0, 4);
+  const links = editionLinks(await fetchHtml(searchUrl(variants[0], 'all', dvd))).slice(0, 4);
   const pages = await Promise.all(links.map(loadEdition));
   const found = pages.find(page => page && variants.some(v => page.html.includes(v)));
   return found ? { ...found.edition, match: 'barcode' } : null;
@@ -79,9 +79,9 @@ async function searchByCode(code) {
 
 const normalize = value => String(value || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 
-async function searchByTitle(titles, year, wants4k) {
+async function searchByTitle(titles, year, wants4k, dvd = false) {
   for (const title of titles) {
-    const links = editionLinks(await fetchHtml(searchUrl(title, 'FR')));
+    const links = editionLinks(await fetchHtml(searchUrl(title, 'FR', dvd))).filter(link => dvd === /\/dvd\//i.test(link));
     if (!links.length) continue;
     // Préférer le format demandé (4K ou Blu-ray classique) d'après l'adresse de la fiche.
     const ranked = links.slice(0, 8).sort((a, b) => Number(/4k/i.test(b) === wants4k) - Number(/4k/i.test(a) === wants4k)).slice(0, 3);
@@ -107,13 +107,14 @@ export default async function handler(req, res) {
     if (mode === 'code') {
       const code = String(req.query.code || '').replace(/\D/g, '');
       if (!/^\d{8,14}$/.test(code)) return res.status(400).json({ error: 'Invalid barcode' });
-      edition = await searchByCode(code);
+      edition = await searchByCode(code, String(req.query.format || '') === 'dvd');
     } else if (mode === 'title') {
       const titles = [req.query.title, req.query.originalTitle].map(t => String(t || '').trim().slice(0, 120)).filter(Boolean);
       const unique = [...new Set(titles)];
       if (!unique.length) return res.status(400).json({ error: 'Missing title' });
       const year = /^\d{4}$/.test(String(req.query.year || '')) ? String(req.query.year) : '';
-      edition = await searchByTitle(unique, year, String(req.query.format || '') === '4k');
+      const format = String(req.query.format || '');
+      edition = await searchByTitle(unique, year, format === '4k', format === 'dvd');
     } else {
       return res.status(400).json({ error: 'Invalid mode' });
     }

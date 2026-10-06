@@ -36,14 +36,17 @@ function lines(html) {
 function parseEdition(html, url, id) {
   const title = decode((html.match(/<meta\s+property="og:title"\s+content="([^"]*)"/i) || [])[1]
     || (html.match(/<title>([\s\S]*?)<\/title>/i) || [])[1]);
-  const cover = (html.match(/<meta\s+property="og:image"\s+content="(https:\/\/images\.static-bluray\.com\/movies\/covers\/[^"?]+)"/i) || [])[1] || '';
+  // Jaquette : covers (Blu-ray) ou dvdcovers (DVD), sinon toute image og:image du site.
+  const cover = (html.match(/<meta\s+property="og:image"\s+content="(https:\/\/images\.static-bluray\.com\/movies\/[a-z]*covers\/[^"?]+)"/i) || [])[1]
+    || (html.match(/<meta\s+property="og:image"\s+content="(https:\/\/images\.static-bluray\.com\/[^"?]+)"/i) || [])[1] || '';
   const video = lines(section(html, 'Video', 'Audio')).filter(v => !/^Video$/i.test(v));
   const audioSection = section(html, 'Audio', 'Subtitles');
   const shortAudio = (audioSection.match(/<div\s+id="shortaudio"[^>]*>([\s\S]*?)<\/div>/i) || [])[1] || '';
-  const audio = [...new Set(lines(shortAudio))];
+  // Certaines fiches (DVD notamment) n'ont pas de bloc « shortaudio » : on lit la section entière.
+  const audio = [...new Set(lines(shortAudio || audioSection).filter(v => !/^Audio$/i.test(v)))];
   const subsSection = section(html, 'Subtitles', 'Discs');
   const shortSubs = (subsSection.match(/<div\s+id="shortsubs"[^>]*>([\s\S]*?)<\/div>/i) || [])[1] || '';
-  const subtitles = decode(shortSubs).split(/,\s*/).filter(Boolean);
+  const subtitles = (shortSubs ? decode(shortSubs).split(/,\s*/) : lines(subsSection).filter(v => !/^Subtitles$/i.test(v)).join(', ').split(/,\s*/)).map(v => v.trim()).filter(Boolean);
   const packaging = lines(section(html, 'Packaging', 'Playback')).find(v => !/^Packaging$/i.test(v)) || '';
   const codec = video.find(v => /^Codec:/i.test(v))?.replace(/^Codec:\s*/i, '') || '';
   if (!title || (!video.length && !audio.length && !subtitles.length)) return null;
@@ -56,7 +59,7 @@ export default async function handler(req, res) {
   let target;
   try {
     target = new URL(String(req.query.url || ''));
-    if (target.origin !== SITE || !/^\/movies\/[a-z0-9-]+\/\d+\/?$/i.test(target.pathname)) throw new Error('Invalid URL');
+    if (target.origin !== SITE || !/^\/(movies|dvd)\/[a-z0-9%._-]+\/\d+\/?$/i.test(target.pathname)) throw new Error('Invalid URL');
   } catch (_) { return res.status(400).json({ error: 'Invalid Blu-ray.com edition URL' }); }
   const id = target.pathname.match(/\/(\d+)\/?$/)[1];
   const controller = new AbortController();

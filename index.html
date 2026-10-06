@@ -12418,7 +12418,7 @@ async function attachBlurayBoxSet(movieId, index) {
  if (!edition || !input) return;
  const pasted = input.value.trim();
  if (!pasted) { input.focus(); return showToast('Collez d’abord le lien Blu-ray.com du coffret.'); }
- const found = pasted.match(/https?:\/\/(?:www\.)?blu-ray\.com\/movies\/[a-z0-9%-]+\/\d+\/?/i);
+ const found = pasted.match(/https?:\/\/(?:www\.)?blu-ray\.com\/(?:movies|dvd)\/[a-z0-9%._-]+\/\d+\/?/i);
  if (!found) { input.focus(); return showToast('Le lien du coffret Blu-ray.com est invalide.'); }
  const parsed = new URL(found[0]);
  const url = `https://www.blu-ray.com${parsed.pathname}`;
@@ -12462,8 +12462,8 @@ async function attachBlurayEdition(movieId, index) {
  if (!edition || !input) return;
  const pasted = input.value.trim();
  if (!pasted) { input.focus(); return showToast('Collez d’abord le lien de l’édition Blu-ray.com dans le champ au-dessus.'); }
- const found = pasted.match(/https?:\/\/(?:www\.)?blu-ray\.com\/movies\/[a-z0-9%-]+\/\d+\/?/i);
- if (!found) { input.focus(); return showToast('Il faut le lien complet d’une édition Blu-ray.com, pas seulement le titre du film.'); }
+ const found = pasted.match(/https?:\/\/(?:www\.)?blu-ray\.com\/(?:movies|dvd)\/[a-z0-9%._-]+\/\d+\/?/i);
+ if (!found) { input.focus(); return showToast('Il faut le lien complet d’une fiche Blu-ray.com (Blu-ray ou DVD), pas seulement le titre du film.'); }
  const parsed = new URL(found[0]);
  const url = `https://www.blu-ray.com${parsed.pathname}`;
  input.value = url;
@@ -12481,7 +12481,7 @@ async function attachBlurayEdition(movieId, index) {
    audioTracks: (data.audioTracks || []).join(' · '),
    subtitles: (data.subtitles || []).join(', '),
    editionType: /steelbook/i.test(data.packaging) ? 'Steelbook' : edition.editionType,
-   format: /4K/i.test(data.title) ? '4K UHD' : edition.format
+   format: /\/dvd\//i.test(data.url || url) ? 'DVD' : (/4K/i.test(data.title) ? '4K UHD' : edition.format)
   });
   if (!edition.discCompositionManual) edition.discComposition = inferDiscComposition([data.title, data.packaging].filter(Boolean).join(' '), edition.format);
   const result = await updateMovieInCloud(movie);
@@ -12684,7 +12684,7 @@ ${editionTechDesktopQuery.matches ? '' : '<details class="edition-more-details r
 <div>
 <div class="flex items-center justify-between gap-2">
 <label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">Édition Blu-ray.com</label>
-<a href="https://www.blu-ray.com/search/?quicksearch=1&amp;quicksearch_country=all&amp;quicksearch_keyword=${encodeURIComponent(movie.title)}&amp;section=bluraymovies" target="_blank" rel="noopener noreferrer" class="text-[9px] text-cyan-300 hover:text-white">Chercher une édition ↗</a>
+<a href="https://www.blu-ray.com/search/?quicksearch=1&amp;quicksearch_country=all&amp;quicksearch_keyword=${encodeURIComponent(movie.title)}&amp;section=${ed.format === 'DVD' ? 'dvdmovies' : 'bluraymovies'}" target="_blank" rel="noopener noreferrer" class="text-[9px] text-cyan-300 hover:text-white">Chercher une édition ↗</a>
 </div>
 <div class="flex gap-2"><input id="blurayUrl-${idx}" type="text" inputmode="url" value="${escapeHtml(ed.blurayUrl || '')}" placeholder="Lien de l’édition exacte" class="flex-1 min-w-0 glass-input text-white text-[10px] px-2.5 py-2 rounded-xl"><button id="blurayLoad-${idx}" onclick="attachBlurayEdition(${movieIdArg}, ${idx})" class="detail-edit-only app-action app-action-cyan px-3 text-[10px]">Importer</button></div>
 </div>
@@ -14642,11 +14642,11 @@ async function findBlurayEditionAuto(movie, edition) {
   return response.json();
  };
  if (/^\d{8,14}$/.test(barcode)) {
-  const byCode = await call({ mode: 'code', code: barcode });
+  const byCode = await call({ mode: 'code', code: barcode, format: edition.format === 'DVD' ? 'dvd' : '' });
   if (byCode.found) return byCode;
  }
  const year = String(movie.releaseDate || '').slice(0, 4);
- const byTitle = await call({ mode: 'title', title: movie.title || '', originalTitle: movie.originalTitle || '', year, format: /4k/i.test(edition.format || '') ? '4k' : '' });
+ const byTitle = await call({ mode: 'title', title: movie.title || '', originalTitle: movie.originalTitle || '', year, format: /4k/i.test(edition.format || '') ? '4k' : (edition.format === 'DVD' ? 'dvd' : '') });
  return byTitle.found ? byTitle : null;
 }
 
@@ -14661,7 +14661,8 @@ function applyBlurayEdition(edition, data) {
  if (!edition.audioTracks) edition.audioTracks = (data.audioTracks || []).join(' · ');
  if (!edition.subtitles) edition.subtitles = (data.subtitles || []).join(', ');
  if (/steelbook/i.test(data.packaging || '') && edition.editionType === 'Amaray') edition.editionType = 'Steelbook';
- if (/\b4K\b/i.test(data.title || '') && edition.format === 'Blu-ray 1080p') edition.format = '4K UHD';
+ if (/\/dvd\//i.test(data.url || '')) edition.format = 'DVD';
+ else if (/\b4K\b/i.test(data.title || '') && edition.format === 'Blu-ray 1080p') edition.format = '4K UHD';
  if (!edition.discCompositionManual) edition.discComposition = inferDiscComposition([data.title, data.packaging].filter(Boolean).join(' '), edition.format);
 }
 
