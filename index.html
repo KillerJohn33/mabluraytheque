@@ -6586,6 +6586,20 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #bottomNav .bott
 .quick-sheet-cancel{width:100%;padding:.95rem;font-weight:800;font-size:.95rem;text-align:center;color:var(--v2-text,#f2f2f7)!important}
 @media (prefers-reduced-motion: reduce){.quick-sheet,.quick-sheet-panel{transition:none}}
 </style>
+<style>
+#brAuthGate { position: fixed; inset: 0; z-index: 99999; display: grid; place-items: center; padding: 24px;
+ background: radial-gradient(120% 80% at 50% 0%, #1e293b, #020617); color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+.br-auth-card { width: 100%; max-width: 360px; text-align: center; }
+.br-auth-logo { font-size: 46px; margin-bottom: 6px; }
+.br-auth-card h1 { font-size: 26px; font-weight: 800; margin: 0 0 6px; }
+.br-auth-sub { color: #94a3b8; font-size: 14px; margin: 0 0 20px; }
+#brAuthForm { display: grid; gap: 10px; }
+#brAuthForm input { width: 100%; box-sizing: border-box; padding: 13px 14px; border-radius: 12px; border: 1px solid #334155; background: #0f172a; color: #f8fafc; font-size: 16px; }
+#brAuthForm button { padding: 13px; border: 0; border-radius: 12px; font-weight: 700; font-size: 16px; color: #fff; background: linear-gradient(135deg, #06b6d4, #2563eb); cursor: pointer; }
+#brAuthForm button:disabled { opacity: .6; }
+.br-auth-msg { min-height: 20px; color: #fbbf24; font-size: 13px; margin: 12px 0 4px; }
+.br-auth-link { display: block; margin: 8px auto 0; background: none; border: 0; color: #67e8f9; font-size: 14px; cursor: pointer; }
+</style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
 
@@ -7554,6 +7568,9 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #bottomNav .bott
 <button onclick="saveApiKeysFromSettings()" class="app-action app-action-cyan w-full px-3 py-2 text-xs">
 <span class="icon-inline w-3.5 h-3.5" data-icon="check"></span><span>Enregistrer la configuration</span>
 </button>
+<button onclick="brLogout()" class="app-action w-full px-3 py-2 text-xs" style="margin-top:6px">
+<span>Se déconnecter</span>
+</button>
 </div>
 </div>
 
@@ -7862,6 +7879,69 @@ let SUPABASE_URL = localStorage.getItem('supa_url') || 'https://vshugonvufhubjwj
 let SUPABASE_KEY = localStorage.getItem('supa_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzaHVnb252dWZodWJqd2prdWhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyMjMwNjUsImV4cCI6MjEwNDc5OTA2NX0.pHsW1O_IQWqQcfFtTz6_pHxZ2-iCpVe9v-UnzsLXpjQ';
 
 let db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// ——— Connexion au compte (protège la base : chaque compte ne voit que ses propres disques) ———
+async function brAuthGate() {
+ try {
+  const { data } = await db.auth.getSession();
+  if (data?.session) return true;
+ } catch (e) { console.warn('session', e); }
+ brShowLogin();
+ return false;
+}
+function brShowLogin(mode = 'login') {
+ const signup = mode === 'signup';
+ let el = document.getElementById('brAuthGate');
+ if (!el) { el = document.createElement('div'); el.id = 'brAuthGate'; document.body.appendChild(el); }
+ el.innerHTML = `
+  <div class="br-auth-card">
+   <div class="br-auth-logo">📀</div>
+   <h1>Ma Blu-raythèque</h1>
+   <p class="br-auth-sub">${signup ? 'Créez votre compte pour protéger votre collection.' : 'Connectez-vous pour accéder à votre collection.'}</p>
+   <form id="brAuthForm" autocomplete="on">
+    <input type="email" name="email" placeholder="E-mail" autocomplete="email" required>
+    <input type="password" name="password" placeholder="Mot de passe${signup ? ' (8 caractères min.)' : ''}" autocomplete="${signup ? 'new-password' : 'current-password'}" minlength="${signup ? 8 : 1}" required>
+    <button type="submit">${signup ? 'Créer mon compte' : 'Se connecter'}</button>
+   </form>
+   <p class="br-auth-msg" id="brAuthMsg"></p>
+   <button class="br-auth-link" type="button" id="brAuthSwitch">${signup ? 'J’ai déjà un compte' : 'Créer un compte'}</button>
+   ${signup ? '' : '<button class="br-auth-link" type="button" id="brAuthReset">Mot de passe oublié</button>'}
+  </div>`;
+ const msg = (t) => { document.getElementById('brAuthMsg').textContent = t; };
+ document.getElementById('brAuthSwitch').onclick = () => brShowLogin(signup ? 'login' : 'signup');
+ const reset = document.getElementById('brAuthReset');
+ if (reset) reset.onclick = async () => {
+  const email = el.querySelector('[name=email]').value.trim();
+  if (!email) { msg('Indiquez votre e-mail ci-dessus.'); return; }
+  const { error } = await db.auth.resetPasswordForEmail(email, { redirectTo: location.origin });
+  msg(error ? 'Erreur : ' + error.message : 'E-mail de réinitialisation envoyé.');
+ };
+ document.getElementById('brAuthForm').onsubmit = async (ev) => {
+  ev.preventDefault();
+  const f = new FormData(ev.target), email = String(f.get('email')).trim(), password = String(f.get('password'));
+  const btn = ev.target.querySelector('button'); btn.disabled = true; msg('');
+  try {
+   if (signup) {
+    const { data, error } = await db.auth.signUp({ email, password, options: { emailRedirectTo: location.origin } });
+    if (error) throw error;
+    if (data.session) { location.reload(); return; }
+    msg('Compte créé. Confirmez votre adresse via l’e-mail reçu, puis connectez-vous.');
+   } else {
+    const { error } = await db.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    location.reload(); return;
+   }
+  } catch (e) {
+   msg(/invalid login/i.test(e.message) ? 'E-mail ou mot de passe incorrect.' : /not confirmed/i.test(e.message) ? 'Adresse pas encore confirmée : ouvrez l’e-mail de confirmation.' : 'Erreur : ' + e.message);
+  }
+  btn.disabled = false;
+ };
+}
+async function brLogout() {
+ if (!confirm('Se déconnecter de Ma Blu-raythèque ?')) return;
+ await db.auth.signOut();
+ location.reload();
+}
+
 
 let collection = [];
 let wishlist = [];
@@ -7979,6 +8059,7 @@ setSyncStatus('synced');
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+if (!(await brAuthGate())) return; // connexion obligatoire
 applyStaticIcons();
 
 const detailModalElement = document.getElementById('detailModal');
