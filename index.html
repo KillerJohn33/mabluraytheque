@@ -6744,6 +6744,16 @@ html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #toast-container { le
 html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #bottomNav { display: none !important; }
 }
 @media (min-width: 1100px) and (hover: hover) and (pointer: fine) {
+/* Doublons retirés sur ordinateur */
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #searchSection > .space-y-4 > button[onclick="toggleScanner()"],
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #searchSection > .space-y-4 > .flex.justify-center,
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #searchSection #scanner-container,
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #searchSection #batchScanPanel,
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #collectionQuickChips [data-quick-format],
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #tabWishlist > div:has(#wishlistTotalCount),
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body label:has(#uiV2Toggle) { display: none !important; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #tabWishlist .wishlist-card-tag { display: none !important; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #collectionQuickChips #collectionSagaToggle { margin-left: auto; }
 /* Barre latérale en bleu dégradé (thèmes sombre et clair) */
 html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide {
   background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 45%, #1e3a8a 100%) !important;
@@ -12043,7 +12053,7 @@ card.innerHTML = `
 <div class="flex items-center gap-3 p-2">
 <img src="${safeImageUrl(m.poster)}" loading="lazy" decoding="async" class="w-12 h-[4.5rem] object-cover rounded-xl flex-shrink-0 border border-white/10 shadow-lg">
 <div class="min-w-0 flex-1">
-<span class="inline-block text-[8px] uppercase tracking-wider font-bold text-pink-200 bg-pink-500/10 border border-pink-300/20 px-1.5 py-0.5 rounded-full mb-1">Wishlist</span>
+<span class="wishlist-card-tag inline-block text-[8px] uppercase tracking-wider font-bold text-pink-200 bg-pink-500/10 border border-pink-300/20 px-1.5 py-0.5 rounded-full mb-1">Wishlist</span>
 <h4 class="text-xs font-bold text-white truncate">${escapeHtml(m.title)}</h4>
 <div class="flex items-center gap-3 text-[9px] mt-1.5">
 <span class="text-pink-300 font-semibold">${priceLabel}</span>
@@ -12059,7 +12069,7 @@ card.innerHTML = `
 <img src="${safeImageUrl(m.poster)}" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.035]">
 <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/10 to-transparent"></div>
 <div class="absolute top-2 left-2">
-<span class="text-[8px] uppercase tracking-wider font-bold text-pink-100 bg-pink-500/20 backdrop-blur-md border border-pink-300/20 px-1.5 py-1 rounded-full">Wishlist</span>
+<span class="wishlist-card-tag text-[8px] uppercase tracking-wider font-bold text-pink-100 bg-pink-500/20 backdrop-blur-md border border-pink-300/20 px-1.5 py-1 rounded-full">Wishlist</span>
 </div>
 <div class="absolute inset-x-0 bottom-0 p-2.5">
 <h4 class="text-[11px] font-bold text-white leading-tight truncate">${escapeHtml(m.title)}</h4>
@@ -15060,7 +15070,6 @@ async function backfillCollectionInfo() {
    <div class="dt-title" data-title>Accueil</div>
    <button type="button" class="dt-search" data-act="search">${svg('search')}<span>Rechercher dans ma collection…</span><kbd>${/Mac/i.test(navigator.platform) ? '⌘' : 'Ctrl'} K</kbd></button>
    <div class="dt-actions">
-    <button type="button" class="dt-btn" data-act="scan">${svg('camera')}<span>Scanner</span></button>
     <button type="button" class="dt-btn primary" data-act="add">${svg('plus')}<span>Ajouter un titre</span></button>
    </div>`;
   document.body.prepend(top);
@@ -15069,6 +15078,13 @@ async function backfillCollectionInfo() {
   side.addEventListener('click', event => {
    const el = event.target.closest('button');
    if (!el) return;
+   if (el.dataset.tab === 'collection' && ((document.getElementById('filterFormat')?.value || 'all') !== 'all' || (document.getElementById('filterCase')?.value || 'all') !== 'all')) {
+    document.getElementById('filterFormat').value = 'all';
+    document.getElementById('filterCase').value = 'all';
+    switchTab('collection');
+    renderCollection();
+    return;
+   }
    if (el.dataset.tab) return switchTab(el.dataset.tab);
    if (el.dataset.space) return openSpaceSection(el.dataset.space);
    if (el.dataset.format || el.dataset.case) {
