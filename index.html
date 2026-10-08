@@ -6922,6 +6922,20 @@ html.ui-v2:not(.is-ipad):not(.desk-v2) body.theme-light {
   --v2-glow: rgba(6, 182, 212, .07);
   --v2-seg-bg: rgba(8, 145, 178, .07);
 }
+
+/* ===== Ordinateur : nombres discrets dans la barre latérale + barre de proportion (formats, Steelbooks) ===== */
+@media (min-width: 1100px) and (hover: hover) and (pointer: fine) {
+html:is(.desk-v2,#nb1):is(.desk-v2,#nb2):is(.desk-v2,#nb3):is(.desk-v2,#nb4):is(.desk-v2,#nb5) #deskSide .ds-item em { background: none !important; padding: 0 !important; font-size: 13px !important; font-weight: 600 !important; color: inherit !important; opacity: .55; font-variant-numeric: tabular-nums; }
+html:is(.desk-v2,#nb1):is(.desk-v2,#nb2):is(.desk-v2,#nb3):is(.desk-v2,#nb4):is(.desk-v2,#nb5) #deskSide .ds-item:hover em, html:is(.desk-v2,#nb1):is(.desk-v2,#nb2):is(.desk-v2,#nb3):is(.desk-v2,#nb4):is(.desk-v2,#nb5) #deskSide .ds-item.on em { background: none !important; opacity: .8; }
+html:is(.desk-v2,#nb1):is(.desk-v2,#nb2):is(.desk-v2,#nb3):is(.desk-v2,#nb4):is(.desk-v2,#nb5) #deskSide .ds-item[data-format], html:is(.desk-v2,#nb1):is(.desk-v2,#nb2):is(.desk-v2,#nb3):is(.desk-v2,#nb4):is(.desk-v2,#nb5) #deskSide .ds-item[data-case] { position: relative; }
+html:is(.desk-v2,#nb1):is(.desk-v2,#nb2):is(.desk-v2,#nb3):is(.desk-v2,#nb4):is(.desk-v2,#nb5) #deskSide .ds-item[data-format]::after, html:is(.desk-v2,#nb1):is(.desk-v2,#nb2):is(.desk-v2,#nb3):is(.desk-v2,#nb4):is(.desk-v2,#nb5) #deskSide .ds-item[data-case]::after { content: ""; position: absolute; left: 41px; right: 12px; bottom: 4px; height: 3px; border-radius: 3px; background: rgba(255, 255, 255, .08); }
+html:is(.desk-v2,#nb1):is(.desk-v2,#nb2):is(.desk-v2,#nb3):is(.desk-v2,#nb4):is(.desk-v2,#nb5) #deskSide .ds-item[data-format] .ds-l::after, html:is(.desk-v2,#nb1):is(.desk-v2,#nb2):is(.desk-v2,#nb3):is(.desk-v2,#nb4):is(.desk-v2,#nb5) #deskSide .ds-item[data-case] .ds-l::after { content: ""; position: absolute; left: 41px; bottom: 4px; height: 3px; border-radius: 3px; width: calc((100% - 53px) * var(--share, 0)); background: var(--bar, currentColor); opacity: .75; z-index: 1; transition: width .4s ease; }
+html:is(.desk-v2,#nb1):is(.desk-v2,#nb2):is(.desk-v2,#nb3):is(.desk-v2,#nb4):is(.desk-v2,#nb5) #deskSide .ds-item[data-format="4K UHD"] { --bar: #5fb0ff; }
+html:is(.desk-v2,#nb1):is(.desk-v2,#nb2):is(.desk-v2,#nb3):is(.desk-v2,#nb4):is(.desk-v2,#nb5) #deskSide .ds-item[data-format="Blu-ray 1080p"] { --bar: #a79bff; }
+html:is(.desk-v2,#nb1):is(.desk-v2,#nb2):is(.desk-v2,#nb3):is(.desk-v2,#nb4):is(.desk-v2,#nb5) #deskSide .ds-item[data-format="DVD"] { --bar: #f6c18a; }
+html:is(.desk-v2,#nb1):is(.desk-v2,#nb2):is(.desk-v2,#nb3):is(.desk-v2,#nb4):is(.desk-v2,#nb5) #deskSide .ds-item[data-case] { --bar: #d4d4d8; }
+html:is(.desk-v2,#nb1):is(.desk-v2,#nb2):is(.desk-v2,#nb3):is(.desk-v2,#nb4):is(.desk-v2,#nb5) #deskSide .ds-item.on[data-format]::after, html:is(.desk-v2,#nb1):is(.desk-v2,#nb2):is(.desk-v2,#nb3):is(.desk-v2,#nb4):is(.desk-v2,#nb5) #deskSide .ds-item.on[data-case]::after { background: rgba(24, 24, 27, .1); }
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -15273,6 +15287,11 @@ async function backfillCollectionInfo() {
   ['4K UHD', 'Blu-ray 1080p', 'DVD'].forEach(f => { counts[f] = collection.filter(m => (m.editions || []).some(e => e.format === f)).length; });
   counts.Steelbook = collection.filter(m => (m.editions || []).some(e => e.editionType === 'Steelbook')).length;
   side.querySelectorAll('[data-count]').forEach(el => { const n = counts[el.dataset.count]; el.textContent = n ? String(n) : ''; });
+  // Part de chaque format (et des Steelbooks) dans la collection : barre fine sous le libellé.
+  side.querySelectorAll('[data-format], [data-case]').forEach(el => {
+   const n = counts[el.dataset.format || el.dataset.case] || 0;
+   el.style.setProperty('--share', collection.length ? (n / collection.length).toFixed(3) : '0');
+  });
   side.querySelector('[data-tab="digital"]').style.display = counts.digital ? '' : 'none';
   let purchase = 0, estimated = 0;
   collection.forEach(m => { const t = calculateMovieTotals(m); purchase += t.totalPurchase; estimated += t.totalEstimated; });
