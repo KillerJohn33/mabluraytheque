@@ -6743,6 +6743,29 @@ html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .quick-sheet { align-
 html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #toast-container { left: auto !important; right: 28px !important; bottom: 24px !important; transform: none !important; align-items: flex-end; }
 html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #bottomNav { display: none !important; }
 }
+@media (min-width: 1100px) and (hover: hover) and (pointer: fine) {
+/* Barre latérale en bleu dégradé (thèmes sombre et clair) */
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide {
+  background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 45%, #1e3a8a 100%) !important;
+  box-shadow: 1px 0 0 rgba(255, 255, 255, .08), 12px 0 40px -24px rgba(30, 58, 138, .9) !important; color: #fff !important;
+}
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide .ds-brand-ico { background: rgba(255, 255, 255, .18); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .25); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide .ds-item { color: rgba(255, 255, 255, .78); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide .ds-item:hover { background: rgba(255, 255, 255, .12); color: #fff; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide .ds-item.on, html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide .ds-item.primary.on { background: #fff; color: #1d4ed8; box-shadow: 0 8px 20px -10px rgba(0, 0, 0, .45); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide .ds-item.primary { background: rgba(255, 255, 255, .16); color: #fff; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide .ds-item em { background: rgba(255, 255, 255, .16); color: #fff; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide .ds-item.on em { background: rgba(37, 99, 235, .14); color: #1d4ed8; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide .ds-title { color: rgba(255, 255, 255, .6); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide .ds-dot { box-shadow: 0 0 0 2px rgba(255, 255, 255, .35); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide .ds-value { background: rgba(255, 255, 255, .14); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide .ds-value:hover { background: rgba(255, 255, 255, .2); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide .ds-user { color: #fff; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide .ds-user:hover { background: rgba(255, 255, 255, .12); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide .ds-user small { color: rgba(255, 255, 255, .7); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide .ds-av { background: rgba(255, 255, 255, .22); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .3); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide .ds-user small i { background: #86efac; }
+}
 @media (prefers-reduced-motion: reduce) {
   html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #detailModal > div, html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #detailModal.detail-modal-closing > div { animation: none !important; }
 }
