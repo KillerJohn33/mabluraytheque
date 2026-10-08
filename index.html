@@ -18,6 +18,9 @@
  // Nouvelle interface : téléphone et iPad. localStorage.ui_v2 = '0' restaure l'ancienne.
  let uiV2=true; try{ uiV2=localStorage.getItem('ui_v2')!=='0'; }catch(_){}
  if(uiV2 && (isIPad || window.matchMedia('(max-width: 767px)').matches)) document.documentElement.classList.add('ui-v2');
+ // Interface ordinateur (inspirée de « Mon Butin ») : localStorage.desk_v2 = '0' restaure l'ancienne.
+ let deskV2=true; try{ deskV2=localStorage.getItem('desk_v2')!=='0'; }catch(_){}
+ if(deskV2 && !isIPad && window.matchMedia('(min-width: 1100px) and (hover: hover) and (pointer: fine)').matches) document.documentElement.classList.add('ui-v2','desk-v2');
 })();
 </script>
 <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,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">
@@ -6599,6 +6602,150 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #bottomNav .bott
 #brAuthForm button:disabled { opacity: .6; }
 .br-auth-msg { min-height: 20px; color: #fbbf24; font-size: 13px; margin: 12px 0 4px; }
 .br-auth-link { display: block; margin: 8px auto 0; background: none; border: 0; color: #67e8f9; font-size: 14px; cursor: pointer; }
+/* ======================================================================
+   INTERFACE ORDINATEUR — inspirée de « Mon Butin »
+   Barre latérale, barre du haut avec recherche, contenu large, fiches en
+   panneau latéral. Active seulement sur ordinateur (≥ 1100 px, souris) via
+   html.desk-v2. Téléphone et iPad inchangés. Réglage « Nouvelle interface
+   ordinateur » dans Options (ou localStorage.desk_v2 = '0') pour revenir.
+   ====================================================================== */
+#deskSide, #deskTop { display: none; }
+/* Le réglage n'apparaît que sur ordinateur (téléphone et iPad inchangés). */
+html.is-ipad #deskV2Row { display: none !important; }
+@media not all and (min-width: 1100px) and (hover: hover) and (pointer: fine) { #deskV2Row { display: none !important; } }
+@media (min-width: 1100px) and (hover: hover) and (pointer: fine) {
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body { --side: 264px; --top: 72px; --desk-max: 1320px; }
+
+/* ---------- Ancienne navigation masquée ---------- */
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body > header, html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #topNav, html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body .mobile-section-hero, html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #homeCustomizeBar .home-customize-copy { display: none !important; }
+
+/* ---------- Barre latérale ---------- */
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide {
+  display: flex; flex-direction: column; position: fixed; z-index: 45; left: 0; top: 0; bottom: 0; width: var(--side);
+  padding: 18px 14px 14px; overflow-y: auto; scrollbar-width: none;
+  background: color-mix(in srgb, var(--v2-card) 55%, var(--v2-bg)); box-shadow: inset -1px 0 0 rgba(var(--rgb-neutral), .12);
+  color: var(--v2-text); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+}
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide::-webkit-scrollbar { display: none; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-brand { display: flex; align-items: center; gap: 10px; padding: 4px 10px 20px; font-size: 19px; font-weight: 800; letter-spacing: -.02em; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-brand-ico { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; color: #fff;
+  background: linear-gradient(145deg, #60a5fa, #2563eb); box-shadow: 0 6px 14px -6px rgba(37, 99, 235, .8); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-brand-ico svg { width: 20px; height: 20px; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-nav { display: flex; flex-direction: column; gap: 2px; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-item {
+  display: flex; align-items: center; gap: 12px; height: 42px; padding: 0 12px; border: 0; border-radius: 12px; background: none;
+  color: var(--v2-muted); font: 600 14.5px/1 inherit; font-family: inherit; text-align: left; cursor: pointer; transition: background .15s, color .15s;
+}
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-item svg { width: 19px; height: 19px; flex: none; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-item .ds-l { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-item em { font-style: normal; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: rgba(var(--rgb-neutral), .1); color: var(--v2-muted); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-item em:empty { display: none; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-item:hover { background: var(--v2-card); color: var(--v2-text); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-item.on { background: var(--v2-accent-soft); color: var(--v2-accent); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-item.on em { background: rgba(var(--rgb-accent), .2); color: var(--v2-accent); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-item.primary { color: #fff; background: linear-gradient(140deg, #3b82f6, #1d4ed8); box-shadow: 0 10px 22px -12px rgba(37, 99, 235, .9); margin: 2px 0; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-item.primary em { background: rgba(255, 255, 255, .2); color: #fff; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-item.primary.on { box-shadow: 0 0 0 2px rgba(96, 165, 250, .55), 0 10px 22px -12px rgba(37, 99, 235, .9); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-item.small { height: 36px; font-size: 13.5px; font-weight: 500; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-item.small svg { width: 17px; height: 17px; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-title { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--v2-muted); padding: 18px 12px 6px; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-dot { width: 9px; height: 9px; border-radius: 50%; flex: none; margin: 0 5px; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-value {
+  margin: 16px 2px 0; padding: 14px 16px; border: 0; border-radius: 18px; text-align: left; color: #fff; cursor: pointer; font-family: inherit;
+  background: linear-gradient(135deg, #1e3a8a, #2563eb 60%, #3b82f6); box-shadow: 0 12px 26px -14px rgba(37, 99, 235, .8);
+  display: flex; flex-direction: column; gap: 3px; transition: transform .15s;
+}
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-value:hover { transform: translateY(-2px); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-value small { font-size: 12px; opacity: .8; } html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-value b { font-size: 22px; font-weight: 800; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-value span { font-size: 12px; opacity: .85; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-spacer { flex: 1; min-height: 16px; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-user { display: flex; align-items: center; gap: 10px; padding: 10px; border: 0; border-radius: 14px; background: none; color: var(--v2-text); font-family: inherit; text-align: left; cursor: pointer; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-user:hover { background: var(--v2-card); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-av { width: 36px; height: 36px; border-radius: 50%; flex: none; display: grid; place-items: center; overflow: hidden; font-weight: 800; color: #fff; background: linear-gradient(145deg, #60a5fa, #2563eb); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-av img { width: 100%; height: 100%; object-fit: cover; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-user span { display: flex; flex-direction: column; min-width: 0; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-user b { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-user small { font-size: 12px; color: var(--v2-muted); display: flex; align-items: center; gap: 6px; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-user small i { width: 7px; height: 7px; border-radius: 50%; background: var(--v2-green); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-user small i.off { background: #9ca3af; } html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-user small i.err { background: var(--v2-red); } html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .ds-user small i.busy { background: var(--v2-orange); }
+
+/* ---------- Barre du haut ---------- */
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskTop {
+  display: flex; align-items: center; gap: 18px; position: fixed; z-index: 44; top: 0; left: var(--side); right: 0; height: var(--top); padding: 0 40px;
+  background: color-mix(in srgb, var(--v2-bg) 82%, transparent); backdrop-filter: blur(18px) saturate(1.5); -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  box-shadow: 0 1px 0 rgba(var(--rgb-neutral), .12); color: var(--v2-text);
+}
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .dt-title { font-size: 22px; font-weight: 800; letter-spacing: -.02em; min-width: 170px; white-space: nowrap; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .dt-search {
+  flex: 1; max-width: 560px; display: flex; align-items: center; gap: 10px; height: 42px; padding: 0 14px; border: 0; border-radius: 12px; cursor: text;
+  background: var(--v2-card); color: var(--v2-muted); font: 14px inherit; font-family: inherit; box-shadow: inset 0 0 0 1px rgba(var(--rgb-neutral), .14); transition: box-shadow .15s;
+}
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .dt-search:hover { box-shadow: inset 0 0 0 1.5px var(--v2-accent); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .dt-search svg { width: 18px; height: 18px; } html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .dt-search span { flex: 1; text-align: left; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .dt-search kbd { font: 600 11px/1 inherit; font-family: inherit; padding: 4px 6px; border-radius: 6px; background: var(--v2-bg); box-shadow: inset 0 0 0 1px rgba(var(--rgb-neutral), .16); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .dt-actions { margin-left: auto; display: flex; gap: 8px; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .dt-btn {
+  display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 14px; border: 0; border-radius: 11px; cursor: pointer; white-space: nowrap;
+  background: var(--v2-card); color: var(--v2-text); font: 600 14px/1 inherit; font-family: inherit; box-shadow: inset 0 0 0 1px rgba(var(--rgb-neutral), .14); transition: transform .12s, filter .12s;
+}
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .dt-btn svg { width: 18px; height: 18px; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .dt-btn:hover { filter: brightness(1.12); transform: translateY(-1px); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .dt-btn.primary { background: linear-gradient(140deg, #3b82f6, #1d4ed8); color: #fff; box-shadow: 0 10px 22px -10px rgba(37, 99, 235, .9); }
+
+/* ---------- Contenu ---------- */
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body { padding: 0 !important; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body > main {
+  position: static !important; max-width: none !important; width: auto !important;
+  margin: 0 0 0 var(--side) !important; padding: calc(var(--top) + 24px) 40px 64px !important; background: none !important;
+}
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body > main { display: flex !important; flex-direction: column; gap: 22px; --desktop-page-top-gap: 0px; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body > main > * { width: 100%; max-width: var(--desk-max); margin: 0 auto !important; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body > main > [id^="tab"] { padding-top: 0 !important; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body > main > [id^="tab"] > :first-child:not(.hidden) { margin-top: 0 !important; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #collectionTopBars { display: none !important; }
+
+/* Accueil : bloc « Ajouter un titre » sur une ligne */
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #searchSection > .space-y-4 { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px 12px; padding: 18px; border-radius: var(--v2-radius); background: var(--v2-panel); box-shadow: var(--v2-hair), var(--v2-lift); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #searchSection > .space-y-4 > * { margin: 0 !important; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #searchSection > .space-y-4 > .space-y-2 { flex: 1 1 520px; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #searchSection > .space-y-4 > button { width: auto !important; flex: none; padding: 0 18px !important; height: 46px; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #searchSection > .space-y-4 > .flex.justify-center { align-self: center; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #searchSection > .space-y-4 > #scanner-container, html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #searchSection > .space-y-4 > #batchScanPanel { flex: 1 1 100%; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #searchInput { height: 46px; }
+
+/* Grilles d'affiches plus larges, effet de survol */
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body main :is(#collectionGrid, #wishlistGrid, #digitalGrid).grid { grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)) !important; gap: 22px 18px !important; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body main :is(#collectionGrid, #wishlistGrid, #digitalGrid, #recentGrid, #trackedSeriesGrid) > * { transition: transform .2s cubic-bezier(.2, .8, .2, 1), box-shadow .2s ease !important; cursor: pointer; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body main :is(#collectionGrid, #wishlistGrid, #digitalGrid, #recentGrid, #trackedSeriesGrid).grid > *:hover,
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body main .home-media-card:hover { transform: translateY(-4px) !important; box-shadow: 0 22px 40px -18px rgba(0, 0, 0, .7), 0 0 0 2px var(--v2-accent) !important; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body main :is(#collectionGrid, #wishlistGrid, #digitalGrid, #recentGrid).grid > * img { transition: transform .35s cubic-bezier(.2, .8, .2, 1); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body main :is(#collectionGrid, #wishlistGrid, #digitalGrid, #recentGrid).grid > *:hover img { transform: scale(1.04); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body main .coll-list-view > *:hover { background: var(--v2-card-2) !important; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body main button, html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body main [onclick] { cursor: pointer; }
+
+/* Sélecteur Ma collection / Digital / Wishlist : déjà dans la barre latérale */
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #collectionTopBars > .tab-switcher, html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #tabDigital .tab-switcher, html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #tabWishlist .tab-switcher { display: none !important; }
+
+/* ---------- Fiches : panneau latéral à droite ---------- */
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #detailModal { justify-content: flex-end !important; align-items: stretch !important; padding: 0 !important; background: rgba(0, 0, 0, .38) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #detailModal > div {
+  width: min(700px, 52vw) !important; max-width: none !important; height: 100vh !important; max-height: none !important; margin: 0 !important;
+  border-radius: 22px 0 0 22px !important; box-shadow: -30px 0 80px -20px rgba(0, 0, 0, .65) !important;
+  animation: deskDrawerIn .32s cubic-bezier(.32, .72, 0, 1) both !important; transform-origin: right center;
+}
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #detailModal.detail-modal-closing > div { animation: deskDrawerOut .18s ease-in forwards !important; }
+@keyframes deskDrawerIn { from { transform: translateX(100%); } to { transform: none; } }
+@keyframes deskDrawerOut { to { transform: translateX(100%); } }
+
+/* Recherche globale, actions rapides et notifications alignées sur le contenu */
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #globalSearchModal { padding-left: calc(var(--side) + 24px) !important; padding-top: 90px !important; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) .quick-sheet { align-items: center; padding-left: var(--side); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #toast-container { left: auto !important; right: 28px !important; bottom: 24px !important; transform: none !important; align-items: flex-end; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #bottomNav { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #detailModal > div, html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #detailModal.detail-modal-closing > div { animation: none !important; }
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -7541,6 +7688,10 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):not(.is-ipad) body #bottomNav .bott
 <span><span class="block text-xs font-semibold text-gray-300">Nouvelle interface</span><span class="block text-[10px] text-gray-500 mt-0.5">Téléphone et iPad. Désactiver pour retrouver l’ancienne apparence</span></span>
 <input id="uiV2Toggle" type="checkbox" onchange="setUiV2Enabled(this.checked)" class="w-4 h-4 accent-cyan-400">
 </label>
+<label id="deskV2Row" class="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.025] px-3 py-2.5">
+<span><span class="block text-xs font-semibold text-gray-300">Nouvelle interface ordinateur</span><span class="block text-[10px] text-gray-500 mt-0.5">Barre latérale et fiches en panneau. Désactiver pour retrouver l’ancienne apparence</span></span>
+<input id="deskV2Toggle" type="checkbox" onchange="setDeskV2Enabled(this.checked)" class="w-4 h-4 accent-cyan-400">
+</label>
 </div>
 
 <div class="modern-panel space-options-panel p-4 md:p-5 space-y-3">
@@ -8166,6 +8317,8 @@ const hapticsToggle = document.getElementById('hapticsToggle');
 if (hapticsToggle) hapticsToggle.checked = localStorage.getItem('haptics_enabled') !== '0';
 const uiV2Toggle = document.getElementById('uiV2Toggle');
 if (uiV2Toggle) uiV2Toggle.checked = isUiV2Preferred();
+const deskV2Toggle = document.getElementById('deskV2Toggle');
+if (deskV2Toggle) deskV2Toggle.checked = isDeskV2Preferred();
 if (getPendingMovieUpdates().length) {
  setSyncStatus(navigator.onLine ? 'syncing' : 'offline');
  if (navigator.onLine) setTimeout(flushPendingMovieUpdates, 600);
@@ -8385,11 +8538,23 @@ const uiV2MobileQuery = window.matchMedia('(max-width: 767px)');
 function isUiV2Preferred() {
  try { return localStorage.getItem('ui_v2') !== '0'; } catch (_) { return true; }
 }
+const deskV2Query = window.matchMedia('(min-width: 1100px) and (hover: hover) and (pointer: fine)');
+function isDeskV2Preferred() {
+ try { return localStorage.getItem('desk_v2') !== '0'; } catch (_) { return true; }
+}
 function applyUiV2() {
  const root = document.documentElement;
- root.classList.toggle('ui-v2', isUiV2Preferred() && (root.classList.contains('is-ipad') || uiV2MobileQuery.matches));
+ const desk = isDeskV2Preferred() && !root.classList.contains('is-ipad') && deskV2Query.matches;
+ root.classList.toggle('desk-v2', desk);
+ root.classList.toggle('ui-v2', desk || (isUiV2Preferred() && (root.classList.contains('is-ipad') || uiV2MobileQuery.matches)));
  placeCollectionQuickChips();
+ if (typeof deskRefresh === 'function') deskRefresh();
 }
+function setDeskV2Enabled(enabled) {
+ try { localStorage.setItem('desk_v2', enabled ? '1' : '0'); } catch (_) {}
+ applyUiV2();
+}
+deskV2Query.addEventListener?.('change', applyUiV2);
 function setUiV2Enabled(enabled) {
  try { localStorage.setItem('ui_v2', enabled ? '1' : '0'); } catch (_) {}
  applyUiV2();
@@ -9883,6 +10048,7 @@ updateSettingsCounters();
 renderIncompletePanel();
 animateActiveTabPanel(tab);
 updateTopNavIndicator();
+if (typeof deskRefresh === 'function') deskRefresh();
 }
 
 // Conteneur qui défile réellement : <main> sur téléphone, la fenêtre ailleurs.
@@ -14824,6 +14990,140 @@ async function backfillCollectionInfo() {
   await new Promise(resolve => setTimeout(resolve, 2500));
  }
 }
+</script>
+<script>
+// --- Interface ordinateur : barre latérale et barre du haut (inspirées de « Mon Butin ») ---
+(() => {
+ const svg = name => (typeof svgMarkup === 'function' ? svgMarkup(name) : '');
+ const isDesk = () => document.documentElement.classList.contains('desk-v2');
+ const TITLES = { home: 'Accueil', collection: 'Collection', wishlist: 'Wishlist', digital: 'Numérique', series: 'Séries', stats: 'Statistiques', settings: 'Mon espace' };
+ const SPACE = { profile: 'Mon profil', installation: 'Mon installation', subscriptions: 'Mes abonnements', options: 'Options' };
+ const euro = value => (Number(value) || 0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+
+ function build() {
+  if (document.getElementById('deskSide')) return;
+  const side = document.createElement('aside');
+  side.id = 'deskSide';
+  side.setAttribute('aria-label', 'Navigation principale');
+  side.innerHTML = `
+   <div class="ds-brand"><span class="ds-brand-ico">${svg('disc')}</span>Blu-raythèque</div>
+   <nav class="ds-nav">
+    <button type="button" class="ds-item" data-tab="home">${svg('home')}<span class="ds-l">Accueil</span></button>
+    <button type="button" class="ds-item primary" data-tab="collection">${svg('disc')}<span class="ds-l">Collection</span><em data-count="collection"></em></button>
+    <button type="button" class="ds-item" data-tab="wishlist">${svg('star')}<span class="ds-l">Wishlist</span><em data-count="wishlist"></em></button>
+    <button type="button" class="ds-item" data-tab="digital">${svg('cloud')}<span class="ds-l">Numérique</span><em data-count="digital"></em></button>
+    <button type="button" class="ds-item" data-tab="series">${svg('tv')}<span class="ds-l">Séries</span><em data-count="series"></em></button>
+    <button type="button" class="ds-item" data-tab="stats">${svg('barchart')}<span class="ds-l">Statistiques</span></button>
+   </nav>
+   <div class="ds-title">Formats</div>
+   <div class="ds-nav">
+    <button type="button" class="ds-item small" data-format="4K UHD"><span class="ds-dot" style="background:#5fb0ff"></span><span class="ds-l">4K UHD</span><em data-count="4K UHD"></em></button>
+    <button type="button" class="ds-item small" data-format="Blu-ray 1080p"><span class="ds-dot" style="background:#a79bff"></span><span class="ds-l">Blu-ray</span><em data-count="Blu-ray 1080p"></em></button>
+    <button type="button" class="ds-item small" data-format="DVD"><span class="ds-dot" style="background:#f6c18a"></span><span class="ds-l">DVD</span><em data-count="DVD"></em></button>
+    <button type="button" class="ds-item small" data-case="Steelbook">${svg('package')}<span class="ds-l">Steelbooks</span><em data-count="Steelbook"></em></button>
+   </div>
+   <button type="button" class="ds-value" data-tab="stats"><small>Valeur estimée</small><b data-value="estimated">—</b><span data-value="purchase"></span></button>
+   <div class="ds-title">Mon espace</div>
+   <div class="ds-nav">
+    <button type="button" class="ds-item small" data-space="installation">${svg('tv')}<span class="ds-l">Installation</span></button>
+    <button type="button" class="ds-item small" data-space="subscriptions">${svg('wallet')}<span class="ds-l">Abonnements</span></button>
+    <button type="button" class="ds-item small" data-space="options">${svg('settings')}<span class="ds-l">Options</span></button>
+   </div>
+   <div class="ds-spacer"></div>
+   <button type="button" class="ds-user" data-space="profile"><span class="ds-av" data-avatar>B</span><span><b data-user-name>Mon profil</b><small><i data-sync-dot></i><span data-sync-label>Synchronisé</span></small></span></button>`;
+  const top = document.createElement('div');
+  top.id = 'deskTop';
+  top.innerHTML = `
+   <div class="dt-title" data-title>Accueil</div>
+   <button type="button" class="dt-search" data-act="search">${svg('search')}<span>Rechercher dans ma collection…</span><kbd>${/Mac/i.test(navigator.platform) ? '⌘' : 'Ctrl'} K</kbd></button>
+   <div class="dt-actions">
+    <button type="button" class="dt-btn" data-act="scan">${svg('camera')}<span>Scanner</span></button>
+    <button type="button" class="dt-btn primary" data-act="add">${svg('plus')}<span>Ajouter un titre</span></button>
+   </div>`;
+  document.body.prepend(top);
+  document.body.prepend(side);
+
+  side.addEventListener('click', event => {
+   const el = event.target.closest('button');
+   if (!el) return;
+   if (el.dataset.tab) return switchTab(el.dataset.tab);
+   if (el.dataset.space) return openSpaceSection(el.dataset.space);
+   if (el.dataset.format || el.dataset.case) {
+    resetCollectionFilters();
+    if (el.dataset.format) document.getElementById('filterFormat').value = el.dataset.format;
+    if (el.dataset.case) { syncCollectionCaseOptions(); document.getElementById('filterCase').value = el.dataset.case; }
+    switchTab('collection');
+    renderCollection();
+    refresh();
+   }
+  });
+  top.addEventListener('click', event => {
+   const act = event.target.closest('[data-act]')?.dataset.act;
+   if (act === 'search') openGlobalSearch();
+   if (act === 'add' || act === 'scan') {
+    switchTab('home');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (act === 'add') setTimeout(() => document.getElementById('searchInput')?.focus(), 60);
+    else if (document.getElementById('scanner-container')?.classList.contains('hidden')) toggleScanner();
+   }
+  });
+ }
+
+ function refresh() {
+  if (!isDesk()) return;
+  build();
+  const side = document.getElementById('deskSide');
+  const tab = typeof currentTab !== 'undefined' ? currentTab : 'home';
+  const format = document.getElementById('filterFormat')?.value || 'all';
+  const caseValue = document.getElementById('filterCase')?.value || 'all';
+  side.querySelectorAll('[data-tab]').forEach(el => el.classList.toggle('on', !el.classList.contains('ds-value') && el.dataset.tab === tab && !(tab === 'collection' && (format !== 'all' || caseValue !== 'all'))));
+  side.querySelectorAll('[data-format]').forEach(el => el.classList.toggle('on', tab === 'collection' && el.dataset.format === format));
+  side.querySelectorAll('[data-case]').forEach(el => el.classList.toggle('on', tab === 'collection' && el.dataset.case === caseValue));
+  const space = typeof activeSpaceSection !== 'undefined' ? activeSpaceSection : '';
+  side.querySelectorAll('[data-space]').forEach(el => el.classList.toggle('on', tab === 'settings' && el.dataset.space === space));
+
+  // Compteurs et valeur
+  const counts = {
+   collection: collection.length, wishlist: wishlist.length,
+   digital: (typeof digitalLibrary !== 'undefined' ? digitalLibrary.length : 0),
+   series: (typeof trackedSeries !== 'undefined' ? trackedSeries.length : 0)
+  };
+  ['4K UHD', 'Blu-ray 1080p', 'DVD'].forEach(f => { counts[f] = collection.filter(m => (m.editions || []).some(e => e.format === f)).length; });
+  counts.Steelbook = collection.filter(m => (m.editions || []).some(e => e.editionType === 'Steelbook')).length;
+  side.querySelectorAll('[data-count]').forEach(el => { const n = counts[el.dataset.count]; el.textContent = n ? String(n) : ''; });
+  side.querySelector('[data-tab="digital"]').style.display = counts.digital ? '' : 'none';
+  let purchase = 0, estimated = 0;
+  collection.forEach(m => { const t = calculateMovieTotals(m); purchase += t.totalPurchase; estimated += t.totalEstimated; });
+  side.querySelector('[data-value="estimated"]').textContent = euro(estimated || purchase);
+  side.querySelector('[data-value="purchase"]').textContent = purchase ? `${euro(purchase)} d’achats` : '';
+
+  // Profil et synchronisation
+  const profile = (typeof profileData !== 'undefined' && profileData.profile) || {};
+  const name = String(profile.displayName || '').trim();
+  side.querySelector('[data-user-name]').textContent = name || 'Mon profil';
+  const av = side.querySelector('[data-avatar]');
+  av.innerHTML = profile.photo ? `<img src="${escapeHtml(profile.photo)}" alt="">` : escapeHtml((name || 'B').charAt(0).toUpperCase());
+  const label = document.getElementById('syncStatusLabel')?.textContent || '';
+  side.querySelector('[data-sync-label]').textContent = label || 'Synchronisé';
+  const dot = side.querySelector('[data-sync-dot]');
+  dot.className = /erreur|réessayer/i.test(label) ? 'err' : /hors ligne/i.test(label) ? 'off' : /synchronisation|envoi|connexion|…/i.test(label) ? 'busy' : '';
+
+  // Titre de page
+  const top = document.getElementById('deskTop');
+  top.querySelector('[data-title]').textContent = tab === 'settings' ? (SPACE[space] || TITLES.settings) : (TITLES[tab] || 'Blu-raythèque');
+ }
+
+ // Rafraîchir après les rendus de données (compteurs, valeur, profil).
+ let pending = false;
+ const schedule = () => { if (pending || !isDesk()) return; pending = true; requestAnimationFrame(() => { pending = false; refresh(); }); };
+ ['renderCollection', 'renderWishlist', 'renderTrackedSeries', 'renderDigital', 'renderProfileCard', 'setSyncStatus', 'applySpaceSection'].forEach(fnName => {
+  const original = window[fnName];
+  if (typeof original !== 'function') return;
+  window[fnName] = function (...args) { const result = original.apply(this, args); schedule(); return result; };
+ });
+ window.deskRefresh = refresh;
+ if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', refresh); else refresh();
+})();
 </script>
 </body>
 </html>
