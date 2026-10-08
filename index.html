@@ -6885,6 +6885,43 @@ html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) #deskTo
 @media (prefers-reduced-motion: reduce) {
   html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #detailModal > div, html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #detailModal.detail-modal-closing > div { animation: none !important; }
 }
+
+/* ===== Pas de halo lumineux autour des boutons (téléphone, iPad, ordinateur) ===== */
+html:is(.ui-v2,#ng1):is(.ui-v2,#ng2):is(.ui-v2,#ng3) body .choice-bar > .choice-option.is-active,
+html:is(.ui-v2,#ng1):is(.ui-v2,#ng2):is(.ui-v2,#ng3) body .quick-chip.is-active, html:is(.ui-v2,#ng1):is(.ui-v2,#ng2):is(.ui-v2,#ng3) body .quick-chip[aria-pressed="true"],
+html:is(.ui-v2,#ng1):is(.ui-v2,#ng2):is(.ui-v2,#ng3) body #homeDashboard > div::before { box-shadow: none !important; }
+html:is(.ui-v2,#ng1):is(.ui-v2,#ng2):is(.ui-v2,#ng3) body .icon-chip, html.is-ipad #bottomNav .bottom-nav-btn.active .icon-inline { filter: none !important; }
+html:is(.desk-v2,#ng4):is(.desk-v2,#ng5):is(.desk-v2,#ng6):is(.desk-v2,#ng7):is(.desk-v2,#ng8) #deskTop .dt-btn.primary, html:is(.desk-v2,#ng4):is(.desk-v2,#ng5):is(.desk-v2,#ng6):is(.desk-v2,#ng7):is(.desk-v2,#ng8) #deskSide .ds-item.on, html:is(.desk-v2,#ng4):is(.desk-v2,#ng5):is(.desk-v2,#ng6):is(.desk-v2,#ng7):is(.desk-v2,#ng8) #deskSide .ds-item.primary.on,
+html:is(.desk-v2,#ng4):is(.desk-v2,#ng5):is(.desk-v2,#ng6):is(.desk-v2,#ng7):is(.desk-v2,#ng8) #deskSide .ds-brand-ico, html:is(.desk-v2,#ng4):is(.desk-v2,#ng5):is(.desk-v2,#ng6):is(.desk-v2,#ng7):is(.desk-v2,#ng8) #deskSide .ds-av { box-shadow: none !important; }
+html:is(.desk-v2,#ng4):is(.desk-v2,#ng5):is(.desk-v2,#ng6):is(.desk-v2,#ng7):is(.desk-v2,#ng8) #deskSide .ds-value { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1) !important; }
+
+/* ===== Téléphone : couleur principale cyan (celle du logo), panneaux et tuiles assortis ===== */
+/* Icônes de Mon espace accordées au cyan */
+html:is(.ui-v2,#cy1):is(.ui-v2,#cy2):is(.ui-v2,#cy3):not(.is-ipad):not(.desk-v2) body #mobileProfileToggle > span:first-child > .icon-inline:first-child { --ico: #0891b2 !important; }
+html:is(.ui-v2,#cy1):is(.ui-v2,#cy2):is(.ui-v2,#cy3):not(.is-ipad):not(.desk-v2) body #mobileInstallationToggle > span:first-child > .icon-inline:first-child { --ico: #0284c7 !important; }
+
+html.ui-v2:not(.is-ipad):not(.desk-v2) body {
+  --rgb-accent: 34, 211, 238; --on-accent: #042f37;
+  --rgb-azure: 103, 232, 249; --on-azure: #042f37;
+  --rgb-blue2: 56, 189, 248; --on-blue2: #04263a;
+  --v2-card: #121a1d; --v2-card-2: #1a2529;
+  --v2-panel: radial-gradient(120% 90% at 0% 0%, rgba(34, 211, 238, .11), transparent 55%),
+              linear-gradient(165deg, #172024 0%, #121a1d 60%, #0f1518 100%);
+  --v2-hair: inset 0 0 0 1px rgba(103, 232, 249, .09);
+  --v2-glow: rgba(34, 211, 238, .08);
+  --v2-seg-bg: rgba(103, 232, 249, .07);
+}
+html.ui-v2:not(.is-ipad):not(.desk-v2) body.theme-light {
+  --rgb-accent: 8, 145, 178; --on-accent: #ffffff;
+  --rgb-azure: 14, 116, 144; --on-azure: #ffffff;
+  --rgb-blue2: 2, 132, 199; --on-blue2: #ffffff;
+  --v2-card: #ffffff; --v2-card-2: #eef8fb;
+  --v2-panel: radial-gradient(120% 90% at 0% 0%, rgba(6, 182, 212, .08), transparent 55%),
+              linear-gradient(165deg, #ffffff 0%, #f7fcfd 100%);
+  --v2-hair: inset 0 0 0 1px rgba(8, 145, 178, .1);
+  --v2-glow: rgba(6, 182, 212, .07);
+  --v2-seg-bg: rgba(8, 145, 178, .07);
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
