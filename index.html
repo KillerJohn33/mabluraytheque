@@ -6776,6 +6776,29 @@ html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide .ds-user sm
 html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide .ds-av { background: rgba(255, 255, 255, .22); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .3); }
 html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) #deskSide .ds-user small i { background: #86efac; }
 }
+@media (min-width: 1100px) and (hover: hover) and (pointer: fine) {
+/* Thème sombre : barre latérale presque noire, accents bleus contrastés (thème clair inchangé) */
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body:not(.theme-light) #deskSide {
+  background: radial-gradient(130% 55% at 0% 0%, rgba(59, 130, 246, .22), transparent 60%), linear-gradient(180deg, #0d1424 0%, #090d18 50%, #05070c 100%) !important;
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, .07), 12px 0 40px -28px rgba(0, 0, 0, .9) !important;
+}
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body:not(.theme-light) #deskSide .ds-brand-ico { background: linear-gradient(145deg, #3b82f6, #1d4ed8); box-shadow: 0 6px 16px -6px rgba(37, 99, 235, .7); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body:not(.theme-light) #deskSide .ds-item { color: #aab4c5; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body:not(.theme-light) #deskSide .ds-item:hover { background: rgba(255, 255, 255, .06); color: #fff; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body:not(.theme-light) #deskSide .ds-item.primary { background: rgba(59, 130, 246, .14); color: #dbe7ff; box-shadow: inset 0 0 0 1px rgba(96, 165, 250, .28); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body:not(.theme-light) #deskSide .ds-item.on, html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body:not(.theme-light) #deskSide .ds-item.primary.on {
+  background: linear-gradient(140deg, #2563eb, #1d4ed8); color: #fff; box-shadow: 0 10px 24px -12px rgba(37, 99, 235, .9);
+}
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body:not(.theme-light) #deskSide .ds-item em { background: rgba(255, 255, 255, .08); color: #cbd5e1; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body:not(.theme-light) #deskSide .ds-item.on em { background: rgba(255, 255, 255, .2); color: #fff; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body:not(.theme-light) #deskSide .ds-title { color: #64748b; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body:not(.theme-light) #deskSide .ds-dot { box-shadow: none; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body:not(.theme-light) #deskSide .ds-value { background: linear-gradient(135deg, #172554, #1e3a8a 70%, #1d4ed8); box-shadow: inset 0 0 0 1px rgba(96, 165, 250, .25), 0 12px 26px -16px rgba(37, 99, 235, .7); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body:not(.theme-light) #deskSide .ds-value:hover { filter: brightness(1.12); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body:not(.theme-light) #deskSide .ds-user:hover { background: rgba(255, 255, 255, .06); }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body:not(.theme-light) #deskSide .ds-user small { color: #94a3b8; }
+html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body:not(.theme-light) #deskSide .ds-av { background: linear-gradient(145deg, #3b82f6, #1d4ed8); box-shadow: none; }
+}
 @media (prefers-reduced-motion: reduce) {
   html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #detailModal > div, html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #detailModal.detail-modal-closing > div { animation: none !important; }
 }
