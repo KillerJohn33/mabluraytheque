@@ -6799,6 +6799,38 @@ html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body:not(.theme-light
 html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body:not(.theme-light) #deskSide .ds-user small { color: #94a3b8; }
 html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body:not(.theme-light) #deskSide .ds-av { background: linear-gradient(145deg, #3b82f6, #1d4ed8); box-shadow: none; }
 }
+@media (min-width: 1100px) and (hover: hover) and (pointer: fine) {
+/* ===== Couleur principale ordinateur : jaune pellicule (remplace le bleu) ===== */
+html.ui-v2.desk-v2 body:not(.theme-light) { --rgb-accent: 250, 204, 21; --on-accent: #1c1917; }
+html.ui-v2.desk-v2 body.theme-light { --rgb-accent: 161, 98, 7; --on-accent: #ffffff; }
+/* La 4K garde sa propre couleur dans la répartition par format */
+html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body main [style*="#22d3ee"] { background: #5fb0ff !important; }
+/* Thème sombre : noir chaud, accents jaunes, texte foncé sur le jaune */
+html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body:not(.theme-light) #deskSide { background: radial-gradient(130% 55% at 0% 0%, rgba(234, 179, 8, .2), transparent 60%), linear-gradient(180deg, #16140a 0%, #0b0a05 50%, #050403 100%) !important; box-shadow: inset -1px 0 0 rgba(255, 255, 255, .07) !important; }
+html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body:not(.theme-light) #deskSide .ds-item.on, html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body:not(.theme-light) #deskSide .ds-item.primary.on { background: linear-gradient(140deg, #facc15, #eab308) !important; color: #1c1917 !important; box-shadow: 0 10px 24px -12px rgba(234, 179, 8, .8) !important; }
+html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body:not(.theme-light) #deskSide .ds-item.on em { background: rgba(28, 25, 23, .15) !important; color: #1c1917 !important; }
+html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body:not(.theme-light) #deskSide .ds-item.primary { background: rgba(234, 179, 8, .12) !important; box-shadow: inset 0 0 0 1px rgba(250, 204, 21, .3) !important; color: #fef3c7 !important; }
+html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body:not(.theme-light) #deskSide .ds-value { background: linear-gradient(135deg, #1c1606, #3f2f06 70%, #713f12) !important; box-shadow: inset 0 0 0 1px rgba(250, 204, 21, .28), 0 12px 26px -16px rgba(202, 138, 4, .6) !important; }
+html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body:not(.theme-light) #deskSide .ds-value b { color: #fde047; }
+html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body:not(.theme-light) #deskSide .ds-brand-ico, html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body:not(.theme-light) #deskSide .ds-av { background: linear-gradient(145deg, #facc15, #ca8a04) !important; color: #1c1917 !important; box-shadow: 0 6px 16px -6px rgba(234, 179, 8, .6) !important; }
+/* Thème clair : barre jaune dégradée, texte foncé */
+html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body.theme-light #deskSide { background: linear-gradient(180deg, #fde047 0%, #facc15 40%, #eab308 75%, #ca8a04 100%) !important; box-shadow: 12px 0 40px -24px rgba(161, 98, 7, .6) !important; color: #1c1917 !important; }
+html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body.theme-light #deskSide .ds-item, html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body.theme-light #deskSide .ds-user { color: rgba(28, 25, 23, .78) !important; }
+html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body.theme-light #deskSide .ds-item:hover, html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body.theme-light #deskSide .ds-user:hover { background: rgba(255, 255, 255, .35) !important; color: #1c1917 !important; }
+html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body.theme-light #deskSide .ds-item.on, html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body.theme-light #deskSide .ds-item.primary.on { background: #1c1917 !important; color: #fde047 !important; box-shadow: 0 10px 22px -12px rgba(28, 25, 23, .6) !important; }
+html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body.theme-light #deskSide .ds-item.on em { background: rgba(253, 224, 71, .2) !important; color: #fde047 !important; }
+html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body.theme-light #deskSide .ds-item.primary { background: rgba(255, 255, 255, .4) !important; box-shadow: inset 0 0 0 1px rgba(28, 25, 23, .12) !important; color: #1c1917 !important; }
+html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body.theme-light #deskSide .ds-item em { background: rgba(28, 25, 23, .1) !important; color: #1c1917 !important; }
+html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body.theme-light #deskSide .ds-title { color: rgba(28, 25, 23, .55) !important; }
+html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body.theme-light #deskSide .ds-value { background: rgba(28, 25, 23, .88) !important; color: #fef9c3 !important; box-shadow: 0 12px 26px -14px rgba(28, 25, 23, .6) !important; }
+html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body.theme-light #deskSide .ds-value b { color: #fde047; }
+html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body.theme-light #deskSide .ds-brand-ico, html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body.theme-light #deskSide .ds-av { background: #1c1917 !important; color: #fde047 !important; box-shadow: none !important; }
+html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body.theme-light #deskSide .ds-user small { color: rgba(28, 25, 23, .65) !important; }
+html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body.theme-light #deskSide .ds-user small i { background: #15803d !important; }
+/* Bouton principal de la barre du haut */
+html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) #deskTop .dt-btn.primary { background: linear-gradient(140deg, #facc15, #eab308) !important; color: #1c1917 !important; box-shadow: 0 10px 22px -10px rgba(234, 179, 8, .8) !important; }
+html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) #deskTop .dt-search:hover { box-shadow: inset 0 0 0 1.5px rgb(var(--rgb-accent)) !important; }
+}
 @media (prefers-reduced-motion: reduce) {
   html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #detailModal > div, html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #detailModal.detail-modal-closing > div { animation: none !important; }
 }
