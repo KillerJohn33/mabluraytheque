@@ -15440,7 +15440,7 @@ async function backfillCollectionInfo() {
    if (!drag) return;
    // étirement dans le sens du mouvement, proportionnel à la vitesse
    const st = Math.min(Math.abs(drag.v) * 0.9, 0.38);
-   setX(drag.x, drag.w, 1.22 + st, 1.22 - st * 0.45);
+   setX(drag.x, drag.w, 1.15 + st, 1.15 - st * 0.45);
    drag.v *= 0.82;
    loop();
   });
