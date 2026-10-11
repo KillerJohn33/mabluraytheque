@@ -15490,6 +15490,9 @@ async function backfillCollectionInfo() {
   const prev = [...group.querySelectorAll('button')].find(b => isOn(b) && visible(b));
   if (!prev) return;
   const from = prev.getBoundingClientRect(), key = label(btn);
+  // l'ancien bouton perd sa pastille immédiatement (pas de fondu en double pendant le glissé)
+  prev.style.setProperty('transition', 'none', 'important');
+  setTimeout(() => prev.style.removeProperty('transition'), 60);
   setTimeout(() => requestAnimationFrame(() => {
    // le bouton d'arrivée peut se trouver dans un autre écran (ex. Ma collection → Wishlist) : on le retrouve par son libellé
    const to = [...document.querySelectorAll(GROUPS.map(s => s + ' button').join(', '))]
@@ -15509,29 +15512,34 @@ async function backfillCollectionInfo() {
    const host = to.closest(gsel), hr = host.getBoundingClientRect();
    if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
    Object.assign(pill.style, { left: r.left - hr.left + host.scrollLeft + 'px', top: r.top - hr.top + host.scrollTop + 'px', width: r.width + 'px', height: r.height + 'px', borderRadius: cs.borderRadius, background: bg });
-   host.prepend(pill);
+   // ajoutée en DERNIER : insérée en premier, elle décalait les couleurs des boutons (règles :nth-child)
+   host.appendChild(pill);
    // le bouton laisse voir la pastille qui arrive (fond transparent le temps de l'animation)
    to.style.setProperty('background', 'transparent', 'important');
    to.style.setProperty('background-image', 'none', 'important');
    to.classList.add('pill-hold');
    const vert = Math.abs(r.top - from.top) > Math.abs(r.left - from.left);
    const dx = from.left - r.left, dy = from.top - r.top, sx = from.width / r.width, sy = from.height / r.height;
-   // la pastille glisse vite en gardant sa forme (léger allongement), dépasse un peu la cible puis s'y cale (ressort)
-   const ov = vert ? [0, Math.sign(-dy) * 4] : [Math.sign(-dx) * 6, 0];
+   // Glissé continu et pleinement opaque : la pastille s'allonge un peu en route, dépasse à peine la cible et s'y pose en douceur.
+   const ov = vert ? [0, Math.sign(-dy) * 3] : [Math.sign(-dx) * 4, 0];
    const a = pill.animate([
-    { transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`, opacity: .9 },
-    { transform: vert ? `translate(${dx * .35}px, ${dy * .35}px) scale(.97, 1.08)` : `translate(${dx * .35}px, ${dy * .35}px) scale(1.08, .96)`, opacity: .82, offset: .35 },
-    { transform: `translate(${ov[0]}px, ${ov[1]}px) scale(1.02, .98)`, opacity: .95, offset: .68 },
-    { transform: 'translate(0, 0) scale(1, 1)', opacity: 1 }
-   ], { duration: 380, easing: 'cubic-bezier(.25, .8, .3, 1)' });
+    { transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})` },
+    { transform: vert ? `translate(${dx * .4}px, ${dy * .4}px) scale(.98, 1.06)` : `translate(${dx * .4}px, ${dy * .4}px) scale(1.06, .97)`, offset: .4 },
+    { transform: `translate(${ov[0]}px, ${ov[1]}px) scale(1.01, .99)`, offset: .78 },
+    { transform: 'translate(0, 0) scale(1, 1)' }
+   ], { duration: 420, easing: 'cubic-bezier(.22, .9, .32, 1)', fill: 'forwards' });
    let finished = false;
    const done = () => {
     if (finished) return; finished = true;
-    pill.remove(); to.classList.remove('pill-hold');
+    // Le vrai fond du bouton revient d'abord SOUS la pastille, puis la pastille est retirée à l'image suivante :
+    // le passage de l'une à l'autre est invisible (plus d'effet de « rechargement »).
     to.style.removeProperty('background'); to.style.removeProperty('background-image');
-    restoreTransition();
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+     pill.remove(); to.classList.remove('pill-hold');
+     restoreTransition();
+    }));
    };
-   a.onfinish = done; a.oncancel = done; setTimeout(done, 700);
+   a.onfinish = done; a.oncancel = done; setTimeout(done, 800);
   }), 0);
  }, true);
 })();
