@@ -6936,6 +6936,60 @@ html:is(.desk-v2,#nb1):is(.desk-v2,#nb2):is(.desk-v2,#nb3):is(.desk-v2,#nb4):is(
 html:is(.desk-v2,#nb1):is(.desk-v2,#nb2):is(.desk-v2,#nb3):is(.desk-v2,#nb4):is(.desk-v2,#nb5) #deskSide .ds-item[data-case] { --bar: #d4d4d8; }
 html:is(.desk-v2,#nb1):is(.desk-v2,#nb2):is(.desk-v2,#nb3):is(.desk-v2,#nb4):is(.desk-v2,#nb5) #deskSide .ds-item.on[data-format]::after, html:is(.desk-v2,#nb1):is(.desk-v2,#nb2):is(.desk-v2,#nb3):is(.desk-v2,#nb4):is(.desk-v2,#nb5) #deskSide .ds-item.on[data-case]::after { background: rgba(24, 24, 27, .1); }
 }
+
+/* ===== Téléphone : barre de navigation « verre liquide » (reprise de Mon Butin, couleur cyan de l'app) ===== */
+@media (max-width: 767px) {
+html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2) body #bottomNav.mobile-bottom-nav {
+  left: 50% !important; right: auto !important; transform: translateX(-50%) !important;
+  width: calc(100% - 32px) !important; max-width: 440px !important;
+  bottom: max(env(safe-area-inset-bottom), 10px) !important; height: 62px !important; padding: 6px !important; gap: 2px !important;
+  border-radius: 999px !important; overflow: visible !important;
+  background: rgba(28, 30, 38, .38) !important;
+  backdrop-filter: blur(26px) saturate(210%) brightness(1.08) !important; -webkit-backdrop-filter: blur(26px) saturate(210%) brightness(1.08) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .28), inset 0 -1px 0 rgba(255, 255, 255, .06), inset 0 0 0 .5px rgba(255, 255, 255, .16), 0 10px 30px -12px rgba(0, 0, 0, .5) !important;
+  touch-action: none; -webkit-user-select: none; user-select: none;
+}
+html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2) body #bottomNav.mobile-bottom-nav::after {
+  content: "" !important; display: block !important; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, 0) 45%) !important;
+}
+html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2) body #bottomNav .bottom-nav-btn {
+  position: relative; z-index: 1; flex: 1 1 0 !important; height: auto !important; margin: 0 !important; align-self: stretch !important;
+  border-radius: 999px !important; background: none !important; box-shadow: none !important; transform: none !important;
+  color: rgba(235, 240, 250, .62) !important; gap: 1px !important; transition: color .2s ease !important;
+}
+html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2) body #bottomNav .bottom-nav-btn .icon-inline, html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2) body #bottomNav .bottom-nav-btn .icon-inline svg { width: 23px !important; height: 23px !important; color: inherit !important; }
+html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2) body #bottomNav .bottom-nav-label { font-size: 10px !important; font-weight: 600 !important; }
+html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2) body #bottomNav .bottom-nav-btn.active { color: #22d3ee !important; background: none !important; box-shadow: none !important; }
+html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2) body #bottomNav .bottom-nav-btn.active .icon-inline { color: inherit !important; animation: none !important; }
+html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2) body #bottomNav .bottom-nav-btn.active svg { stroke-width: 2.2; }
+html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2) body #bottomNav .bottom-nav-btn.ind-over { color: #67e8f9 !important; }
+html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2) body #bottomNav .bottom-nav-badge { box-shadow: none !important; z-index: 3; }
+/* Indicateur unique sous l'onglet actif : il se soulève en goutte de verre et suit le doigt */
+html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2) body #bottomNav .nav-ind {
+  position: absolute; top: 6px; bottom: 6px; left: 0; z-index: 0; border-radius: 999px; pointer-events: none; transform-origin: center;
+  background: rgba(255, 255, 255, .11); box-shadow: inset 0 0 0 .5px rgba(255, 255, 255, .14);
+  transition: transform .42s cubic-bezier(.25, 1.35, .45, 1), width .3s ease, background .25s ease, box-shadow .25s ease, top .25s ease, bottom .25s ease;
+  will-change: transform;
+}
+html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2) body #bottomNav .nav-ind.no-anim { transition: none !important; }
+html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2) body #bottomNav .nav-ind.lift {
+  top: -1px; bottom: -1px; z-index: 2; transition: background .2s ease, box-shadow .2s ease, top .2s ease, bottom .2s ease;
+  background: radial-gradient(120% 120% at 50% 0%, rgba(255, 255, 255, .22), rgba(255, 255, 255, .04) 60%, rgba(255, 255, 255, .08));
+  backdrop-filter: saturate(1.8) brightness(1.15); -webkit-backdrop-filter: saturate(1.8) brightness(1.15);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6), inset 0 -1px 0 rgba(255, 255, 255, .2), inset 0 0 0 .5px rgba(255, 255, 255, .4), 0 8px 18px -10px rgba(0, 0, 0, .5);
+}
+/* Thème clair */
+html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2) body.theme-light #bottomNav.mobile-bottom-nav {
+  background: rgba(255, 255, 255, .5) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), inset 0 0 0 .5px rgba(0, 0, 0, .08), 0 10px 30px -14px rgba(0, 0, 0, .25) !important;
+}
+html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2) body.theme-light #bottomNav .bottom-nav-btn { color: rgba(30, 41, 59, .6) !important; }
+html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2) body.theme-light #bottomNav .bottom-nav-btn.active { color: #0891b2 !important; }
+html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2) body.theme-light #bottomNav .bottom-nav-btn.ind-over { color: #0e7490 !important; }
+html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2) body.theme-light #bottomNav .nav-ind:not(.lift) { background: rgba(8, 145, 178, .1); box-shadow: none; }
+}
+@media (max-width: 767px) and (prefers-reduced-motion: reduce) { html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2) body #bottomNav .nav-ind { transition: none !important; } }
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
@@ -8461,6 +8515,19 @@ const updateMobileScrollShell = () => {
  document.documentElement.style.setProperty('--mobile-nav-height', navHeight + 'px');
 };
 
+const activateBottomNav = id => {
+ const config = immediateMobileActions[id];
+ if (!config) return;
+ if (handleActiveTabReselect(config.tab)) {
+  appHaptic('light');
+  return;
+ }
+ const scrollContainer = cancelMobileScrollMomentum();
+ config.action();
+ finishMobileTabSwitch(scrollContainer);
+ appHaptic('light');
+};
+window.activateBottomNav = activateBottomNav;
 Object.entries(immediateMobileActions).forEach(([id, config]) => {
  const button = document.getElementById(id);
  if (!button) return;
@@ -8468,15 +8535,9 @@ Object.entries(immediateMobileActions).forEach(([id, config]) => {
   if (event.touches.length !== 1) return;
   event.preventDefault();
   event.stopPropagation();
-
-  if (handleActiveTabReselect(config.tab)) {
-   appHaptic('light');
-   return;
-  }
-  const scrollContainer = cancelMobileScrollMomentum();
-  config.action();
-  finishMobileTabSwitch(scrollContainer);
-  appHaptic('light');
+  // Téléphone : l'indicateur « verre liquide » change d'onglet au lever du doigt (il peut glisser d'un onglet à l'autre).
+  if (window.isGlassNavActive?.()) return;
+  activateBottomNav(id);
  }, { passive: false, capture: true });
 });
 
@@ -10239,6 +10300,7 @@ renderIncompletePanel();
 animateActiveTabPanel(tab);
 updateTopNavIndicator();
 if (typeof deskRefresh === 'function') deskRefresh();
+if (window.syncNavInd) requestAnimationFrame(() => window.syncNavInd(true));
 }
 
 // Conteneur qui défile réellement : <main> sur téléphone, la fenêtre ailleurs.
@@ -15324,6 +15386,87 @@ async function backfillCollectionInfo() {
  });
  window.deskRefresh = refresh;
  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', refresh); else refresh();
+})();
+</script>
+<script>
+// --- Téléphone : indicateur « verre liquide » de la barre de navigation (comme Mon Butin) ---
+// Au toucher il se soulève en goutte de verre, suit le doigt en s'étirant, puis se repose sur l'onglet choisi.
+(() => {
+ let ind = null, drag = null, raf = 0;
+ const bar = () => document.getElementById('bottomNav');
+ const isGlass = () => {
+  const root = document.documentElement, b = bar();
+  return !!b && root.classList.contains('ui-v2') && !root.classList.contains('is-ipad') && !root.classList.contains('desk-v2')
+   && window.matchMedia('(max-width: 767px)').matches && !b.classList.contains('hidden');
+ };
+ window.isGlassNavActive = isGlass;
+ const tabsOf = () => [...document.querySelectorAll('#bottomNav .bottom-nav-btn')];
+ const tabAt = x => {
+  const ts = tabsOf();
+  return ts.find(t => { const r = t.getBoundingClientRect(); return x >= r.left && x <= r.right; }) || (x < ts[0]?.getBoundingClientRect().left ? ts[0] : ts[ts.length - 1]);
+ };
+ function ensure() {
+  const b = bar();
+  if (!isGlass()) { ind?.remove(); ind = null; return null; }
+  if (!ind || !b.contains(ind)) { ind = document.createElement('div'); ind.className = 'nav-ind'; ind.setAttribute('aria-hidden', 'true'); b.appendChild(ind); }
+  return ind;
+ }
+ function setX(x, w, sx = 1, sy = 1) {
+  const br = bar().getBoundingClientRect();
+  const left = Math.max(br.left + 2, Math.min(br.right - 2 - w, x - w / 2)) - br.left;
+  ind.style.width = w + 'px';
+  ind.style.transform = `translate3d(${left}px,0,0) scale(${sx},${sy})`;
+ }
+ window.syncNavInd = (animate = true) => {
+  if (!ensure() || drag) return;
+  const on = document.querySelector('#bottomNav .bottom-nav-btn.active');
+  if (!on) return;
+  const r = on.getBoundingClientRect();
+  if (!animate) ind.classList.add('no-anim');
+  setX(r.left + r.width / 2, r.width);
+  if (!animate) { void ind.offsetWidth; ind.classList.remove('no-anim'); }
+ };
+ document.addEventListener('pointerdown', ev => {
+  const tab = ev.target.closest?.('#bottomNav .bottom-nav-btn');
+  if (!tab || ev.pointerType === 'mouse' || !ensure()) return;
+  drag = { x: ev.clientX, lastX: ev.clientX, t: performance.now(), v: 0, w: tab.getBoundingClientRect().width, over: tab, moved: false, start: ev.clientX };
+  ind.classList.add('lift');
+  try { bar().setPointerCapture(ev.pointerId); } catch (_) {}
+  loop();
+ }, true);
+ function loop() {
+  cancelAnimationFrame(raf);
+  raf = requestAnimationFrame(() => {
+   if (!drag) return;
+   // étirement dans le sens du mouvement, proportionnel à la vitesse
+   const st = Math.min(Math.abs(drag.v) * 0.9, 0.38);
+   setX(drag.x, drag.w, 1.22 + st, 1.22 - st * 0.45);
+   drag.v *= 0.82;
+   loop();
+  });
+ }
+ document.addEventListener('pointermove', ev => {
+  if (!drag) return;
+  const now = performance.now(), dt = Math.max(8, now - drag.t);
+  drag.v = (ev.clientX - drag.lastX) / dt; drag.lastX = ev.clientX; drag.t = now; drag.x = ev.clientX;
+  if (Math.abs(ev.clientX - drag.start) > 6) drag.moved = true;
+  const t = tabAt(ev.clientX);
+  if (t !== drag.over) { drag.over = t; tabsOf().forEach(x => x.classList.toggle('ind-over', x === t)); }
+ }, true);
+ const end = (ev, cancel) => {
+  if (!drag) return;
+  const t = cancel ? null : (drag.moved ? tabAt(ev.clientX) : drag.over);
+  drag = null; cancelAnimationFrame(raf);
+  tabsOf().forEach(x => x.classList.remove('ind-over'));
+  ind?.classList.remove('lift');
+  if (t?.id && window.activateBottomNav) window.activateBottomNav(t.id);
+  requestAnimationFrame(() => window.syncNavInd(true));
+ };
+ document.addEventListener('pointerup', ev => end(ev, false), true);
+ document.addEventListener('pointercancel', ev => end(ev, true), true);
+ addEventListener('resize', () => window.syncNavInd(false));
+ const start = () => requestAnimationFrame(() => window.syncNavInd(false));
+ if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
 </script>
 </body>
