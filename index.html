@@ -6799,89 +6799,6 @@ html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body:not(.theme-light
 html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body:not(.theme-light) #deskSide .ds-user small { color: #94a3b8; }
 html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body:not(.theme-light) #deskSide .ds-av { background: linear-gradient(145deg, #3b82f6, #1d4ed8); box-shadow: none; }
 }
-@media (min-width: 1100px) and (hover: hover) and (pointer: fine) {
-/* ===== Tuiles harmonisées avec la barre latérale (ordinateur uniquement) =====
-   Jetons de l'habillage redéfinis en tons graphite : cartes, panneaux, pastilles et
-   boutons suivent la couleur neutre. Vert (vu), orange (à compléter) et rouge
-   (suppression) gardent leur sens ; les formats gardent leurs couleurs. */
-html.ui-v2.desk-v2 body:not(.theme-light) {
-  --rgb-blue2: 212, 212, 216; --on-blue2: #18181b;
-  --rgb-azure: 212, 212, 216; --on-azure: #18181b;
-  --rgb-pink: 228, 228, 231;  --on-pink: #18181b;
-  --rgb-neutral: 212, 212, 216;
-  --v2-bg: #09090b; --v2-card: #18181b; --v2-card-2: #232326;
-  --v2-panel: linear-gradient(165deg, #1d1d20 0%, #18181b 60%, #141416 100%);
-  --v2-hair: inset 0 0 0 1px rgba(255, 255, 255, .07);
-  --v2-glow: transparent; --v2-modal-bg: #0f0f11; --v2-seg-bg: rgba(255, 255, 255, .06);
-  --v2-header-bg: rgba(9, 9, 11, .82);
-}
-html.ui-v2.desk-v2 body.theme-light {
-  --rgb-blue2: 63, 63, 70; --rgb-azure: 63, 63, 70; --rgb-pink: 63, 63, 70; --rgb-neutral: 63, 63, 70;
-  --v2-bg: #f4f4f5; --v2-card: #ffffff; --v2-card-2: #f4f4f5;
-  --v2-panel: linear-gradient(165deg, #ffffff 0%, #fafafa 100%);
-  --v2-hair: inset 0 0 0 1px rgba(24, 24, 27, .08);
-  --v2-glow: transparent; --v2-modal-bg: #f4f4f5; --v2-seg-bg: rgba(24, 24, 27, .06);
-  --v2-header-bg: rgba(244, 244, 245, .86);
-}
-/* Accents froids codés en dur (cyan, bleu, violet, rose…) ramenés aux tons neutres */
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="text-cyan-"],
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="text-sky-"],
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="text-blue-"],
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="text-purple-"],
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="text-violet-"],
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="text-indigo-"],
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="text-pink-"],
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="text-fuchsia-"] { color: rgb(var(--rgb-accent)) !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="border-cyan-"],
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="border-sky-"],
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="border-blue-"],
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="border-purple-"],
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="border-violet-"],
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="border-indigo-"],
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="border-pink-"],
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="border-fuchsia-"] { border-color: rgba(var(--rgb-neutral), .18) !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="bg-cyan-"],
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="bg-sky-"],
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="bg-blue-"],
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="bg-purple-"],
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="bg-violet-"],
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="bg-indigo-"],
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="bg-pink-"],
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class*="bg-fuchsia-"] { background-color: rgba(var(--rgb-neutral), .12) !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-cyan-400"],html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-cyan-500"],html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-cyan-600"],html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-sky-400"],html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-sky-500"],html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-sky-600"],html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-blue-400"],html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-blue-500"],html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-blue-600"],html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-purple-400"],html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-purple-500"],html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-purple-600"],html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-violet-400"],html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-violet-500"],html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-violet-600"],html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-indigo-400"],html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-indigo-500"],html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-indigo-600"],html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-pink-400"],html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-pink-500"],html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-pink-600"],html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-fuchsia-400"],html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-fuchsia-500"],html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal, #globalSearchModal, .quick-sheet) [class~="bg-fuchsia-600"] { background-color: rgb(var(--rgb-accent)) !important; color: var(--on-accent) !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body #modalContent.movie-detail-editing .movie-edit-toggle, html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body .movie-detail-editing .movie-edit-toggle { color: rgb(var(--rgb-accent)) !important; border-color: rgba(var(--rgb-neutral), .22) !important; background: rgba(var(--rgb-neutral), .1) !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body #modalContent .edition-card, html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body #modalContent .edition-card:hover, html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body #modalContent .edition-card.has-edition-cover { border-color: rgba(var(--rgb-neutral), .14) !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body .empty-state-icon { color: rgb(var(--rgb-accent)) !important; background: rgba(var(--rgb-neutral), .1) !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body main .bg-clip-text.text-transparent[class*="from-cyan"], html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body main .bg-clip-text.text-transparent[class*="from-sky"], html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body main .bg-clip-text.text-transparent[class*="from-blue"], html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body main .bg-clip-text.text-transparent[class*="from-purple"], html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body main .bg-clip-text.text-transparent[class*="from-violet"] { background: none !important; -webkit-text-fill-color: currentColor !important; color: rgb(var(--rgb-accent)) !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body #syncStatus, html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body #syncStatus:hover { background: var(--v2-card-2) !important; border-color: rgba(var(--rgb-neutral), .16) !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body .home-customize-bar { border-color: rgba(var(--rgb-neutral), .12) !important; background: var(--v2-card) !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal) input[type="checkbox"], html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal) input[type="radio"], html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body :is(main, #detailModal) input[type="range"] { accent-color: rgb(var(--rgb-accent)) !important; }
-/* ===== Couleur principale ordinateur : neutre graphite & argent (remplace le bleu) ===== */
-html.ui-v2.desk-v2 body:not(.theme-light) { --rgb-accent: 228, 228, 231; --on-accent: #18181b; }
-html.ui-v2.desk-v2 body.theme-light { --rgb-accent: 39, 39, 42; --on-accent: #ffffff; }
-/* La 4K garde sa propre couleur dans la répartition par format */
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body main [style*="#22d3ee"] { background: #5fb0ff !important; }
-/* Barre latérale graphite (sombre : presque noire ; clair : anthracite) */
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body:not(.theme-light) #deskSide { background: linear-gradient(180deg, #1c1c1f 0%, #121214 50%, #09090b 100%) !important; box-shadow: inset -1px 0 0 rgba(255, 255, 255, .07) !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body.theme-light #deskSide { background: linear-gradient(180deg, #3f3f46 0%, #27272a 50%, #18181b 100%) !important; box-shadow: 12px 0 40px -24px rgba(24, 24, 27, .7) !important; color: #fff !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) #deskSide .ds-item { color: #a1a1aa !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) #deskSide .ds-item:hover, html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) #deskSide .ds-user:hover { background: rgba(255, 255, 255, .07) !important; color: #fff !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) #deskSide .ds-item.primary { background: rgba(255, 255, 255, .08) !important; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14) !important; color: #f4f4f5 !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) #deskSide .ds-item.on, html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) #deskSide .ds-item.primary.on { background: #f4f4f5 !important; color: #18181b !important; box-shadow: 0 10px 24px -12px rgba(0, 0, 0, .7) !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) #deskSide .ds-item em { background: rgba(255, 255, 255, .09) !important; color: #d4d4d8 !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) #deskSide .ds-item.on em { background: rgba(24, 24, 27, .12) !important; color: #18181b !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) #deskSide .ds-title { color: #71717a !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) #deskSide .ds-dot { box-shadow: none !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) #deskSide .ds-value { background: linear-gradient(135deg, #27272a, #3f3f46) !important; color: #fff !important; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1), 0 12px 26px -16px rgba(0, 0, 0, .8) !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) #deskSide .ds-value:hover { filter: brightness(1.12); }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) #deskSide .ds-brand-ico, html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) #deskSide .ds-av { background: #f4f4f5 !important; color: #18181b !important; box-shadow: none !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) #deskSide .ds-user, html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) #deskSide .ds-user b { color: #f4f4f5 !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) #deskSide .ds-user small { color: #a1a1aa !important; }
-/* Bouton principal de la barre du haut */
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body:not(.theme-light) #deskTop .dt-btn.primary { background: #f4f4f5 !important; color: #18181b !important; box-shadow: 0 10px 22px -12px rgba(0, 0, 0, .8) !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) body.theme-light #deskTop .dt-btn.primary { background: #18181b !important; color: #fff !important; box-shadow: 0 10px 22px -12px rgba(24, 24, 27, .6) !important; }
-html:is(.desk-v2,#a1):is(.desk-v2,#a2):is(.desk-v2,#a3):is(.desk-v2,#a4) #deskTop .dt-search:hover { box-shadow: inset 0 0 0 1.5px rgb(var(--rgb-accent)) !important; }
-}
 @media (prefers-reduced-motion: reduce) {
   html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #detailModal > div, html:is(.desk-v2,#dk1):is(.desk-v2,#dk2):is(.desk-v2,#dk3) body #detailModal.detail-modal-closing > div { animation: none !important; }
 }
@@ -6895,12 +6812,12 @@ html:is(.desk-v2,#ng4):is(.desk-v2,#ng5):is(.desk-v2,#ng6):is(.desk-v2,#ng7):is(
 html:is(.desk-v2,#ng4):is(.desk-v2,#ng5):is(.desk-v2,#ng6):is(.desk-v2,#ng7):is(.desk-v2,#ng8) #deskSide .ds-brand-ico, html:is(.desk-v2,#ng4):is(.desk-v2,#ng5):is(.desk-v2,#ng6):is(.desk-v2,#ng7):is(.desk-v2,#ng8) #deskSide .ds-av { box-shadow: none !important; }
 html:is(.desk-v2,#ng4):is(.desk-v2,#ng5):is(.desk-v2,#ng6):is(.desk-v2,#ng7):is(.desk-v2,#ng8) #deskSide .ds-value { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1) !important; }
 
-/* ===== Téléphone : couleur principale cyan (celle du logo), panneaux et tuiles assortis ===== */
+/* ===== Téléphone et ordinateur : couleur principale cyan (celle du logo), panneaux et tuiles assortis ===== */
 /* Icônes de Mon espace accordées au cyan */
-html:is(.ui-v2,#cy1):is(.ui-v2,#cy2):is(.ui-v2,#cy3):not(.is-ipad):not(.desk-v2) body #mobileProfileToggle > span:first-child > .icon-inline:first-child { --ico: #0891b2 !important; }
-html:is(.ui-v2,#cy1):is(.ui-v2,#cy2):is(.ui-v2,#cy3):not(.is-ipad):not(.desk-v2) body #mobileInstallationToggle > span:first-child > .icon-inline:first-child { --ico: #0284c7 !important; }
+html:is(.ui-v2,#cy1):is(.ui-v2,#cy2):is(.ui-v2,#cy3):not(.is-ipad) body #mobileProfileToggle > span:first-child > .icon-inline:first-child { --ico: #0891b2 !important; }
+html:is(.ui-v2,#cy1):is(.ui-v2,#cy2):is(.ui-v2,#cy3):not(.is-ipad) body #mobileInstallationToggle > span:first-child > .icon-inline:first-child { --ico: #0284c7 !important; }
 
-html.ui-v2:not(.is-ipad):not(.desk-v2) body {
+html.ui-v2:not(.is-ipad) body {
   --rgb-accent: 34, 211, 238; --on-accent: #042f37;
   --rgb-azure: 103, 232, 249; --on-azure: #042f37;
   --rgb-blue2: 56, 189, 248; --on-blue2: #04263a;
@@ -6911,7 +6828,7 @@ html.ui-v2:not(.is-ipad):not(.desk-v2) body {
   --v2-glow: rgba(34, 211, 238, .08);
   --v2-seg-bg: rgba(103, 232, 249, .07);
 }
-html.ui-v2:not(.is-ipad):not(.desk-v2) body.theme-light {
+html.ui-v2:not(.is-ipad) body.theme-light {
   --rgb-accent: 8, 145, 178; --on-accent: #ffffff;
   --rgb-azure: 14, 116, 144; --on-azure: #ffffff;
   --rgb-blue2: 2, 132, 199; --on-blue2: #ffffff;
@@ -6994,6 +6911,35 @@ html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2)
 /* Transition « pastille liquide » entre boutons (reprise de Mon Butin) */
 .slide-pill { position: absolute; z-index: 0; pointer-events: none; transform-origin: center; will-change: transform; }
 .pill-hold { position: relative; z-index: 1; }
+
+/* ===== Ordinateur : barre latérale et boutons à la couleur cyan de l'app (comme sur téléphone) ===== */
+@media (min-width: 1100px) and (hover: hover) and (pointer: fine) {
+/* Thème sombre : fond presque noir teinté de cyan */
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide { background: radial-gradient(130% 55% at 0% 0%, rgba(34, 211, 238, .16), transparent 60%), linear-gradient(180deg, #0f1a1d 0%, #0a1214 50%, #05090a 100%) !important; box-shadow: inset -1px 0 0 rgba(103, 232, 249, .08) !important; color: #e6f7fa !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-item, html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-user { color: #9fb3b9 !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-item:hover, html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-user:hover { background: rgba(103, 232, 249, .08) !important; color: #fff !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-item.primary { background: rgba(34, 211, 238, .12) !important; box-shadow: inset 0 0 0 1px rgba(103, 232, 249, .25) !important; color: #cffafe !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-item.on, html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-item.primary.on { background: #22d3ee !important; color: #042f37 !important; box-shadow: none !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-title { color: #5f7c84 !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-value { background: linear-gradient(135deg, #0c2a31, #0e4a57 60%, #0891b2) !important; color: #fff !important; box-shadow: inset 0 0 0 1px rgba(103, 232, 249, .25) !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-brand-ico, html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-av { background: #22d3ee !important; color: #042f37 !important; box-shadow: none !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-user b { color: #f0fdff !important; } html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-user small { color: #8aa3aa !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskTop .dt-btn.primary { background: #22d3ee !important; color: #042f37 !important; box-shadow: none !important; }
+/* Thème clair : barre latérale en dégradé cyan, texte blanc */
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide { background: linear-gradient(180deg, #06b6d4 0%, #0891b2 50%, #155e75 100%) !important; box-shadow: none !important; color: #fff !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-item, html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-user { color: rgba(255, 255, 255, .85) !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-item:hover, html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-user:hover { background: rgba(255, 255, 255, .14) !important; color: #fff !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-item.primary { background: rgba(255, 255, 255, .16) !important; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .24) !important; color: #fff !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-item.on, html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-item.primary.on { background: #fff !important; color: #0e7490 !important; box-shadow: none !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-title { color: rgba(255, 255, 255, .65) !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-value { background: rgba(255, 255, 255, .14) !important; color: #fff !important; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .24) !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-brand-ico, html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-av { background: #fff !important; color: #0e7490 !important; box-shadow: none !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-user b { color: #fff !important; } html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-user small { color: rgba(255, 255, 255, .75) !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-item[data-format]::after, html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-item[data-case]::after { background: rgba(255, 255, 255, .18) !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-dot { box-shadow: 0 0 0 2px rgba(255, 255, 255, .35) !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskTop .dt-btn.primary { background: #0891b2 !important; color: #fff !important; box-shadow: none !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) #deskTop .dt-search:hover { box-shadow: inset 0 0 0 1.5px rgb(var(--rgb-accent)) !important; }
+}
 </style>
 </head>
 <body class="theme-noir text-gray-100 min-h-screen pb-10 selection:bg-cyan-500 selection:text-white">
