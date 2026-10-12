@@ -6915,30 +6915,53 @@ html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2)
 /* ===== Ordinateur : barre latérale et boutons à la couleur cyan de l'app (comme sur téléphone) ===== */
 @media (min-width: 1100px) and (hover: hover) and (pointer: fine) {
 /* Thème sombre : fond presque noir teinté de cyan */
-html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide { background: radial-gradient(130% 55% at 0% 0%, rgba(34, 211, 238, .16), transparent 60%), linear-gradient(180deg, #0f1a1d 0%, #0a1214 50%, #05090a 100%) !important; box-shadow: inset -1px 0 0 rgba(103, 232, 249, .08) !important; color: #e6f7fa !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide { background: radial-gradient(130% 55% at 0% 0%, rgba(110, 196, 214, .07), transparent 60%), linear-gradient(180deg, #121a1c 0%, #0d1416 50%, #080c0d 100%) !important; box-shadow: inset -1px 0 0 rgba(103, 232, 249, .08) !important; color: #e6f7fa !important; }
 html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-item, html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-user { color: #9fb3b9 !important; }
 html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-item:hover, html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-user:hover { background: rgba(103, 232, 249, .08) !important; color: #fff !important; }
 html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-item.primary { background: rgba(34, 211, 238, .12) !important; box-shadow: inset 0 0 0 1px rgba(103, 232, 249, .25) !important; color: #cffafe !important; }
-html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-item.on, html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-item.primary.on { background: #22d3ee !important; color: #042f37 !important; box-shadow: none !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-item.on, html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-item.primary.on { background: rgba(var(--rgb-accent), .16) !important; color: #e3f4f7 !important; box-shadow: inset 0 0 0 1px rgba(var(--rgb-accent), .28) !important; }
 html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-title { color: #5f7c84 !important; }
-html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-value { background: linear-gradient(135deg, #0c2a31, #0e4a57 60%, #0891b2) !important; color: #fff !important; box-shadow: inset 0 0 0 1px rgba(103, 232, 249, .25) !important; }
-html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-brand-ico, html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-av { background: #22d3ee !important; color: #042f37 !important; box-shadow: none !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-value { background: linear-gradient(135deg, #12242a, #183a43 60%, #2a6676) !important; color: #fff !important; box-shadow: inset 0 0 0 1px rgba(103, 232, 249, .25) !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-brand-ico, html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-av { background: rgb(var(--rgb-accent)) !important; color: var(--on-accent) !important; box-shadow: none !important; }
 html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-user b { color: #f0fdff !important; } html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskSide .ds-user small { color: #8aa3aa !important; }
-html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskTop .dt-btn.primary { background: #22d3ee !important; color: #042f37 !important; box-shadow: none !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body:not(.theme-light) #deskTop .dt-btn.primary { background: rgb(var(--rgb-accent)) !important; color: var(--on-accent) !important; box-shadow: none !important; }
 /* Thème clair : barre latérale en dégradé cyan, texte blanc */
-html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide { background: linear-gradient(180deg, #06b6d4 0%, #0891b2 50%, #155e75 100%) !important; box-shadow: none !important; color: #fff !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide { background: linear-gradient(180deg, #4fa6b8 0%, #3a8a9d 50%, #2a6474 100%) !important; box-shadow: none !important; color: #fff !important; }
 html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-item, html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-user { color: rgba(255, 255, 255, .85) !important; }
 html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-item:hover, html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-user:hover { background: rgba(255, 255, 255, .14) !important; color: #fff !important; }
 html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-item.primary { background: rgba(255, 255, 255, .16) !important; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .24) !important; color: #fff !important; }
-html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-item.on, html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-item.primary.on { background: #fff !important; color: #0e7490 !important; box-shadow: none !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-item.on, html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-item.primary.on { background: #fff !important; color: #2f7586 !important; box-shadow: none !important; }
 html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-title { color: rgba(255, 255, 255, .65) !important; }
 html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-value { background: rgba(255, 255, 255, .14) !important; color: #fff !important; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .24) !important; }
-html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-brand-ico, html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-av { background: #fff !important; color: #0e7490 !important; box-shadow: none !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-brand-ico, html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-av { background: #fff !important; color: #2f7586 !important; box-shadow: none !important; }
 html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-user b { color: #fff !important; } html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-user small { color: rgba(255, 255, 255, .75) !important; }
 html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-item[data-format]::after, html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-item[data-case]::after { background: rgba(255, 255, 255, .18) !important; }
 html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskSide .ds-dot { box-shadow: 0 0 0 2px rgba(255, 255, 255, .35) !important; }
-html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskTop .dt-btn.primary { background: #0891b2 !important; color: #fff !important; box-shadow: none !important; }
+html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) body.theme-light #deskTop .dt-btn.primary { background: rgb(var(--rgb-accent)) !important; color: #fff !important; box-shadow: none !important; }
 html:is(.desk-v2,#cs1):is(.desk-v2,#cs2):is(.desk-v2,#cs3):is(.desk-v2,#cs4):is(.desk-v2,#cs5) #deskTop .dt-search:hover { box-shadow: inset 0 0 0 1.5px rgb(var(--rgb-accent)) !important; }
+/* Ordinateur : cyan adouci (moins saturé) pour l'ensemble des panneaux, tuiles et boutons */
+html.desk-v2.ui-v2:not(.is-ipad) body {
+  --rgb-accent: 110, 196, 214; --on-accent: #062a31;
+  --rgb-azure: 150, 212, 224; --on-azure: #062a31;
+  --rgb-blue2: 122, 182, 212; --on-blue2: #08243a;
+  --v2-card: #141a1c; --v2-card-2: #1b2326;
+  --v2-panel: radial-gradient(120% 90% at 0% 0%, rgba(110, 196, 214, .06), transparent 55%),
+              linear-gradient(165deg, #182023 0%, #141a1c 60%, #101618 100%);
+  --v2-hair: inset 0 0 0 1px rgba(150, 212, 224, .08);
+  --v2-glow: rgba(110, 196, 214, .05);
+  --v2-seg-bg: rgba(150, 212, 224, .06);
+}
+html.desk-v2.ui-v2:not(.is-ipad) body.theme-light {
+  --rgb-accent: 47, 128, 148; --on-accent: #ffffff;
+  --rgb-azure: 44, 106, 122; --on-azure: #ffffff;
+  --rgb-blue2: 52, 120, 160; --on-blue2: #ffffff;
+  --v2-card: #ffffff; --v2-card-2: #f1f7f8;
+  --v2-panel: radial-gradient(120% 90% at 0% 0%, rgba(47, 128, 148, .05), transparent 55%),
+              linear-gradient(165deg, #ffffff 0%, #f8fbfc 100%);
+  --v2-hair: inset 0 0 0 1px rgba(47, 128, 148, .1);
+  --v2-glow: rgba(47, 128, 148, .05);
+  --v2-seg-bg: rgba(47, 128, 148, .06);
+}
 }
 </style>
 </head>
@@ -15211,7 +15234,7 @@ async function backfillCollectionInfo() {
    <div class="ds-brand"><span class="ds-brand-ico">${svg('disc')}</span>Blu-raythèque</div>
    <nav class="ds-nav">
     <button type="button" class="ds-item" data-tab="home">${svg('home')}<span class="ds-l">Accueil</span></button>
-    <button type="button" class="ds-item primary" data-tab="collection">${svg('disc')}<span class="ds-l">Collection</span><em data-count="collection"></em></button>
+    <button type="button" class="ds-item" data-tab="collection">${svg('disc')}<span class="ds-l">Collection</span><em data-count="collection"></em></button>
     <button type="button" class="ds-item" data-tab="wishlist">${svg('star')}<span class="ds-l">Wishlist</span><em data-count="wishlist"></em></button>
     <button type="button" class="ds-item" data-tab="digital">${svg('cloud')}<span class="ds-l">Numérique</span><em data-count="digital"></em></button>
     <button type="button" class="ds-item" data-tab="series">${svg('tv')}<span class="ds-l">Séries</span><em data-count="series"></em></button>
