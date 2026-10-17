@@ -192,11 +192,13 @@ async function searchByTitle(titles, year, format) {
   const wanted = format === '4k' ? '4K UHD' : (format === 'dvd' ? 'DVD' : 'Blu-ray 1080p');
   for (const title of titles) {
     const words = normalize(title).split(' ').filter(w => w.length > 2);
+    // L'année doit concorder (les coffrets multi-films n'en ont pas) ; le titre exact passe en premier.
+    const exact = normalize(title);
     const results = parseResults(await fetchHtml(searchUrl(title))).filter(e => {
-      if (year && e.year && Math.abs(Number(e.year) - Number(year)) > 1) return false;
+      if (year && (!e.year || Math.abs(Number(e.year) - Number(year)) > 1)) return false;
       const name = normalize(e.title);
       return !words.length || words.every(w => name.includes(w));
-    });
+    }).sort((a, b) => Number(normalize(b.title) === exact) - Number(normalize(a.title) === exact));
     let hit = results.find(e => appFormat(e.support) === wanted);
     if (!hit) hit = (await loadOtherEditions(results.slice(0, 4))).find(e => appFormat(e.support) === wanted);
     if (!hit) continue;
