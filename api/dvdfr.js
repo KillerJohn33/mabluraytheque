@@ -62,7 +62,9 @@ function info(html, label) {
   return match ? decode(match[1]) : '';
 }
 
-function parseProduct(html, url) {
+function parseProduct(source, url) {
+  // Espaces normalisés : le HTML servi contient des doubles espaces dans certaines balises.
+  const html = String(source).replace(/\s+/g, ' ').replace(/ >/g, '>');
   const ean = (html.match(/"isbn"\s*:\s*"(\d{8,14})"/) || [])[1] || info(html, 'EAN').replace(/\D/g, '');
   const h1 = (html.match(/<h1 class="titre[^"]*">([\s\S]*?)<\/h1>/i) || [])[1] || '';
   const year = (h1.match(/<span class="commentLangue">\s*\((\d{4})\)\s*<\/span>/i) || [])[1] || '';
@@ -112,13 +114,13 @@ const PRODUCT_LINK = '(?:https:\\/\\/www\\.dvdfr\\.com)?(\\/dvd\\/(\\d{8,14})-[a
 // ou renvoyées par detail_autres_editions_liste.php.
 function parseOtherEditions(html, title, year) {
   const pattern = new RegExp(`otherEdition-line" href="${PRODUCT_LINK}"[^>]*>[\\s\\S]*?<div class="pull-left">\\s*([^<]*?)\\s*&nbsp;-&nbsp;`, 'gi');
-  return [...String(html).replace(/\s+/g, ' ').matchAll(pattern)].map(m => ({ path: m[1], ean: m[2], title, year, support: decode(m[3]) }));
+  return [...String(html).replace(/\s+/g, ' ').replace(/ >/g, '>').matchAll(pattern)].map(m => ({ path: m[1], ean: m[2], title, year, support: decode(m[3]) }));
 }
 
 // Éditions d'une page de résultats : chaque résultat principal (titre, année, format)
 // suivi de ses « autres éditions » quand la page les contient déjà.
 function parseResults(html) {
-  const flat = html.replace(/\s+/g, ' ');
+  const flat = html.replace(/\s+/g, ' ').replace(/ >/g, '>');
   const start = flat.indexOf('id="liste_livres"');
   if (start < 0) return [];
   const body = flat.slice(start);
