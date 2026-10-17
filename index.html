@@ -13160,6 +13160,7 @@ ${editionTechDesktopQuery.matches ? '' : '<details class="edition-more-details r
 </div>
 <div class="flex gap-2"><input id="blurayUrl-${idx}" type="text" inputmode="url" value="${escapeHtml(ed.blurayUrl || '')}" placeholder="Lien de l’édition exacte" class="flex-1 min-w-0 glass-input text-white text-[10px] px-2.5 py-2 rounded-xl"><button id="blurayLoad-${idx}" onclick="attachBlurayEdition(${movieIdArg}, ${idx})" class="detail-edit-only app-action app-action-cyan px-3 text-[10px]">Importer</button></div>
 </div>
+${ed.dvdfrUrl ? `<div class="flex items-center justify-between gap-2"><span class="text-[8px] text-gray-500 uppercase tracking-wider">Fiche DVDFr${ed.dvdfrAutoMatch === 'title' ? ' (probable)' : ''}</span><a href="${escapeHtml(ed.dvdfrUrl)}" target="_blank" rel="noopener noreferrer" class="text-[9px] text-cyan-300 hover:text-white">Voir sur DVDFr ↗</a></div>` : ''}
 <div>
 <label class="block text-[8px] text-gray-500 uppercase tracking-wider mb-1">Éditeur</label>
 <input type="text" value="${escapeHtml(ed.publisher || '')}" onchange="updateEditionField(${movieIdArg}, ${idx}, 'publisher', this.value)" class="w-full glass-input text-white text-[10px] px-2.5 py-2 rounded-xl">
@@ -13444,7 +13445,7 @@ edition[field] = val;
 if (!edition.discCompositionManual && (field === 'title' || field === 'format')) {
  edition.discComposition = inferDiscComposition(edition.title, edition.format);
 }
-if (field === 'barcode' && val !== previous) { movie.editions[editionIdx].metadataChecked = false; movie.editions[editionIdx].image = ''; movie.editions[editionIdx].publisher = ''; movie.editions[editionIdx].physicalDescription = ''; }
+if (field === 'barcode' && val !== previous) { movie.editions[editionIdx].metadataChecked = false; movie.editions[editionIdx].image = ''; movie.editions[editionIdx].backImage = ''; movie.editions[editionIdx].dvdfrUrl = ''; movie.editions[editionIdx].dvdfrAutoVersion = 0; movie.editions[editionIdx].publisher = ''; movie.editions[editionIdx].physicalDescription = ''; }
 if (field === 'barcode' && val && movie.editions.some((ed, idx) => idx !== editionIdx && String(ed.barcode || '') === String(val))) {
 movie.editions[editionIdx][field] = previous;
 showToast('⚠️ Ce code-barres est déjà utilisé pour ce titre.');
@@ -13456,6 +13457,8 @@ if (!result.success) { edition[field] = previous; edition.discComposition = prev
 else {
 renderCollection(); renderWishlist();
 if (!document.getElementById('tabCollection').classList.contains('hidden')) renderIncompletePanel();
+// Nouveau code-barres : jaquette et infos de l'édition recherchées aussitôt (DVDFr en priorité).
+if (field === 'barcode' && val && val !== previous) autoEnrichMovie(movie);
 if (field === 'purchasePrice' || field === 'estimatedPrice') {
 const totals = calculateMovieTotals(movie);
 const purchaseEl = document.getElementById('editionTotalPurchase');
@@ -15105,6 +15108,43 @@ function newEditionDefaults(fields = {}, isWishlist = false) {
  };
 }
 
+// Recherche automatique de la fiche DVDFr d'une édition (code-barres puis titre).
+// DVDFr est la source prioritaire des jaquettes et des détails d'édition françaises.
+const DVDFR_AUTO_VERSION = 1;
+async function findDvdfrEditionAuto(movie, edition) {
+ const barcode = String(edition.barcode || '').replace(/\D/g, '');
+ const call = async params => {
+  const response = await fetch(`/api/dvdfr?${new URLSearchParams(params)}`);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+ };
+ if (/^\d{8,14}$/.test(barcode)) {
+  const byCode = await call({ mode: 'code', code: barcode });
+  if (byCode.found) return byCode;
+ }
+ // Sans code-barres (ou code inconnu de DVDFr), la recherche par titre n'est faite que pour la collection.
+ if (movie.isWishlist) return null;
+ const year = String(movie.releaseDate || '').slice(0, 4);
+ const byTitle = await call({ mode: 'title', title: movie.title || '', originalTitle: movie.originalTitle || '', year, format: /4k/i.test(edition.format || '') ? '4k' : (edition.format === 'DVD' ? 'dvd' : '') });
+ return byTitle.found ? byTitle : null;
+}
+
+function applyDvdfrEdition(edition, data) {
+ const exact = data.match === 'barcode';
+ edition.dvdfrUrl = data.url;
+ edition.dvdfrAutoMatch = data.match;
+ // Une jaquette déjà présente n'est jamais remplacée.
+ if (!edition.image && data.image) edition.image = data.image;
+ if (!edition.backImage && data.backImage) edition.backImage = data.backImage;
+ if (!edition.publisher && data.publisher) edition.publisher = data.publisher;
+ if (exact && data.format) edition.format = data.format;
+ edition.videoCodec = edition.videoCodec || data.videoCodec || '';
+ if (!edition.audioTracks && data.audioTracks?.length) edition.audioTracks = data.audioTracks.join(' · ');
+ if (!edition.subtitles && data.subtitles?.length) edition.subtitles = data.subtitles.join(', ');
+ if (data.steelbook && edition.editionType === 'Amaray') edition.editionType = 'Steelbook';
+ if (exact && !edition.discCompositionManual) edition.discComposition = inferDiscComposition([data.support, data.title].filter(Boolean).join(' '), edition.format);
+}
+
 // Recherche automatique de la fiche Blu-ray.com d'une édition (code-barres puis titre).
 async function findBlurayEditionAuto(movie, edition) {
  const barcode = String(edition.barcode || '').replace(/\D/g, '');
@@ -15153,6 +15193,7 @@ function refreshAfterEnrich(movie) {
 // fiche Blu-ray.com de chaque édition. N'enregistre et ne redessine que si quelque chose change.
 const autoEnrichRunning = new Set();
 let blurayAutoFailures = 0;
+let dvdfrAutoFailures = 0;
 async function autoEnrichMovie(movie, { quiet = false } = {}) {
  if (!movie || !navigator.onLine || autoEnrichRunning.has(movie.id)) return false;
  autoEnrichRunning.add(movie.id);
@@ -15167,6 +15208,17 @@ async function autoEnrichMovie(movie, { quiet = false } = {}) {
     const detail = await response.json();
     if (response.ok) applyTmdbExtras(movie, extractTmdbExtras(detail, isTv));
    } catch (_) {}
+  }
+  // DVDFr en premier : sa jaquette et ses infos priment sur celles des autres sources.
+  for (const edition of movie.editions || []) {
+   // Après plusieurs échecs d'affilée, DVDFr est laissé tranquille jusqu'au prochain lancement.
+   if (edition.dvdfrUrl || alreadyIllustrated.has(edition.id) || edition.dvdfrAutoVersion === DVDFR_AUTO_VERSION || dvdfrAutoFailures >= 3) continue;
+   try {
+    const data = await findDvdfrEditionAuto(movie, edition);
+    if (data) applyDvdfrEdition(edition, data);
+    edition.dvdfrAutoVersion = DVDFR_AUTO_VERSION;
+    dvdfrAutoFailures = 0;
+   } catch (_) { dvdfrAutoFailures++; }
   }
   // Infos liées au code-barres (éditeur, jaquette, format…), déjà gérées par l'application.
   if ((movie.editions || []).some(ed => /^\d{8,14}$/.test(String(ed.barcode || '').replace(/\D/g, '')) && !ed.metadataChecked)) {
@@ -15188,7 +15240,7 @@ async function autoEnrichMovie(movie, { quiet = false } = {}) {
   const result = await updateMovieInCloud(movie);
   if (result.success) {
    refreshAfterEnrich(movie);
-   const matches = (movie.editions || []).map(ed => ed.blurayUrl && ed.blurayAutoMatch).filter(Boolean);
+   const matches = (movie.editions || []).flatMap(ed => [ed.dvdfrUrl && ed.dvdfrAutoMatch, ed.blurayUrl && ed.blurayAutoMatch]).filter(Boolean);
    if (!quiet && matches.includes('barcode')) showToast(`Édition de « ${movie.title} » complétée automatiquement.`);
    else if (!quiet && matches.includes('title')) showToast(`Édition probable de « ${movie.title} » trouvée : vérifiez-la dans la fiche.`);
   }
@@ -15205,13 +15257,14 @@ async function backfillCollectionInfo() {
  collectionBackfillStarted = true;
  const pending = [...collection, ...wishlist].filter(movie => movie.tmdb_id && (
   movie.tmdbExtrasVersion !== TMDB_EXTRAS_VERSION ||
-  (!movie.isWishlist && (movie.editions || []).some(ed => !ed.blurayUrl && !String(ed.image || '').trim() && ed.blurayAutoVersion !== BLURAY_AUTO_VERSION))
+  (!movie.isWishlist && (movie.editions || []).some(ed => !ed.blurayUrl && !String(ed.image || '').trim() && ed.blurayAutoVersion !== BLURAY_AUTO_VERSION)) ||
+  (movie.editions || []).some(ed => !ed.dvdfrUrl && !String(ed.image || '').trim() && ed.dvdfrAutoVersion !== DVDFR_AUTO_VERSION)
  ));
  for (const movie of pending) {
   if (!navigator.onLine) break;
   if (!collection.includes(movie) && !wishlist.includes(movie)) continue;
   await autoEnrichMovie(movie, { quiet: true });
-  // Rythme modéré pour ne pas surcharger TMDB et Blu-ray.com.
+  // Rythme modéré pour ne pas surcharger TMDB, DVDFr et Blu-ray.com.
   await new Promise(resolve => setTimeout(resolve, 2500));
  }
 }
