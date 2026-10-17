@@ -106,8 +106,17 @@ function searchUrl(keywords) {
   return `${SITE}/listeliv.php?${params}`;
 }
 
+const PRODUCT_LINK = '(?:https:\\/\\/www\\.dvdfr\\.com)?(\\/dvd\\/(\\d{8,14})-[a-z0-9-]+\\/)';
+
+// Lignes « autres éditions » (format seulement), présentes dans la page rendue
+// ou renvoyées par detail_autres_editions_liste.php.
+function parseOtherEditions(html, title, year) {
+  const pattern = new RegExp(`otherEdition-line" href="${PRODUCT_LINK}"[^>]*>[\\s\\S]*?<div class="pull-left">\\s*([^<]*?)\\s*&nbsp;-&nbsp;`, 'gi');
+  return [...String(html).replace(/\s+/g, ' ').matchAll(pattern)].map(m => ({ path: m[1], ean: m[2], title, year, support: decode(m[3]) }));
+}
+
 // Éditions d'une page de résultats : chaque résultat principal (titre, année, format)
-// suivi de ses « autres éditions » (format seulement).
+// suivi de ses « autres éditions » quand la page les contient déjà.
 function parseResults(html) {
   const flat = html.replace(/\s+/g, ' ');
   const start = flat.indexOf('id="liste_livres"');
@@ -116,16 +125,14 @@ function parseResults(html) {
   const editions = [];
   const parts = body.split(/<h2 class="livre_titre">/).slice(1);
   for (const part of parts) {
-    const head = part.match(/<a href="https:\/\/www\.dvdfr\.com(\/dvd\/(\d{8,14})-[a-z0-9-]+\/)">([\s\S]*?)<\/a>/i);
+    const head = part.match(new RegExp(`<a href="${PRODUCT_LINK}"[^>]*>([\\s\\S]*?)<\\/a>`, 'i'));
     if (!head) continue;
     const label = decode(head[3]);
     const year = (label.match(/\((\d{4})\)\s*$/) || [])[1] || '';
     const title = label.replace(/\s*\(\d{4}\)\s*$/, '');
     const mainFormat = decode((part.match(/<span class="item_format">([\s\S]*?)<\/span>/i) || [])[1] || '');
     editions.push({ path: head[1], ean: head[2], title, year, support: mainFormat });
-    for (const other of part.matchAll(/otherEdition-line" href="https:\/\/www\.dvdfr\.com(\/dvd\/(\d{8,14})-[a-z0-9-]+\/)">[\s\S]*?<div class="pull-left">\s*([^<]*?)\s*&nbsp;-&nbsp;/gi)) {
-      editions.push({ path: other[1], ean: other[2], title, year, support: decode(other[3]) });
-    }
+    editions.push(...parseOtherEditions(part, title, year));
   }
   const seen = new Set();
   return editions.filter(e => !seen.has(e.ean) && seen.add(e.ean));
@@ -157,6 +164,28 @@ async function searchByCode(code) {
   return null;
 }
 
+// Autres éditions des résultats principaux, chargées à part par DVDFr (comme le fait la page en JavaScript).
+async function loadOtherEditions(mains) {
+  if (!mains.length) return [];
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 7000);
+  try {
+    const response = await fetch(`${SITE}/detail_autres_editions_liste.php`, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: { ...HEADERS, Accept: 'application/json, text/plain, */*', 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest', Referer: `${SITE}/listeliv.php` },
+      body: JSON.stringify({ data: { gencodsAutresEditions: mains.map(m => m.ean), typeProduitAutresEditions: mains.map(() => '3'), showAutreEdit: true } })
+    });
+    if (!response.ok) return [];
+    const json = await response.json();
+    return mains.flatMap(m => parseOtherEditions(json?.[m.ean]?.contentAutresEdits || '', m.title, m.year));
+  } catch (_) {
+    return [];
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function searchByTitle(titles, year, format) {
   const wanted = format === '4k' ? '4K UHD' : (format === 'dvd' ? 'DVD' : 'Blu-ray 1080p');
   for (const title of titles) {
@@ -166,7 +195,8 @@ async function searchByTitle(titles, year, format) {
       const name = normalize(e.title);
       return !words.length || words.every(w => name.includes(w));
     });
-    const hit = results.find(e => appFormat(e.support) === wanted);
+    let hit = results.find(e => appFormat(e.support) === wanted);
+    if (!hit) hit = (await loadOtherEditions(results.slice(0, 4))).find(e => appFormat(e.support) === wanted);
     if (!hit) continue;
     const product = await loadProduct(hit.path);
     if (product) return { ...product, match: 'title' };
