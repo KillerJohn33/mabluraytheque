@@ -193,12 +193,16 @@ async function searchByTitle(titles, year, format) {
   for (const title of titles) {
     const words = normalize(title).split(' ').filter(w => w.length > 2);
     // L'année doit concorder (les coffrets multi-films n'en ont pas) ; le titre exact passe en premier.
+    // L'année doit concorder (les coffrets multi-films n'en ont pas). Si des éditions portent
+    // exactement ce titre, les doubles programmes et titres approchants sont écartés.
     const exact = normalize(title);
-    const results = parseResults(await fetchHtml(searchUrl(title))).filter(e => {
+    const matching = parseResults(await fetchHtml(searchUrl(title))).filter(e => {
       if (year && (!e.year || Math.abs(Number(e.year) - Number(year)) > 1)) return false;
       const name = normalize(e.title);
       return !words.length || words.every(w => name.includes(w));
-    }).sort((a, b) => Number(normalize(b.title) === exact) - Number(normalize(a.title) === exact));
+    });
+    const exactOnly = matching.filter(e => normalize(e.title) === exact);
+    const results = exactOnly.length ? exactOnly : matching;
     let hit = results.find(e => appFormat(e.support) === wanted);
     if (!hit) hit = (await loadOtherEditions(results.slice(0, 4))).find(e => appFormat(e.support) === wanted);
     if (!hit) continue;
