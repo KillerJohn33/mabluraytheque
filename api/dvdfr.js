@@ -180,7 +180,7 @@ async function loadOtherEditions(mains) {
     });
     if (!response.ok) return [];
     const json = await response.json();
-    return mains.flatMap(m => parseOtherEditions(json?.[m.ean]?.contentAutresEdits || '', m.title, m.year));
+    return mains.flatMap(m => parseOtherEditions(json?.[m.ean]?.contentAutresEdits || '', m.title, m.year).map(e => ({ ...e, parent: m.ean })));
   } catch (_) {
     return [];
   } finally {
@@ -212,6 +212,57 @@ async function searchByTitle(titles, year, format) {
   return null;
 }
 
+// Agenda des prochaines sorties françaises (DVD, Blu-ray, 4K) : liste « Prochains » de DVDFr, toutes pages.
+const MONTHS = { janvier: 1, fevrier: 2, mars: 3, avril: 4, mai: 5, juin: 6, juillet: 7, aout: 8, septembre: 9, octobre: 10, novembre: 11, decembre: 12 };
+function isoDate(text) {
+  const m = normalize(text).match(/(\d{1,2}) ([a-z]+) (\d{4})/);
+  if (!m || !MONTHS[m[2]]) return '';
+  return `${m[3]}-${String(MONTHS[m[2]]).padStart(2, '0')}-${m[1].padStart(2, '0')}`;
+}
+
+function parseReleaseList(html) {
+  const flat = String(html).replace(/\s+/g, ' ').replace(/ >/g, '>');
+  const start = flat.indexOf('id="liste_livres"');
+  if (start < 0) return [];
+  return flat.slice(start).split(/<div class="col-xs-4 text-center/).slice(1).map(part => {
+    const head = part.match(new RegExp(`<h2 class="livre_titre"> <a href="${PRODUCT_LINK}"[^>]*>([\\s\\S]*?)<\\/a>`, 'i'));
+    if (!head) return null;
+    const label = decode(head[3]);
+    const image = (part.match(/<img src="(https:\/\/images\.epagine\.fr\/[^"]+)"/i) || [])[1] || '';
+    const support = decode((part.match(/<span class="item_format">([\s\S]*?)<\/span>/i) || [])[1] || '');
+    return {
+      url: `${SITE}${head[1]}`,
+      ean: head[2],
+      title: label.replace(/\s*\(\d{4}\)\s*$/, ''),
+      year: (label.match(/\((\d{4})\)\s*$/) || [])[1] || '',
+      date: isoDate(decode((part.match(/<li class="MiseEnLigne">([^<]*)<\/li>/i) || [])[1] || '')),
+      publisher: decode((part.match(/<span itemprop="publisher">([^<]*)<\/span>/i) || [])[1] || ''),
+      support,
+      format: appFormat(support),
+      steelbook: /steelbook/i.test(`${label} ${support}`),
+      image: /no_image/i.test(image) ? '' : image.replace(/_1_v\.jpg$/i, '_1.jpg')
+    };
+  }).filter(item => item && item.date);
+}
+
+async function upcomingReleases() {
+  const page = n => `${SITE}/list-191212/prochains/?num_table=191212&type_page=tables&page=${n}`;
+  const first = await fetchHtml(page(1));
+  const last = Math.min(10, Math.max(1, ...[...first.matchAll(/(?:page=|class="lastpage">)(\d+)/g)].map(m => Number(m[1]))));
+  const rest = await Promise.all(Array.from({ length: last - 1 }, (_, i) => fetchHtml(page(i + 2)).catch(() => '')));
+  const seen = new Set();
+  const items = [first, ...rest].flatMap(parseReleaseList).filter(item => !seen.has(item.ean) && seen.add(item.ean));
+  // Autres éditions de chaque sortie (Blu-ray, DVD… d'un film affiché en 4K), par paquets de 24 comme sur le site.
+  const batches = [];
+  for (let i = 0; i < items.length; i += 24) batches.push(items.slice(i, i + 24));
+  const others = (await Promise.all(batches.map(loadOtherEditions))).flat();
+  return items.map(item => ({
+    ...item,
+    editions: [{ ean: item.ean, url: item.url, format: item.format, support: item.support },
+      ...others.filter(o => o.parent === item.ean && o.ean !== item.ean).map(o => ({ ean: o.ean, url: `${SITE}${o.path}`, format: appFormat(o.support), support: o.support }))]
+  })).sort((a, b) => a.date.localeCompare(b.date));
+}
+
 export default async function handler(req, res) {
   if (!allowRequest(req)) { res.setHeader('Cache-Control', 'no-store'); return res.status(429).json({ error: 'Trop de requêtes. Réessayez dans une minute.' }); }
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
@@ -222,6 +273,10 @@ export default async function handler(req, res) {
       const code = String(req.query.code || '').replace(/\D/g, '');
       if (!/^\d{8,14}$/.test(code)) return res.status(400).json({ error: 'Invalid barcode' });
       edition = await searchByCode(code);
+    } else if (mode === 'releases') {
+      const items = await upcomingReleases();
+      res.setHeader('Cache-Control', items.length ? 's-maxage=21600, stale-while-revalidate=86400' : 'no-store');
+      return res.status(200).json({ items });
     } else if (mode === 'title') {
       const titles = [...new Set([req.query.title, req.query.originalTitle].map(t => String(t || '').trim().slice(0, 120)).filter(Boolean))];
       if (!titles.length) return res.status(400).json({ error: 'Missing title' });
@@ -239,4 +294,4 @@ export default async function handler(req, res) {
   }
 }
 
-export { parseProduct, parseResults };
+export { parseProduct, parseResults, parseReleaseList };
