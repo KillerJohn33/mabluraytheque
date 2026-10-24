@@ -6921,6 +6921,29 @@ html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2)
 @media (max-width: 767px) and (prefers-reduced-motion: reduce) { html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2) body #bottomNav .nav-ind { transition: none !important; } }
 
 /* Transition « pastille liquide » entre boutons (reprise de Mon Butin) */
+/* ===== Onglet Wishlist : vue « Sorties » (agenda DVDFr) ===== */
+#tabWishlist:not(.releases-mode) > #releasesView { display: none !important; }
+#tabWishlist.releases-mode > :not(.mobile-section-hero):not(.tab-switcher):not(#releasesView) { display: none !important; }
+.releases-refresh { flex: none; width: 2rem; height: 2rem; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; color: rgb(var(--rgb-accent, 34, 211, 238)); background: rgba(var(--rgb-accent, 34, 211, 238), .12); }
+.releases-count:not(:empty) { margin-left: .3rem; font-size: .6rem; font-weight: 800; padding: .05rem .38rem; border-radius: 999px; background: rgba(var(--rgb-accent, 34, 211, 238), .18); }
+.releases-day { font-size: .62rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 0 .2rem; }
+.release-card { display: flex; gap: .75rem; padding: .7rem; border-radius: 1rem; background: var(--v2-card, rgba(255, 255, 255, .04)); box-shadow: var(--v2-hair, inset 0 0 0 1px rgba(255, 255, 255, .06)); }
+.release-cover { flex: none; width: 3.6rem; height: 5.2rem; object-fit: cover; border-radius: .55rem; background: rgba(var(--rgb-accent, 34, 211, 238), .08); }
+.release-cover-empty { display: block; }
+.release-title { font-size: .8rem; font-weight: 700; line-height: 1.25; }
+.release-year { font-weight: 500; opacity: .6; }
+.release-publisher { font-size: .62rem; margin-top: .3rem; }
+.release-format { font-size: .58rem; font-weight: 800; padding: .12rem .4rem; border-radius: .4rem; color: var(--fmt); background: color-mix(in srgb, var(--fmt) 16%, transparent); }
+.release-tag { font-size: .58rem; font-weight: 700; padding: .12rem .45rem; border-radius: .4rem; }
+.release-tag-wish { color: rgb(var(--rgb-pink, 244, 114, 182)); background: rgba(var(--rgb-pink, 244, 114, 182), .14); }
+.release-tag-new { color: rgb(var(--rgb-accent, 34, 211, 238)); background: rgba(var(--rgb-accent, 34, 211, 238), .14); }
+.release-tag-owned { color: rgb(var(--rgb-green, 52, 211, 153)); background: rgba(var(--rgb-green, 52, 211, 153), .14); }
+@media (min-width: 1100px) and (hover: hover) and (pointer: fine) {
+ html.desk-v2 #releasesList > section { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; }
+ html.desk-v2 #releasesList > section > .releases-day { grid-column: 1 / -1; margin: 0; }
+ html.desk-v2 #releasesList > section > * + * { margin-top: 0 !important; }
+}
+body.theme-light .release-format { background: color-mix(in srgb, var(--fmt) 22%, transparent); filter: saturate(1.4) brightness(.8); }
 /* Pastille coulissante (règle commune à toutes les applications, comme Ma Collection) :
    la sélection glisse d'un bouton à l'autre, nette (position et taille réelles), avec un léger rebond. */
 .slide-pill { position: absolute; z-index: 0; pointer-events: none; transform-origin: 0 0; will-change: transform; backface-visibility: hidden; box-shadow: none !important; }
@@ -6999,6 +7022,9 @@ html.desk-v2.ui-v2:not(.is-ipad) body.theme-light {
 </button>
 <button id="tabCollectionBtn" onclick="switchTab('collection')" class="flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent">
 <span class="icon-inline w-3.5 h-3.5" data-icon="disc"></span> <span>Collection</span>
+</button>
+<button id="tabWishlistBtn" onclick="switchTab('wishlist')" class="flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent">
+<span class="icon-inline w-3.5 h-3.5" data-icon="star"></span> <span>Wishlist</span>
 </button>
 
 <button id="tabStatsBtn" onclick="switchTab('stats')" class="flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent">
@@ -7162,7 +7188,6 @@ html.desk-v2.ui-v2:not(.is-ipad) body.theme-light {
 <div class="choice-bar w-full tab-switcher" role="group" aria-label="Affichage de la collection">
 <button type="button" class="choice-option is-active" aria-pressed="true" disabled>Ma collection</button>
 <button type="button" onclick="switchTab('digital')" class="choice-option" aria-pressed="false">Digital</button>
-<button type="button" onclick="switchTab('wishlist')" class="choice-option choice-option-pink" aria-pressed="false">Wishlist <span id="wishlistBadge" class="hidden bg-pink-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full ml-1">0</span></button>
 </div>
 </div>
 
@@ -7291,7 +7316,6 @@ html.desk-v2.ui-v2:not(.is-ipad) body.theme-light {
 <div class="choice-bar w-full tab-switcher" role="group" aria-label="Affichage de la collection">
 <button type="button" onclick="switchTab('collection')" class="choice-option" aria-pressed="false">Ma collection</button>
 <button type="button" class="choice-option is-active" aria-pressed="true" disabled>Digital</button>
-<button type="button" onclick="switchTab('wishlist')" class="choice-option choice-option-pink" aria-pressed="false">Wishlist</button>
 </div>
 <div class="flex items-center justify-center gap-3 text-sm text-gray-400">
 <span><strong id="digitalMovieCountTop" class="text-amber-300 font-black text-xl">0</strong> film<span id="digitalMoviePlural"></span></span>
@@ -7346,11 +7370,28 @@ html.desk-v2.ui-v2:not(.is-ipad) body.theme-light {
 
 <!-- ONGLET WISHLIST -->
 <div id="tabWishlist" class="hidden space-y-4">
-<div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="sparkles"></span><h2 class="font-black text-white relative z-10">Collection</h2></div>
-<div class="choice-bar w-full tab-switcher" role="group" aria-label="Affichage de la collection">
-<button type="button" onclick="switchTab('collection')" class="choice-option" aria-pressed="false">Ma collection</button>
-<button type="button" onclick="switchTab('digital')" class="choice-option" aria-pressed="false">Digital</button>
-<button type="button" class="choice-option choice-option-pink is-active" aria-pressed="true" disabled>Wishlist</button>
+<div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="star"></span><h2 class="font-black text-white relative z-10">Wishlist</h2></div>
+<div class="choice-bar w-full tab-switcher" role="group" aria-label="Affichage de la wishlist">
+<button type="button" id="wishlistViewListBtn" onclick="switchTab('wishlist')" class="choice-option choice-option-pink is-active" aria-pressed="true">Ma wishlist</button>
+<button type="button" id="wishlistViewReleasesBtn" onclick="switchTab('releases')" class="choice-option" aria-pressed="false">Sorties</button>
+</div>
+<div id="releasesView" class="space-y-3">
+<div class="glass-card releases-head p-3 rounded-2xl flex items-center justify-between gap-3">
+<div class="flex items-center gap-2.5 min-w-0">
+<span class="icon-chip chip-sm" data-icon="calendar"></span>
+<div class="min-w-0">
+<h2 class="text-xs font-bold text-white">Prochaines sorties en France</h2>
+<p id="releasesSubtitle" class="text-[10px] text-gray-400">DVD, Blu-ray et 4K à venir, d’après DVDFr.</p>
+</div>
+</div>
+<button type="button" onclick="loadReleases(true)" class="releases-refresh" aria-label="Actualiser les sorties" title="Actualiser"><span class="icon-inline w-3.5 h-3.5" data-icon="refresh"></span></button>
+</div>
+<div class="choice-bar w-full" role="group" aria-label="Filtrer les sorties">
+<button type="button" id="releasesFilterMine" onclick="setReleasesFilter('mine')" class="choice-option is-active" aria-pressed="true">Pour moi <span id="releasesMineCount" class="releases-count"></span></button>
+<button type="button" id="releasesFilter4k" onclick="setReleasesFilter('4k')" class="choice-option" aria-pressed="false">4K</button>
+<button type="button" id="releasesFilterAll" onclick="setReleasesFilter('all')" class="choice-option" aria-pressed="false">Toutes</button>
+</div>
+<div id="releasesList" class="space-y-4"></div>
 </div>
 <div class="glass-card p-3 rounded-2xl border border-pink-500/30 flex items-center justify-between">
 <div class="flex items-center gap-2.5">
@@ -8005,6 +8046,11 @@ html.desk-v2.ui-v2:not(.is-ipad) body.theme-light {
 <span class="icon-inline w-8 h-8" data-icon="disc"></span>
 <span class="bottom-nav-label">Collection</span>
 </button>
+<button id="bottomTabWishlistBtn" onclick="switchTab('wishlist')" class="bottom-nav-btn">
+<span id="bottomReleasesBadge" class="hidden bottom-nav-badge" title="Sorties qui vous concernent cette semaine"></span>
+<span class="icon-inline w-8 h-8" data-icon="star"></span>
+<span class="bottom-nav-label">Wishlist</span>
+</button>
 
 <button id="bottomTabStatsBtn" onclick="switchTab('stats')" class="bottom-nav-btn">
 <span class="icon-inline w-8 h-8" data-icon="barchart"></span>
@@ -8435,6 +8481,7 @@ detailModalElement?.addEventListener('pointerdown', event => {
 const immediateMobileActions = {
  bottomTabHomeBtn: { tab:'home', action:() => switchTab('home') },
  bottomTabCollectionBtn: { tab:'collection', action:() => switchTab('collection') },
+ bottomTabWishlistBtn: { tab:'wishlist', action:() => switchTab('wishlist') },
  bottomTabStatsBtn: { tab:'stats', action:() => switchTab('stats') },
  bottomTabSettingsBtn: { tab:'settings', action:() => openSpaceSection('installation') }
 };
@@ -8510,7 +8557,7 @@ Object.entries(immediateMobileActions).forEach(([id, config]) => {
  }, { passive: false, capture: true });
 });
 
-const topNavTabs = { tabHomeBtn:'home', tabCollectionBtn:'collection', tabStatsBtn:'stats', tabSettingsBtn:'settings' };
+const topNavTabs = { tabHomeBtn:'home', tabCollectionBtn:'collection', tabWishlistBtn:'wishlist', tabStatsBtn:'stats', tabSettingsBtn:'settings' };
 Object.entries(topNavTabs).forEach(([id, tab]) => {
  document.getElementById(id)?.addEventListener('click', event => {
   if (!handleActiveTabReselect(tab)) return;
@@ -8581,6 +8628,7 @@ if (loadCollectionFromCache()) {
 brReveal();
 await syncAllData(true);
 brEnableMotion();
+setTimeout(() => loadReleases(false, { silent: true }), 2500);
 setTimeout(() => backfillCollectionInfo(), 8000);
 setMediaTypeFilter(document.getElementById('filterMediaType')?.value || 'all');
 
@@ -10222,14 +10270,14 @@ if (collectionMobileHero) collectionMobileHero.classList.toggle('hidden', tab !=
 const inactiveClass = "flex-1 py-2 font-semibold text-[10px] transition flex items-center justify-center gap-1 text-gray-400 hover:text-white border-b-[3px] border-transparent";
 const activeClass = "flex-1 py-2 font-bold text-[10px] transition flex items-center justify-center gap-1 text-cyan-400 border-b-[3px] border-cyan-400";
 
-['tabHomeBtn', 'tabCollectionBtn', 'tabStatsBtn', 'tabSettingsBtn'].forEach(id => {
+['tabHomeBtn', 'tabCollectionBtn', 'tabWishlistBtn', 'tabStatsBtn', 'tabSettingsBtn'].forEach(id => {
 const btn = document.getElementById(id);
 if (btn) {
 btn.className = inactiveClass;
 }
 });
 
-['bottomTabHomeBtn', 'bottomTabCollectionBtn', 'bottomTabStatsBtn', 'bottomTabSettingsBtn'].forEach(id => {
+['bottomTabHomeBtn', 'bottomTabCollectionBtn', 'bottomTabWishlistBtn', 'bottomTabStatsBtn', 'bottomTabSettingsBtn'].forEach(id => {
 const btn = document.getElementById(id);
 if (btn) btn.classList.remove('active');
 });
@@ -10250,11 +10298,20 @@ document.getElementById('tabDigital').classList.remove('hidden');
 document.getElementById('tabCollectionBtn').className = activeClass;
 document.getElementById('bottomTabCollectionBtn').classList.add('active');
 if (!renderedTabs.digital) renderDigital();
-} else if (tab === 'wishlist') {
-document.getElementById('tabWishlist').classList.remove('hidden');
-document.getElementById('tabCollectionBtn').className = activeClass;
-document.getElementById('bottomTabCollectionBtn').classList.add('active');
-if (!renderedTabs.wishlist) renderWishlist();
+} else if (tab === 'wishlist' || tab === 'releases') {
+// Onglet Wishlist : vue « Ma wishlist » ou vue « Sorties » (agenda DVDFr)
+const releases = tab === 'releases';
+const wishlistTab = document.getElementById('tabWishlist');
+wishlistTab.classList.remove('hidden');
+wishlistTab.classList.toggle('releases-mode', releases);
+[['wishlistViewListBtn', !releases], ['wishlistViewReleasesBtn', releases]].forEach(([id, on]) => {
+ const btn = document.getElementById(id);
+ if (btn) { btn.classList.toggle('is-active', on); btn.classList.toggle('choice-option-pink', id === 'wishlistViewListBtn'); btn.setAttribute('aria-pressed', String(on)); }
+});
+document.getElementById('tabWishlistBtn').className = activeClass;
+document.getElementById('bottomTabWishlistBtn').classList.add('active');
+if (releases) loadReleases();
+else if (!renderedTabs.wishlist) renderWishlist();
 } else if (tab === 'stats') {
 document.getElementById('tabStats').classList.remove('hidden');
 document.getElementById('tabStatsBtn').className = activeClass;
@@ -12256,6 +12313,206 @@ ${wishlistPersonalRatingBadge(m, 'w-3 h-3')}
 fragment.appendChild(card);
 });
 grid.appendChild(fragment);
+}
+
+// --- SORTIES : agenda des prochaines éditions françaises (DVDFr), rapproché de la wishlist et de la collection ---
+const RELEASES_CACHE_KEY = 'dvdfr_releases_v1';
+const RELEASES_MAX_AGE = 6 * 3600 * 1000;
+const RELEASE_FORMATS = { '4K UHD': { label: '4K', color: '#5fb0ff' }, 'Blu-ray 1080p': { label: 'Blu-ray', color: '#a79bff' }, 'DVD': { label: 'DVD', color: '#f6c18a' } };
+let releasesItems = [];
+let releasesFetchedAt = 0;
+let releasesLoading = false;
+let releasesError = false;
+let releasesFilter = (() => { try { return ['mine', '4k', 'all'].includes(localStorage.getItem('releases_filter')) ? localStorage.getItem('releases_filter') : 'mine'; } catch (_) { return 'mine'; } })();
+try {
+ const cached = JSON.parse(localStorage.getItem(RELEASES_CACHE_KEY) || 'null');
+ if (cached && Array.isArray(cached.items)) { releasesItems = cached.items; releasesFetchedAt = Number(cached.at) || 0; }
+} catch (_) {}
+
+const releaseTodayKey = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+
+// Film de la wishlist ou de la collection correspondant à une sortie (titre français ou original, année ±1).
+function releaseMatch(item) {
+ const title = normalizeTitleForMatch(item.title);
+ if (!title) return null;
+ const sameWork = movie => {
+  const names = [movie.title, movie.originalTitle].map(normalizeTitleForMatch).filter(Boolean);
+  if (!names.includes(title)) return false;
+  const year = Number(String(movie.releaseDate || '').slice(0, 4));
+  return !item.year || !year || Math.abs(Number(item.year) - year) <= 1;
+ };
+ const wish = wishlist.find(sameWork);
+ if (wish) return { kind: 'wishlist', movie: wish };
+ const owned = collection.find(sameWork);
+ if (!owned) return null;
+ const codes = new Set((owned.editions || []).map(ed => canonicalBarcode(ed.barcode)).filter(Boolean));
+ const alreadyOwned = (item.editions || [item]).some(ed => codes.has(canonicalBarcode(ed.ean)));
+ return { kind: alreadyOwned ? 'owned' : 'upgrade', movie: owned };
+}
+
+// Sorties à venir qui concernent l'utilisateur : films de sa wishlist et nouvelles éditions de ses films.
+function releasesForMe() {
+ const today = releaseTodayKey();
+ return releasesItems.filter(item => item.date >= today && ['wishlist', 'upgrade'].includes(releaseMatch(item)?.kind));
+}
+
+async function loadReleases(force = false, { silent = false } = {}) {
+ const fresh = Date.now() - releasesFetchedAt < RELEASES_MAX_AGE && releasesItems.length;
+ if (!silent) renderReleases();
+ if ((fresh && !force) || releasesLoading || !navigator.onLine) return;
+ releasesLoading = true; releasesError = false;
+ if (!silent) renderReleases();
+ try {
+  const response = await fetch('/api/dvdfr?mode=releases');
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const data = await response.json();
+  if (!Array.isArray(data.items) || !data.items.length) throw new Error('Liste vide');
+  releasesItems = data.items;
+  releasesFetchedAt = Date.now();
+  try { localStorage.setItem(RELEASES_CACHE_KEY, JSON.stringify({ at: releasesFetchedAt, items: releasesItems })); } catch (_) {}
+  await applyReleaseDatesToWishlist();
+ } catch (error) {
+  console.warn('Sorties DVDFr indisponibles :', error);
+  releasesError = true;
+ } finally {
+  releasesLoading = false;
+  if (currentTab === 'releases') preserveAppScroll(() => renderReleases());
+  else updateReleasesBadge();
+ }
+}
+
+// Les films de la wishlist sans date de sortie Blu-ray reçoivent celle trouvée sur DVDFr (calendrier de la wishlist).
+async function applyReleaseDatesToWishlist() {
+ const today = releaseTodayKey();
+ const changed = new Map();
+ releasesItems.forEach(item => {
+  const match = releaseMatch(item);
+  if (match?.kind !== 'wishlist' || item.date < today || match.movie.blurayReleaseDateFR) return;
+  if (!changed.has(match.movie) || item.date < changed.get(match.movie)) changed.set(match.movie, item.date);
+ });
+ for (const [movie, date] of changed) {
+  movie.blurayReleaseDateFR = date;
+  await updateMovieInCloud(movie);
+ }
+ if (changed.size) preserveAppScroll(() => renderWishlist());
+}
+
+function setReleasesFilter(filter) {
+ releasesFilter = filter;
+ try { localStorage.setItem('releases_filter', filter); } catch (_) {}
+ renderReleases();
+}
+
+function updateReleasesBadge() {
+ const badge = document.getElementById('bottomReleasesBadge');
+ if (!badge) return;
+ const limit = new Date(); limit.setDate(limit.getDate() + 7);
+ const limitKey = `${limit.getFullYear()}-${String(limit.getMonth() + 1).padStart(2, '0')}-${String(limit.getDate()).padStart(2, '0')}`;
+ const soon = releasesForMe().filter(item => item.date <= limitKey).length;
+ badge.title = soon ? `${soon} sortie${soon > 1 ? 's' : ''} qui vous concerne${soon > 1 ? 'nt' : ''} cette semaine` : '';
+ badge.classList.toggle('hidden', !soon);
+ if (typeof window.deskRefresh === 'function') window.deskRefresh();
+}
+
+function releaseFormatsHtml(item) {
+ const formats = [...new Set((item.editions || [item]).map(ed => ed.format).filter(Boolean))]
+  .sort((a, b) => Object.keys(RELEASE_FORMATS).indexOf(a) - Object.keys(RELEASE_FORMATS).indexOf(b));
+ return formats.map(format => `<span class="release-format" style="--fmt:${RELEASE_FORMATS[format]?.color || '#94a3b8'}">${escapeHtml(RELEASE_FORMATS[format]?.label || format)}</span>`).join('')
+  + (item.steelbook ? '<span class="release-format" style="--fmt:#cbd5e1">Steelbook</span>' : '');
+}
+
+function renderReleases() {
+ const list = document.getElementById('releasesList');
+ if (!list) return;
+ const today = releaseTodayKey();
+ const upcoming = releasesItems.filter(item => item.date >= today);
+ const mine = releasesForMe();
+ const mineCount = document.getElementById('releasesMineCount');
+ if (mineCount) mineCount.textContent = mine.length ? String(mine.length) : '';
+ [['mine', 'releasesFilterMine'], ['4k', 'releasesFilter4k'], ['all', 'releasesFilterAll']].forEach(([key, id]) => {
+  const btn = document.getElementById(id);
+  if (btn) { btn.classList.toggle('is-active', releasesFilter === key); btn.setAttribute('aria-pressed', String(releasesFilter === key)); }
+ });
+ const subtitle = document.getElementById('releasesSubtitle');
+ if (subtitle) subtitle.textContent = releasesLoading && !releasesItems.length ? 'Chargement des sorties…'
+  : releasesError && !releasesItems.length ? 'DVDFr ne répond pas pour le moment. Réessayez plus tard.'
+  : `${upcoming.length} édition${upcoming.length > 1 ? 's' : ''} à venir, d’après DVDFr.`;
+ updateReleasesBadge();
+ const shown = releasesFilter === 'mine' ? mine
+  : releasesFilter === '4k' ? upcoming.filter(item => (item.editions || [item]).some(ed => ed.format === '4K UHD'))
+  : upcoming;
+ if (!releasesItems.length) {
+  list.innerHTML = releasesLoading
+   ? Array.from({ length: 3 }, () => '<div class="skeleton-card min-h-[5.5rem]"><div class="skeleton-block w-14 h-20 flex-none"></div><div class="flex-1 space-y-2 pt-1"><div class="skeleton-block h-4 w-3/4"></div><div class="skeleton-block h-3 w-1/2"></div></div></div>').join('')
+   : '<div class="app-empty-state"><span class="empty-state-icon">' + ic('calendar', 'w-5 h-5') + '</span><div><p class="text-sm font-semibold text-white">Aucune sortie chargée</p><p class="text-[11px] text-gray-400 mt-1">Touchez « Actualiser » pour récupérer l’agenda DVDFr.</p></div></div>';
+  return;
+ }
+ if (!shown.length) {
+  list.innerHTML = '<div class="app-empty-state"><span class="empty-state-icon">' + ic('calendar', 'w-5 h-5') + '</span><div><p class="text-sm font-semibold text-white">'
+   + (releasesFilter === 'mine' ? 'Rien d’annoncé pour vos films' : 'Aucune sortie') + '</p><p class="text-[11px] text-gray-400 mt-1">'
+   + (releasesFilter === 'mine' ? 'Les sorties des films de votre wishlist et les nouvelles éditions de vos films apparaîtront ici.' : 'Aucune édition annoncée pour ce filtre.')
+   + '</p>' + (releasesFilter === 'mine' ? '<button type="button" onclick="setReleasesFilter(\'all\')" class="app-action app-action-cyan mt-3 px-3 py-2 text-[11px]">Voir toutes les sorties</button>' : '') + '</div></div>';
+  return;
+ }
+ const groups = new Map();
+ shown.forEach(item => { if (!groups.has(item.date)) groups.set(item.date, []); groups.get(item.date).push(item); });
+ list.innerHTML = [...groups].map(([date, items]) => {
+  const d = new Date(date + 'T12:00:00');
+  const label = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+  return `<section class="space-y-2"><h3 class="releases-day text-gray-400">${escapeHtml(label.charAt(0).toUpperCase() + label.slice(1))}</h3>${items.map(item => {
+   const match = releaseMatch(item);
+   const tag = match?.kind === 'wishlist' ? '<span class="release-tag release-tag-wish">Dans ma wishlist</span>'
+    : match?.kind === 'upgrade' ? '<span class="release-tag release-tag-new">Nouvelle édition d’un de mes films</span>'
+    : match?.kind === 'owned' ? '<span class="release-tag release-tag-owned">Déjà dans ma collection</span>' : '';
+   const canAdd = !match;
+   const ean = escapeHtml(JSON.stringify(String(item.ean)));
+   return `<article class="release-card">
+    ${item.image ? `<img src="${safeImageUrl(item.image)}" alt="" loading="lazy" decoding="async" class="release-cover" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'release-cover release-cover-empty'}))">` : '<span class="release-cover release-cover-empty"></span>'}
+    <div class="min-w-0 flex-1">
+     <p class="release-title text-white">${escapeHtml(item.title)}${item.year ? ` <span class="release-year">(${escapeHtml(item.year)})</span>` : ''}</p>
+     <div class="flex flex-wrap items-center gap-1 mt-1">${releaseFormatsHtml(item)}${tag}</div>
+     ${item.publisher ? `<p class="release-publisher text-gray-400">${escapeHtml(item.publisher)}</p>` : ''}
+     <div class="flex flex-wrap gap-1.5 mt-2">
+      ${canAdd ? `<button type="button" onclick='addReleaseToWishlist(${ean}, this)' class="app-action app-action-pink px-2.5 py-1.5 text-[10px]">${ic('plus', 'w-3 h-3')} Wishlist</button>` : ''}
+      ${match?.movie ? `<button type="button" onclick='openMovieDetail(${JSON.stringify(match.movie.id)})' class="app-action app-action-cyan px-2.5 py-1.5 text-[10px]">${ic('book', 'w-3 h-3')} Ma fiche</button>` : ''}
+      <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="app-action app-action-cyan px-2.5 py-1.5 text-[10px]">DVDFr ↗</a>
+     </div>
+    </div>
+   </article>`;
+  }).join('')}</section>`;
+ }).join('');
+}
+
+// Ajoute une sortie à la wishlist : film retrouvé sur TMDB, édition créée avec le code-barres DVDFr
+// (la jaquette, le format et les détails sont ensuite complétés automatiquement).
+async function addReleaseToWishlist(ean, button) {
+ const item = releasesItems.find(entry => String(entry.ean) === String(ean));
+ if (!item) return;
+ if (button) { button.disabled = true; button.textContent = 'Ajout…'; }
+ try {
+  const search = async withYear => {
+   const params = new URLSearchParams({ api_key: API_KEY, language: 'fr-FR', query: item.title });
+   if (withYear && item.year) params.set('year', item.year);
+   const response = await fetch(`https://api.themoviedb.org/3/search/movie?${params}`);
+   const data = await response.json();
+   return Array.isArray(data.results) ? data.results : [];
+  };
+  const withYear = await search(true);
+  const results = withYear.length ? withYear : await search(false);
+  const found = results[0];
+  if (!found) { showToast(`« ${item.title} » introuvable sur TMDB : ajoutez-le depuis la recherche.`); return; }
+  window.lastScannedBarcode = String(item.ean);
+  window.lastScannedProductTitle = '';
+  await addMovieFromTMDB({ ...found, media_type: 'movie' }, true);
+  const added = wishlist.find(movie => (movie.editions || []).some(ed => canonicalBarcode(ed.barcode) === canonicalBarcode(item.ean)));
+  if (added && !added.blurayReleaseDateFR) { added.blurayReleaseDateFR = item.date; await updateMovieInCloud(added); }
+ } catch (error) {
+  console.warn('Ajout depuis les sorties :', error);
+  showToast('⚠️ Ajout impossible pour le moment.');
+ } finally {
+  window.lastScannedBarcode = ''; window.lastScannedProductTitle = '';
+  if (currentTab === 'releases') preserveAppScroll(() => renderReleases());
+ }
 }
 
 function effectiveReleaseDate(m) {
@@ -14895,7 +15152,7 @@ async function backfillCollectionInfo() {
 (() => {
  const svg = name => (typeof svgMarkup === 'function' ? svgMarkup(name) : '');
  const isDesk = () => document.documentElement.classList.contains('desk-v2');
- const TITLES = { home: 'Accueil', collection: 'Collection', wishlist: 'Wishlist', digital: 'Numérique', series: 'Séries', stats: 'Statistiques', settings: 'Mon espace' };
+ const TITLES = { home: 'Accueil', collection: 'Collection', wishlist: 'Wishlist', releases: 'Sorties', digital: 'Numérique', stats: 'Statistiques', settings: 'Mon espace' };
  const SPACE = { profile: 'Mon profil', installation: 'Mon installation', subscriptions: 'Mes abonnements', options: 'Options' };
  const euro = value => (Number(value) || 0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 
@@ -14910,6 +15167,7 @@ async function backfillCollectionInfo() {
     <button type="button" class="ds-item" data-tab="home">${svg('home')}<span class="ds-l">Accueil</span></button>
     <button type="button" class="ds-item" data-tab="collection">${svg('disc')}<span class="ds-l">Collection</span><em data-count="collection"></em></button>
     <button type="button" class="ds-item" data-tab="wishlist">${svg('star')}<span class="ds-l">Wishlist</span><em data-count="wishlist"></em></button>
+    <button type="button" class="ds-item" data-tab="releases">${svg('calendar')}<span class="ds-l">Sorties</span><em data-count="releases"></em></button>
     <button type="button" class="ds-item" data-tab="digital">${svg('cloud')}<span class="ds-l">Numérique</span><em data-count="digital"></em></button>
     <button type="button" class="ds-item" data-tab="stats">${svg('barchart')}<span class="ds-l">Statistiques</span></button>
    </nav>
@@ -14989,7 +15247,8 @@ async function backfillCollectionInfo() {
   // Compteurs et valeur
   const counts = {
    collection: collection.length, wishlist: wishlist.length,
-   digital: (typeof digitalLibrary !== 'undefined' ? digitalLibrary.length : 0)
+   digital: (typeof digitalLibrary !== 'undefined' ? digitalLibrary.length : 0),
+   releases: (typeof releasesForMe === 'function' ? releasesForMe().length : 0)
   };
   ['4K UHD', 'Blu-ray 1080p', 'DVD'].forEach(f => { counts[f] = collection.filter(m => (m.editions || []).some(e => e.format === f)).length; });
   counts.Steelbook = collection.filter(m => (m.editions || []).some(e => e.editionType === 'Steelbook')).length;
