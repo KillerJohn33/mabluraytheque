@@ -4003,6 +4003,9 @@ body.theme-light #tabHome #homeDashboard > div{
 #seriesSidebarLayout{gap:1.35rem !important}
 #tabCollection > #collectionOverviewBar{margin-top:1.35rem !important}
 #tabWishlist > .tab-switcher + .glass-card{margin-top:1.35rem !important}
+/* La vue « Sorties » (masquée) s'intercale entre le sélecteur et la carte « Ma liste de souhaits » : même espacement. */
+#tabWishlist > .tab-switcher + #releasesView,
+#tabWishlist > .tab-switcher + #releasesView + .glass-card{margin-top:1.35rem !important}
 
 /* Accueil modulable */
 #tabHome:not(.hidden){
