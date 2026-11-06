@@ -7107,7 +7107,7 @@ html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3
 html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) body #deskHome { display: flex; flex-direction: column; gap: 30px; }
 html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) body:has(#tabHome.hidden) #deskHome { display: none !important; }
 /* Panneaux remplacés par le nouvel accueil */
-html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) body #tabHome > :is(#homeWidgetDashboard, #homeWidgetRecent, #homeCalendarLayout, #homeWidgetReleases, #homeWidgetFormatMix, #homeWidgetWatchProgress) { display: none !important; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) body #tabHome { display: none !important; }
 /* « Ajouter un titre » : le panneau de recherche TMDB s'ouvre depuis la barre du haut */
 html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4):not(.desk-adding) body #searchSection:not(:has(#searchResultsContainer:not(.hidden), #scanner-container:not(.hidden), #batchScanPanel:not(.hidden), #searchInput:not(:placeholder-shown))) { display: none !important; }
 html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) body #deskTop .dt-btn.dt-icon { width: 40px; padding: 0; justify-content: center; }
@@ -8865,6 +8865,7 @@ if (loadCollectionFromCache()) {
  applyHomeLayout();
  renderCollection();
  renderWishlist();
+ renderHomeRecent();
  renderIncompletePanel();
  renderEquipment();
  renderDigital();
