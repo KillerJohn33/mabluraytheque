@@ -8104,6 +8104,7 @@ html.desk-v2.ui-v2:not(.is-ipad) body.theme-light {
 <div class="flex items-center gap-2.5 min-w-0"><span class="icon-chip chip-sm" data-icon="cloud"></span><div class="min-w-0"><p class="text-xs font-bold text-white">Plex · <span id="plexServerName">-</span></p><p id="plexSyncStatus" class="text-[10px] text-gray-400 truncate">Jamais synchronisé</p></div></div>
 <div class="flex items-center gap-1.5 flex-none">
 <button type="button" onclick="syncPlexLibrary()" class="app-action app-action-cyan px-3 py-2 text-[10px]"><span class="icon-inline w-3.5 h-3.5" data-icon="refresh"></span> Synchroniser</button>
+<button type="button" onclick="resyncPlexLibrary()" class="app-action px-3 py-2 text-[10px]" title="Tout relire depuis Plex, affiches comprises">Tout resynchroniser</button>
 <button type="button" onclick="disconnectPlex()" class="equipment-icon-button danger" aria-label="Déconnecter Plex" title="Déconnecter Plex"><span class="icon-inline w-3.5 h-3.5" data-icon="x"></span></button>
 </div>
 </div>
@@ -10018,20 +10019,55 @@ async function fetchAndUploadPlexPoster(base, token, thumbPath, ratingKey) {
  } catch (_) { return ''; }
 }
 
-async function syncPlexLibrary(silent = false) {
+let plexSyncRunning = false;
+async function plexApiJson(action, payload) {
+ const res = await callPlexApi(action, payload);
+ const data = await res.json().catch(() => ({}));
+ if (!res.ok) throw new Error(data?.error || 'Synchronisation Plex impossible.');
+ return data;
+}
+// Resynchronisation complète : affiches et données entièrement relues depuis Plex.
+function resyncPlexLibrary() {
+ if (!confirm('Tout resynchroniser depuis Plex ? La liste Digital sera entièrement relue (affiches comprises). Cela peut prendre une minute.')) return;
+ return syncPlexLibrary(false, { full: true });
+}
+async function syncPlexLibrary(silent = false, opts = {}) {
  const plex = profileData.plex || {};
  if (!plex.token) { if (!silent) showToast('Connectez d’abord votre compte Plex.'); return false; }
+ if (plexSyncRunning) { if (!silent) showToast('Synchronisation Plex déjà en cours…'); return false; }
+ plexSyncRunning = true;
+ const statusNode = document.getElementById('plexSyncStatus');
+ const progress = text => { if (statusNode) statusNode.textContent = text; };
  if (!silent) showToast('Synchronisation Plex en cours…');
  try {
-  const libraryRes = await callPlexApi('library', {
-   token: plex.token,
-   clientId: plex.clientId || getPlexClientId(),
-   serverClientIdentifier: plex.serverClientIdentifier || ''
-  });
-  const libraryData = await libraryRes.json().catch(() => ({}));
-  if (!libraryRes.ok) throw new Error(libraryData?.error || 'library');
-  const base = String(libraryData.serverUri || plex.serverUri || '').replace(/\/$/, '');
-  const sourceItems = Array.isArray(libraryData.items) ? libraryData.items : [];
+  const clientId = plex.clientId || getPlexClientId();
+  // 1) serveur et bibliothèques (adresse redétectée à chaque fois)
+  progress('Connexion au serveur…');
+  const info = await plexApiJson('sections', { token: plex.token, clientId, serverClientIdentifier: plex.serverClientIdentifier || '' });
+  const base = String(info.serverUri || '').replace(/\/$/, '');
+  if (!info.sections?.length) throw new Error('Aucune bibliothèque de films ou de séries sur ce serveur Plex.');
+  // 2) lecture page par page ; la moindre erreur annule tout (la liste actuelle est conservée)
+  const sourceItems = [];
+  const PAGE = 200;
+  for (const section of info.sections) {
+   let startAt = 0, total = Infinity;
+   while (startAt < total) {
+    progress(`Lecture de « ${section.title} »… ${sourceItems.length} élément(s)`);
+    let page, tries = 0;
+    for (;;) {
+     try { page = await plexApiJson('page', { token: plex.token, clientId, serverUri: base, sectionKey: section.key, sectionTitle: section.title, sectionType: section.type, start: startAt, size: PAGE }); break; }
+     catch (e) { if (++tries >= 3) throw e; await new Promise(r => setTimeout(r, 1200 * tries)); }
+    }
+    sourceItems.push(...(page.items || []));
+    total = Number(page.total) || 0;
+    if (!(page.items || []).length) break;
+    startAt += PAGE;
+   }
+  }
+  const libraryData = { serverUri: base, serverName: info.serverName };
+  if (info.serverClientIdentifier) profileData.plex.serverClientIdentifier = info.serverClientIdentifier;
+  const seenKeys = new Set();
+  for (let i = sourceItems.length - 1; i >= 0; i--) { const k = sourceItems[i].ratingKey; if (seenKeys.has(k)) sourceItems.splice(i, 1); else seenKeys.add(k); }
   const items = sourceItems.map(m => ({
    id: `plex_${m.ratingKey}`,
    ratingKey: String(m.ratingKey || ''),
@@ -10058,9 +10094,11 @@ async function syncPlexLibrary(silent = false) {
   // récupérées directement lorsque la connexion Plex le permet.
   if (!silent) showToast('Mise à jour des affiches…');
   const previousByKey = new Map(digitalLibrary.map(d => [d.ratingKey, d]));
-  await mapWithConcurrency(items, 5, async item => {
+  let postersDone = 0;
+  await mapWithConcurrency(items, 6, async item => {
+   if (++postersDone % 20 === 0) progress(`Affiches… ${postersDone}/${items.length}`);
    const previous = previousByKey.get(item.ratingKey);
-   if (previous && previous.thumbPath === item.thumbPath && previous.posterData) {
+   if (!opts.full && previous && previous.thumbPath === item.thumbPath && previous.posterData) {
     item.posterData = previous.posterData;
     return;
    }
@@ -10085,8 +10123,11 @@ async function syncPlexLibrary(silent = false) {
   return true;
  } catch (error) {
   console.warn('Synchronisation Plex indisponible :', error);
-  if (!silent) showToast(`⚠️ ${error?.message && error.message !== 'library' ? error.message : 'Synchronisation Plex impossible.'}`);
+  if (!silent) showToast(`⚠️ ${error?.message === 'cloud_save' ? 'Synchronisé sur cet appareil, mais l’enregistrement en ligne a échoué.' : (error?.message || 'Synchronisation Plex impossible.')}`);
   return false;
+ } finally {
+  plexSyncRunning = false;
+  renderPlexCard();
  }
 }
 

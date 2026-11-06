@@ -58,6 +58,7 @@ async function listResources(token, clientId) {
     `${PLEX_API}/resources?includeHttps=1&includeRelay=1`,
     { headers: plexHeaders(clientId, { 'X-Plex-Token': token }) }
   );
+  if (response.status === 401) throw new Error('plex_http_401');
   if (!response.ok) throw new Error('resources_failed');
   const data = await response.json();
   const servers = (Array.isArray(data) ? data : [])
@@ -122,6 +123,42 @@ function plexLibraryItem(metadata, section) {
   };
 }
 
+// Trouve une adresse joignable du serveur (toutes les connexions HTTPS sont essayées, locale exclue côté Vercel).
+async function resolveServer(token, clientId, serverClientIdentifier) {
+  const servers = await listResources(token, clientId);
+  const server = servers.find(item => item.clientIdentifier === serverClientIdentifier)
+    || servers.find(item => item.owned)
+    || servers[0];
+  if (!server) throw new Error('no_server');
+  const connections = orderedConnections(server);
+  if (!connections.length && /^https:\/\//i.test(server.uri || '')) connections.push({ uri: server.uri });
+  for (const connection of connections) {
+    try {
+      const data = await fetchPlexJson(connection.uri, '/library/sections', token, clientId);
+      return { server, base: String(connection.uri).replace(/\/$/, ''), sectionsData: data };
+    } catch (_) {}
+  }
+  throw new Error('server_unreachable');
+}
+
+async function listSections(token, clientId, serverClientIdentifier) {
+  const { server, base, sectionsData } = await resolveServer(token, clientId, serverClientIdentifier);
+  const sections = (sectionsData?.MediaContainer?.Directory || [])
+    .filter(section => section.type === 'movie' || section.type === 'show')
+    .map(section => ({ key: String(section.key), title: section.title || '', type: section.type }));
+  return { serverName: server.name || 'Serveur Plex', serverClientIdentifier: server.clientIdentifier || '', serverUri: base, sections };
+}
+
+// Une page d'une section (lecture découpée : aucune requête trop longue, même pour une grosse bibliothèque).
+async function readSectionPage(token, clientId, base, section, start, size) {
+  const path = `/library/sections/${encodeURIComponent(section.key)}/all?includeGuids=1&X-Plex-Container-Start=${start}&X-Plex-Container-Size=${size}`;
+  const data = await fetchPlexJson(base, path, token, clientId);
+  const container = data?.MediaContainer || {};
+  const items = (container.Metadata || []).map(metadata => plexLibraryItem(metadata, section)).filter(item => item.ratingKey);
+  const total = Number(container.totalSize ?? container.size ?? items.length) || 0;
+  return { items, total, start, size };
+}
+
 async function readLibrary(token, clientId, serverClientIdentifier) {
   const servers = await listResources(token, clientId);
   const server = servers.find(item => item.clientIdentifier === serverClientIdentifier)
@@ -146,7 +183,7 @@ async function readLibrary(token, clientId, serverClientIdentifier) {
     .filter(section => section.type === 'movie' || section.type === 'show');
   const results = await Promise.all(sections.map(async section => {
     try {
-      const data = await fetchPlexJson(base, `/library/sections/${encodeURIComponent(section.key)}/all`, token, clientId);
+      const data = await fetchPlexJson(base, `/library/sections/${encodeURIComponent(section.key)}/all?includeGuids=1`, token, clientId);
       return (data?.MediaContainer?.Metadata || []).map(metadata => plexLibraryItem(metadata, section));
     } catch (_) {
       return [];
@@ -196,6 +233,24 @@ export default async function handler(req, res) {
       if (!token || token.length > 512) return res.status(400).json({ error: 'Jeton Plex invalide.' });
       return res.status(200).json(await listResources(token, clientId));
     }
+    if (action === 'sections') {
+      const token = String(body.token || '').trim();
+      const serverClientIdentifier = String(body.serverClientIdentifier || '').trim();
+      if (!token || token.length > 512) return res.status(400).json({ error: 'Jeton Plex invalide.' });
+      return res.status(200).json(await listSections(token, clientId, serverClientIdentifier.slice(0, 256)));
+    }
+    if (action === 'page') {
+      const token = String(body.token || '').trim();
+      const base = String(body.serverUri || '').trim().replace(/\/$/, '');
+      const key = String(body.sectionKey || '').trim();
+      const start = Math.max(0, parseInt(body.start, 10) || 0);
+      const size = Math.min(300, Math.max(1, parseInt(body.size, 10) || 200));
+      if (!token || token.length > 512) return res.status(400).json({ error: 'Jeton Plex invalide.' });
+      if (!/^https:\/\/[a-z0-9.-]+\.plex\.direct(:\d+)?$/i.test(base) && !/^https:\/\/[a-z0-9.-]+(:\d+)?$/i.test(base)) return res.status(400).json({ error: 'Adresse du serveur invalide.' });
+      if (!/^\d{1,10}$/.test(key)) return res.status(400).json({ error: 'Bibliothèque invalide.' });
+      const section = { key, title: String(body.sectionTitle || '').slice(0, 120), type: body.sectionType === 'show' ? 'show' : 'movie' };
+      return res.status(200).json(await readSectionPage(token, clientId, base, section, start, size));
+    }
     if (action === 'library') {
       const token = String(body.token || '').trim();
       const serverClientIdentifier = String(body.serverClientIdentifier || '').trim();
@@ -207,8 +262,10 @@ export default async function handler(req, res) {
   } catch (error) {
     const messages = {
       no_server: 'Aucun serveur Plex trouvé sur ce compte.',
-      server_unreachable: 'Le serveur Plex est actuellement inaccessible.'
+      server_unreachable: 'Le serveur Plex est injoignable depuis Internet. Vérifiez que Plex est allumé et que l’« Accès à distance » est activé dans ses réglages.'
     };
-    return res.status(502).json({ error: messages[error?.message] || 'Service Plex indisponible.' });
+    const msg = String(error?.message || '');
+    if (/^plex_http_401/.test(msg)) return res.status(401).json({ error: 'Connexion Plex expirée : reconnectez votre compte.' });
+    return res.status(502).json({ error: messages[msg] || 'Service Plex indisponible.' });
   }
 }

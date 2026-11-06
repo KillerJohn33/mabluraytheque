@@ -1,5 +1,6 @@
 {
   "functions": {
-    "api/dvdfr.js": { "regions": ["cdg1"] }
+    "api/dvdfr.js": { "regions": ["cdg1"] },
+    "api/plex.js": { "maxDuration": 30 }
   }
 }
