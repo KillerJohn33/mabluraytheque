@@ -7077,6 +7077,8 @@ html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3
 html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) #modalContent h3 { word-break: normal !important; overflow-wrap: break-word !important; hyphens: manual !important; }
 /* Fiche film (téléphone) : le titre reste entier ; « Vu / Non vu » passe à la ligne si le titre est long. */
 @media (max-width: 767px) { html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) #modalContent .movie-detail-title-row { flex-wrap: wrap !important; row-gap: 6px; } html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) #modalContent .movie-detail-title-row h3 { flex: 1 1 9rem !important; } }
+/* Téléphone et iPad : fond neutre uni (pas de reflets colorés), pour une barre d'état propre en thème clair comme sombre */
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f):not(.desk-v2) body::before { content: none !important; display: none !important; }
 /* Fond : la couleur de base passe sur la racine pour que le fond flou (body::before) reste visible partout */
 html.a3 { background: #050506 !important; }
 html.a3:has(> body.theme-light) { background: #eef0f3 !important; }
