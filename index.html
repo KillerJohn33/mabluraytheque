@@ -2180,7 +2180,7 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
   /* Les panneaux structurants deviennent des sections continues, plus contrastees. */
   #tabHome > .glass-card,
   #homeCalendarLayout > .glass-card,
-  #tabCollection > #collectionOverviewBar,
+  :is(#tabCollection,#tabDigital) > :is(#collectionOverviewBar,#digitalOverviewBar),
   #collectionFilterPanel > .glass-card,
   #tabSeries > .glass-card,
   #seriesSidebarLayout > .glass-card,
@@ -2209,7 +2209,7 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
   /* Trait lumineux progressif : il identifie immédiatement le début de chaque section. */
   #tabHome > .glass-card::before,
   #homeCalendarLayout > .glass-card::before,
-  #tabCollection > #collectionOverviewBar::before,
+  :is(#tabCollection,#tabDigital) > :is(#collectionOverviewBar,#digitalOverviewBar)::before,
   #collectionFilterPanel > .glass-card::before,
   #tabSeries > .glass-card::before,
   #seriesSidebarLayout > .glass-card::before,
@@ -2235,7 +2235,7 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
   }
   #tabHome > .glass-card > *,
   #homeCalendarLayout > .glass-card > *,
-  #tabCollection > #collectionOverviewBar > *,
+  :is(#tabCollection,#tabDigital) > :is(#collectionOverviewBar,#digitalOverviewBar) > *,
   #collectionFilterPanel > .glass-card > *,
   #tabSeries > .glass-card > *,
   #seriesSidebarLayout > .glass-card > *,
@@ -2283,7 +2283,7 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
   }
   body.theme-light #tabHome > .glass-card,
   body.theme-light #homeCalendarLayout > .glass-card,
-  body.theme-light #tabCollection > #collectionOverviewBar,
+  body.theme-light :is(#tabCollection,#tabDigital) > :is(#collectionOverviewBar,#digitalOverviewBar),
   body.theme-light #collectionFilterPanel > .glass-card,
   body.theme-light #tabSeries > .glass-card,
   body.theme-light #seriesSidebarLayout > .glass-card,
@@ -2746,7 +2746,7 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
 
   #tabHome > .glass-card,
   #homeCalendarLayout > .glass-card,
-  #tabCollection > #collectionOverviewBar,
+  :is(#tabCollection,#tabDigital) > :is(#collectionOverviewBar,#digitalOverviewBar),
   #collectionFilterPanel > .glass-card,
   #tabSeries > .glass-card,
   #seriesSidebarLayout > .glass-card,
@@ -2772,7 +2772,7 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
   }
   #tabHome > .glass-card::before,
   #homeCalendarLayout > .glass-card::before,
-  #tabCollection > #collectionOverviewBar::before,
+  :is(#tabCollection,#tabDigital) > :is(#collectionOverviewBar,#digitalOverviewBar)::before,
   #collectionFilterPanel > .glass-card::before,
   #tabSeries > .glass-card::before,
   #seriesSidebarLayout > .glass-card::before,
@@ -2799,7 +2799,7 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
   }
   #tabHome > .glass-card > *,
   #homeCalendarLayout > .glass-card > *,
-  #tabCollection > #collectionOverviewBar > *,
+  :is(#tabCollection,#tabDigital) > :is(#collectionOverviewBar,#digitalOverviewBar) > *,
   #collectionFilterPanel > .glass-card > *,
   #tabSeries > .glass-card > *,
   #seriesSidebarLayout > .glass-card > *,
@@ -2899,7 +2899,7 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
 
   body.theme-light #tabHome > .glass-card,
   body.theme-light #homeCalendarLayout > .glass-card,
-  body.theme-light #tabCollection > #collectionOverviewBar,
+  body.theme-light :is(#tabCollection,#tabDigital) > :is(#collectionOverviewBar,#digitalOverviewBar),
   body.theme-light #collectionFilterPanel > .glass-card,
   body.theme-light #tabSeries > .glass-card,
   body.theme-light #seriesSidebarLayout > .glass-card,
@@ -3080,7 +3080,7 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
 
   #tabHome > .glass-card,
   #homeCalendarLayout > .glass-card,
-  #tabCollection > #collectionOverviewBar,
+  :is(#tabCollection,#tabDigital) > :is(#collectionOverviewBar,#digitalOverviewBar),
   #collectionFilterPanel > .glass-card,
   #tabSeries > .glass-card,
   #seriesSidebarLayout > .glass-card,
@@ -3106,7 +3106,7 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
   }
   #tabHome > .glass-card::before,
   #homeCalendarLayout > .glass-card::before,
-  #tabCollection > #collectionOverviewBar::before,
+  :is(#tabCollection,#tabDigital) > :is(#collectionOverviewBar,#digitalOverviewBar)::before,
   #collectionFilterPanel > .glass-card::before,
   #tabSeries > .glass-card::before,
   #seriesSidebarLayout > .glass-card::before,
@@ -3133,7 +3133,7 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
   }
   #tabHome > .glass-card > *,
   #homeCalendarLayout > .glass-card > *,
-  #tabCollection > #collectionOverviewBar > *,
+  :is(#tabCollection,#tabDigital) > :is(#collectionOverviewBar,#digitalOverviewBar) > *,
   #collectionFilterPanel > .glass-card > *,
   #tabSeries > .glass-card > *,
   #seriesSidebarLayout > .glass-card > *,
@@ -3249,7 +3249,7 @@ body.theme-light .skeleton-block { background:rgba(100,116,139,.14); }
 
   body.theme-light #tabHome > .glass-card,
   body.theme-light #homeCalendarLayout > .glass-card,
-  body.theme-light #tabCollection > #collectionOverviewBar,
+  body.theme-light :is(#tabCollection,#tabDigital) > :is(#collectionOverviewBar,#digitalOverviewBar),
   body.theme-light #collectionFilterPanel > .glass-card,
   body.theme-light #tabSeries > .glass-card,
   body.theme-light #seriesSidebarLayout > .glass-card,
@@ -3419,7 +3419,7 @@ body.theme-light .detail-danger-label{color:#991b1b}
 @media (min-width:768px) and (hover:hover) and (pointer:fine){
   #tabHome > .glass-card,
   #homeCalendarLayout > .glass-card,
-  #tabCollection > #collectionOverviewBar,
+  :is(#tabCollection,#tabDigital) > :is(#collectionOverviewBar,#digitalOverviewBar),
   #collectionFilterPanel > .glass-card,
   #tabSeries > .glass-card,
   #seriesSidebarLayout > .glass-card,
@@ -3439,7 +3439,7 @@ body.theme-light .detail-danger-label{color:#991b1b}
   }
   #tabHome > .glass-card::after,
   #homeCalendarLayout > .glass-card::after,
-  #tabCollection > #collectionOverviewBar::after,
+  :is(#tabCollection,#tabDigital) > :is(#collectionOverviewBar,#digitalOverviewBar)::after,
   #collectionFilterPanel > .glass-card::after,
   #tabSeries > .glass-card::after,
   #seriesSidebarLayout > .glass-card::after,
@@ -3481,7 +3481,7 @@ body.theme-light .detail-danger-label{color:#991b1b}
 @media (max-width:767px), (hover:none) and (pointer:coarse) and (max-width:1366px), (any-pointer:coarse) and (max-width:1366px){
   #tabHome > .glass-card,
   #homeCalendarLayout > .glass-card,
-  #tabCollection > #collectionOverviewBar,
+  :is(#tabCollection,#tabDigital) > :is(#collectionOverviewBar,#digitalOverviewBar),
   #collectionFilterPanel > .glass-card,
   #tabSeries > .glass-card,
   #seriesSidebarLayout > .glass-card,
@@ -3501,7 +3501,7 @@ body.theme-light .detail-danger-label{color:#991b1b}
   }
   #tabHome > .glass-card::after,
   #homeCalendarLayout > .glass-card::after,
-  #tabCollection > #collectionOverviewBar::after,
+  :is(#tabCollection,#tabDigital) > :is(#collectionOverviewBar,#digitalOverviewBar)::after,
   #collectionFilterPanel > .glass-card::after,
   #tabSeries > .glass-card::after,
   #seriesSidebarLayout > .glass-card::after,
@@ -3846,7 +3846,7 @@ body.theme-light #modalContent .digital-detail-hero{
 
 #tabHome > .glass-card,
 #homeCalendarLayout > .glass-card,
-#tabCollection > #collectionOverviewBar,
+:is(#tabCollection,#tabDigital) > :is(#collectionOverviewBar,#digitalOverviewBar),
 #collectionFilterPanel > .glass-card,
 #tabSeries > .glass-card,
 #seriesSidebarLayout > .glass-card,
@@ -3874,7 +3874,7 @@ body.theme-light #modalContent .digital-detail-hero{
 }
 #tabHome > .glass-card::before,
 #homeCalendarLayout > .glass-card::before,
-#tabCollection > #collectionOverviewBar::before,
+:is(#tabCollection,#tabDigital) > :is(#collectionOverviewBar,#digitalOverviewBar)::before,
 #collectionFilterPanel > .glass-card::before,
 #tabSeries > .glass-card::before,
 #seriesSidebarLayout > .glass-card::before,
@@ -3900,7 +3900,7 @@ body.theme-light #modalContent .digital-detail-hero{
 }
 #tabHome > .glass-card::after,
 #homeCalendarLayout > .glass-card::after,
-#tabCollection > #collectionOverviewBar::after,
+:is(#tabCollection,#tabDigital) > :is(#collectionOverviewBar,#digitalOverviewBar)::after,
 #collectionFilterPanel > .glass-card::after,
 #tabSeries > .glass-card::after,
 #seriesSidebarLayout > .glass-card::after,
@@ -3916,7 +3916,7 @@ body.theme-light #modalContent .digital-detail-hero{
 }
 #tabHome > .glass-card > *,
 #homeCalendarLayout > .glass-card > *,
-#tabCollection > #collectionOverviewBar > *,
+:is(#tabCollection,#tabDigital) > :is(#collectionOverviewBar,#digitalOverviewBar) > *,
 #collectionFilterPanel > .glass-card > *,
 #tabSeries > .glass-card > *,
 #seriesSidebarLayout > .glass-card > *,
@@ -3951,7 +3951,7 @@ body.theme-light #modalContent .digital-detail-hero{
 
 body.theme-light #tabHome > .glass-card,
 body.theme-light #homeCalendarLayout > .glass-card,
-body.theme-light #tabCollection > #collectionOverviewBar,
+body.theme-light :is(#tabCollection,#tabDigital) > :is(#collectionOverviewBar,#digitalOverviewBar),
 body.theme-light #collectionFilterPanel > .glass-card,
 body.theme-light #tabSeries > .glass-card,
 body.theme-light #seriesSidebarLayout > .glass-card,
@@ -3981,7 +3981,7 @@ body.theme-light #tabHome #homeDashboard > div{
 @media (max-width:767px){
   #tabHome > .glass-card,
   #homeCalendarLayout > .glass-card,
-  #tabCollection > #collectionOverviewBar,
+  :is(#tabCollection,#tabDigital) > :is(#collectionOverviewBar,#digitalOverviewBar),
   #collectionFilterPanel > .glass-card,
   #tabSeries > .glass-card,
   #seriesSidebarLayout > .glass-card,
@@ -4004,7 +4004,7 @@ body.theme-light #tabHome #homeDashboard > div{
 #tabSeries > * + *{margin-top:1.35rem !important}
 #tabSeries > .mobile-section-hero + *{margin-top:0 !important}
 #seriesSidebarLayout{gap:1.35rem !important}
-#tabCollection > #collectionOverviewBar{margin-top:1.35rem !important}
+:is(#tabCollection,#tabDigital) > :is(#collectionOverviewBar,#digitalOverviewBar){margin-top:1.35rem !important}
 #tabWishlist > .tab-switcher + .glass-card{margin-top:1.35rem !important}
 /* La vue « Sorties » (masquée) s'intercale entre le sélecteur et la carte « Ma liste de souhaits » : même espacement. */
 #tabWishlist > .tab-switcher + #releasesView,
@@ -5418,7 +5418,7 @@ html.is-ipad #homeWidgetFormatMix #homeFormatMix{
 }
 
 /* Collections : cartes aérées et outils regroupés. */
-html.is-ipad #collectionOverviewBar,
+html.is-ipad :is(#collectionOverviewBar,#digitalOverviewBar),
 html.is-ipad #tabWishlist>.glass-card,
 html.is-ipad #digitalEmptyState{
  padding:1rem 1.15rem!important
@@ -6258,12 +6258,12 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .home-media-card { border-radi
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body .home-watch-next-row img { border-radius: 8px !important; }
 
 /* ---------- Bilan de la collection ---------- */
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #collectionOverviewBar strong { font-size: 26px !important; letter-spacing: -.02em; color: var(--v2-text) !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #collectionOverviewBar .text-\[11px\] { font-size: 14px !important; color: var(--v2-muted) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body :is(#collectionOverviewBar,#digitalOverviewBar) strong { font-size: 26px !important; letter-spacing: -.02em; color: var(--v2-text) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body :is(#collectionOverviewBar,#digitalOverviewBar) .text-\[11px\] { font-size: 14px !important; color: var(--v2-muted) !important; }
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #collectionOverviewValue { background: var(--v2-green-soft); color: var(--v2-green) !important; padding: 5px 11px; border-radius: 999px; font-size: 14px !important; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #collectionOverviewBarTrack { height: 8px !important; background: var(--v2-gray-soft) !important; gap: 3px; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #collectionOverviewBarTrack > * { border-radius: 999px; }
-html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #collectionOverviewLegend { font-size: 12px !important; color: var(--v2-muted) !important; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body :is(#collectionOverviewBarTrack,#digitalOverviewBarTrack) { height: 8px !important; background: var(--v2-gray-soft) !important; gap: 3px; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body :is(#collectionOverviewBarTrack,#digitalOverviewBarTrack) > * { border-radius: 999px; }
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body :is(#collectionOverviewLegend,#digitalOverviewLegend) { font-size: 12px !important; color: var(--v2-muted) !important; }
 
 /* ---------- Statistiques : tuiles libellé + valeur ---------- */
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body #tabStats [id$="Grid"] { gap: 8px !important; }
@@ -7380,6 +7380,11 @@ html:is(.ui-v2,#ed1):is(.ui-v2,#ed2):is(.ui-v2,#ed3):is(.ui-v2,#ed4):is(.ui-v2,#
 html:is(.ui-v2,#ed1):is(.ui-v2,#ed2):is(.ui-v2,#ed3):is(.ui-v2,#ed4):is(.ui-v2,#ed5):is(.ui-v2,#ed6) body #modalContent .movie-detail-editions > .grid:last-child > div { border-radius: 14px !important; padding: 12px 14px !important; background: rgba(var(--rgb-neutral), .07) !important; border: 0 !important; }
 html:is(.ui-v2,#ed1):is(.ui-v2,#ed2):is(.ui-v2,#ed3):is(.ui-v2,#ed4):is(.ui-v2,#ed5):is(.ui-v2,#ed6) body #modalContent .movie-detail-editions > .grid:last-child p:first-child { font-size: 11px !important; text-transform: none !important; color: var(--v2-muted) !important; letter-spacing: 0 !important; }
 html:is(.ui-v2,#ed1):is(.ui-v2,#ed2):is(.ui-v2,#ed3):is(.ui-v2,#ed4):is(.ui-v2,#ed5):is(.ui-v2,#ed6) body #modalContent .movie-detail-editions > .grid:last-child p:last-child { font-size: 20px !important; font-weight: 800 !important; color: var(--v2-text) !important; }
+/* Digital : même présentation que Ma collection */
+#digitalOverviewBarTrack i { display: block; height: 100%; } #digitalOverviewBarTrack i + i { margin-left: 2px; }
+.digital-server-chip { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; color: #1a1a1a; background: #e5a00d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55%; }
+#digitalFilterPanel > .choice-bar { display: none !important; }
+.pcard.is-digital .pc-img[src=""] { visibility: hidden; }
 /* Pastille coulissante (règle commune à toutes les applications, comme Ma Collection) :
    la sélection glisse d'un bouton à l'autre, nette (position et taille réelles), avec un léger rebond. */
 .slide-pill { position: absolute; z-index: 0; pointer-events: none; transform-origin: 0 0; will-change: transform; backface-visibility: hidden; box-shadow: none !important; }
@@ -7755,10 +7760,26 @@ html.desk-v2.ui-v2:not(.is-ipad) body.theme-light {
 <button type="button" onclick="switchTab('collection')" class="choice-option" aria-pressed="false">Ma collection</button>
 <button type="button" class="choice-option is-active" aria-pressed="true" disabled>Digital</button>
 </div>
-<div class="flex items-center justify-center gap-3 text-sm text-gray-400">
-<span><strong id="digitalMovieCountTop" class="text-amber-300 font-black text-xl">0</strong> film<span id="digitalMoviePlural"></span></span>
+<div id="digitalOverviewBar" class="glass-card rounded-2xl border border-white/10 p-3 space-y-2.5">
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-3">
+<span class="flex items-baseline gap-1"><strong id="digitalMovieCountTop" class="text-cyan-300 font-black text-xl">0</strong><span class="text-gray-400 text-[11px]">film<span id="digitalMoviePlural"></span></span></span>
 <span class="text-gray-600">•</span>
-<span><strong id="digitalSeriesCountTop" class="text-amber-300 font-black text-xl">0</strong> série<span id="digitalSeriesPlural"></span></span>
+<span class="flex items-baseline gap-1"><strong id="digitalSeriesCountTop" class="text-sky-300 font-black text-xl">0</strong><span class="text-gray-400 text-[11px]">série<span id="digitalSeriesPlural"></span></span></span>
+</div>
+<span id="digitalOverviewServer" class="digital-server-chip"></span>
+</div>
+<div id="digitalOverviewBarTrack" class="flex h-2.5 rounded-full overflow-hidden bg-white/5"></div>
+<div id="digitalOverviewLegend" class="flex flex-wrap gap-x-3 gap-y-1 text-[9px] text-gray-400"></div>
+</div>
+<div id="digitalQuickRow" class="flex items-center gap-2 flex-wrap">
+<button type="button" onclick="toggleDigitalFilters()" class="glass-pill px-3 py-2 rounded-xl text-[11px] font-semibold text-cyan-300 hover:text-white flex items-center gap-1.5"><span class="icon-inline w-3.5 h-3.5" data-icon="filter"></span> Filtrer</button>
+<div id="digitalQuickChips" class="flex items-center gap-1.5 flex-wrap">
+<button type="button" data-digital-type="all" onclick="setDigitalTypeFilter('all')" class="quick-chip is-active">Tous</button>
+<button type="button" data-digital-type="movie" onclick="setDigitalTypeFilter('movie')" class="quick-chip">Films</button>
+<button type="button" data-digital-type="show" onclick="setDigitalTypeFilter('show')" class="quick-chip">Séries</button>
+<button type="button" data-digital-type="concert" onclick="setDigitalTypeFilter('concert')" class="quick-chip">Concerts</button>
+</div>
 </div>
 <div id="digitalEmptyState" class="glass-card p-5 rounded-2xl border border-white/10 text-center space-y-3">
 <span class="icon-chip chip-lg mx-auto" data-icon="cloud"></span>
@@ -12804,6 +12825,27 @@ function isDigitalConcert(item) {
  return item.type === 'movie' && /concert/i.test(item.sectionTitle || '');
 }
 
+// Affiches manquantes des films Plex : récupérées sur TMDB et gardées en mémoire.
+let digitalPosterBackfillRunning = false;
+async function backfillDigitalPosters() {
+ if (digitalPosterBackfillRunning || !Array.isArray(digitalLibrary)) return;
+ const todo = digitalLibrary.filter(d => !d.posterData && !d.poster && d.tmdbId && !d.posterTried).slice(0, 60);
+ if (!todo.length) return;
+ digitalPosterBackfillRunning = true;
+ let changed = 0;
+ try {
+  await mapWithConcurrency(todo, 4, async d => {
+   d.posterTried = true;
+   try {
+    const r = await fetch(`https://api.themoviedb.org/3/${d.type === 'show' ? 'tv' : 'movie'}/${encodeURIComponent(d.tmdbId)}?api_key=${API_KEY}&language=fr-FR`);
+    const j = r.ok ? await r.json() : null;
+    if (j?.poster_path) { d.poster = `https://image.tmdb.org/t/p/w342${j.poster_path}`; changed++; }
+   } catch (_) {}
+  });
+ } finally { digitalPosterBackfillRunning = false; }
+ if (changed) { try { saveDigitalLibraryLocal(); } catch (_) {} renderDigital(); }
+ if (digitalLibrary.some(d => !d.posterData && !d.poster && d.tmdbId && !d.posterTried)) setTimeout(backfillDigitalPosters, 500);
+}
 function renderDigital() {
  renderedTabs.digital = true;
  const empty = document.getElementById('digitalEmptyState');
@@ -12827,6 +12869,16 @@ function renderDigital() {
  const digitalSeriesPluralEl = document.getElementById('digitalSeriesPlural');
  if (digitalSeriesPluralEl) digitalSeriesPluralEl.textContent = digitalSeriesCount > 1 ? 's' : '';
 
+ document.getElementById('digitalOverviewBar')?.classList.toggle('hidden', !hasItems);
+ document.getElementById('digitalQuickRow')?.classList.toggle('hidden', !hasItems);
+ document.querySelectorAll('#digitalQuickChips [data-digital-type]').forEach(b => { const on = b.dataset.digitalType === digitalTypeFilter; b.classList.toggle('is-active', on); b.setAttribute('aria-pressed', String(on)); });
+ { const res = {}; library.forEach(d => { const r = String(d.resolution || '').toLowerCase(); const k = r === '4k' ? '4K' : /^(1080|720)$/.test(r) ? 'HD ' + r + 'p' : r ? 'SD' : 'Inconnue'; res[k] = (res[k] || 0) + 1; });
+   const col = { '4K': '#5fb0ff', 'HD 1080p': '#a79bff', 'HD 720p': '#c4b5fd', 'SD': '#f6c18a', 'Inconnue': 'rgba(150,150,150,.5)' };
+   const rows = Object.entries(res).sort((a, b) => b[1] - a[1]);
+   const track = document.getElementById('digitalOverviewBarTrack'); if (track) track.innerHTML = rows.map(([k, n]) => `<i style="flex:${n};background:${col[k] || '#888'}"></i>`).join('');
+   const lg = document.getElementById('digitalOverviewLegend'); if (lg) lg.innerHTML = rows.map(([k, n]) => `<span class="flex items-center gap-1"><i class="inline-block w-1.5 h-1.5 rounded-full" style="background:${col[k] || '#888'}"></i>${escapeHtml(k)} · ${n}</span>`).join('');
+   const sv = document.getElementById('digitalOverviewServer'); if (sv) sv.textContent = profileData?.plex?.serverName ? 'Plex · ' + profileData.plex.serverName : 'Plex'; }
+ if (hasItems) setTimeout(backfillDigitalPosters, 300);
  if (!hasItems) { grid.classList.add('hidden'); if (noResults) noResults.classList.add('hidden'); grid.innerHTML = ''; return; }
 
  const librarySelect = document.getElementById('digitalLibraryFilter');
