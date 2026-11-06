@@ -7177,6 +7177,35 @@ html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #de
 html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-formats p b { font-weight: 600; color: var(--v2-muted); }
 html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-empty { padding: 14px; font-size: 13px; color: var(--v2-muted); }
 @media (max-width: 1280px) { html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-top, html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-bottom { grid-template-columns: 1fr; } }
+/* ===== Barre latérale ordinateur : épurée et visuelle ===== */
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-value { display: none !important; }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-brand { padding-bottom: 26px; }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-title { padding: 22px 12px 8px; font-size: 10.5px; }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide > .ds-nav:not(.ds-formats):not(.ds-space) { gap: 4px; }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide > .ds-nav:not(.ds-formats):not(.ds-space) .ds-item { height: 44px; gap: 12px; padding: 0 10px 0 6px; font-size: 14.5px; }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide > .ds-nav:not(.ds-formats):not(.ds-space) .ds-item > svg { box-sizing: content-box; width: 17px; height: 17px; padding: 7.5px; border-radius: 10px; background: rgba(var(--rgb-neutral), .09); flex: none; transition: background .2s, color .2s; }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide > .ds-nav:not(.ds-formats):not(.ds-space) .ds-item.on > svg { background: rgba(var(--rgb-accent), .18); color: rgb(var(--rgb-accent)); }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide > .ds-nav:not(.ds-formats):not(.ds-space) .ds-item.on::before { display: none !important; }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-item em { font-style: normal; font-size: 11.5px; font-weight: 700; min-width: 22px; padding: 2px 7px; border-radius: 999px; text-align: center; background: rgba(var(--rgb-neutral), .1); color: var(--v2-muted); }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-item em:empty { display: none; }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-formats { display: grid !important; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 4px; }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-formats .ds-item { height: auto !important; min-height: 0; flex-direction: column; align-items: flex-start; gap: 6px; padding: 11px 12px !important; border-radius: 14px; background: rgba(var(--rgb-neutral), .07); box-shadow: inset 0 0 0 .5px rgba(var(--rgb-neutral), .14); }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-formats .ds-item:hover { background: rgba(var(--rgb-neutral), .12); }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-formats .ds-item .ds-l { position: static; order: 2; font-size: 12px; font-weight: 600; color: var(--v2-muted); }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-formats .ds-item .ds-l::after, html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-formats .ds-item::after { display: none !important; }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-formats .ds-item em { order: 1; margin: 0; padding: 0; min-width: 0; background: none !important; font-size: 20px !important; font-weight: 800 !important; line-height: 1 !important; color: var(--v2-text) !important; opacity: 1 !important; }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-formats .ds-item em:empty { display: block; }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-formats .ds-item em:empty::before { content: "0"; opacity: .45; }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-formats .ds-item .ds-dot, html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-formats .ds-item > svg { position: absolute; top: 13px; right: 12px; width: 8px; height: 8px; margin: 0; }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-formats .ds-item > svg { width: 15px; height: 15px; top: 10px; opacity: .7; }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-formats .ds-item { position: relative; }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-formats .ds-item.on { box-shadow: inset 0 0 0 1.5px rgba(var(--rgb-accent), .55); }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-space { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 0 4px; }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-space .ds-item { height: auto !important; flex-direction: column; justify-content: center; gap: 6px; padding: 12px 4px !important; border-radius: 14px; background: rgba(var(--rgb-neutral), .07); box-shadow: inset 0 0 0 .5px rgba(var(--rgb-neutral), .14); }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-space .ds-item:hover { background: rgba(var(--rgb-neutral), .12); }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-space .ds-item > svg { width: 19px; height: 19px; margin: 0; color: rgb(var(--rgb-accent)); }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-space .ds-item .ds-l { font-size: 11px; font-weight: 600; color: var(--v2-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(.desk-v2,#sb5):is(.desk-v2,#sb6):is(.desk-v2,#sb7) body #deskSide .ds-space .ds-item.on::before { display: none !important; }
 /* Pastille coulissante (règle commune à toutes les applications, comme Ma Collection) :
    la sélection glisse d'un bouton à l'autre, nette (position et taille réelles), avec un léger rebond. */
 .slide-pill { position: absolute; z-index: 0; pointer-events: none; transform-origin: 0 0; will-change: transform; backface-visibility: hidden; box-shadow: none !important; }
@@ -15490,7 +15519,7 @@ async function backfillCollectionInfo() {
     <button type="button" class="ds-item" data-tab="stats">${svg('barchart')}<span class="ds-l">Statistiques</span></button>
    </nav>
    <div class="ds-title">Formats</div>
-   <div class="ds-nav">
+   <div class="ds-nav ds-formats">
     <button type="button" class="ds-item small" data-format="4K UHD"><span class="ds-dot" style="background:#5fb0ff"></span><span class="ds-l">4K UHD</span><em data-count="4K UHD"></em></button>
     <button type="button" class="ds-item small" data-format="Blu-ray 1080p"><span class="ds-dot" style="background:#a79bff"></span><span class="ds-l">Blu-ray</span><em data-count="Blu-ray 1080p"></em></button>
     <button type="button" class="ds-item small" data-format="DVD"><span class="ds-dot" style="background:#f6c18a"></span><span class="ds-l">DVD</span><em data-count="DVD"></em></button>
@@ -15498,7 +15527,7 @@ async function backfillCollectionInfo() {
    </div>
    <button type="button" class="ds-value" data-tab="stats"><small>Valeur estimée</small><b data-value="estimated">—</b><span data-value="purchase"></span></button>
    <div class="ds-title">Mon espace</div>
-   <div class="ds-nav">
+   <div class="ds-nav ds-space">
     <button type="button" class="ds-item small" data-space="installation">${svg('tv')}<span class="ds-l">Installation</span></button>
     <button type="button" class="ds-item small" data-space="subscriptions">${svg('wallet')}<span class="ds-l">Abonnements</span></button>
     <button type="button" class="ds-item small" data-space="options">${svg('settings')}<span class="ds-l">Options</span></button>
