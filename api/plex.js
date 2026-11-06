@@ -127,9 +127,8 @@ function plexLibraryItem(metadata, section) {
 async function resolveServer(token, clientId, serverClientIdentifier) {
   const servers = await listResources(token, clientId);
   const server = servers.find(item => item.clientIdentifier === serverClientIdentifier)
-    || servers.find(item => item.owned)
-    || servers[0];
-  if (!server) throw new Error('no_server');
+    || (serverClientIdentifier ? null : (servers.find(item => item.owned) || servers[0]));
+  if (!server) throw new Error(serverClientIdentifier ? 'server_missing' : 'no_server');
   const connections = orderedConnections(server);
   if (!connections.length && /^https:\/\//i.test(server.uri || '')) connections.push({ uri: server.uri });
   for (const connection of connections) {
@@ -262,6 +261,7 @@ export default async function handler(req, res) {
   } catch (error) {
     const messages = {
       no_server: 'Aucun serveur Plex trouvé sur ce compte.',
+      server_missing: 'Le serveur Plex choisi est introuvable : utilisez « Changer de serveur ».',
       server_unreachable: 'Le serveur Plex est injoignable depuis Internet. Vérifiez que Plex est allumé et que l’« Accès à distance » est activé dans ses réglages.'
     };
     const msg = String(error?.message || '');

@@ -8104,6 +8104,7 @@ html.desk-v2.ui-v2:not(.is-ipad) body.theme-light {
 <div class="flex items-center gap-2.5 min-w-0"><span class="icon-chip chip-sm" data-icon="cloud"></span><div class="min-w-0"><p class="text-xs font-bold text-white">Plex · <span id="plexServerName">-</span></p><p id="plexSyncStatus" class="text-[10px] text-gray-400 truncate">Jamais synchronisé</p></div></div>
 <div class="flex items-center gap-1.5 flex-wrap">
 <button type="button" onclick="syncPlexLibrary()" class="app-action app-action-cyan px-3 py-2 text-[10px]"><span class="icon-inline w-3.5 h-3.5" data-icon="refresh"></span> Synchroniser</button>
+<button type="button" onclick="plexChangeServer()" class="app-action px-3 py-2 text-[10px]">Changer de serveur</button>
 <button type="button" onclick="plexReconnectAndSync()" class="app-action app-action-amber px-3 py-2 text-[10px]" title="Ouvre la page de connexion Plex, puis importe toute la bibliothèque">Se reconnecter et tout synchroniser</button>
 <button type="button" onclick="disconnectPlex()" class="equipment-icon-button danger" aria-label="Déconnecter Plex" title="Déconnecter Plex"><span class="icon-inline w-3.5 h-3.5" data-icon="x"></span></button>
 </div>
@@ -9941,7 +9942,8 @@ async function finishPlexLink(token, clientId, opts = {}) {
   if (!res.ok) throw new Error('resources');
   const servers = await res.json();
   if (!Array.isArray(servers) || !servers.length) { showToast('⚠️ Aucun serveur Plex trouvé sur ce compte.'); return; }
-  const server = servers[0];
+  let server = servers[0];
+  if (servers.length > 1) { const pick = await plexServerPicker(servers.map(x => ({ ...x, online: true })), profileData.plex?.serverClientIdentifier); if (!pick) return; server = pick; }
   const previous = JSON.parse(JSON.stringify(profileData));
   setDevicePlexToken(token);
   profileData.plex = {
@@ -10040,8 +10042,8 @@ async function plexDirectFetch(url, clientId, token, timeoutMs = 9000) {
 async function plexReadLibraryDirect(token, clientId, wantedId, progress) {
  const resources = await plexDirectFetch('https://plex.tv/api/v2/resources?includeHttps=1&includeRelay=1', clientId, token);
  const servers = (Array.isArray(resources) ? resources : []).filter(r => String(r.provides || '').split(',').includes('server'));
- const server = servers.find(r => r.clientIdentifier === wantedId) || servers.find(r => r.owned) || servers[0];
- if (!server) throw new Error('Aucun serveur Plex trouvé sur ce compte.');
+ const server = servers.find(r => r.clientIdentifier === wantedId) || (wantedId ? null : (servers.find(r => r.owned) || servers[0]));
+ if (!server) throw new Error(wantedId ? 'Le serveur Plex choisi est introuvable : utilisez « Changer de serveur ».' : 'Aucun serveur Plex trouvé sur ce compte.');
  const token2 = server.accessToken || token;
  const conns = (server.connections || []).filter(c => /^https:/i.test(c.uri || ''))
   .sort((a, b) => (a.local ? 0 : a.relay ? 2 : 1) - (b.local ? 0 : b.relay ? 2 : 1));
@@ -10101,6 +10103,57 @@ async function plexResumePendingLogin() {
  localStorage.removeItem('plex_pending_pin');
  showToast('⚠️ Connexion Plex non validée. Réessayez « Se reconnecter et tout synchroniser ».');
 }
+// ——— Choix du serveur Plex (ex. passage de « PC maison » à « Multimédia ») ———
+async function plexListServers(token, clientId) {
+ try {
+  const res = await plexDirectFetch('https://plex.tv/api/v2/resources?includeHttps=1&includeRelay=1', clientId, token);
+  return (Array.isArray(res) ? res : []).filter(r => String(r.provides || '').split(',').includes('server'))
+   .map(r => ({ name: r.name || 'Serveur Plex', clientIdentifier: r.clientIdentifier || '', owned: !!r.owned, online: !!r.presence, lastSeenAt: r.lastSeenAt || '' }));
+ } catch (e) {
+  if (/expirée/.test(e?.message || '')) throw e;
+  const r = await callPlexApi('resources', { token, clientId });
+  if (!r.ok) throw new Error('Impossible de récupérer vos serveurs Plex.');
+  return (await r.json()).map(x => ({ name: x.name, clientIdentifier: x.clientIdentifier, owned: x.owned, online: true }));
+ }
+}
+function plexServerPicker(servers, currentId) {
+ return new Promise(resolve => {
+  document.getElementById('plexServerPicker')?.remove();
+  const wrap = document.createElement('div');
+  wrap.id = 'plexServerPicker';
+  wrap.style.cssText = 'position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:16px;background:var(--v2-overlay,rgba(0,0,0,.55));-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)';
+  wrap.innerHTML = `<div style="width:100%;max-width:420px;border-radius:22px;padding:18px;background:var(--v2-modal-bg,#1c1c1e);box-shadow:var(--v2-hair),0 24px 60px -20px rgba(0,0,0,.6);color:var(--v2-text,#fff)">
+   <p style="font-size:17px;font-weight:800;margin:0 0 4px">Choisir le serveur Plex</p>
+   <p style="font-size:12px;color:var(--v2-muted,#999);margin:0 0 14px">Les films du serveur choisi remplaceront ceux de la liste Digital.</p>
+   <div style="display:flex;flex-direction:column;gap:8px">${servers.map((sv, i) => `<button type="button" data-i="${i}" style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;border-radius:14px;border:0;cursor:pointer;font:inherit;color:inherit;background:rgba(var(--rgb-neutral,200,200,200),.08);box-shadow:${sv.clientIdentifier === currentId ? 'inset 0 0 0 1.5px rgb(var(--rgb-accent,34,211,238))' : 'inset 0 0 0 .5px rgba(var(--rgb-neutral,200,200,200),.18)'}">
+     <span style="width:9px;height:9px;border-radius:50%;flex:none;background:${sv.online ? '#34c759' : 'rgba(150,150,150,.6)'}"></span>
+     <span style="flex:1;min-width:0"><b style="display:block;font-size:14px">${escapeHtml(sv.name)}</b><small style="font-size:11px;color:var(--v2-muted,#999)">${sv.owned ? 'Mon serveur' : 'Partagé avec moi'} · ${sv.online ? 'en ligne' : 'hors ligne'}${sv.clientIdentifier === currentId ? ' · actuel' : ''}</small></span></button>`).join('')}</div>
+   <button type="button" data-cancel style="margin-top:12px;width:100%;padding:11px;border-radius:12px;border:0;cursor:pointer;font:600 13px inherit;color:var(--v2-muted,#999);background:transparent">Annuler</button></div>`;
+  wrap.addEventListener('click', ev => {
+   const b = ev.target.closest('button[data-i]');
+   if (b) { wrap.remove(); resolve(servers[+b.dataset.i]); }
+   else if (ev.target === wrap || ev.target.closest('[data-cancel]')) { wrap.remove(); resolve(null); }
+  });
+  document.body.appendChild(wrap);
+ });
+}
+async function plexChangeServer() {
+ const plex = profileData.plex || {};
+ if (!plex.token) return plexReconnectAndSync();
+ try {
+  const servers = await plexListServers(plex.token, plex.clientId || getPlexClientId());
+  if (!servers.length) return showToast('⚠️ Aucun serveur Plex trouvé sur ce compte.');
+  const pick = await plexServerPicker(servers, plex.serverClientIdentifier);
+  if (!pick) return;
+  profileData.plex.serverClientIdentifier = pick.clientIdentifier;
+  profileData.plex.serverName = pick.name;
+  profileData.plex.serverUri = '';
+  profileData.updatedAt = new Date().toISOString();
+  saveProfileLocal(); renderPlexCard(); saveProfileBundleCloud();
+  showToast(`Serveur « ${pick.name} » choisi. Synchronisation…`);
+  return syncPlexLibrary(false, { full: true, strictServer: true });
+ } catch (e) { showToast(`⚠️ ${e?.message || 'Impossible de récupérer vos serveurs Plex.'}`); }
+}
 let plexSyncRunning = false;
 async function plexApiJson(action, payload) {
  const res = await callPlexApi(action, payload);
@@ -10127,7 +10180,7 @@ async function syncPlexLibrary(silent = false, opts = {}) {
   progress('Connexion au serveur…');
   let direct = null;
   try { direct = await plexReadLibraryDirect(plex.token, clientId, plex.serverClientIdentifier || '', progress); }
-  catch (e) { if (/expirée/.test(e?.message || '')) throw e; console.warn('Lecture Plex directe impossible, passage par le serveur :', e); }
+  catch (e) { if (/expirée|introuvable/.test(e?.message || '')) throw e; console.warn('Lecture Plex directe impossible, passage par le serveur :', e); }
   const info = direct ? { serverUri: direct.serverUri, serverName: direct.serverName, serverClientIdentifier: direct.serverClientIdentifier, sections: [] }
    : await plexApiJson('sections', { token: plex.token, clientId, serverClientIdentifier: plex.serverClientIdentifier || '' });
   const base = String(info.serverUri || '').replace(/\/$/, '');
