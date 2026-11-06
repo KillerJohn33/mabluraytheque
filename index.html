@@ -7258,6 +7258,32 @@ html:is(.desk-v2,#sb1):is(.desk-v2,#sb2):is(.desk-v2,#sb3):is(.desk-v2,#sb4):is(
 .global-add-trigger { display: none; }
 html.ui-v2:not(.desk-v2) body > header .global-add-trigger { display: inline-grid; place-items: center; width: 40px; height: 40px; flex: none; border: 0; border-radius: 999px; cursor: pointer; color: rgb(var(--rgb-accent)); background: var(--v2-card); box-shadow: var(--v2-hair); }
 html.ui-v2:not(.desk-v2) body > header .global-add-trigger + .global-search-trigger { margin-left: 8px !important; }
+/* Statistiques visuelles */
+.sv-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+.sv-formats, .sv-months, .sv-genres { grid-column: 1 / -1; }
+@media (min-width: 768px) { .sv-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); } .sv-formats { grid-column: span 3; } .sv-seen { grid-column: span 1; } .sv-value { grid-column: span 2; } .sv-months { grid-column: span 4; } .sv-genres { grid-column: span 2; } }
+.sv-card { min-width: 0; padding: 16px; border-radius: 18px; background: var(--v2-card, rgba(255,255,255,.05)); box-shadow: var(--v2-hair, inset 0 0 0 1px rgba(255,255,255,.08)); -webkit-backdrop-filter: var(--a3-glass-blur, none); backdrop-filter: var(--a3-glass-blur, none); color: var(--v2-text, #fff); }
+.sv-label { font-size: 12px; font-weight: 600; color: var(--v2-muted, #999); margin: 0 0 12px; }
+.sv-donut-row { display: flex; align-items: center; gap: 18px; }
+.sv-donut { position: relative; width: 112px; height: 112px; flex: none; border-radius: 50%; display: grid; place-items: center; }
+.sv-donut::after { content: ""; position: absolute; inset: 14px; border-radius: 50%; background: var(--v2-bg, #000); }
+.sv-donut > span { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; line-height: 1.1; }
+.sv-donut b { font-size: 22px; font-weight: 800; } .sv-donut small { font-size: 10.5px; color: var(--v2-muted, #999); }
+.sv-ring { width: 104px; height: 104px; margin: 0 auto; } .sv-ring::after { inset: 11px; }
+.sv-legend { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.sv-legend p { display: flex; align-items: center; gap: 9px; margin: 0; font-size: 13.5px; } .sv-legend i { width: 9px; height: 9px; border-radius: 50%; flex: none; } .sv-legend span { flex: 1; } .sv-legend b { color: var(--v2-muted, #999); font-weight: 600; }
+.sv-big { display: block; font-size: 28px; font-weight: 800; line-height: 1.1; letter-spacing: -.01em; }
+.sv-foot { margin: 8px 0 0; font-size: 12px; color: var(--v2-muted, #999); text-align: inherit; } .sv-seen { text-align: center; }
+.sv-up { color: var(--v2-green, #34c759); font-weight: 700; } .sv-down { color: var(--v2-red, #ff453a); font-weight: 700; }
+.sv-bars { display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px; height: 120px; align-items: end; }
+.sv-bars > div { height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 5px; }
+.sv-bars span { width: 100%; max-width: 26px; border-radius: 6px 6px 3px 3px; background: linear-gradient(180deg, rgb(var(--rgb-accent)), rgba(var(--rgb-accent), .45)); }
+.sv-bars span.is-zero { background: rgba(var(--rgb-neutral), .16); }
+.sv-bars small { font-size: 10px; color: var(--v2-muted, #999); }
+.sv-hbar { display: grid; grid-template-columns: minmax(70px, 34%) 1fr auto; align-items: center; gap: 10px; margin-bottom: 9px; font-size: 13px; }
+.sv-hbar span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .sv-hbar i { height: 7px; border-radius: 7px; background: rgba(var(--rgb-neutral), .14); overflow: hidden; } .sv-hbar i b { display: block; height: 100%; border-radius: 7px; background: rgb(var(--rgb-accent)); } .sv-hbar em { font-style: normal; color: var(--v2-muted, #999); font-weight: 600; }
+.sv-empty { font-size: 12px; color: var(--v2-muted, #999); }
+html:is(.desk-v2) .sv-grid { margin-bottom: 22px; }
 /* Pastille coulissante (règle commune à toutes les applications, comme Ma Collection) :
    la sélection glisse d'un bouton à l'autre, nette (position et taille réelles), avec un léger rebond. */
 .slide-pill { position: absolute; z-index: 0; pointer-events: none; transform-origin: 0 0; will-change: transform; backface-visibility: hidden; box-shadow: none !important; }
@@ -7800,6 +7826,7 @@ html.desk-v2.ui-v2:not(.is-ipad) body.theme-light {
 <!-- ONGLET STATS -->
 <div id="tabStats" class="hidden modern-page">
 <div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="barchart"></span><h2 class="font-black text-white relative z-10">Statistiques</h2></div>
+<div id="statsVisual" class="sv-grid" aria-label="Statistiques en un coup d’œil"></div>
 <div class="modern-panel p-4 md:p-5 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip" data-icon="barchart"></span>
@@ -14110,7 +14137,35 @@ list.innerHTML = incomplete.length ? incomplete.map(({movie, reasons}) =>
 list.querySelectorAll('.incomplete-item').forEach(button => button.addEventListener('click', () => openMovieDetail(collection.find(movie => String(movie.id) === button.dataset.movieId)?.id)));
 }
 
+function renderStatsVisual() {
+ const box = document.getElementById('statsVisual'); if (!box) return;
+ const eur = v => (Number(v) || 0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+ const fmts = {}; let editions = 0, est = 0, buy = 0;
+ collection.forEach(m => { const t = calculateMovieTotals(m); est += t.totalEstimated; buy += t.totalPurchase; (m.editions || []).forEach(e => { const k = deskFormatKey(e.format); fmts[k] = (fmts[k] || 0) + 1; editions++; }); });
+ const colorOf = k => (DESK_FORMATS.find(f => f[0] === k) || [, , 'rgba(var(--rgb-neutral),.45)'])[2];
+ const rows = Object.entries(fmts).sort((a, b) => b[1] - a[1]);
+ let acc = 0; const stops = rows.map(([k, n]) => { const a = acc / editions * 360, b = (acc += n) / editions * 360; return `${colorOf(k)} ${a}deg ${b}deg`; }).join(',');
+ const seen = collection.filter(m => m.seen).length, pct = collection.length ? Math.round(seen / collection.length * 100) : 0;
+ // ajouts des 12 derniers mois
+ const now = new Date(), months = [];
+ for (let i = 11; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth() - i, 1); months.push({ y: d.getFullYear(), m: d.getMonth(), n: 0 }); }
+ collection.forEach(mv => { const d = new Date(mv.addedAt || 0); const slot = months.find(x => x.y === d.getFullYear() && x.m === d.getMonth()); if (slot) slot.n++; });
+ const maxM = Math.max(1, ...months.map(x => x.n));
+ const ml = ['J','F','M','A','M','J','J','A','S','O','N','D'];
+ // genres
+ const g = {}; collection.forEach(m => (m.genres || []).forEach(x => { g[x] = (g[x] || 0) + 1; }));
+ const genres = Object.entries(g).sort((a, b) => b[1] - a[1]).slice(0, 5), maxG = Math.max(1, ...genres.map(x => x[1]));
+ const gain = est - buy;
+ box.innerHTML = `
+  <div class="sv-card sv-formats"><p class="sv-label">Formats</p><div class="sv-donut-row"><div class="sv-donut" style="background:${editions ? `conic-gradient(${stops})` : 'rgba(var(--rgb-neutral),.15)'}"><span><b>${editions}</b><small>éditions</small></span></div>
+   <div class="sv-legend">${rows.map(([k, n]) => `<p><i style="background:${colorOf(k)}"></i><span>${escapeHtml(k)}</span><b>${n}</b></p>`).join('') || '<p class="sv-empty">Aucune édition</p>'}</div></div></div>
+  <div class="sv-card sv-seen"><p class="sv-label">Films vus</p><div class="sv-donut sv-ring" style="background:conic-gradient(rgb(var(--rgb-accent)) 0 ${pct * 3.6}deg, rgba(var(--rgb-neutral),.15) ${pct * 3.6}deg 360deg)"><span><b>${pct} %</b><small>${seen} / ${collection.length}</small></span></div><p class="sv-foot">${Math.max(0, collection.length - seen)} à découvrir</p></div>
+  <div class="sv-card sv-value"><p class="sv-label">Valeur de la collection</p><b class="sv-big">${eur(est || buy)}</b><p class="sv-foot">${eur(buy)} d’achats${buy && est ? ` · <span class="${gain >= 0 ? 'sv-up' : 'sv-down'}">${gain >= 0 ? '+' : ''}${eur(gain)}</span>` : ''}</p><p class="sv-foot">${collection.length ? `${eur((est || buy) / collection.length)} par film en moyenne` : ''}</p></div>
+  <div class="sv-card sv-months"><p class="sv-label">Ajouts sur 12 mois</p><div class="sv-bars">${months.map(x => `<div title="${x.n} ajout(s)"><span style="height:${Math.max(4, x.n / maxM * 100)}%" class="${x.n ? '' : 'is-zero'}"></span><small>${ml[x.m]}</small></div>`).join('')}</div></div>
+  <div class="sv-card sv-genres"><p class="sv-label">Genres préférés</p>${genres.map(([k, n]) => `<div class="sv-hbar"><span>${escapeHtml(k)}</span><i><b style="width:${n / maxG * 100}%"></b></i><em>${n}</em></div>`).join('') || '<p class="sv-empty">Genres inconnus</p>'}</div>`;
+}
 function renderStats() {
+try { renderStatsVisual(); } catch (e) { console.warn('stats visuelles', e); }
 const totalMovies = collection.length;
 let movieCount = 0;
 let seriesCount = 0;
