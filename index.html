@@ -7098,6 +7098,81 @@ html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3
 html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) #globalSearchModal .global-search-panel { background: rgba(24, 24, 28, .94) !important; }
 html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) body.theme-light #globalSearchModal .global-search-panel { background: rgba(250, 250, 252, .96) !important; }
 html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) #globalSearchModal input:focus, html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) #globalSearchModal input:focus-visible { outline: none !important; box-shadow: inset 0 0 0 1px rgba(var(--rgb-accent), .45) !important; border-radius: 8px; }
+/* ===== Accueil ordinateur : bandeau, tuiles, affiches, sorties, formats (html.desk-v2 seulement) ===== */
+#deskHome { display: none; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) body #deskHome { display: flex; flex-direction: column; gap: 30px; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) body:has(#tabHome.hidden) #deskHome { display: none !important; }
+/* Panneaux remplacés par le nouvel accueil */
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) body #tabHome > :is(#homeWidgetDashboard, #homeWidgetRecent, #homeCalendarLayout, #homeWidgetReleases, #homeWidgetFormatMix, #homeWidgetWatchProgress) { display: none !important; }
+/* « Ajouter un titre » : le panneau de recherche TMDB s'ouvre depuis la barre du haut */
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4):not(.desk-adding) body #searchSection:not(:has(#searchResultsContainer:not(.hidden), #scanner-container:not(.hidden), #batchScanPanel:not(.hidden), #searchInput:not(:placeholder-shown))) { display: none !important; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) body #deskTop .dt-btn.dt-icon { width: 40px; padding: 0; justify-content: center; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) body #deskTop .dt-btn.dt-icon svg { color: rgb(var(--rgb-accent)); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome button { font: inherit; color: inherit; text-align: left; border: 0; background: none; padding: 0; cursor: pointer; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-top { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 18px; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-hero { position: relative; overflow: hidden; min-height: 248px; border-radius: 22px; display: flex; align-items: flex-end; background: var(--v2-card-2); box-shadow: var(--v2-hair), 0 18px 40px -22px rgba(0,0,0,.6); isolation: isolate; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; transition: transform .6s cubic-bezier(.2,.8,.2,1); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-hero:hover .dh-hero-bg { transform: scale(1.03); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-hero-poster .dh-hero-bg { filter: blur(28px) saturate(1.3); transform: scale(1.25); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-hero-poster:hover .dh-hero-bg { transform: scale(1.28); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-hero::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(0,0,0,0) 25%, rgba(0,0,0,.72) 100%), linear-gradient(90deg, rgba(0,0,0,.45), rgba(0,0,0,0) 65%); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-hero-cover { position: absolute; right: 26px; top: 50%; transform: translateY(-50%); height: 78%; aspect-ratio: 2/3; object-fit: cover; border-radius: 12px; box-shadow: 0 18px 36px -14px rgba(0,0,0,.75), inset 0 0 0 .5px rgba(255,255,255,.2); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-hero-copy { display: flex; flex-direction: column; gap: 6px; padding: 26px; color: #fff; max-width: calc(100% - 200px); min-width: 0; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-hero:not(.dh-hero-poster) .dh-hero-copy { max-width: 100%; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-hero-copy small { font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; opacity: .82; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-hero-copy strong { font-size: 28px; line-height: 1.12; font-weight: 800; letter-spacing: -.01em; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-hero-copy em { font-style: normal; font-size: 13px; opacity: .85; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-chips i { font-style: normal; font-size: 11px; font-weight: 700; padding: 4px 9px; border-radius: 999px; background: rgba(255,255,255,.18); box-shadow: inset 0 1px 0 rgba(255,255,255,.28), inset 0 0 0 .5px rgba(255,255,255,.25); -webkit-backdrop-filter: blur(12px) saturate(1.6); backdrop-filter: blur(12px) saturate(1.6); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-hero-empty { cursor: default; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-hero-empty .dh-hero-copy { color: var(--v2-text); max-width: 100%; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-hero-empty::after { display: none; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-tile, html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-card { background: var(--v2-card); box-shadow: var(--v2-hair), 0 10px 30px -18px rgba(0,0,0,.5); -webkit-backdrop-filter: var(--a3-glass-blur, blur(24px) saturate(1.7)); backdrop-filter: var(--a3-glass-blur, blur(24px) saturate(1.7)); border-radius: 18px; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-tile { display: flex; flex-direction: column; justify-content: center; gap: 4px; padding: 16px 18px; min-width: 0; transition: transform .15s ease; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-tile:hover { transform: translateY(-2px); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-tile small { font-size: 12px; font-weight: 600; color: var(--v2-muted); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-tile b { font-size: 26px; line-height: 1.1; font-weight: 800; color: var(--v2-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-tile span { font-size: 11px; color: var(--v2-muted); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-progress { display: block; height: 4px; margin-top: 8px; border-radius: 4px; background: rgba(var(--rgb-neutral), .18); overflow: hidden; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-progress i { display: block; height: 100%; border-radius: 4px; background: linear-gradient(90deg, rgba(var(--rgb-accent), .55), rgb(var(--rgb-accent))); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-section { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 0 2px; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-head h2 { font-size: 18px; font-weight: 700; color: var(--v2-text); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-link { font-size: 13px; font-weight: 600; color: var(--v2-muted); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-link:hover { color: var(--v2-text); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-filter { align-self: flex-start; width: auto !important; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-filter .choice-option { flex: none !important; padding-left: 16px !important; padding-right: 16px !important; text-align: center; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-posters { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); grid-template-rows: auto; grid-auto-rows: 0; gap: 0 16px; overflow: hidden; padding: 6px 4px 4px; margin: -6px -4px -4px; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-poster { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-cover { position: relative; display: block; aspect-ratio: 2/3; border-radius: 14px; overflow: hidden; background: var(--v2-card-2); box-shadow: var(--v2-hair), 0 12px 26px -16px rgba(0,0,0,.6); transition: transform .2s cubic-bezier(.2,.8,.2,1), box-shadow .2s ease; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-cover img { width: 100%; height: 100%; object-fit: cover; transition: transform .35s cubic-bezier(.2,.8,.2,1); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-poster:hover .dh-cover { transform: translateY(-4px); box-shadow: 0 22px 40px -18px rgba(0,0,0,.7), 0 0 0 2px rgba(var(--rgb-accent), .7); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-poster:hover .dh-cover img { transform: scale(1.04); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-cover i { position: absolute; top: 9px; left: 9px; font-style: normal; font-size: 10px; font-weight: 800; color: #fff; padding: 3px 7px; border-radius: 6px; background: rgba(20,20,22,.5); display: inline-flex; align-items: center; gap: 5px; box-shadow: inset 0 0 0 .5px rgba(255,255,255,.22); -webkit-backdrop-filter: blur(10px) saturate(1.6); backdrop-filter: blur(10px) saturate(1.6); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-cover i::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--fmt); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-poster strong { margin-top: 7px; font-size: 13px; font-weight: 600; color: var(--v2-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-poster small { font-size: 12px; color: var(--v2-muted); min-height: 1em; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-bottom { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-list { display: flex; flex-direction: column; padding: 6px; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-row { display: flex; align-items: center; gap: 14px; padding: 10px 12px; border-radius: 13px; min-width: 0; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-row + .dh-row { box-shadow: 0 -.5px 0 rgba(var(--rgb-neutral), .16); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-row:hover { background: rgba(var(--rgb-neutral), .08); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-row img { width: 38px; height: 54px; object-fit: cover; border-radius: 7px; flex: none; background: var(--v2-card-2); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-row > span { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-row strong { font-size: 14px; font-weight: 600; color: var(--v2-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-row strong i { font-style: normal; font-size: 10px; font-weight: 700; margin-left: 6px; padding: 2px 7px; border-radius: 999px; color: var(--v2-text); background: rgba(var(--rgb-neutral), .14); vertical-align: 1px; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-row > span small { font-size: 12px; color: var(--v2-muted); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-row > b { display: flex; flex-direction: column; align-items: flex-end; font-size: 16px; font-weight: 800; color: var(--v2-text); line-height: 1.1; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-row > b small { font-size: 11px; font-weight: 600; color: var(--v2-muted); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-formats { display: flex; flex-direction: column; gap: 10px; padding: 18px; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-bar { display: flex; gap: 2px; height: 7px; border-radius: 7px; overflow: hidden; margin-bottom: 4px; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-formats p { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--v2-text); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-formats p i { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-formats p span { flex: 1; }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-formats p b { font-weight: 600; color: var(--v2-muted); }
+html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-empty { padding: 14px; font-size: 13px; color: var(--v2-muted); }
+@media (max-width: 1280px) { html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-top, html:is(.desk-v2,#dh1):is(.desk-v2,#dh2):is(.desk-v2,#dh3):is(.desk-v2,#dh4) #deskHome .dh-bottom { grid-template-columns: 1fr; } }
 /* Pastille coulissante (règle commune à toutes les applications, comme Ma Collection) :
    la sélection glisse d'un bouton à l'autre, nette (position et taille réelles), avec un léger rebond. */
 .slide-pill { position: absolute; z-index: 0; pointer-events: none; transform-origin: 0 0; will-change: transform; backface-visibility: hidden; box-shadow: none !important; }
@@ -10406,6 +10481,7 @@ function openSpaceSection(section) {
 let currentTab = 'home';
 function switchTab(tab) {
 currentTab = tab;
+if (tab !== 'home') document.documentElement.classList.remove('desk-adding');
 ['tabHome', 'tabCollection', 'tabWishlist', 'tabDigital', 'tabStats', 'tabSettings'].forEach(id => {
 const el = document.getElementById(id);
 if (el) el.classList.add('hidden');
@@ -11342,6 +11418,7 @@ function renderHomeWidgetsContent() {
  renderHomeWishlistFocus();
  renderHomeFormatMix();
  renderHomeWatchProgress();
+ renderDeskHome();
 }
 function applyIPadHomeLayout() {
  const tab=document.getElementById('tabHome');
@@ -11567,6 +11644,7 @@ renderHomeWatchNext();
 renderHomeWishlistFocus();
 renderHomeFormatMix();
 renderHomeWatchProgress();
+renderDeskHome();
 
 const recentOptions = normalizedHomeLayout().options;
 const recentSorted = [...collection].sort((a,b) => new Date(b.addedAt || 0) - new Date(a.addedAt || 0));
@@ -11636,6 +11714,74 @@ function renderHomeWatchProgress() {
  const box=document.getElementById('homeWatchProgress'); if(!box)return;
  const seen=collection.filter(movie=>movie.seen).length, total=collection.length, pct=total?Math.round(seen/total*100):0;
  box.innerHTML=`<div class="home-progress-value"><strong>${pct}%</strong><span>${seen} vu${seen>1?'s':''} sur ${total}</span></div><div class="home-progress-track"><i style="width:${pct}%"></i></div><p>${Math.max(0,total-seen)} film${total-seen>1?'s':''} encore à découvrir</p>`;
+}
+// --- Accueil ordinateur (html.desk-v2) : bandeau « Dernier ajout », tuiles, affiches filtrables, sorties, formats ---
+let deskHomeFilter='all';
+const DESK_FORMATS=[['4K UHD','4K','#5fb0ff'],['Blu-ray','Blu-ray','#a79bff'],['DVD','DVD','#f6c18a']];
+function deskFormatKey(format){ const f=String(format||''); if(/4k|uhd/i.test(f))return '4K UHD'; if(/blu/i.test(f))return 'Blu-ray'; if(/dvd/i.test(f))return 'DVD'; return f||'Autre'; }
+function deskBestFormat(movie){ const keys=(movie.editions||[]).map(e=>deskFormatKey(e.format)); return DESK_FORMATS.find(([k])=>keys.includes(k)) || null; }
+function deskAgo(date){
+ const t=new Date(date||0).getTime(); if(!t)return '';
+ const days=Math.floor((Date.now()-t)/86400000);
+ if(days<=0)return 'aujourd’hui'; if(days===1)return 'hier'; if(days<7)return `il y a ${days} jours`;
+ if(days<30){const w=Math.round(days/7);return `il y a ${w} semaine${w>1?'s':''}`;}
+ const m=Math.round(days/30); return m<12?`il y a ${m} mois`:`il y a ${Math.round(days/365)} an${days>=730?'s':''}`;
+}
+function setDeskHomeFilter(value){ deskHomeFilter=value; renderDeskHome(); }
+function renderDeskHome(){
+ const tab=document.getElementById('tabHome'); if(!tab)return;
+ let box=document.getElementById('deskHome');
+ if(!box){ box=document.createElement('section'); box.id='deskHome'; box.setAttribute('aria-label','Accueil'); tab.before(box); }
+ const eur=v=>(Number(v)||0).toLocaleString('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0});
+ const sorted=[...collection].sort((a,b)=>new Date(b.addedAt||0)-new Date(a.addedAt||0));
+ const latest=sorted[0];
+ // Bandeau
+ let hero;
+ if(latest){
+  const ed=latest.editions||[];
+  const fmts=[...new Set(ed.map(e=>deskFormatKey(e.format)).filter(Boolean))].map(k=>k==='4K UHD'?'4K UHD':k);
+  const chips=[...fmts, ed.some(e=>String(e.editionType||'').toLowerCase()==='steelbook')?'Steelbook':'', latest.seen?'Vu':'Non vu'].filter(Boolean);
+  const year=latest.releaseDate?String(latest.releaseDate).slice(0,4):'';
+  const meta=[latest.director, year, latest.runtime?formatRuntime(latest.runtime):''].filter(Boolean).map(escapeHtml).join(' · ');
+  const bg=latest.backdrop||latest.poster;
+  hero=`<button type="button" class="dh-hero${latest.backdrop?'':' dh-hero-poster'}" onclick='openMovieDetail(${JSON.stringify(latest.id)})'>
+   <img class="dh-hero-bg" src="${safeImageUrl(bg)}" alt="" decoding="async">
+   ${latest.backdrop?'':`<img class="dh-hero-cover" src="${safeImageUrl(latest.poster)}" alt="" decoding="async">`}
+   <span class="dh-hero-copy"><small>Dernier ajout${deskAgo(latest.addedAt)?' · '+deskAgo(latest.addedAt):''}</small><strong>${escapeHtml(latest.title)}</strong>${meta?`<em>${meta}</em>`:''}<span class="dh-chips">${chips.map(c=>`<i>${escapeHtml(c)}</i>`).join('')}</span></span>
+  </button>`;
+ } else {
+  hero=`<div class="dh-hero dh-hero-empty"><span class="dh-hero-copy"><small>Bienvenue</small><strong>Votre collection est vide</strong><em>Ajoutez votre premier film avec « Ajouter un titre ».</em></span></div>`;
+ }
+ // Tuiles
+ let editions=0,steel=0,est=0,buy=0; const monthAgo=Date.now()-30*86400000;
+ collection.forEach(m=>{const t=calculateMovieTotals(m);est+=t.totalEstimated;buy+=t.totalPurchase;(m.editions||[]).forEach(e=>{editions++;if(String(e.editionType||'').toLowerCase()==='steelbook')steel++;});});
+ const recentCount=collection.filter(m=>new Date(m.addedAt||0).getTime()>=monthAgo).length;
+ const seen=collection.filter(m=>m.seen).length, pct=collection.length?Math.round(seen/collection.length*100):0;
+ const tiles=`<div class="dh-tiles">
+  <button type="button" class="dh-tile" onclick="switchTab('collection')"><small>Œuvres</small><b>${collection.length}</b><span>${recentCount?`+${recentCount} ce mois-ci`:'Aucun ajout ce mois-ci'}</span></button>
+  <button type="button" class="dh-tile" onclick="switchTab('stats')"><small>Éditions</small><b>${editions}</b><span>${steel?`dont ${steel} Steelbook${steel>1?'s':''}`:'&nbsp;'}</span></button>
+  <button type="button" class="dh-tile" onclick="switchTab('stats')"><small>Valeur estimée</small><b>${eur(est||buy)}</b><span>${buy?`${eur(buy)} d’achats`:'&nbsp;'}</span></button>
+  <button type="button" class="dh-tile" onclick="switchTab('stats')"><small>Films vus</small><b>${pct} %</b><span class="dh-progress"><i style="width:${pct}%"></i></span></button>
+ </div>`;
+ // Derniers ajouts
+ const filters=[['all','Tous'],...DESK_FORMATS.map(([k,l])=>[k,l])];
+ const filtered=deskHomeFilter==='all'?sorted:sorted.filter(m=>(m.editions||[]).some(e=>deskFormatKey(e.format)===deskHomeFilter));
+ const posters=filtered.slice(0,12).map(m=>{const f=deskBestFormat(m);const y=m.releaseDate?String(m.releaseDate).slice(0,4):'';return `<button type="button" class="dh-poster" data-quick-movie="${escapeHtml(String(m.id))}" onclick='openMovieDetail(${JSON.stringify(m.id)})'><span class="dh-cover"><img src="${safeImageUrl(m.poster)}" alt="" loading="lazy" decoding="async">${f?`<i style="--fmt:${f[2]}">${f[1]}</i>`:''}</span><strong>${escapeHtml(m.title)}</strong><small>${escapeHtml(y)}</small></button>`;}).join('');
+ const recent=`<div class="dh-section"><div class="dh-head"><h2>Derniers ajouts</h2><button type="button" class="dh-link" onclick="switchTab('collection')">Tout voir</button></div>
+  <div class="choice-bar dh-filter" role="group" aria-label="Format">${filters.map(([k,l])=>`<button type="button" class="choice-option${deskHomeFilter===k?' is-active':''}" aria-pressed="${deskHomeFilter===k}" onclick="setDeskHomeFilter('${k}')">${l}</button>`).join('')}</div>
+  <div class="dh-posters">${posters||'<p class="dh-empty">Aucun film dans ce format.</p>'}</div></div>`;
+ // Prochaines sorties
+ const today=new Date();today.setHours(0,0,0,0);
+ const events=(typeof homeCalendarEvents==='function'?homeCalendarEvents():[]).filter(e=>new Date(e.date+'T12:00:00')>=today).slice(0,4);
+ const rel=`<div class="dh-section"><div class="dh-head"><h2>Prochaines sorties</h2><button type="button" class="dh-link" onclick="switchTab('releases')">Agenda</button></div>
+  <div class="dh-card dh-list">${events.length?events.map(e=>{const d=new Date(e.date+'T12:00:00');return `<button type="button" class="dh-row" onclick='openMovieDetail(${JSON.stringify(e.movieId)})'><img src="${safeImageUrl(e.poster)}" alt="" loading="lazy" decoding="async"><span><strong>${escapeHtml(e.title)} <i>${escapeHtml(e.label)}</i></strong><small>${escapeHtml(e.detail)}</small></span><b>${d.getDate()}<small>${d.toLocaleDateString('fr-FR',{month:'short'})}</small></b></button>`;}).join(''):'<p class="dh-empty">Aucune sortie prévue pour les films de votre wishlist.</p>'}</div></div>`;
+ // Formats
+ const counts={}; let total=0;
+ collection.forEach(m=>(m.editions||[]).forEach(e=>{const k=deskFormatKey(e.format);counts[k]=(counts[k]||0)+1;total++;}));
+ const rows=Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([k,n])=>[k,n,(DESK_FORMATS.find(f=>f[0]===k)||[,,'rgba(var(--rgb-neutral),.45)'])[2]]);
+ const fmt=`<div class="dh-section"><div class="dh-head"><h2>Formats</h2><button type="button" class="dh-link" onclick="switchTab('stats')">Stats</button></div>
+  <div class="dh-card dh-formats">${total?`<div class="dh-bar">${rows.map(([k,n,c])=>`<i style="flex:${n};background:${c}"></i>`).join('')}</div>${rows.map(([k,n,c])=>`<p><i style="background:${c}"></i><span>${escapeHtml(k)}</span><b>${n}</b></p>`).join('')}`:'<p class="dh-empty">Ajoutez une édition pour voir vos formats.</p>'}</div></div>`;
+ box.innerHTML=`<div class="dh-top">${hero}${tiles}</div>${recent}<div class="dh-bottom">${rel}${fmt}</div>`;
 }
 function pickRandomMovie() {
 if (collection.length === 0) return showToast("Votre collection est vide.");
@@ -15347,6 +15493,7 @@ async function backfillCollectionInfo() {
    <div class="dt-title" data-title>Accueil</div>
    <button type="button" class="dt-search" data-act="search">${svg('search')}<span>Rechercher dans ma collection…</span><kbd>${/Mac/i.test(navigator.platform) ? '⌘' : 'Ctrl'} K</kbd></button>
    <div class="dt-actions">
+    <button type="button" class="dt-btn dt-icon" data-act="scan" title="Scanner un code-barres" aria-label="Scanner un code-barres">${svg('batchscan')}</button>
     <button type="button" class="dt-btn primary" data-act="add">${svg('plus')}<span>Ajouter un titre</span></button>
    </div>`;
   document.body.prepend(top);
@@ -15377,6 +15524,9 @@ async function backfillCollectionInfo() {
    const act = event.target.closest('[data-act]')?.dataset.act;
    if (act === 'search') openGlobalSearch();
    if (act === 'add' || act === 'scan') {
+    const root = document.documentElement;
+    if (act === 'add' && root.classList.contains('desk-adding') && currentTab === 'home' && !document.getElementById('searchInput')?.value) { root.classList.remove('desk-adding'); return; }
+    root.classList.add('desk-adding');
     switchTab('home');
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (act === 'add') setTimeout(() => document.getElementById('searchInput')?.focus(), 60);
