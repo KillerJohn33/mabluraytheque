@@ -7303,6 +7303,34 @@ html:is(.desk-v2) .sv-grid { margin-bottom: 22px; }
 .owned-flag.is-wish { color: var(--v2-pink, #ff6fae); background: rgba(255,111,174,.12); }
 [data-quick-movie]:has(> .upgrade-flag) { position: relative; }
 .upgrade-flag { position: absolute; z-index: 3; top: 8px; right: 8px; max-width: calc(100% - 16px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 9px; font-weight: 800; padding: 3px 7px; border-radius: 6px; color: #fff; background: rgba(20,20,22,.6); box-shadow: inset 0 0 0 .5px rgba(255,255,255,.25); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); pointer-events: none; }
+/* ===== Vignettes : affiche pleine, fondu vers le noir, infos par-dessus ===== */
+.pcard, html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard { position: relative !important; display: block !important; aspect-ratio: 2 / 3; overflow: hidden !important; border-radius: 16px !important; background: #000 !important; border: 0 !important; padding: 0 !important; cursor: pointer; isolation: isolate; box-shadow: 0 0 0 .5px rgba(255,255,255,.08), 0 12px 26px -16px rgba(0,0,0,.7) !important; text-align: left; color: #fff !important; transition: transform .2s cubic-bezier(.2,.8,.2,1), box-shadow .2s ease !important; }
+html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard > * { position: absolute !important; margin: 0 !important; }
+html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard > .pc-img { inset: 0; width: 100% !important; height: 100% !important; object-fit: cover; z-index: 0; transition: transform .35s cubic-bezier(.2,.8,.2,1); border-radius: 0 !important; }
+html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard > .pc-fade { inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,.55) 62%, rgba(0,0,0,.92) 84%, #000 100%) !important; }
+html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard > .pc-top { top: 8px; left: 8px; right: 8px; z-index: 2; display: flex; gap: 5px; pointer-events: none; }
+html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard > .pc-info { left: 0; right: 0; bottom: 0; z-index: 2; display: flex !important; flex-direction: column; gap: 5px; padding: 10px 10px 10px !important; pointer-events: none; background: none !important; }
+html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard .pc-info strong { display: block; font-size: 13px; font-weight: 700; line-height: 1.2; color: #fff !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 3px rgba(0,0,0,.6); }
+html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard .pc-info small { font-size: 11px; color: rgba(255,255,255,.7); }
+html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard .pc-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard .pc-chip { font-style: normal; font-size: 10px; font-weight: 700; line-height: 1; padding: 4px 6px; border-radius: 6px; color: rgba(255,255,255,.92) !important; background: rgba(255,255,255,.14) !important; box-shadow: inset 0 0 0 .5px rgba(255,255,255,.16); white-space: nowrap; }
+html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard .pc-chip.is-seen { color: #7ee2a0 !important; background: rgba(52,199,89,.18) !important; }
+html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard .pc-chip.is-unseen { color: rgba(255,255,255,.7) !important; }
+html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard .pc-chip.is-price { color: #fff !important; }
+html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard .pc-chip.is-rate { color: #ffd36b !important; background: rgba(255,200,60,.16) !important; }
+html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard .pc-chip.is-tmdb { color: #9fd8ff !important; }
+html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard .pc-chip.is-pre { color: #ff9ccb !important; background: rgba(255,111,174,.18) !important; }
+html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard .pc-chip.is-res { color: #9fe6f2 !important; }
+html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard .pc-fmt { font-style: normal; display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 800; color: #fff; padding: 3px 7px; border-radius: 6px; background: rgba(20,20,22,.5); box-shadow: inset 0 0 0 .5px rgba(255,255,255,.22); -webkit-backdrop-filter: blur(10px) saturate(1.6); backdrop-filter: blur(10px) saturate(1.6); }
+html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard .pc-fmt[style]::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--fmt); }
+html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard .pc-fmt.is-wish { color: #ffc2dd; } html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard .pc-fmt.is-plex { color: #f5c04a; }
+html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard > .plex-flag { top: auto; bottom: auto; top: 8px; right: 8px; left: auto; z-index: 3; }
+html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard > .upgrade-flag { z-index: 3; }
+@media (hover: hover) { html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard:hover { transform: translateY(-4px) !important; box-shadow: 0 22px 40px -18px rgba(0,0,0,.7), 0 0 0 2px rgba(var(--rgb-accent), .7) !important; } html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body .pcard:hover > .pc-img { transform: scale(1.04); } }
+/* Accueil : la vignette porte ses infos (plus de titre sous l'affiche) */
+html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body #deskHome .dh-poster.pcard { flex-direction: initial; }
+html:is(.ui-v2,#pc1):is(.ui-v2,#pc2):is(.ui-v2,#pc3):is(.ui-v2,#pc4):is(.ui-v2,#pc5):is(.ui-v2,#pc6) body #deskHome .dh-poster.pcard .pc-chip:nth-child(n+4) { display: none; }
+@media (min-width: 1100px) { html:is(.ui-v2,#dh1):is(.ui-v2,#dh2):is(.ui-v2,#dh3):is(.ui-v2,#dh4) #deskHome .dh-posters { display: flex; gap: 16px; overflow: hidden; } html:is(.ui-v2,#dh1):is(.ui-v2,#dh2):is(.ui-v2,#dh3):is(.ui-v2,#dh4) #deskHome .dh-posters > .dh-poster { flex: 0 0 calc((100% - 80px) / 6); } }
 /* Pastille coulissante (règle commune à toutes les applications, comme Ma Collection) :
    la sélection glisse d'un bouton à l'autre, nette (position et taille réelles), avec un léger rebond. */
 .slide-pill { position: absolute; z-index: 0; pointer-events: none; transform-origin: 0 0; will-change: transform; backface-visibility: hidden; box-shadow: none !important; }
@@ -12150,7 +12178,7 @@ function renderDeskHome(){
  // Derniers ajouts
  const filters=[['all','Tous'],...DESK_FORMATS.map(([k,l])=>[k,l])];
  const filtered=deskHomeFilter==='all'?sorted:sorted.filter(m=>(m.editions||[]).some(e=>deskFormatKey(e.format)===deskHomeFilter));
- const posters=filtered.slice(0,12).map(m=>{const f=deskBestFormat(m);const y=m.releaseDate?String(m.releaseDate).slice(0,4):'';return `<button type="button" class="dh-poster" data-quick-movie="${escapeHtml(String(m.id))}" onclick='openMovieDetail(${JSON.stringify(m.id)})'><span class="dh-cover"><img src="${safeImageUrl(m.poster)}" alt="" loading="lazy" decoding="async">${f?`<i style="--fmt:${f[2]}">${f[1]}</i>`:''}</span><strong>${escapeHtml(m.title)}</strong><small>${escapeHtml(y)}</small></button>`;}).join('');
+ const posters=filtered.slice(0,12).map(m=>{const f=deskBestFormat(m);const y=m.releaseDate?String(m.releaseDate).slice(0,4):'';const t=calculateMovieTotals(m);return `<button type="button" class="dh-poster pcard" data-quick-movie="${escapeHtml(String(m.id))}" onclick='openMovieDetail(${JSON.stringify(m.id)})'>${posterCardHTML({ poster: m.poster, title: m.title, top: pcFormatTag(m), chips: [y ? pcChip(escapeHtml(y)) : '', t.totalPurchase > 0 ? pcChip(`${t.totalPurchase.toFixed(0)} €`, 'is-price') : '', m.seen ? pcChip('Vu', 'is-seen') : pcChip('Non vu', 'is-unseen'), pcRating(m)] })}</button>`;}).join('');
  const recent=`<div class="dh-section"><div class="dh-head"><h2>Derniers ajouts</h2><button type="button" class="dh-link" onclick="switchTab('collection')">Tout voir</button></div>
   <div class="choice-bar dh-filter" role="group" aria-label="Format">${filters.map(([k,l])=>`<button type="button" class="choice-option${deskHomeFilter===k?' is-active':''}" aria-pressed="${deskHomeFilter===k}" onclick="setDeskHomeFilter('${k}')">${l}</button>`).join('')}</div>
   <div class="dh-posters">${posters||'<p class="dh-empty">Aucun film dans ce format.</p>'}</div></div>`;
@@ -12378,6 +12406,20 @@ sagaBtn.setAttribute('aria-pressed', String(collectionGroupBySaga));
 }
 }
 
+// ——— Vignette unique : affiche pleine, fondu vers le noir, infos par-dessus ———
+function posterCardHTML({ poster = '', title = '', top = '', chips = [], sub = '' }) {
+ return `<img class="pc-img" src="${safeImageUrl(poster)}" alt="" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'">
+  <span class="pc-fade" aria-hidden="true"></span>${top ? `<span class="pc-top">${top}</span>` : ''}
+  <span class="pc-info"><strong>${escapeHtml(title)}</strong>${sub ? `<small>${sub}</small>` : ''}${chips.length ? `<span class="pc-chips">${chips.filter(Boolean).join('')}</span>` : ''}</span>`;
+}
+function pcChip(text, cls = '') { return `<i class="pc-chip ${cls}">${text}</i>`; }
+function pcRating(m) {
+ const r = Number(m.imdbUserRating ?? m.personalRating ?? m.userRating ?? m.myRating);
+ if (Number.isFinite(r) && r > 0) return pcChip(`★ ${r % 1 ? r.toFixed(1) : r}`, 'is-rate');
+ const t = Number(m.imdbRating || m.voteAverage);
+ return Number.isFinite(t) && t > 0 ? pcChip(`★ ${t.toFixed(1)}`, 'is-tmdb') : '';
+}
+function pcFormatTag(m) { const f = deskBestFormat(m); return f ? `<i class="pc-fmt" style="--fmt:${f[2]}">${f[1]}</i>` : ''; }
 function buildCollectionCardsFragment(list, modeOverride) {
 const mode = modeOverride || collectionViewMode;
 const fragment = document.createDocumentFragment();
@@ -12419,19 +12461,10 @@ ${imdbBadge(m)}
 `;
 } else {
 const rowSize = mode === 'row' ? ' flex-none w-28 sm:w-32 md:w-36' : '';
-card.className = `relative rounded-2xl overflow-hidden cursor-pointer bg-black border border-white/10 hover:border-cyan-500/50 transition${rowSize}`;
-card.innerHTML = `
-<img src="${safeImageUrl(m.poster)}" loading="lazy" decoding="async" class="w-full aspect-[2/3] object-cover">
-<div class="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none"></div>
-<div class="absolute inset-x-0 bottom-0 p-2.5">
-<h4 class="text-xs font-bold text-white truncate">${escapeHtml(m.title)}</h4>
-<div class="flex items-center justify-between text-[10px] mt-1">
-<span class="text-cyan-300 font-semibold">${totals.count} éd.</span>
-<span class="font-bold text-emerald-400">${totals.totalPurchase.toFixed(2)} €</span>
-</div>
-${statusRow}
-</div>
-`;
+card.className = `pcard${rowSize}`;
+card.innerHTML = posterCardHTML({ poster: m.poster, title: m.title, top: pcFormatTag(m), chips: [
+ pcChip(`${totals.count} éd.`), totals.totalPurchase > 0 ? pcChip(`${totals.totalPurchase.toFixed(2).replace('.', ',')} €`, 'is-price') : '',
+ m.seen ? pcChip('Vu', 'is-seen') : pcChip('Non vu', 'is-unseen'), pcRating(m) ] });
 }
 if (bulkMode) {
   const selected = bulkSelected.has(String(m.id));
@@ -12802,17 +12835,7 @@ function renderDigital() {
   grid.innerHTML = sorted.map(item => {
    const poster = item.posterData || item.poster || '';
    return `
-   <div onclick="openDigitalDetail('${item.id}')" class="movie-card-item glass-card rounded-2xl overflow-hidden border border-white/10 cursor-pointer">
-    <div class="relative aspect-[2/3] bg-black/40">
-     ${poster ? `<img src="${escapeHtml(poster)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.style.display='none'" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-gray-600"><span class="icon-inline w-8 h-8" data-icon="cloud"></span></div>`}
-     <span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-black/70 text-[8px] font-bold text-amber-300 uppercase tracking-wider">${escapeHtml(item.sectionTitle || (item.type === 'show' ? 'Série' : 'Film'))}</span>
-     ${item.resolution ? `<span class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md bg-black/70 text-[8px] font-bold text-cyan-300 uppercase">${escapeHtml(item.resolution)}</span>` : ''}
-    </div>
-    <div class="p-2">
-     <p class="text-[11px] font-semibold text-white truncate" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</p>
-     <p class="text-[9px] text-gray-500 mt-0.5">${[item.year, item.duration ? formatRuntime(item.duration) : ''].filter(Boolean).join(' · ')}</p>
-    </div>
-   </div>
+   <div onclick="openDigitalDetail('${item.id}')" class="pcard is-digital" role="button" tabindex="0">${posterCardHTML({ poster, title: item.title, top: `<i class="pc-fmt is-plex">${escapeHtml(item.sectionTitle || (item.type === 'show' ? 'Série' : 'Film'))}</i>`, chips: [item.year ? pcChip(String(item.year)) : '', item.duration ? pcChip(formatRuntime(item.duration)) : '', item.resolution ? pcChip(escapeHtml(String(item.resolution).toLowerCase() === '4k' ? '4K' : /^\d+$/.test(item.resolution) ? item.resolution + 'p' : item.resolution), 'is-res') : ''] })}</div>
   `;
   }).join('');
  }
@@ -13026,23 +13049,9 @@ ${wishlistPersonalRatingBadge(m)}
 </div>
 `;
 } else {
-card.className = "group relative rounded-2xl overflow-hidden cursor-pointer bg-black border border-pink-500/20 hover:border-pink-400/50 transition-all duration-200 shadow-lg hover:shadow-pink-500/10 hover:-translate-y-0.5";
-card.innerHTML = `
-<div class="relative aspect-[2/3] overflow-hidden">
-<img src="${safeImageUrl(m.poster)}" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.035]">
-<div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/10 to-transparent"></div>
-<div class="absolute top-2 left-2">
-<span class="wishlist-card-tag text-[8px] uppercase tracking-wider font-bold text-pink-100 bg-pink-500/20 backdrop-blur-md border border-pink-300/20 px-1.5 py-1 rounded-full">Wishlist</span>
-</div>
-<div class="absolute inset-x-0 bottom-0 p-2.5">
-<h4 class="text-[11px] font-bold text-white leading-tight truncate">${escapeHtml(m.title)}</h4>
-<div class="flex items-end gap-2 mt-1.5">
-${wishlistPersonalRatingBadge(m, 'w-3 h-3')}
-
-</div>
-</div>
-</div>
-`;
+card.className = "pcard is-wish";
+card.innerHTML = posterCardHTML({ poster: m.poster, title: m.title, top: '<i class="pc-fmt is-wish">Wishlist</i>', chips: [
+ totals.totalPurchase > 0 ? pcChip(`${totals.totalPurchase.toFixed(2).replace('.', ',')} €`, 'is-price') : '', m.preordered ? pcChip('Précommandé', 'is-pre') : (() => { const d = typeof effectiveReleaseDate === 'function' ? effectiveReleaseDate(m) : ''; return d ? pcChip(new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })) : ''; })(), pcRating(m) ] });
 }
 { const of = ownedFormatsFor(m.tmdb_id || m.tmdbId, isSeries(m)); if (of.length) { const f = document.createElement('span'); f.className = 'upgrade-flag'; f.textContent = 'Déjà en ' + ownedFormatsLabel(of); f.title = 'Vous possédez déjà ce film : cette entrée est une mise à niveau'; card.appendChild(f); } }
 fragment.appendChild(card);
