@@ -7385,6 +7385,11 @@ html:is(.ui-v2,#ed1):is(.ui-v2,#ed2):is(.ui-v2,#ed3):is(.ui-v2,#ed4):is(.ui-v2,#
 .digital-server-chip { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; color: #1a1a1a; background: #e5a00d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55%; }
 #digitalFilterPanel > .choice-bar { display: none !important; }
 .pcard.is-digital .pc-img[src=""] { visibility: hidden; }
+html:is(.ui-v2,#fd1):is(.ui-v2,#fd2):is(.ui-v2,#fd3):is(.ui-v2,#fd4):is(.ui-v2,#fd5):is(.ui-v2,#fd6) body #modalContent :is(.movie-detail-info,.movie-detail-editions,.digital-detail-info,.digital-detail-media,.digital-detail-actions,.series-detail-info)::after,
+html:is(.ui-v2,#fd1):is(.ui-v2,#fd2):is(.ui-v2,#fd3):is(.ui-v2,#fd4):is(.ui-v2,#fd5):is(.ui-v2,#fd6) body #modalContent :is(.digital-detail-actions)::before { display: none !important; content: none !important; }
+html:is(.ui-v2,#fd1):is(.ui-v2,#fd2):is(.ui-v2,#fd3):is(.ui-v2,#fd4):is(.ui-v2,#fd5):is(.ui-v2,#fd6) body #modalContent .digital-detail-actions { border: 0 !important; background: none !important; box-shadow: none !important; padding: 0 !important; }
+html:is(.ui-v2,#fd1):is(.ui-v2,#fd2):is(.ui-v2,#fd3):is(.ui-v2,#fd4):is(.ui-v2,#fd5):is(.ui-v2,#fd6) body #modalContent .digital-detail-hero { border-color: transparent !important; }
+html:is(.ui-v2,#fd1):is(.ui-v2,#fd2):is(.ui-v2,#fd3):is(.ui-v2,#fd4):is(.ui-v2,#fd5):is(.ui-v2,#fd6) body #modalContent .movie-detail-shell > :not(.movie-detail-hero)::before, html:is(.ui-v2,#fd1):is(.ui-v2,#fd2):is(.ui-v2,#fd3):is(.ui-v2,#fd4):is(.ui-v2,#fd5):is(.ui-v2,#fd6) body #modalContent .movie-detail-shell > :not(.movie-detail-hero)::after { background: none !important; box-shadow: none !important; }
 /* Pastille coulissante (règle commune à toutes les applications, comme Ma Collection) :
    la sélection glisse d'un bouton à l'autre, nette (position et taille réelles), avec un léger rebond. */
 .slide-pill { position: absolute; z-index: 0; pointer-events: none; transform-origin: 0 0; will-change: transform; backface-visibility: hidden; box-shadow: none !important; }
