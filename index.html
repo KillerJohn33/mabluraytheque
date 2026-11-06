@@ -8102,9 +8102,9 @@ html.desk-v2.ui-v2:not(.is-ipad) body.theme-light {
 </div>
 <div id="plexConnected" class="hidden flex items-center justify-between gap-3 flex-wrap">
 <div class="flex items-center gap-2.5 min-w-0"><span class="icon-chip chip-sm" data-icon="cloud"></span><div class="min-w-0"><p class="text-xs font-bold text-white">Plex · <span id="plexServerName">-</span></p><p id="plexSyncStatus" class="text-[10px] text-gray-400 truncate">Jamais synchronisé</p></div></div>
-<div class="flex items-center gap-1.5 flex-none">
+<div class="flex items-center gap-1.5 flex-wrap">
 <button type="button" onclick="syncPlexLibrary()" class="app-action app-action-cyan px-3 py-2 text-[10px]"><span class="icon-inline w-3.5 h-3.5" data-icon="refresh"></span> Synchroniser</button>
-<button type="button" onclick="resyncPlexLibrary()" class="app-action px-3 py-2 text-[10px]" title="Tout relire depuis Plex, affiches comprises">Tout resynchroniser</button>
+<button type="button" onclick="plexReconnectAndSync()" class="app-action app-action-amber px-3 py-2 text-[10px]" title="Ouvre la page de connexion Plex, puis importe toute la bibliothèque">Se reconnecter et tout synchroniser</button>
 <button type="button" onclick="disconnectPlex()" class="equipment-icon-button danger" aria-label="Déconnecter Plex" title="Déconnecter Plex"><span class="icon-inline w-3.5 h-3.5" data-icon="x"></span></button>
 </div>
 </div>
@@ -8909,6 +8909,7 @@ if (loadCollectionFromCache()) {
 }
 brReveal();
 await syncAllData(true);
+plexResumePendingLogin();
 brEnableMotion();
 setTimeout(() => loadReleases(false, { silent: true }), 2500);
 setTimeout(() => backfillCollectionInfo(), 8000);
@@ -9903,7 +9904,8 @@ async function callPlexApi(action, payload = {}) {
  return response;
 }
 
-async function startPlexLink() {
+async function startPlexLink() { return plexReconnectAndSync(); }
+async function startPlexLinkPopup() {
  const clientId = getPlexClientId();
  try {
   const res = await callPlexApi('pin', { clientId });
@@ -9933,7 +9935,7 @@ async function startPlexLink() {
  }
 }
 
-async function finishPlexLink(token, clientId) {
+async function finishPlexLink(token, clientId, opts = {}) {
  try {
   const res = await callPlexApi('resources', { token, clientId });
   if (!res.ok) throw new Error('resources');
@@ -9962,7 +9964,7 @@ async function finishPlexLink(token, clientId) {
    return;
   }
   showToast(`Connecté à ${profileData.plex.serverName}.`);
-  syncPlexLibrary();
+  syncPlexLibrary(false, opts);
  } catch (error) {
   showToast('⚠️ Impossible de récupérer vos serveurs Plex.');
  }
@@ -10019,6 +10021,86 @@ async function fetchAndUploadPlexPoster(base, token, thumbPath, ratingKey) {
  } catch (_) { return ''; }
 }
 
+// ——— Plex en direct depuis l'appareil (plex.tv et le serveur acceptent les appels du navigateur) ———
+function plexDirectHeaders(clientId, token) {
+ const h = { Accept: 'application/json', 'X-Plex-Product': 'Ma Bluraythèque', 'X-Plex-Version': '1.0', 'X-Plex-Client-Identifier': clientId };
+ if (token) h['X-Plex-Token'] = token;
+ return h;
+}
+async function plexDirectFetch(url, clientId, token, timeoutMs = 9000) {
+ const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), timeoutMs);
+ try {
+  const res = await fetch(url, { headers: plexDirectHeaders(clientId, token), signal: ctrl.signal, cache: 'no-store' });
+  if (res.status === 401) throw new Error('Connexion Plex expirée : utilisez « Se reconnecter et tout synchroniser ».');
+  if (!res.ok) throw new Error('plex_http_' + res.status);
+  return await res.json();
+ } finally { clearTimeout(t); }
+}
+// Lit toute la bibliothèque directement : toutes les adresses du serveur sont essayées (réseau local compris).
+async function plexReadLibraryDirect(token, clientId, wantedId, progress) {
+ const resources = await plexDirectFetch('https://plex.tv/api/v2/resources?includeHttps=1&includeRelay=1', clientId, token);
+ const servers = (Array.isArray(resources) ? resources : []).filter(r => String(r.provides || '').split(',').includes('server'));
+ const server = servers.find(r => r.clientIdentifier === wantedId) || servers.find(r => r.owned) || servers[0];
+ if (!server) throw new Error('Aucun serveur Plex trouvé sur ce compte.');
+ const token2 = server.accessToken || token;
+ const conns = (server.connections || []).filter(c => /^https:/i.test(c.uri || ''))
+  .sort((a, b) => (a.local ? 0 : a.relay ? 2 : 1) - (b.local ? 0 : b.relay ? 2 : 1));
+ let base = '', sections = null;
+ for (const c of conns) {
+  progress?.(`Connexion à ${server.name || 'Plex'}…`);
+  try { sections = await plexDirectFetch(String(c.uri).replace(/\/$/, '') + '/library/sections', clientId, token2, c.local ? 4000 : 9000); base = String(c.uri).replace(/\/$/, ''); break; } catch (e) { if (/expirée/.test(e.message)) throw e; }
+ }
+ if (!base) throw new Error('direct_unreachable');
+ const list = (sections?.MediaContainer?.Directory || []).filter(d => d.type === 'movie' || d.type === 'show');
+ const items = [];
+ for (const sec of list) {
+  for (let start = 0, total = Infinity; start < total; start += 300) {
+   progress?.(`Lecture de « ${sec.title} »… ${items.length} élément(s)`);
+   const data = await plexDirectFetch(`${base}/library/sections/${encodeURIComponent(sec.key)}/all?includeGuids=1&X-Plex-Container-Start=${start}&X-Plex-Container-Size=300`, clientId, token2, 20000);
+   const mc = data?.MediaContainer || {}; const md = mc.Metadata || [];
+   md.forEach(m => {
+    const g = (m.Guid || []).find(x => String(x?.id || '').startsWith('tmdb://'));
+    const media = (m.Media || [])[0]; const part = media && (media.Part || [])[0];
+    items.push({ ratingKey: String(m.ratingKey || ''), title: m.title || 'Sans titre', year: m.year || null, type: sec.type, sectionTitle: sec.title || '',
+     tmdbId: g ? String(g.id).replace('tmdb://', '') : '', thumbPath: m.thumb || '', duration: m.duration ? Math.round(m.duration / 60000) : 0,
+     resolution: media?.videoResolution || '', videoCodec: media?.videoCodec || '', audioCodec: media?.audioCodec || '', audioChannels: media?.audioChannels || null,
+     container: media?.container || part?.container || '', fileSize: part?.size || null, addedAt: m.addedAt ? m.addedAt * 1000 : Date.now() });
+   });
+   total = Number(mc.totalSize ?? md.length) || 0;
+   if (!md.length) break;
+  }
+ }
+ return { serverName: server.name || 'Serveur Plex', serverClientIdentifier: server.clientIdentifier || '', serverUri: base, token: token2, items };
+}
+// Se reconnecter : la page de connexion Plex s'ouvre dans la même fenêtre, puis revient dans l'app qui synchronise tout.
+async function plexReconnectAndSync() {
+ const clientId = getPlexClientId();
+ try {
+  const res = await callPlexApi('pin', { clientId });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data?.id || !data?.code) throw new Error('pin');
+  localStorage.setItem('plex_pending_pin', JSON.stringify({ id: data.id, clientId, at: Date.now() }));
+  const back = `${location.origin}${location.pathname}?plex=retour`;
+  location.href = `https://app.plex.tv/auth#?clientID=${encodeURIComponent(clientId)}&code=${encodeURIComponent(data.code)}&forwardUrl=${encodeURIComponent(back)}&context%5Bdevice%5D%5Bproduct%5D=${encodeURIComponent('Ma Bluraythèque')}`;
+ } catch (_) { showToast('⚠️ Impossible d’ouvrir la connexion Plex. Vérifiez votre connexion Internet.'); }
+}
+// Au retour de la page Plex : récupère le jeton puis lance la synchronisation complète.
+async function plexResumePendingLogin() {
+ let pending; try { pending = JSON.parse(localStorage.getItem('plex_pending_pin') || 'null'); } catch (_) {}
+ if (!pending?.id || Date.now() - pending.at > 15 * 60000) { localStorage.removeItem('plex_pending_pin'); return; }
+ if (/[?&]plex=retour/.test(location.search)) history.replaceState(null, '', location.pathname + location.hash);
+ showToast('Connexion à Plex…');
+ for (let i = 0; i < 10; i++) {
+  try {
+   const r = await callPlexApi('check', { id: pending.id, clientId: pending.clientId });
+   const d = await r.json().catch(() => ({}));
+   if (d?.authToken) { localStorage.removeItem('plex_pending_pin'); await finishPlexLink(d.authToken, pending.clientId, { full: true }); return; }
+  } catch (_) {}
+  await new Promise(r => setTimeout(r, 1500));
+ }
+ localStorage.removeItem('plex_pending_pin');
+ showToast('⚠️ Connexion Plex non validée. Réessayez « Se reconnecter et tout synchroniser ».');
+}
 let plexSyncRunning = false;
 async function plexApiJson(action, payload) {
  const res = await callPlexApi(action, payload);
@@ -10043,11 +10125,16 @@ async function syncPlexLibrary(silent = false, opts = {}) {
   const clientId = plex.clientId || getPlexClientId();
   // 1) serveur et bibliothèques (adresse redétectée à chaque fois)
   progress('Connexion au serveur…');
-  const info = await plexApiJson('sections', { token: plex.token, clientId, serverClientIdentifier: plex.serverClientIdentifier || '' });
+  let direct = null;
+  try { direct = await plexReadLibraryDirect(plex.token, clientId, plex.serverClientIdentifier || '', progress); }
+  catch (e) { if (/expirée/.test(e?.message || '')) throw e; console.warn('Lecture Plex directe impossible, passage par le serveur :', e); }
+  const info = direct ? { serverUri: direct.serverUri, serverName: direct.serverName, serverClientIdentifier: direct.serverClientIdentifier, sections: [] }
+   : await plexApiJson('sections', { token: plex.token, clientId, serverClientIdentifier: plex.serverClientIdentifier || '' });
   const base = String(info.serverUri || '').replace(/\/$/, '');
-  if (!info.sections?.length) throw new Error('Aucune bibliothèque de films ou de séries sur ce serveur Plex.');
+  if (!direct && !info.sections?.length) throw new Error('Aucune bibliothèque de films ou de séries sur ce serveur Plex.');
   // 2) lecture page par page ; la moindre erreur annule tout (la liste actuelle est conservée)
-  const sourceItems = [];
+  const sourceItems = direct ? direct.items : [];
+  if (direct && !sourceItems.length) throw new Error('Aucun film trouvé dans votre bibliothèque Plex.');
   const PAGE = 200;
   for (const section of info.sections) {
    let startAt = 0, total = Infinity;
@@ -10102,7 +10189,7 @@ async function syncPlexLibrary(silent = false, opts = {}) {
     item.posterData = previous.posterData;
     return;
    }
-   item.posterData = base ? await fetchAndUploadPlexPoster(base, plex.token, item.thumbPath, item.ratingKey) : '';
+   item.posterData = base ? await fetchAndUploadPlexPoster(base, direct?.token || plex.token, item.thumbPath, item.ratingKey) : '';
   });
 
   digitalLibrary = items;
