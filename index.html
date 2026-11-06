@@ -7286,6 +7286,19 @@ html.ui-v2:not(.desk-v2) body > header .global-add-trigger + .global-search-trig
 html:is(.desk-v2) .sv-grid { margin-bottom: 22px; }
 .saga-missing-btn { margin-left: auto; font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px; border: 0; cursor: pointer; color: var(--v2-text, #fff); background: rgba(var(--rgb-accent, 34,211,238), .16); box-shadow: inset 0 0 0 .5px rgba(var(--rgb-accent, 34,211,238), .35); font-family: inherit; }
 .saga-missing-btn.is-complete { cursor: default; background: rgba(52,199,89,.14); box-shadow: none; color: var(--v2-green, #34c759); }
+/* Fiche film enrichie */
+#modalContent .movie-detail-hero.has-backdrop .movie-detail-hero-layout { min-height: 190px; align-items: flex-end; }
+.detail-extras { display: flex; flex-direction: column; gap: 10px; }
+.detail-plex { display: flex; align-items: center; gap: 12px; padding: 11px 13px; border-radius: 16px; background: rgba(229,160,13,.12); box-shadow: inset 0 0 0 .5px rgba(229,160,13,.35); color: var(--v2-text, #fff); }
+.detail-plex-ico { width: 34px; height: 34px; flex: none; display: grid; place-items: center; border-radius: 10px; background: #e5a00d; color: #1a1a1a; } .detail-plex-ico svg { width: 18px; height: 18px; }
+.detail-plex b { display: block; font-size: 13.5px; } .detail-plex small { display: block; font-size: 11.5px; color: var(--v2-muted, #aaa); }
+.detail-watch { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.detail-trailer { display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 14px; border-radius: 12px; font-size: 13px; font-weight: 700; color: var(--v2-text, #fff); text-decoration: none; background: var(--v2-card, rgba(255,255,255,.08)); box-shadow: var(--v2-hair, inset 0 0 0 1px rgba(255,255,255,.1)); }
+.detail-trailer svg { width: 16px; height: 16px; color: rgb(var(--rgb-accent, 34,211,238)); }
+.detail-providers { display: flex; align-items: center; gap: 10px; min-width: 0; } .detail-providers small { font-size: 11px; font-weight: 600; color: var(--v2-muted, #999); white-space: nowrap; }
+.detail-providers > div { display: flex; gap: 6px; flex-wrap: wrap; } .detail-providers img { width: 32px; height: 32px; border-radius: 9px; display: block; box-shadow: 0 2px 6px rgba(0,0,0,.3); }
+[data-quick-movie]:has(> .plex-flag) { position: relative; }
+.plex-flag { position: absolute; z-index: 3; bottom: 8px; right: 8px; font-size: 9px; font-weight: 800; letter-spacing: .02em; padding: 3px 6px; border-radius: 6px; color: #1a1a1a; background: #e5a00d; box-shadow: 0 2px 6px rgba(0,0,0,.35); pointer-events: none; }
 /* Pastille coulissante (règle commune à toutes les applications, comme Ma Collection) :
    la sélection glisse d'un bouton à l'autre, nette (position et taille réelles), avec un léger rebond. */
 .slide-pill { position: absolute; z-index: 0; pointer-events: none; transform-origin: 0 0; will-change: transform; backface-visibility: hidden; box-shadow: none !important; }
@@ -12409,6 +12422,7 @@ if (bulkMode) {
   card.setAttribute('aria-pressed', String(selected));
   card.insertAdjacentHTML('beforeend', `<span class="absolute top-2 right-2 z-10 w-8 h-8 rounded-full flex items-center justify-center border ${selected ? 'bg-cyan-400 text-black border-cyan-300' : 'bg-black/75 text-white border-white/60'}" aria-hidden="true">${selected ? '✓' : ''}</span>`);
 }
+ if (!m.isWishlist && plexMatchFor(m)) { const flag = document.createElement('span'); flag.className = 'plex-flag'; flag.textContent = 'PLEX'; flag.title = 'Aussi dans Plex'; card.appendChild(flag); }
 fragment.appendChild(card);
 });
 return fragment;
@@ -13681,6 +13695,62 @@ function unlockDetailBackgroundScroll() {
 }
 
 // --- MODAL & ÉDITION AVANCÉE DES ÉDITIONS ---
+// ——— Fiche film enrichie : grand fond, « Aussi dans Plex », bande-annonce, plateformes ———
+function plexMatchFor(movie) {
+ if (typeof digitalLibrary === 'undefined' || !Array.isArray(digitalLibrary) || !digitalLibrary.length || !movie) return null;
+ const tid = String(movie.tmdb_id || movie.tmdbId || '');
+ const norm = v => String(v || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+ const year = String(movie.releaseDate || '').slice(0, 4);
+ return digitalLibrary.find(d => tid && String(d.tmdbId || '') === tid)
+  || digitalLibrary.find(d => norm(d.title) === norm(movie.title) && (!year || !d.year || String(d.year) === year)) || null;
+}
+function plexQualityLabel(d) {
+ const r = String(d.resolution || '').toLowerCase();
+ const res = r === '4k' ? '4K' : /^\d+$/.test(r) ? r + 'p' : (r ? r.toUpperCase() : '');
+ return [res, d.videoCodec ? String(d.videoCodec).toUpperCase() : '', d.audioChannels ? (d.audioChannels > 6 ? '7.1' : d.audioChannels > 2 ? '5.1' : 'stéréo') : ''].filter(Boolean).join(' · ');
+}
+const tmdbExtraCache = new Map();
+function fetchTmdbDetailExtras(tmdbId, isTv) {
+ const type = isTv ? 'tv' : 'movie', key = type + tmdbId;
+ if (tmdbExtraCache.has(key)) return tmdbExtraCache.get(key);
+ const get = u => fetch(u).then(r => r.ok ? r.json() : {}).catch(() => ({}));
+ const p = Promise.all([
+  get(`https://api.themoviedb.org/3/${type}/${tmdbId}/videos?api_key=${API_KEY}&language=fr-FR`),
+  get(`https://api.themoviedb.org/3/${type}/${tmdbId}/videos?api_key=${API_KEY}`),
+  get(`https://api.themoviedb.org/3/${type}/${tmdbId}/watch/providers?api_key=${API_KEY}`)
+ ]).then(([fr, all, prov]) => {
+  const vids = [...(fr.results || []), ...(all.results || [])].filter(v => v.site === 'YouTube' && /Trailer|Teaser/.test(v.type));
+  const trailer = vids.find(v => v.type === 'Trailer') || vids[0] || null;
+  const frp = prov?.results?.FR || {};
+  const providers = [...(frp.flatrate || []).map(x => ({ ...x, kind: 'Abonnement' })), ...(frp.rent || []).map(x => ({ ...x, kind: 'Location' }))]
+   .filter((x, i, a) => a.findIndex(y => y.provider_id === x.provider_id) === i).slice(0, 8);
+  return { trailerKey: trailer?.key || '', providers, link: frp.link || '' };
+ });
+ tmdbExtraCache.set(key, p); return p;
+}
+function enhanceMovieDetail(movie) {
+ const shell = document.querySelector('#modalContent .movie-detail-shell'); if (!shell) return;
+ const hero = shell.querySelector('.movie-detail-hero');
+ if (hero && movie.backdrop) {
+  const bg = hero.querySelector('#movieDetailHero');
+  if (bg) { bg.style.backgroundImage = `linear-gradient(90deg,rgba(0,0,0,.82),rgba(0,0,0,.25) 70%),url('${safeImageUrl(movie.backdrop)}')`; bg.style.filter = 'none'; bg.style.opacity = '.85'; }
+  hero.classList.add('has-backdrop');
+ }
+ const box = document.createElement('div');
+ box.className = 'detail-extras';
+ const plex = plexMatchFor(movie);
+ box.innerHTML = `${plex ? `<div class="detail-plex"><span class="detail-plex-ico">${svgMarkup('tv')}</span><span><b>Aussi dans Plex</b><small>${escapeHtml(plexQualityLabel(plex) || 'Disponible en numérique')}${plex.sectionTitle ? ' · ' + escapeHtml(plex.sectionTitle) : ''}</small></span></div>` : ''}<div class="detail-watch" hidden></div>`;
+ if (hero) hero.after(box); else shell.prepend(box);
+ const tid = movie.tmdb_id || movie.tmdbId;
+ if (!tid) { if (!plex) box.remove(); return; }
+ fetchTmdbDetailExtras(tid, isSeries(movie)).then(x => {
+  if (!box.isConnected) return;
+  const w = box.querySelector('.detail-watch'), parts = [];
+  if (x.trailerKey) parts.push(`<a class="detail-trailer" href="https://www.youtube.com/watch?v=${encodeURIComponent(x.trailerKey)}" target="_blank" rel="noopener">${svgMarkup('clapper')}<span>Bande-annonce</span></a>`);
+  if (x.providers.length) parts.push(`<div class="detail-providers"><small>Où regarder</small><div>${x.providers.map(pv => `<a href="${escapeHtml(x.link || '#')}" target="_blank" rel="noopener" title="${escapeHtml(pv.provider_name)} · ${pv.kind}"><img src="https://image.tmdb.org/t/p/w92${escapeHtml(pv.logo_path || '')}" alt="${escapeHtml(pv.provider_name)}" loading="lazy"></a>`).join('')}</div></div>`);
+  if (parts.length) { w.innerHTML = parts.join(''); w.hidden = false; } else if (!plex) box.remove();
+ });
+}
 function openMovieDetail(movieId, skipPhysicalLookup = false) {
 let movie = collection.find(m => m.id === movieId) || wishlist.find(m => m.id === movieId);
 if (!movie) return;
@@ -13935,7 +14005,8 @@ ${movie.isWishlist ? `<button onclick="moveWishlistToCollection(${movieIdArg})" 
 modal.classList.remove('hidden');
 if (wasHidden) modal.querySelector(':scope > div').scrollTop = 0;
 lockDetailBackgroundScroll();
-applyPosterAccent('movieDetailHero', movie.poster);
+if (!movie.backdrop) applyPosterAccent('movieDetailHero', movie.poster);
+try { enhanceMovieDetail(movie); } catch (e) { console.warn('fiche enrichie', e); }
 if (!skipPhysicalLookup) {
  loadPhysicalEditionDetails(movie.id);
  loadMovieFinancials(movie);
