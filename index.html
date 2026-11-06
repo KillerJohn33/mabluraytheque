@@ -7397,6 +7397,8 @@ html:is(.ui-v2,#fd1):is(.ui-v2,#fd2):is(.ui-v2,#fd3):is(.ui-v2,#fd4):is(.ui-v2,#
 html:is(.ui-v2,#fd1):is(.ui-v2,#fd2):is(.ui-v2,#fd3):is(.ui-v2,#fd4):is(.ui-v2,#fd5):is(.ui-v2,#fd6) body #modalContent :is(.movie-detail-hero,.digital-detail-hero) :is(.detail-movie-poster) { box-shadow: 0 16px 34px -12px rgba(0,0,0,.85) !important; border: 0 !important; }
 html:is(.ui-v2,#fd1):is(.ui-v2,#fd2):is(.ui-v2,#fd3):is(.ui-v2,#fd4):is(.ui-v2,#fd5):is(.ui-v2,#fd6) body #modalContent :is(.movie-detail-info,.movie-detail-editions,.digital-detail-info,.digital-detail-media,.series-detail-info) { box-shadow: none !important; border: 0 !important; }
 html:is(.ui-v2,#fd1):is(.ui-v2,#fd2):is(.ui-v2,#fd3):is(.ui-v2,#fd4):is(.ui-v2,#fd5):is(.ui-v2,#fd6) body #modalContent .edition-card { box-shadow: none !important; }
+/* Téléphone : pas de bande-annonce ni de « Où regarder » dans la fiche (gardés sur iPad et ordinateur) */
+@media (max-width: 767px) { html:not(.is-ipad):not(.desk-v2) #modalContent .detail-watch { display: none !important; } }
 /* Pastille coulissante (règle commune à toutes les applications, comme Ma Collection) :
    la sélection glisse d'un bouton à l'autre, nette (position et taille réelles), avec un léger rebond. */
 .slide-pill { position: absolute; z-index: 0; pointer-events: none; transform-origin: 0 0; will-change: transform; backface-visibility: hidden; box-shadow: none !important; }
