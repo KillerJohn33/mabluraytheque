@@ -6392,6 +6392,10 @@ html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > main > [id^="tab"] > * {
   animation: v2Unfold .46s cubic-bezier(.2, .85, .25, 1) both;
 }
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > main > [id^="tab"] > *:nth-child(1) { animation-delay: .03s; }
+/* Barres « Ma collection / Digital » et « Ma wishlist / Sorties » : elles ne bougent pas au changement d'écran,
+   pour que la pastille coulissante glisse à l'horizontale, sans saut ni décalage. */
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):is(.ui-v2,#ui-v2-c) body > main > [id^="tab"] > :is(.tab-switcher, #collectionTopBars),
+html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b):is(.ui-v2,#ui-v2-c) body > main > [id^="tab"] .tab-switcher { animation: none !important; transform: none !important; opacity: 1 !important; }
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > main > [id^="tab"] > *:nth-child(2) { animation-delay: .07s; }
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > main > [id^="tab"] > *:nth-child(3) { animation-delay: .11s; }
 html:is(.ui-v2,#ui-v2-a):is(.ui-v2,#ui-v2-b) body > main > [id^="tab"] > *:nth-child(4) { animation-delay: .15s; }
