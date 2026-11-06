@@ -25,6 +25,9 @@
  // puis s'affiche d'un coup, sans animation d'entrée ni contenu qui se recompose (voir brReveal).
  const root=document.documentElement;
  root.classList.add('booting','no-enter');
+ // Thème A3 (verre prononcé, cyan fondu). localStorage.ui_a3 = '0' revient à l'habillage précédent.
+ let a3=true; try{ a3=localStorage.getItem('ui_a3')!=='0'; }catch(_){}
+ if(a3) root.classList.add('a3');
  let light=false; try{ light=localStorage.getItem('app_theme')==='theme-light'; }catch(_){}
  root.style.backgroundColor=light?'#f3f6f8':'#050505';
  setTimeout(()=>{ root.classList.remove('booting'); root.style.backgroundColor=''; },3000);
@@ -6947,6 +6950,152 @@ html:is(.ui-v2,#gl1):is(.ui-v2,#gl2):is(.ui-v2,#gl3):not(.is-ipad):not(.desk-v2)
  html.desk-v2 #releasesList > section > * + * { margin-top: 0 !important; }
 }
 body.theme-light .release-format { background: color-mix(in srgb, var(--fmt) 22%, transparent); filter: saturate(1.4) brightness(.8); }
+
+/* =====================================================================
+   THÈME A3 · épuré, verre prononcé, cyan fondu (téléphone, iPad, ordinateur)
+   Activé par la classe .a3 sur <html> (localStorage.ui_a3 = '0' pour revenir au précédent).
+   ===================================================================== */
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) body {
+  --rgb-accent: 125, 211, 224; --on-accent: #06262c;
+  --rgb-blue2: 125, 211, 224; --on-blue2: #06262c;
+  --rgb-azure: 125, 211, 224; --on-azure: #06262c;
+  --rgb-neutral: 199, 199, 204;
+  --v2-bg: #050506; --v2-text: #f2f2f7; --v2-muted: #98989f;
+  --v2-card: rgba(30, 30, 34, .56); --v2-card-2: rgba(255, 255, 255, .06);
+  --v2-panel: rgba(30, 30, 34, .52);
+  --v2-hair: inset 0 1px 0 rgba(200, 240, 248, .12), inset 0 0 0 .5px rgba(255, 255, 255, .10);
+  --v2-lift: 0 12px 30px -18px rgba(0, 0, 0, .7);
+  --v2-header-bg: rgba(8, 8, 10, .5);
+  --v2-modal-bg: rgba(20, 20, 24, .78);
+  --v2-overlay: rgba(0, 0, 0, .45);
+  --v2-seg-bg: rgba(255, 255, 255, .07);
+  --v2-glow: transparent;
+  --a3-glass-blur: blur(26px) saturate(1.7);
+  --a3-on-bg: rgba(255, 255, 255, .13);
+  --a3-on-edge: inset 0 1px 0 rgba(255, 255, 255, .10), inset 0 0 0 .5px rgba(255, 255, 255, .14);
+  --a3-acc-text: #b9e6ee;
+  --a3-amb-opacity: .5;
+}
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) body.theme-light {
+  --rgb-accent: 44, 132, 150; --on-accent: #ffffff;
+  --rgb-blue2: 44, 132, 150; --on-blue2: #ffffff;
+  --rgb-azure: 44, 132, 150; --on-azure: #ffffff;
+  --rgb-neutral: 72, 72, 74;
+  --v2-bg: #eef0f3; --v2-text: #1c1c1e; --v2-muted: #6e6e73;
+  --v2-card: rgba(255, 255, 255, .62); --v2-card-2: rgba(255, 255, 255, .55);
+  --v2-panel: rgba(255, 255, 255, .6);
+  --v2-hair: inset 0 1px 0 rgba(255, 255, 255, .9), inset 0 0 0 .5px rgba(0, 0, 0, .07);
+  --v2-lift: 0 12px 28px -18px rgba(0, 0, 0, .25);
+  --v2-header-bg: rgba(238, 240, 243, .6);
+  --v2-modal-bg: rgba(246, 247, 249, .84);
+  --v2-overlay: rgba(28, 28, 30, .28);
+  --v2-seg-bg: rgba(0, 0, 0, .05);
+  --a3-on-bg: rgba(255, 255, 255, .85);
+  --a3-on-edge: inset 0 1px 0 #fff, 0 1px 5px -1px rgba(0, 0, 0, .16);
+  --a3-acc-text: #2c7f91;
+  --a3-amb-opacity: .36;
+}
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) body::before { content: ""; position: fixed; inset: -12%; z-index: -1; pointer-events: none;
+  background: radial-gradient(48% 42% at 18% 20%, rgba(143, 100, 64, .9), rgba(143, 100, 64, 0) 100%), radial-gradient(44% 40% at 84% 38%, rgba(53, 89, 107, .9), rgba(53, 89, 107, 0) 100%),
+              radial-gradient(46% 38% at 42% 92%, rgba(110, 44, 40, .85), rgba(110, 44, 40, 0) 100%), radial-gradient(34% 30% at 70% 8%, rgba(74, 79, 87, .8), rgba(74, 79, 87, 0) 100%);
+  opacity: var(--a3-amb-opacity); }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) body > header.glass-card,
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .glass-card,
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .home-widget-panel,
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .release-card,
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .wishlist-filter-card,
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) #modalContent .movie-detail-info,
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) #modalContent .movie-detail-editions,
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) #ipadSpaceNav,
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) #bottomNav.mobile-bottom-nav,
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .quick-sheet-card,
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) #detailModal > div,
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .app-empty-state { -webkit-backdrop-filter: var(--a3-glass-blur) !important; backdrop-filter: var(--a3-glass-blur) !important; }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .release-card,
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .app-empty-state { background: var(--v2-panel) !important; box-shadow: var(--v2-hair) !important; }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .glass-card .glass-card,
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .modern-panel .glass-card { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .app-action-cyan,
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .app-action:not([class*='app-action-']) { background: var(--v2-card-2) !important; color: var(--v2-text) !important; box-shadow: var(--v2-hair) !important; }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .app-action-cyan svg,
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .app-action-cyan .icon-chip,
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .app-action:not([class*='app-action-']) svg { color: rgb(var(--rgb-accent)) !important; }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) main .app-action-cyan .icon-chip:not(.chip-lg) { background: rgba(var(--rgb-accent), .14) !important; }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) main button.glass-pill { --c: var(--rgb-neutral); }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) main button.glass-pill:not(.text-pink-300):not(.text-pink-200):not(.text-amber-300) { background: var(--v2-card-2) !important; color: var(--v2-text) !important; box-shadow: var(--v2-hair) !important; }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .choice-bar { background: var(--v2-seg-bg) !important; box-shadow: inset 0 0 0 .5px rgba(127, 127, 127, .14) !important; }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .choice-bar > .choice-option { color: var(--v2-muted) !important; opacity: 1 !important; }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .choice-bar > .choice-option.is-active { background: var(--a3-on-bg) !important; color: var(--v2-text) !important; box-shadow: var(--a3-on-edge) !important; }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .choice-bar > .choice-option.is-active .bg-pink-500,
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .releases-count:not(:empty) { background: rgba(var(--rgb-accent), .2) !important; color: var(--v2-text) !important; }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .home-option-chip.is-active { background: var(--a3-on-bg) !important; color: var(--v2-text) !important; border-color: transparent !important; box-shadow: var(--a3-on-edge) !important; }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) #bottomNav .bottom-nav-btn.active { color: var(--v2-text) !important; }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) #bottomNav .bottom-nav-btn.active .icon-inline { color: rgb(var(--rgb-accent)) !important; }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) #bottomNav .nav-ind { background: var(--a3-on-bg) !important; box-shadow: var(--a3-on-edge) !important; }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .text-cyan-300,
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .text-cyan-400,
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .text-cyan-200 { color: var(--a3-acc-text) !important; }
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body #deskSide,
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body.theme-light #deskSide { background: var(--v2-panel) !important; -webkit-backdrop-filter: var(--a3-glass-blur) !important; backdrop-filter: var(--a3-glass-blur) !important; box-shadow: inset -.5px 0 0 rgba(127, 127, 127, .22) !important; color: var(--v2-text) !important; }
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body #deskTop { background: var(--v2-header-bg) !important; -webkit-backdrop-filter: var(--a3-glass-blur) !important; backdrop-filter: var(--a3-glass-blur) !important; }
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body #deskSide .ds-item,
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body #deskSide .ds-user,
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body.theme-light #deskSide .ds-item,
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body.theme-light #deskSide .ds-user { color: var(--v2-muted) !important; }
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body #deskSide .ds-item:hover,
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body #deskSide .ds-user:hover,
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body.theme-light #deskSide .ds-item:hover,
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body.theme-light #deskSide .ds-user:hover { background: var(--v2-card-2) !important; color: var(--v2-text) !important; }
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body #deskSide .ds-item.on,
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body #deskSide .ds-item.primary.on,
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body.theme-light #deskSide .ds-item.on,
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body.theme-light #deskSide .ds-item.primary.on { position: relative; background: var(--a3-on-bg) !important; color: var(--v2-text) !important; box-shadow: var(--a3-on-edge) !important; }
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body #deskSide .ds-item.on::before { content: ''; position: absolute; left: 3px; top: 30%; bottom: 30%; width: 3px; border-radius: 3px; background: rgb(var(--rgb-accent)); opacity: .85; }
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body #deskSide .ds-item.on svg { color: rgb(var(--rgb-accent)) !important; }
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body #deskSide .ds-title,
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body.theme-light #deskSide .ds-title { color: var(--v2-muted) !important; opacity: .8; }
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body #deskSide .ds-value,
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body.theme-light #deskSide .ds-value { background: var(--v2-card-2) !important; color: var(--v2-text) !important; box-shadow: var(--v2-hair) !important; }
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body #deskSide .ds-brand-ico,
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body #deskSide .ds-av,
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body.theme-light #deskSide .ds-brand-ico,
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body.theme-light #deskSide .ds-av { background: var(--v2-card-2) !important; color: rgb(var(--rgb-accent)) !important; box-shadow: var(--v2-hair) !important; }
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body #deskSide .ds-user b,
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body.theme-light #deskSide .ds-user b { color: var(--v2-text) !important; }
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body #deskSide .ds-user small,
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body.theme-light #deskSide .ds-user small { color: var(--v2-muted) !important; }
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body #deskSide .ds-item[data-format]::after,
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body #deskSide .ds-item[data-case]::after,
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body.theme-light #deskSide .ds-item[data-format]::after,
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body.theme-light #deskSide .ds-item[data-case]::after { background: rgba(127, 127, 127, .2) !important; }
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body #deskTop .dt-btn.primary,
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body.theme-light #deskTop .dt-btn.primary { background: var(--v2-card-2) !important; color: var(--v2-text) !important; box-shadow: var(--v2-hair) !important; }
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body #deskTop .dt-btn.primary svg { color: rgb(var(--rgb-accent)) !important; }
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body #deskTop .dt-search,
+html:is(.desk-v2,#a3d1):is(.desk-v2,#a3d2):is(.desk-v2,#a3d3):is(.desk-v2,#a3d4):is(.desk-v2,#a3d5):is(.desk-v2,#a3d6).a3 body #deskTop .dt-btn { background: var(--v2-card) !important; -webkit-backdrop-filter: var(--a3-glass-blur); backdrop-filter: var(--a3-glass-blur); box-shadow: var(--v2-hair) !important; }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) #modalContent h2,
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) #modalContent h3 { word-break: normal !important; overflow-wrap: break-word !important; hyphens: manual !important; }
+/* Fiche film (téléphone) : le titre reste entier ; « Vu / Non vu » passe à la ligne si le titre est long. */
+@media (max-width: 767px) { html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) #modalContent .movie-detail-title-row { flex-wrap: wrap !important; row-gap: 6px; } html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) #modalContent .movie-detail-title-row h3 { flex: 1 1 9rem !important; } }
+/* Fond : la couleur de base passe sur la racine pour que le fond flou (body::before) reste visible partout */
+html.a3 { background: #050506 !important; }
+html.a3:has(> body.theme-light) { background: #eef0f3 !important; }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) body { background: transparent !important; }
+/* « Choisis un film pour moi » : le bouton Lancer ne sort plus du panneau */
+html body #homeWidgetRandom #randomFilter { min-width: 0 !important; width: auto !important; }
+html body #homeWidgetRandom .app-action { flex: none !important; }
+/* Pastille « Tous » et rubriques de Mon espace (iPad) : verre neutre, l'icône seule colorée ; les formats gardent leur couleur */
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) .quick-chip.is-active[data-quick-format="all"] { background: var(--a3-on-bg) !important; color: var(--v2-text) !important; box-shadow: var(--a3-on-edge) !important; border-color: transparent !important; }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) #ipadSpaceNav button.is-active, html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) body.theme-light #ipadSpaceNav button.is-active { background: var(--a3-on-bg) !important; color: var(--v2-text) !important; box-shadow: var(--a3-on-edge) !important; border-color: transparent !important; }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) #ipadSpaceNav button.is-active .icon-inline { color: rgb(var(--rgb-accent)) !important; }
+/* Statistiques (iPad) : libellé au-dessus du montant, plus de libellés tronqués (« Prix d'… ») */
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f).is-ipad body #tabStats #statsValueGrid > div { flex: 1 1 30% !important; display: flex !important; flex-direction: column !important; align-items: flex-start !important; justify-content: center !important; gap: 4px !important; text-align: left !important; }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f).is-ipad body #tabStats #statsValueGrid > div > p { position: static !important; transform: none !important; margin: 0 !important; width: auto !important; max-width: 100% !important; }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f).is-ipad body #tabStats #statsValueGrid > div > p:first-child { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; }
+/* Recherche globale : panneau presque opaque (le verre au-dessus du voile assombri devenait gris) */
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) #globalSearchModal .global-search-panel { background: rgba(24, 24, 28, .94) !important; }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) body.theme-light #globalSearchModal .global-search-panel { background: rgba(250, 250, 252, .96) !important; }
+html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) #globalSearchModal input:focus, html:is(.a3,#a3a):is(.a3,#a3b):is(.a3,#a3c):is(.a3,#a3d):is(.a3,#a3e):is(.a3,#a3f) #globalSearchModal input:focus-visible { outline: none !important; box-shadow: inset 0 0 0 1px rgba(var(--rgb-accent), .45) !important; border-radius: 8px; }
 /* Pastille coulissante (règle commune à toutes les applications, comme Ma Collection) :
    la sélection glisse d'un bouton à l'autre, nette (position et taille réelles), avec un léger rebond. */
 .slide-pill { position: absolute; z-index: 0; pointer-events: none; transform-origin: 0 0; will-change: transform; backface-visibility: hidden; box-shadow: none !important; }
@@ -7129,7 +7278,7 @@ html.desk-v2.ui-v2:not(.is-ipad) body.theme-light {
 <div id="homeCalendarLayout" data-home-widget="calendar" data-home-size="wide" class="home-widget glass-card p-3 md:p-4 rounded-2xl border border-white/10 space-y-3">
 <div class="flex items-center gap-2">
 <span class="icon-chip chip-sm" data-icon="calendar"></span>
-<div><h3 class="text-xs font-bold text-white">Calendrier récapitulatif</h3><p class="text-[10px] text-gray-400">Wishlist et épisodes des séries en cours.</p></div>
+<div><h3 class="text-xs font-bold text-white">Calendrier récapitulatif</h3><p class="text-[10px] text-gray-400">Sorties des films de votre wishlist.</p></div>
 </div>
 <div class="flex items-center justify-between"><button onclick="changeHomeCalendarMonth(-1)" class="glass-pill w-8 h-8 rounded-xl flex items-center justify-center text-gray-300 hover:text-white"><span class="icon-inline w-3.5 h-3.5" data-icon="chevronleft"></span></button><span id="homeCalMonthLabel" class="text-sm md:text-base font-bold text-white"></span><button onclick="changeHomeCalendarMonth(1)" class="glass-pill w-8 h-8 rounded-xl flex items-center justify-center text-gray-300 hover:text-white"><span class="icon-inline w-3.5 h-3.5" data-icon="chevronright"></span></button></div>
 <div class="grid grid-cols-7 gap-1 text-center text-[8px] md:text-[9px] text-gray-500 font-bold uppercase"><div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div><div>D</div></div>
