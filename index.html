@@ -8806,6 +8806,19 @@ updateDesktopNavOffsets();
 updateTopNavIndicator();
 window.addEventListener('resize', () => { updateMobileNavigation(); updateMobileScrollShell(); applySpaceSection(activeSpaceSection); updateDesktopNavOffsets(); updateTopNavIndicator(); });
 window.visualViewport?.addEventListener('resize', updateMobileScrollShell);
+// La hauteur réelle de l'en-tête n'est connue qu'une fois les styles et la barre d'état appliqués :
+// on la suit en continu pour que le contenu ne passe jamais sous le titre.
+if (window.ResizeObserver) {
+ const shellObserver = new ResizeObserver(() => updateMobileScrollShell());
+ const headerEl = document.querySelector('body > header');
+ if (headerEl) shellObserver.observe(headerEl, { box: 'border-box' });
+ const navEl = document.getElementById('bottomNav');
+ if (navEl) shellObserver.observe(navEl, { box: 'border-box' });
+}
+window.addEventListener('load', updateMobileScrollShell);
+window.addEventListener('pageshow', updateMobileScrollShell);
+document.fonts?.ready?.then(updateMobileScrollShell);
+[300, 1000, 2500].forEach(delay => setTimeout(updateMobileScrollShell, delay));
 
 const savedTheme = localStorage.getItem('app_theme') || 'theme-noir';
 changeTheme(savedTheme);
