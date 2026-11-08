@@ -7444,6 +7444,17 @@ html.ui-v2:not(.desk-v2) body :is(#collectionFilterRow,#digitalQuickRow) { displ
 html.tab-entering .tab-rise { animation: tabRise .46s cubic-bezier(.22, 1, .36, 1) both; animation-delay: calc(var(--i, 0) * 38ms); }
 @media (prefers-reduced-motion: reduce) { html.tab-entering .tab-rise { animation: none; } }
 
+/* Collection / Digital fluides : une seule animation d'entrée (tabRise), plus de cascades concurrentes,
+   et rendu différé des vignettes hors écran. */
+html:is(.ui-v2,#fl1):is(.ui-v2,#fl2):is(.ui-v2,#fl3):is(.ui-v2,#fl4):is(.ui-v2,#fl5):is(.ui-v2,#fl6) body :is(#tabCollection,#tabDigital):not(.hidden),
+html:is(.ui-v2,#fl1):is(.ui-v2,#fl2):is(.ui-v2,#fl3):is(.ui-v2,#fl4):is(.ui-v2,#fl5):is(.ui-v2,#fl6) body :is(#tabCollection,#tabDigital) > *:not(.tab-rise),
+html:is(.ui-v2,#fl1):is(.ui-v2,#fl2):is(.ui-v2,#fl3):is(.ui-v2,#fl4):is(.ui-v2,#fl5):is(.ui-v2,#fl6) body :is(#collectionGrid,#digitalGrid) > *:not(.tab-rise),
+html:is(.ui-v2,#fl1):is(.ui-v2,#fl2):is(.ui-v2,#fl3):is(.ui-v2,#fl4):is(.ui-v2,#fl5):is(.ui-v2,#fl6) body > main > .mobile-section-hero { animation: none !important; }
+html:is(.ui-v2,#fl1):is(.ui-v2,#fl2):is(.ui-v2,#fl3):is(.ui-v2,#fl4):is(.ui-v2,#fl5):is(.ui-v2,#fl6) body :is(#collectionGrid,#digitalGrid) > .pcard { content-visibility: auto; contain-intrinsic-size: auto 260px; contain: layout paint style; }
+html:is(.ui-v2,#fl1):is(.ui-v2,#fl2):is(.ui-v2,#fl3):is(.ui-v2,#fl4):is(.ui-v2,#fl5):is(.ui-v2,#fl6) body .tab-rise { will-change: opacity, transform; }
+html.tab-entering html:is(.ui-v2,#fl1):is(.ui-v2,#fl2):is(.ui-v2,#fl3):is(.ui-v2,#fl4):is(.ui-v2,#fl5):is(.ui-v2,#fl6) body .tab-rise { animation: tabRise .42s cubic-bezier(.22, 1, .36, 1) both !important; animation-delay: calc(var(--i, 0) * 32ms) !important; }
+@media (prefers-reduced-motion: reduce) { html.tab-entering html:is(.ui-v2,#fl1):is(.ui-v2,#fl2):is(.ui-v2,#fl3):is(.ui-v2,#fl4):is(.ui-v2,#fl5):is(.ui-v2,#fl6) body .tab-rise { animation: none !important; } }
+
 /* Pastille coulissante (règle commune à toutes les applications, comme Ma Collection) :
    la sélection glisse d'un bouton à l'autre, nette (position et taille réelles), avec un léger rebond. */
 .slide-pill { position: absolute; z-index: 0; pointer-events: none; transform-origin: 0 0; will-change: transform; backface-visibility: hidden; box-shadow: none !important; }
@@ -16213,8 +16224,8 @@ async function backfillCollectionInfo() {
    const page = document.getElementById(id); if (!page) return;
    const vh = window.innerHeight; let i = 0;
    const els = [...page.querySelectorAll(':scope > :not(.hidden), #collectionGrid > *, #digitalGrid > *, .sv-grid > *')]
-    .filter(el => !el.matches('#collectionGrid, #digitalGrid, .sv-grid') && el.offsetParent && el.getBoundingClientRect().top < vh);
-   els.forEach(el => { el.style.setProperty('--i', Math.min(i++, 14)); el.classList.add('tab-rise'); });
+    .filter(el => !el.matches('#collectionGrid, #digitalGrid, .sv-grid, .choice-bar, .tab-switcher, .mobile-section-hero') && !el.querySelector(':scope > .choice-option') && el.offsetParent && el.getBoundingClientRect().top < vh).slice(0, 12);
+   els.forEach(el => { el.style.setProperty('--i', i++); el.classList.add('tab-rise'); });
    void page.offsetWidth; root.classList.add('tab-entering');
    clearTimeout(timer); timer = setTimeout(() => { root.classList.remove('tab-entering'); els.forEach(el => { el.classList.remove('tab-rise'); el.style.removeProperty('--i'); }); }, 1200);
   });
