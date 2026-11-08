@@ -7399,6 +7399,24 @@ html:is(.ui-v2,#fd1):is(.ui-v2,#fd2):is(.ui-v2,#fd3):is(.ui-v2,#fd4):is(.ui-v2,#
 html:is(.ui-v2,#fd1):is(.ui-v2,#fd2):is(.ui-v2,#fd3):is(.ui-v2,#fd4):is(.ui-v2,#fd5):is(.ui-v2,#fd6) body #modalContent .edition-card { box-shadow: none !important; }
 /* Téléphone : pas de bande-annonce ni de « Où regarder » dans la fiche (gardés sur iPad et ordinateur) */
 @media (max-width: 767px) { html:not(.is-ipad):not(.desk-v2) #modalContent .detail-watch { display: none !important; } }
+/* Carte compteur : anneau des formats, compacte (tous appareils). */
+html:is(.ui-v2,#ov1):is(.ui-v2,#ov2):is(.ui-v2,#ov3) body .ov-ring-card{display:flex!important;align-items:center;gap:14px;padding:10px 14px!important}
+html:is(.ui-v2,#ov1):is(.ui-v2,#ov2):is(.ui-v2,#ov3) body .ov-ring-card>*{margin:0!important}
+html:is(.ui-v2,#ov1):is(.ui-v2,#ov2):is(.ui-v2,#ov3) body .ov-ring-card .ov-track-hidden{display:none!important}
+html:is(.ui-v2,#ov1):is(.ui-v2,#ov2):is(.ui-v2,#ov3) body .ov-ring{position:relative;flex:0 0 60px;width:60px;height:60px;display:grid;place-items:center}
+html:is(.ui-v2,#ov1):is(.ui-v2,#ov2):is(.ui-v2,#ov3) body .ov-ring::before{content:"";position:absolute;inset:0;border-radius:50%;background:var(--ring,rgba(var(--rgb-accent),.18));-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6.5px));mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6.5px))}
+html:is(.ui-v2,#ov1):is(.ui-v2,#ov2):is(.ui-v2,#ov3) body .ov-ring>span{position:relative;display:flex;flex-direction:column;align-items:center;line-height:1}
+html:is(.ui-v2,#ov1):is(.ui-v2,#ov2):is(.ui-v2,#ov3) body .ov-ring strong{font-size:20px!important;font-weight:800;letter-spacing:-.02em;color:var(--v2-text)!important}
+html:is(.ui-v2,#ov1):is(.ui-v2,#ov2):is(.ui-v2,#ov3) body .ov-ring small{font-size:10px;margin-top:2px;color:var(--v2-muted)}
+html:is(.ui-v2,#ov1):is(.ui-v2,#ov2):is(.ui-v2,#ov3) body .ov-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px}
+html:is(.ui-v2,#ov1):is(.ui-v2,#ov2):is(.ui-v2,#ov3) body .ov-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;color:var(--v2-muted)}
+html:is(.ui-v2,#ov1):is(.ui-v2,#ov2):is(.ui-v2,#ov3) body .ov-head b{color:var(--v2-text);font-weight:700}
+html:is(.ui-v2,#ov1):is(.ui-v2,#ov2):is(.ui-v2,#ov3) body .ov-head #collectionOverviewValue{font-size:12px!important;font-weight:700;padding:3px 9px}
+html:is(.ui-v2,#ov1):is(.ui-v2,#ov2):is(.ui-v2,#ov3) body .ov-legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--v2-muted)}
+html:is(.ui-v2,#ov1):is(.ui-v2,#ov2):is(.ui-v2,#ov3) body .ov-legend>span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+html:is(.ui-v2,#ov1):is(.ui-v2,#ov2):is(.ui-v2,#ov3) body .ov-legend i{width:7px;height:7px;border-radius:50%;display:inline-block}
+html:is(.ui-v2,#ov1):is(.ui-v2,#ov2):is(.ui-v2,#ov3) body .ov-legend b{color:var(--v2-text);font-weight:700}
+
 /* Pastille coulissante (règle commune à toutes les applications, comme Ma Collection) :
    la sélection glisse d'un bouton à l'autre, nette (position et taille réelles), avec un léger rebond. */
 .slide-pill { position: absolute; z-index: 0; pointer-events: none; transform-origin: 0 0; will-change: transform; backface-visibility: hidden; box-shadow: none !important; }
@@ -7648,17 +7666,13 @@ html.desk-v2.ui-v2:not(.is-ipad) body.theme-light {
 </div>
 </div>
 
-<div id="collectionOverviewBar" class="glass-card rounded-2xl border border-white/10 p-3 space-y-2.5">
-<div class="flex items-center justify-between gap-2">
-<div class="flex items-center gap-3">
-<span class="flex items-baseline gap-1"><strong id="collectionMovieCount" class="text-cyan-300 font-black text-xl">0</strong><span class="text-gray-400 text-[11px]">film<span id="collectionMoviePlural"></span></span></span>
-<span class="text-gray-600">•</span>
-<span class="flex items-baseline gap-1"><strong id="collectionSeriesCount" class="text-sky-300 font-black text-xl">0</strong><span class="text-gray-400 text-[11px]">série<span id="collectionSeriesPlural"></span></span></span>
+<div id="collectionOverviewBar" class="glass-card rounded-2xl ov-ring-card">
+<div id="collectionOverviewRing" class="ov-ring"><span><strong id="collectionMovieCount">0</strong><small>film<span id="collectionMoviePlural"></span></small></span></div>
+<div class="ov-body">
+<div class="ov-head"><span class="ov-sub"><b id="collectionSeriesCount">0</b> série<span id="collectionSeriesPlural"></span></span><span id="collectionOverviewValue">0,00 €</span></div>
+<div id="collectionOverviewLegend" class="ov-legend"></div>
 </div>
-<span id="collectionOverviewValue" class="text-emerald-300 font-black text-sm">0,00 €</span>
-</div>
-<div id="collectionOverviewBarTrack" class="flex h-2.5 rounded-full overflow-hidden bg-white/5"></div>
-<div id="collectionOverviewLegend" class="flex flex-wrap gap-x-3 gap-y-1 text-[9px] text-gray-400"></div>
+<div id="collectionOverviewBarTrack" class="ov-track-hidden"></div>
 </div>
 
 <div id="collectionFilterRow" class="flex flex-col md:flex-row md:items-center gap-2">
@@ -7774,17 +7788,13 @@ html.desk-v2.ui-v2:not(.is-ipad) body.theme-light {
 <button type="button" onclick="switchTab('collection')" class="choice-option" aria-pressed="false">Ma collection</button>
 <button type="button" class="choice-option is-active" aria-pressed="true" disabled>Digital</button>
 </div>
-<div id="digitalOverviewBar" class="glass-card rounded-2xl border border-white/10 p-3 space-y-2.5">
-<div class="flex items-center justify-between gap-2">
-<div class="flex items-center gap-3">
-<span class="flex items-baseline gap-1"><strong id="digitalMovieCountTop" class="text-cyan-300 font-black text-xl">0</strong><span class="text-gray-400 text-[11px]">film<span id="digitalMoviePlural"></span></span></span>
-<span class="text-gray-600">•</span>
-<span class="flex items-baseline gap-1"><strong id="digitalSeriesCountTop" class="text-sky-300 font-black text-xl">0</strong><span class="text-gray-400 text-[11px]">série<span id="digitalSeriesPlural"></span></span></span>
+<div id="digitalOverviewBar" class="glass-card rounded-2xl ov-ring-card">
+<div id="digitalOverviewRing" class="ov-ring"><span><strong id="digitalMovieCountTop">0</strong><small>film<span id="digitalMoviePlural"></span></small></span></div>
+<div class="ov-body">
+<div class="ov-head"><span class="ov-sub"><b id="digitalSeriesCountTop">0</b> série<span id="digitalSeriesPlural"></span></span><span id="digitalOverviewServer" class="digital-server-chip"></span></div>
+<div id="digitalOverviewLegend" class="ov-legend"></div>
 </div>
-<span id="digitalOverviewServer" class="digital-server-chip"></span>
-</div>
-<div id="digitalOverviewBarTrack" class="flex h-2.5 rounded-full overflow-hidden bg-white/5"></div>
-<div id="digitalOverviewLegend" class="flex flex-wrap gap-x-3 gap-y-1 text-[9px] text-gray-400"></div>
+<div id="digitalOverviewBarTrack" class="ov-track-hidden"></div>
 </div>
 <div id="digitalQuickRow" class="flex items-center gap-2 flex-wrap">
 <button type="button" onclick="toggleDigitalFilters()" class="glass-pill px-3 py-2 rounded-xl text-[11px] font-semibold text-cyan-300 hover:text-white flex items-center gap-1.5"><span class="icon-inline w-3.5 h-3.5" data-icon="filter"></span> Filtrer</button>
@@ -12466,17 +12476,28 @@ if (valueEl) valueEl.textContent = `${totalValue.toLocaleString('fr-FR', { minim
 const total = counts['4K UHD'] + counts['Blu-ray 1080p'] + counts['DVD'] + counts.autres;
 if (!total) {
 track.innerHTML = '';
-legend.innerHTML = '<span class="text-gray-500">Aucune édition enregistrée.</span>';
+legend.innerHTML = '<span>Aucune édition enregistrée.</span>';
+setOverviewRing('collectionOverviewRing', []);
 return;
 }
 const segments = [
-{ key: '4K UHD', label: '4K UHD', color: '#22d3ee' },
-{ key: 'Blu-ray 1080p', label: 'Blu-ray', color: '#a78bfa' },
-{ key: 'DVD', label: 'DVD', color: '#fbbf24' },
+{ key: '4K UHD', label: '4K UHD', color: '#5fb0ff' },
+{ key: 'Blu-ray 1080p', label: 'Blu-ray', color: '#a79bff' },
+{ key: 'DVD', label: 'DVD', color: '#f6c18a' },
 { key: 'autres', label: 'Autres', color: '#64748b' }
 ].filter(s => counts[s.key] > 0);
 track.innerHTML = segments.map(s => `<span style="width:${(counts[s.key] / total * 100).toFixed(1)}%; background:${s.color};" class="h-full"></span>`).join('');
-legend.innerHTML = segments.map(s => `<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full inline-block" style="background:${s.color}"></span>${s.label} · ${counts[s.key]}</span>`).join('');
+legend.innerHTML = segments.map(s => `<span><i style="background:${s.color}"></i>${s.label} <b>${counts[s.key]}</b></span>`).join('');
+setOverviewRing('collectionOverviewRing', segments.map(s => [counts[s.key], s.color]));
+}
+// Anneau des formats de la carte compteur (Collection / Digital)
+function setOverviewRing(id, parts) {
+ const el = document.getElementById(id); if (!el) return;
+ const tot = parts.reduce((a, [n]) => a + n, 0);
+ if (!tot) { el.style.removeProperty('--ring'); return; }
+ let acc = 0; const gap = parts.length > 1 ? 1.2 : 0;
+ const stops = parts.map(([n, c]) => { const a = acc / tot * 360, b = (acc += n) / tot * 360; return `${c} ${a.toFixed(2)}deg ${Math.max(a, b - gap).toFixed(2)}deg, transparent ${Math.max(a, b - gap).toFixed(2)}deg ${b.toFixed(2)}deg`; });
+ el.style.setProperty('--ring', `conic-gradient(${stops.join(',')})`);
 }
 
 function syncCollectionQuickChips(formatFilter) {
@@ -12890,7 +12911,8 @@ function renderDigital() {
    const col = { '4K': '#5fb0ff', 'HD 1080p': '#a79bff', 'HD 720p': '#c4b5fd', 'SD': '#f6c18a', 'Inconnue': 'rgba(150,150,150,.5)' };
    const rows = Object.entries(res).sort((a, b) => b[1] - a[1]);
    const track = document.getElementById('digitalOverviewBarTrack'); if (track) track.innerHTML = rows.map(([k, n]) => `<i style="flex:${n};background:${col[k] || '#888'}"></i>`).join('');
-   const lg = document.getElementById('digitalOverviewLegend'); if (lg) lg.innerHTML = rows.map(([k, n]) => `<span class="flex items-center gap-1"><i class="inline-block w-1.5 h-1.5 rounded-full" style="background:${col[k] || '#888'}"></i>${escapeHtml(k)} · ${n}</span>`).join('');
+   const lg = document.getElementById('digitalOverviewLegend'); if (lg) lg.innerHTML = rows.map(([k, n]) => `<span><i style="background:${col[k] || '#888'}"></i>${escapeHtml(k)} <b>${n}</b></span>`).join('');
+   setOverviewRing('digitalOverviewRing', rows.map(([k, n]) => [n, col[k] || '#888']));
    const sv = document.getElementById('digitalOverviewServer'); if (sv) sv.textContent = profileData?.plex?.serverName ? 'Plex · ' + profileData.plex.serverName : 'Plex'; }
  if (hasItems) setTimeout(backfillDigitalPosters, 300);
  if (!hasItems) { grid.classList.add('hidden'); if (noResults) noResults.classList.add('hidden'); grid.innerHTML = ''; return; }
