@@ -7427,6 +7427,23 @@ html .global-filter-trigger .gft-dot { display: none; position: absolute; top: 8
 html:is(.filters-on-c[data-tab="collection"],.filters-on-d[data-tab="digital"]) .global-filter-trigger .gft-dot { display: block; }
 html.ui-v2:not(.desk-v2) body :is(#collectionFilterRow,#digitalQuickRow) { display: none !important; }
 
+/* Statistiques : tuiles chiffres + classements (barres et valeurs réunies). */
+.sv-kpi { display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; }
+.sv-kpi .sv-label { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.sv-kpi .sv-label .icon-inline { color: rgb(var(--rgb-accent)); }
+.sv-kpi b { font-size: 24px; font-weight: 800; line-height: 1.1; letter-spacing: -.01em; color: var(--v2-text); }
+.sv-kpi small { font-size: 12px; color: var(--v2-muted, #999); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sv-rank { grid-column: 1 / -1; }
+.sv-rank .sv-label { display: flex; justify-content: space-between; } .sv-rank .sv-label em { font-style: normal; font-weight: 500; }
+.sv-rank .sv-hbar em { font-style: normal; font-weight: 700; color: var(--v2-text); min-width: 54px; text-align: right; }
+.sv-rank .sv-hbar em small { margin-left: 6px; font-weight: 500; font-size: 11px; color: var(--v2-muted, #999); }
+.sv-rank .sv-hbar:last-child { margin-bottom: 0; }
+@media (min-width: 768px) { .sv-more .sv-kpi { grid-column: span 1; } .sv-more .sv-rank { grid-column: span 2; } .sv-more .sv-r-people { grid-column: span 3; } }
+/* Transitions d'entrée lors du passage sur un onglet (jamais à l'ouverture de l'app). */
+@keyframes tabRise { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: none; } }
+html.tab-entering .tab-rise { animation: tabRise .46s cubic-bezier(.22, 1, .36, 1) both; animation-delay: calc(var(--i, 0) * 38ms); }
+@media (prefers-reduced-motion: reduce) { html.tab-entering .tab-rise { animation: none; } }
+
 /* Pastille coulissante (règle commune à toutes les applications, comme Ma Collection) :
    la sélection glisse d'un bouton à l'autre, nette (position et taille réelles), avec un léger rebond. */
 .slide-pill { position: absolute; z-index: 0; pointer-events: none; transform-origin: 0 0; will-change: transform; backface-visibility: hidden; box-shadow: none !important; }
@@ -7979,250 +7996,7 @@ html.desk-v2.ui-v2:not(.is-ipad) body.theme-light {
 <div id="tabStats" class="hidden modern-page">
 <div class="mobile-section-hero"><span class="page-hero-icon relative z-10" data-icon="barchart"></span><h2 class="font-black text-white relative z-10">Statistiques</h2></div>
 <div id="statsVisual" class="sv-grid" aria-label="Statistiques en un coup d’œil"></div>
-<div class="modern-panel p-4 md:p-5 space-y-3">
-<div class="flex items-center gap-2">
-<span class="icon-chip" data-icon="barchart"></span>
-<div>
-<h3 class="text-sm font-bold text-white">Affichage des statistiques</h3>
-<p class="text-[11px] text-gray-400">Choisir comment les données sont présentées.</p>
-</div>
-</div>
-<div class="choice-bar" role="group" aria-label="Affichage des statistiques">
-<button id="statsViewListBtn" aria-pressed="false" onclick="setStatsView(false)" class="choice-option flex items-center justify-center gap-1.5">
-<span class="icon-inline w-3.5 h-3.5" data-icon="list"></span> Liste simple
-</button>
-<button id="statsViewChartBtn" aria-pressed="true" onclick="setStatsView(true)" class="choice-option flex items-center justify-center gap-1.5 is-active">
-<span class="icon-inline w-3.5 h-3.5" data-icon="barchart"></span> Avec diagramme
-</button>
-</div>
-</div>
-
-
-
-<div class="modern-panel p-4 md:p-5 space-y-3">
-<div class="flex items-center gap-2">
-<span class="icon-chip" data-icon="grid"></span>
-<div>
-<h3 class="text-sm font-bold text-white">Vue d'ensemble</h3>
-<p class="text-[11px] text-gray-400">Aperçu global de votre collection.</p>
-</div>
-</div>
-<div>
-<p class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.16em] mb-2">Quantités</p>
-<div id="statsCountGrid" class="grid grid-cols-2 gap-3">
-<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0 text-center">
-<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Œuvres</p>
-<p id="statTotalMovies" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-cyan-300">0</p>
-</div>
-<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0 text-center">
-<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Éditions</p>
-<p id="statTotalEditions" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-blue-300">0</p>
-</div>
-<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0 text-center">
-<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Disques physiques</p>
-<p id="statTotalDiscs" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-purple-300">0</p>
-</div>
-<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0 text-center">
-<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Coffrets Collector</p>
-<p id="statCollectorBoxes" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-amber-300">0</p>
-</div>
-<div class="col-span-2 md:col-span-1 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0 text-center">
-<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Vus</p>
-<p id="statSeenMovies" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-emerald-300">0</p>
-</div>
-</div>
-</div>
-
-<div class="mt-4">
-<p class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.16em] mb-2">Valeurs</p>
-<div id="statsValueGrid" class="grid grid-cols-2 gap-3">
-<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0 text-center">
-<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Prix d'achat</p>
-<p id="statTotalValue" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-emerald-300">0 €</p>
-</div>
-<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0 text-center">
-<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Valeur estimée</p>
-<p id="statTotalEstimatedValue" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-sky-300">0 €</p>
-</div>
-<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0 text-center">
-<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Prix moyen / œuvre</p>
-<p id="statAvgPriceMovie" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-cyan-300">0 €</p>
-</div>
-<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0 text-center">
-<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Prix moyen / édition</p>
-<p id="statAvgPriceEdition" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-teal-300">0 €</p>
-</div>
-<div class="col-span-2 md:col-span-1 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0 text-center">
-<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Plus-value estimée</p>
-<p id="statEstimatedGain" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-emerald-300">0 €</p>
-</div>
-</div>
-</div>
-
-<div class="mt-4">
-<p class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.16em] mb-2">Collection physique</p>
-<div class="grid grid-cols-2 gap-3">
-<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0">
-<div class="flex items-center justify-between mb-2">
-<span class="text-[9px] text-gray-400 font-semibold uppercase tracking-wide">Films</span>
-<span id="statMovieCount" class="text-lg font-black text-cyan-300">0</span>
-</div>
-<div class="h-2 rounded-full bg-white/10 overflow-hidden"><div id="statMovieBar" class="h-full rounded-full bg-cyan-500 transition-all duration-500" style="width:0%"></div></div>
-</div>
-<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0">
-<div class="flex items-center justify-between mb-2">
-<span class="text-[9px] text-gray-400 font-semibold uppercase tracking-wide">Séries</span>
-<span id="statSeriesCount" class="text-lg font-black text-sky-300">0</span>
-</div>
-<div class="h-2 rounded-full bg-white/10 overflow-hidden"><div id="statSeriesBar" class="h-full rounded-full bg-sky-500 transition-all duration-500" style="width:0%"></div></div>
-</div>
-</div>
-</div>
-
-<div class="mt-4">
-<p class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.16em] mb-2">Bibliothèque numérique (Plex)</p>
-<div id="statsDigitalGrid" class="grid grid-cols-3 gap-3">
-<div class="rounded-xl border border-amber-400/10 bg-amber-500/[0.025] px-3 py-2.5 min-w-0 text-center">
-<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Films</p>
-<p id="statDigitalMovies" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-amber-300/90">0</p>
-</div>
-<div class="rounded-xl border border-amber-400/10 bg-amber-500/[0.025] px-3 py-2.5 min-w-0 text-center">
-<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Séries</p>
-<p id="statDigitalSeries" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-amber-300/90">0</p>
-</div>
-<div class="rounded-xl border border-amber-400/10 bg-amber-500/[0.025] px-3 py-2.5 min-w-0 text-center">
-<p class="text-[9px] uppercase tracking-wide text-gray-400 font-semibold truncate">Concerts / Autres</p>
-<p id="statDigitalOther" class="mt-1 text-lg md:text-xl font-black leading-tight break-words text-amber-300/90">0</p>
-</div>
-</div>
-</div>
-
-<p class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.16em] mt-4 mb-2">Temps de visionnage</p>
-<div class="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5 min-w-0">
-<div class="flex items-center justify-between mb-2">
-<div>
-<p class="text-[9px] text-gray-400 font-semibold uppercase tracking-wide">Visionnage</p>
-<p id="statSeenPercent" class="text-xs text-gray-500 mt-0.5">0 % de la collection vue</p>
-</div>
-<p id="statWatchTime" class="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-sky-400">0h</p>
-</div>
-<div class="h-2 rounded-full bg-white/10 overflow-hidden"><div id="statSeenBar" class="h-full rounded-full bg-emerald-500 transition-all duration-500" style="width:0%"></div></div>
-<div class="flex justify-between mt-2 text-[10px] text-gray-500"><span id="statSeenDetail">0 vu · 0 à voir</span><span>Temps total</span></div>
-</div>
-</div>
-
-<div class="modern-panel p-4 md:p-5 space-y-3">
-<div class="flex items-center gap-2">
-<span class="icon-chip" data-icon="package"></span>
-<div>
-<h3 class="text-sm font-bold text-white">Boîtiers</h3>
-<p class="text-[11px] text-gray-400">Amaray, Steelbook, Digibook...</p>
-</div>
-</div>
-<div id="statEditionsList" class="space-y-2 text-xs text-gray-300"></div>
-<div id="chartContainerEdition" class="hidden w-full py-2 chart-box">
-<canvas id="chartEdition"></canvas>
-</div>
-</div>
-
-<div class="modern-panel p-4 md:p-5 space-y-3">
-<div class="flex items-center gap-2">
-<span class="icon-chip" data-icon="disc"></span>
-<div>
-<h3 class="text-sm font-bold text-white">Formats</h3>
-<p class="text-[11px] text-gray-400">4K UHD, Blu-ray, DVD...</p>
-</div>
-</div>
-<div id="statFormatsList" class="space-y-2 text-xs text-gray-300"></div>
-<div id="chartContainerFormat" class="hidden w-full py-2 chart-box">
-<canvas id="chartFormat"></canvas>
-</div>
-</div>
-
-<div class="modern-panel p-4 md:p-5 space-y-3">
-<div class="flex items-center gap-2">
-<span class="icon-chip" data-icon="pie"></span>
-<div>
-<h3 class="text-sm font-bold text-white">Supports physiques</h3>
-<p class="text-[11px] text-gray-400">Nombre réel de disques 4K, Blu-ray, 3D, DVD et bonus.</p>
-</div>
-</div>
-<div id="statPhysicalSupportsList" class="space-y-2 text-xs text-gray-300"></div>
-<div id="chartContainerPhysicalSupports" class="hidden w-full py-2 chart-box">
-<canvas id="chartPhysicalSupports"></canvas>
-</div>
-</div>
-
-<div class="modern-panel p-4 md:p-5 space-y-3">
-<div class="flex items-center gap-2">
-<span class="icon-chip" data-icon="store"></span>
-<div>
-<h3 class="text-sm font-bold text-white">Lieux d'achat</h3>
-<p class="text-[11px] text-gray-400">Où vous achetez le plus souvent.</p>
-</div>
-</div>
-<div id="statLocationsList" class="space-y-2 text-xs text-gray-300"></div>
-<div id="chartContainerLocation" class="hidden w-full py-2 chart-box">
-<canvas id="chartLocation"></canvas>
-</div>
-</div>
-
-<div class="modern-panel p-4 md:p-5 space-y-3">
-<div class="flex items-center gap-2">
-<span class="icon-chip" data-icon="tag"></span>
-<div>
-<h3 class="text-sm font-bold text-white">Genres</h3>
-<p class="text-[11px] text-gray-400">Les genres les plus présents.</p>
-</div>
-</div>
-<div id="statGenresList" class="space-y-2 text-xs text-gray-300"></div>
-<div id="chartContainerGenre" class="hidden w-full py-2 chart-box">
-<canvas id="chartGenre"></canvas>
-</div>
-</div>
-
-<div class="modern-panel p-4 md:p-5 space-y-3">
-<div class="flex items-center gap-2">
-<span class="icon-chip" data-icon="clapper"></span>
-<div>
-<h3 class="text-sm font-bold text-white">Top Réalisateurs</h3>
-<p class="text-[11px] text-gray-400">Les réalisateurs les plus présents dans votre collection.</p>
-</div>
-</div>
-<div id="statDirectorsList" class="space-y-2 text-xs text-gray-300"></div>
-<div id="chartContainerDirectors" class="hidden w-full py-2 chart-box">
-<canvas id="chartDirectors"></canvas>
-</div>
-</div>
-
-<div class="modern-panel p-4 md:p-5 space-y-3">
-<div class="flex items-center gap-2">
-<span class="icon-chip" data-icon="users"></span>
-<div>
-<h3 class="text-sm font-bold text-white">Top Acteurs</h3>
-<p class="text-[11px] text-gray-400">Les acteurs les plus présents dans votre collection.</p>
-</div>
-</div>
-<div id="statActorsList" class="space-y-2 text-xs text-gray-300"></div>
-<div id="chartContainerActors" class="hidden w-full py-2 chart-box">
-<canvas id="chartActors"></canvas>
-</div>
-</div>
-
-<div class="modern-panel p-4 md:p-5 space-y-3">
-<div class="flex items-center gap-2">
-<span class="icon-chip" data-icon="trend"></span>
-<div>
-<h3 class="text-sm font-bold text-white">Évolution de la Collection</h3>
-<p class="text-[11px] text-gray-400">Nombre de films ajoutés par mois.</p>
-</div>
-</div>
-<p id="statTimelineEmpty" class="text-[10px] text-gray-500">Aucune donnée disponible.</p>
-<div id="statTimelineList" class="hidden space-y-2 text-xs text-gray-300"></div>
-<div id="chartContainerTimeline" class="hidden py-2 chart-box">
-<canvas id="chartTimeline"></canvas>
-</div>
-</div>
+<div id="statsMore" class="sv-grid sv-more" aria-label="Détail de la collection"></div>
 </div>
 
 <!-- PARAMETRES -->
@@ -14570,61 +14344,34 @@ totalDiscs += Object.values(composition).reduce((sum, count) => sum + count, 0);
 });
 });
 
-document.getElementById('statTotalMovies').innerText = totalMovies;
-document.getElementById('statTotalEditions').innerText = totalEditions;
-document.getElementById('statTotalDiscs').innerText = totalDiscs;
-document.getElementById('statCollectorBoxes').innerText = collectorBoxCount;
-document.getElementById('statSeenMovies').innerText = `${seenCount} / ${totalMovies}`;
-document.getElementById('statWatchTime').innerText = formatWatchTime(totalWatchMinutes);
-document.getElementById('statTotalValue').innerText = `${totalPurchaseVal.toFixed(2)} €`;
-document.getElementById('statTotalEstimatedValue').innerText = `${totalEstimatedVal.toFixed(2)} €`;
-
-const estimatedGain = totalEstimatedVal - totalPurchaseVal;
-const gainEl = document.getElementById('statEstimatedGain');
-gainEl.innerText = `${estimatedGain >= 0 ? '+' : ''}${estimatedGain.toFixed(2)} €`;
-gainEl.className = `mt-1 text-lg md:text-xl font-black leading-tight break-words ${estimatedGain >= 0 ? 'text-emerald-300' : 'text-rose-400'}`;
-
 const digitalItems = Array.isArray(digitalLibrary) ? digitalLibrary : [];
 const digitalMovies = digitalItems.filter(d => d.type === 'movie' && !/concert/i.test(d.sectionTitle || '')).length;
 const digitalSeries = digitalItems.filter(d => d.type === 'show').length;
-const digitalOther = digitalItems.length - digitalMovies - digitalSeries;
-document.getElementById('statDigitalMovies').innerText = digitalMovies;
-document.getElementById('statDigitalSeries').innerText = digitalSeries;
-document.getElementById('statDigitalOther').innerText = digitalOther;
-
-document.getElementById('statMovieCount').innerText = movieCount;
-document.getElementById('statSeriesCount').innerText = seriesCount;
-const moviePercent = totalMovies ? (movieCount / totalMovies) * 100 : 0;
-const seriesPercent = totalMovies ? (seriesCount / totalMovies) * 100 : 0;
-document.getElementById('statMovieBar').style.width = `${moviePercent}%`;
-document.getElementById('statSeriesBar').style.width = `${seriesPercent}%`;
-const seenPercent = totalMovies ? Math.round((seenCount / totalMovies) * 100) : 0;
-document.getElementById('statSeenPercent').innerText = `${seenPercent} % de la collection vue`;
-document.getElementById('statSeenBar').style.width = `${seenPercent}%`;
-document.getElementById('statSeenDetail').innerText = `${seenCount} vu${seenCount > 1 ? 's' : ''} · ${Math.max(0, totalMovies - seenCount)} à voir`;
-
-const avgPriceMovie = totalMovies > 0 ? (totalPurchaseVal / totalMovies) : 0;
-const avgPriceEdition = totalEditions > 0 ? (totalPurchaseVal / totalEditions) : 0;
-
-document.getElementById('statAvgPriceMovie').innerText = `${avgPriceMovie.toFixed(2)} €`;
-document.getElementById('statAvgPriceEdition').innerText = `${avgPriceEdition.toFixed(2)} €`;
-
-renderStatListAndChart('Format', formatsMap, 'statFormatsList', 'chartContainerFormat', 'chartFormat');
-const physicalSupportsMap = {
- '4K UHD': discTotals.bluray4k,
- 'Blu-ray': discTotals.bluray,
- 'Blu-ray 3D': discTotals.bluray3d,
- 'DVD': discTotals.dvd,
- 'Disques bonus': discTotals.bonus
+const eur = v => (Number(v) || 0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+const pl = (n, w) => `${n} ${w}${n > 1 ? 's' : ''}`;
+const kpi = (label, value, sub, icon) => `<div class="sv-card sv-kpi"><p class="sv-label"><span class="icon-inline w-3.5 h-3.5" data-icon="${icon}">${svgMarkup(icon)}</span>${label}</p><b>${value}</b><small>${sub}</small></div>`;
+const fmtColor = { '4K UHD': '#5fb0ff', 'Blu-ray': '#a79bff', 'Blu-ray 3D': '#7dd3c0', 'DVD': '#f6c18a' };
+const rank = (cls, label, map, limit = 6, colors = null) => {
+ const rows = Object.entries(map).filter(([, n]) => n > 0).sort((x, y) => y[1] - x[1]);
+ const top = rows.slice(0, limit), max = Math.max(1, ...top.map(r => r[1])), tot = rows.reduce((t, r) => t + r[1], 0);
+ return `<div class="sv-card sv-rank ${cls}"><p class="sv-label">${label}${rows.length > limit ? `<em>${rows.length} au total</em>` : ''}</p>${top.map(([k, n]) => `<div class="sv-hbar"><span title="${escapeHtml(k)}">${escapeHtml(k)}</span><i><b style="width:${(n / max * 100).toFixed(1)}%${colors && colors[k] ? `;background:${colors[k]}` : ''}"></b></i><em>${n}<small>${tot ? Math.round(n / tot * 100) : 0} %</small></em></div>`).join('') || '<p class="sv-empty">Aucune donnée pour l’instant.</p>'}</div>`;
 };
-Object.keys(physicalSupportsMap).forEach(key => { if (!physicalSupportsMap[key]) delete physicalSupportsMap[key]; });
-renderStatListAndChart('Support', physicalSupportsMap, 'statPhysicalSupportsList', 'chartContainerPhysicalSupports', 'chartPhysicalSupports');
-renderStatListAndChart('Boîtier', editionsMap, 'statEditionsList', 'chartContainerEdition', 'chartEdition');
-renderStatListAndChart('Lieu', locationsMap, 'statLocationsList', 'chartContainerLocation', 'chartLocation');
-renderStatListAndChart('Genre', genresMap, 'statGenresList', 'chartContainerGenre', 'chartGenre');
-renderStatListAndChart('Réalisateur', directorsMap, 'statDirectorsList', 'chartContainerDirectors', 'chartDirectors', 8);
-renderStatListAndChart('Acteur', actorsMap, 'statActorsList', 'chartContainerActors', 'chartActors', 8);
-renderTimelineChart(monthsMap);
+const physicalSupportsMap = { '4K UHD': discTotals.bluray4k, 'Blu-ray': discTotals.bluray, 'Blu-ray 3D': discTotals.bluray3d, 'DVD': discTotals.dvd, 'Disques bonus': discTotals.bonus };
+const avgEdition = totalEditions ? totalPurchaseVal / totalEditions : 0;
+const more = document.getElementById('statsMore');
+if (more) more.innerHTML = [
+ kpi('Œuvres', totalMovies, `${pl(movieCount, 'film')} · ${pl(seriesCount, 'série')}`, 'clapper'),
+ kpi('Éditions', totalEditions, `${pl(collectorBoxCount, 'coffret')} collector`, 'package'),
+ kpi('Disques', totalDiscs, 'supports physiques', 'disc'),
+ kpi('Temps de visionnage', formatWatchTime(totalWatchMinutes), `${Math.max(0, totalMovies - seenCount)} à voir`, 'trend'),
+ kpi('Prix moyen', eur(avgEdition), 'par édition', 'tag'),
+ kpi('Plex', digitalItems.length, `${pl(digitalMovies, 'film')} · ${pl(digitalSeries, 'série')}`, 'cloud'),
+ rank('sv-r-supports', 'Supports physiques', physicalSupportsMap, 6, fmtColor),
+ rank('sv-r-cases', 'Boîtiers', editionsMap),
+ rank('sv-r-shops', 'Lieux d’achat', locationsMap),
+ rank('sv-r-people', 'Réalisateurs', directorsMap, 5),
+ rank('sv-r-people', 'Acteurs', actorsMap, 5)
+].join('');
 }
 
 function renderStatListAndChart(labelKey, dataMap, listElemId, chartContainerId, canvasId, limit = null) {
@@ -16450,6 +16197,29 @@ async function backfillCollectionInfo() {
   // après tous les gestionnaires du clic (nouvelle sélection posée), juste avant l'affichage
   requestAnimationFrame(() => run(true));
  }, true);
+})();
+
+// Transition d'entrée en cascade sur Collection / Statistiques (uniquement lors d'un changement d'onglet)
+(function () {
+ const base = switchTab; let timer = 0;
+ switchTab = function (tab) {
+  const prev = document.documentElement.dataset.tab;
+  const r = base.apply(this, arguments);
+  if (!prev || prev === tab || !['collection', 'stats', 'digital'].includes(tab)) return r;
+  const root = document.documentElement;
+  root.classList.remove('tab-entering'); document.querySelectorAll('.tab-rise').forEach(el => { el.classList.remove('tab-rise'); el.style.removeProperty('--i'); });
+  requestAnimationFrame(() => {
+   const id = { collection: 'tabCollection', stats: 'tabStats', digital: 'tabDigital' }[tab];
+   const page = document.getElementById(id); if (!page) return;
+   const vh = window.innerHeight; let i = 0;
+   const els = [...page.querySelectorAll(':scope > :not(.hidden), #collectionGrid > *, #digitalGrid > *, .sv-grid > *')]
+    .filter(el => !el.matches('#collectionGrid, #digitalGrid, .sv-grid') && el.offsetParent && el.getBoundingClientRect().top < vh);
+   els.forEach(el => { el.style.setProperty('--i', Math.min(i++, 14)); el.classList.add('tab-rise'); });
+   void page.offsetWidth; root.classList.add('tab-entering');
+   clearTimeout(timer); timer = setTimeout(() => { root.classList.remove('tab-entering'); els.forEach(el => { el.classList.remove('tab-rise'); el.style.removeProperty('--i'); }); }, 1200);
+  });
+  return r;
+ };
 })();
 </script>
 </body>
