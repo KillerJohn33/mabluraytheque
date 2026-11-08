@@ -7417,6 +7417,16 @@ html:is(.ui-v2,#ov1):is(.ui-v2,#ov2):is(.ui-v2,#ov3) body .ov-legend>span{displa
 html:is(.ui-v2,#ov1):is(.ui-v2,#ov2):is(.ui-v2,#ov3) body .ov-legend i{width:7px;height:7px;border-radius:50%;display:inline-block}
 html:is(.ui-v2,#ov1):is(.ui-v2,#ov2):is(.ui-v2,#ov3) body .ov-legend b{color:var(--v2-text);font-weight:700}
 
+/* Bouton unique « Filtrer » dans l'en-tête (téléphone/iPad, onglets Collection et Digital). */
+.global-filter-trigger { display: none; }
+html.ui-v2:not(.desk-v2):is([data-tab="collection"],[data-tab="digital"]) body > header .global-filter-trigger { display: inline-grid; place-items: center; position: relative; width: 40px; height: 40px; flex: none; border: 0; border-radius: 999px; cursor: pointer; color: var(--v2-text); background: var(--v2-card); box-shadow: var(--v2-hair); position: absolute; top: 50%; transform: translateY(-50%); right: calc(var(--gft-r, 1rem) + 48px); }
+@media (max-width: 640px) { html.ui-v2:not(.desk-v2) body > header .global-filter-trigger { --gft-r: .65rem; } }
+html.ui-v2.is-ipad:not(.desk-v2):is([data-tab="collection"],[data-tab="digital"]) body > header .global-filter-trigger { right: 146px; }
+html.ui-v2:not(.desk-v2) body #tabDigital .hero-filter-btn { display: none !important; }
+html .global-filter-trigger .gft-dot { display: none; position: absolute; top: 8px; right: 8px; width: 7px; height: 7px; border-radius: 50%; background: rgb(var(--rgb-accent)); }
+html:is(.filters-on-c[data-tab="collection"],.filters-on-d[data-tab="digital"]) .global-filter-trigger .gft-dot { display: block; }
+html.ui-v2:not(.desk-v2) body :is(#collectionFilterRow,#digitalQuickRow) { display: none !important; }
+
 /* Pastille coulissante (règle commune à toutes les applications, comme Ma Collection) :
    la sélection glisse d'un bouton à l'autre, nette (position et taille réelles), avec un léger rebond. */
 .slide-pill { position: absolute; z-index: 0; pointer-events: none; transform-origin: 0 0; will-change: transform; backface-visibility: hidden; box-shadow: none !important; }
@@ -7484,6 +7494,7 @@ html.desk-v2.ui-v2:not(.is-ipad) body.theme-light {
 <span class="icon-chip chip-lg" data-icon="disc"></span>
 <span class="bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">Blu-rayth&egrave;que</span>
 <button type="button" onclick="openAddSheet()" class="global-add-trigger" aria-label="Ajouter un film" title="Ajouter un film"><span class="icon-inline w-4 h-4" data-icon="plus"></span></button>
+<button type="button" onclick="openFilterSheet()" class="global-filter-trigger" aria-label="Filtrer et trier" title="Filtrer et trier"><span class="icon-inline w-4 h-4" data-icon="filter"></span><i class="gft-dot" aria-hidden="true"></i></button>
 <button type="button" onclick="openGlobalSearch()" class="global-search-trigger" aria-label="Rechercher dans toute l’application" title="Recherche globale"><span class="icon-inline w-4 h-4" data-icon="search"></span><span class="global-search-placeholder">Rechercher</span></button>
 </header>
 
@@ -10321,6 +10332,21 @@ async function plexResumePendingLogin() {
  showToast('⚠️ Connexion Plex non validée. Réessayez « Se reconnecter et tout synchroniser ».');
 }
 // ——— Feuille de choix générique (bouton « + », serveur Plex…) ———
+// Bouton unique « Filtrer » (téléphone/iPad) : regroupe toutes les options de la page Collection / Digital
+function openFilterSheet() {
+ const digital = currentTab === 'digital';
+ const opts = [];
+ if (digital) {
+  opts.push({ icon: 'filter', label: 'Filtres et tri', hint: 'Type, tri, affichage…', run: () => { const p = document.getElementById('digitalFilterPanel'); if (p?.classList.contains('hidden')) toggleDigitalFilters(); p?.scrollIntoView({ behavior: 'smooth', block: 'start' }); } });
+ } else {
+  opts.push({ icon: 'filter', label: 'Filtres et tri', hint: 'Format, type, tri, affichage…', run: () => { const p = document.getElementById('collectionFilterPanel'); if (p?.classList.contains('hidden')) toggleCollectionFilters(); p?.scrollIntoView({ behavior: 'smooth', block: 'start' }); } });
+  const inc = document.getElementById('incompleteQuickBtn');
+  if (inc && !inc.classList.contains('hidden')) opts.push({ icon: 'alert', label: 'À compléter', hint: `${document.getElementById('incompleteQuickCount')?.textContent || 0} film(s) avec des infos manquantes`, run: () => toggleIncompleteQuick() });
+  opts.push({ icon: 'clapper', label: collectionGroupBySaga ? 'Ne plus regrouper par saga' : 'Regrouper par saga', hint: collectionGroupBySaga ? 'Regroupement activé' : 'Regroupement désactivé', run: () => toggleCollectionGrouping() });
+  opts.push({ icon: 'list', label: 'Sélectionner', hint: 'Modifier plusieurs films à la fois', run: () => toggleBulkMode() });
+ }
+ brChoiceSheet(digital ? 'Digital' : 'Ma collection', 'Filtrer, trier et organiser', opts).then(o => o?.run());
+}
 function brChoiceSheet(title, subtitle, options) {
  return new Promise(resolve => {
   document.getElementById('brChoiceSheet')?.remove();
@@ -10974,6 +11000,7 @@ function openSpaceSection(section) {
 let currentTab = 'home';
 function switchTab(tab) {
 currentTab = tab;
+document.documentElement.dataset.tab = tab;
 if (tab !== 'home') document.documentElement.classList.remove('desk-adding');
 ['tabHome', 'tabCollection', 'tabWishlist', 'tabDigital', 'tabStats', 'tabSettings'].forEach(id => {
 const el = document.getElementById(id);
@@ -12750,6 +12777,7 @@ const activeFilterCount = [mediaTypeFilter !== 'all', formatFilter !== 'all', ca
 const activeFilterBadge = document.getElementById('activeFilterCount');
 activeFilterBadge.textContent = activeFilterCount ? String(activeFilterCount) : '';
 activeFilterBadge.classList.toggle('hidden', !activeFilterCount);
+document.documentElement.classList.toggle('filters-on-c', !!activeFilterCount);
 
 if (formatFilter !== 'all') {
 filtered = filtered.filter(m => m.editions && m.editions.some(e => e.format === formatFilter));
@@ -12950,6 +12978,7 @@ function renderDigital() {
  const activeFilterCount = [query, libraryFilter !== 'all', digitalTypeFilter !== 'all'].filter(Boolean).length;
  const filterCountEl = document.getElementById('digitalActiveFilterCount');
  if (filterCountEl) { filterCountEl.textContent = activeFilterCount || ''; filterCountEl.classList.toggle('hidden', !activeFilterCount); }
+ document.documentElement.classList.toggle('filters-on-d', !!activeFilterCount);
  const resultCountEl = document.getElementById('digitalResultCount');
  if (resultCountEl) resultCountEl.textContent = `${sorted.length} élément${sorted.length > 1 ? 's' : ''}`;
 
